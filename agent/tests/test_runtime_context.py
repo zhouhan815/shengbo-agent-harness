@@ -225,9 +225,14 @@ async def test_native_compaction_runs_before_24k_and_preserves_raw_history_and_e
     assert "未知业务副作用/未知付费结果" in summary_prompt
     sent = model.seen[1]
     assert "有意不含金额的短摘要" in sent[1].content
-    system = sent[0].content
-    if not isinstance(system, str):
-        system = "\n".join(block.get("text", "") for block in system)
+    # Since 2026-10-22 M3 travels as the last request message (tail placement),
+    # not inside the leading system prompt; the exact facts must survive there.
+    def text(message):
+        content = message.content
+        return content if isinstance(content, str) else "\n".join(block.get("text", "") for block in content)
+    assert "<shengbo_trusted_context>" not in text(sent[0])
+    system = text(sent[-1])
+    assert "<shengbo_trusted_context>" in system
     assert "不可丢失的待确认107元" in system
     assert '"preparation_id": "prep1"' in system
     assert '"allowed_effects": ["submit_script_change"]' in system

@@ -559,20 +559,51 @@ class ActionBoundary(_Boundary):
 class Budget(_Boundary):
     label = "M6 Budget"
 
-    def __init__(self, engine, timeout_seconds=180):
+    def __init__(self, engine, timeout_seconds=180, idle_seconds=60, max_seconds=600):
         super().__init__(engine)
-        self.timeout_seconds = timeout_seconds
+        self.timeout_seconds, self.idle_seconds, self.max_seconds = timeout_seconds, idle_seconds, max_seconds
 
     async def awrap_model_call(self, request, handler):
         scope = _scope(request.runtime)
         self._event(scope, "before_model_timeout", timeout_seconds=self.timeout_seconds,
+                    idle_seconds=self.idle_seconds, max_seconds=self.max_seconds,
                     budget_authority="provider_final_payload_and_parent_run_ledger")
+        from .providers.deepseek import STREAM_ACTIVITY
+        loop = asyncio.get_running_loop()
+        started = loop.time()
+        state = {"streaming": False, "next": 0.0}
         try:
-            async with asyncio.timeout(self.timeout_seconds):
-                return await handler(request)
+            # Without streamed bytes the original total limit applies; once a
+            # stream is alive only silence (or the hard cap) ends the call, so
+            # long reasoning that keeps sending data is no longer cut at 180 s.
+            async with asyncio.timeout(self.timeout_seconds) as deadline:
+                def extend():
+                    now = loop.time()
+                    state["streaming"] = True
+                    deadline.reschedule(min(started + self.max_seconds, now + self.idle_seconds))
+
+                def beat():
+                    now = time.monotonic()
+                    if now < state["next"]:
+                        return
+                    state["next"] = now + min(1.0, self.idle_seconds / 4)
+                    try:
+                        same_loop = asyncio.get_running_loop() is loop
+                    except RuntimeError:
+                        same_loop = False
+                    extend() if same_loop else loop.call_soon_threadsafe(extend)
+                token = STREAM_ACTIVITY.set(beat)
+                try:
+                    return await handler(request)
+                finally:
+                    STREAM_ACTIVITY.reset(token)
         except TimeoutError:
-            self._event(scope, "model_timeout", "FAILED", tail=True, reason_code="MODEL_TIMEOUT")
-            raise ContractError("MODEL_TIMEOUT", "模型响应超时，已保留调用状态以供对账", retryable=True) from None
+            elapsed = loop.time() - started
+            kind = "idle" if state["streaming"] and elapsed < self.max_seconds else "total"
+            self._event(scope, "model_timeout", "FAILED", tail=True, reason_code="MODEL_TIMEOUT",
+                        timeout_kind=kind, elapsed_seconds=round(elapsed, 1))
+            raise ContractError("MODEL_TIMEOUT", "模型响应超时，已保留调用状态以供对账", retryable=True,
+                                details={"timeout_kind": kind}) from None
 
 
 class CompletionGuard(_Boundary):
@@ -715,11 +746,22 @@ class Audit(_Boundary):
         return result
 
 
+def tool_call_retry():
+    """One fresh model attempt when the provider returned a malformed tool call.
+
+    Native ModelRetryMiddleware; the retry passes the same budget gate and
+    attempt ledger. Every other error keeps its original behaviour.
+    """
+    from langchain.agents.middleware import ModelRetryMiddleware
+    return ModelRetryMiddleware(max_retries=1, on_failure="error", initial_delay=0, jitter=False,
+                                retry_on=lambda error: getattr(error, "code", None) == "model_tool_call_invalid")
+
+
 def main_middleware(engine):
     return [RunFence(engine), ContextProjection(engine), ToolPolicy(engine), ActionBoundary(engine),
-            Budget(engine), CompletionGuard(engine), Audit(engine)]
+            Budget(engine), tool_call_retry(), CompletionGuard(engine), Audit(engine)]
 
 
 def worker_middleware(engine):
     return [ChildFence(engine), ContextProjection(engine), ToolPolicy(engine), ActionBoundary(engine), Budget(engine),
-            BranchCompletionGuard(engine), Audit(engine)]
+            tool_call_retry(), BranchCompletionGuard(engine), Audit(engine)]

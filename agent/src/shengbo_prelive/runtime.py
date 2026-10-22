@@ -45,6 +45,11 @@ from .selection import resolve_selection, guard_selected_write, advance_selectio
 from .context_workset import project_branch_working_set
 from .target_scope import completion_product_refs, guard_command_targets, ref_key, verify_script_coverage
 
+# DeepSeek models have a 1M window (/models, 2026-10-22). These are our own
+# fences, not provider limits; summaries trigger at a quarter of each.
+MAX_CONTEXT_INPUT_TOKEN_LIMIT = 1_000_000
+DEEPSEEK_CONTEXT_LIMITS = {"main": 128000, "branch": 64000}
+
 # Role-local main manuals pinned at the first execute turn, by frozen objective.
 # Unlisted manuals remain discoverable through the native Skills list.
 _CORE = "prelive-orchestration"
@@ -124,10 +129,15 @@ SYSTEM_ROLE = {
 
 
 class RuntimeEngine:
-    def __init__(self, root, business_client, *, model=None, model_factory=None, model_name="gpt-6.1-sol", context_input_token_limit=48000, tool_presentation_enabled=False):
-        if isinstance(context_input_token_limit, bool) or not isinstance(context_input_token_limit, int) or not 8000 <= context_input_token_limit <= 48000:
-            raise ValueError("context_input_token_limit must be an integer between 8000 and 48000")
+    def __init__(self, root, business_client, *, model=None, model_factory=None, model_name="gpt-6.1-sol", context_input_token_limit=None, tool_presentation_enabled=False):
+        # None = follow the actual model at start(): DeepSeek (1M window) gets
+        # DEEPSEEK_CONTEXT_LIMITS, any other model keeps the 48k fence.
+        self._explicit_context_limit = context_input_token_limit is not None
+        context_input_token_limit = 48000 if context_input_token_limit is None else context_input_token_limit
+        if isinstance(context_input_token_limit, bool) or not isinstance(context_input_token_limit, int) or not 8000 <= context_input_token_limit <= MAX_CONTEXT_INPUT_TOKEN_LIMIT:
+            raise ValueError(f"context_input_token_limit must be an integer between 8000 and {MAX_CONTEXT_INPUT_TOKEN_LIMIT}")
         self.context_input_token_limit = context_input_token_limit
+        self._branch_context_limit = None
         if type(tool_presentation_enabled) is not bool:
             raise ValueError("tool_presentation_enabled must be a bool")
         self.tool_presentation_enabled = tool_presentation_enabled
@@ -194,6 +204,7 @@ class RuntimeEngine:
                 raise ContractError("OBSERVABILITY_UNAVAILABLE", "执行记录尚未恢复，暂不启动新任务", status=503)
             self.model = self._provided_model or self._make_model()
             self.summary_model = self._make_summary_model() or self.model
+            self._apply_model_context_limits()
             self.main = self._build_graph("main")
             self.workers = {role: self._build_graph(role) for role in ROLES}
             self.started = True
@@ -231,6 +242,28 @@ class RuntimeEngine:
         except TypeError:
             return None
 
+    def _apply_model_context_limits(self):
+        from .providers.deepseek import DeepSeekAgentModel
+        if self._explicit_context_limit or not isinstance(self.model, DeepSeekAgentModel):
+            return
+        main = DEEPSEEK_CONTEXT_LIMITS["main"]
+        self.context_input_token_limit = main
+        self._branch_context_limit = DEEPSEEK_CONTEXT_LIMITS["branch"]
+        self.context_summary_trigger_tokens = main // 4
+        self.context_summary_keep_tokens = self.context_summary_trigger_tokens // 4
+
+    def context_limit_for(self, role):
+        # Read at call time: the main fence stays the public attribute.
+        if role == "main" or self._branch_context_limit is None:
+            return self.context_input_token_limit
+        return self._branch_context_limit
+
+    def summary_tokens_for(self, role):
+        if role == "main" or self._branch_context_limit is None:
+            return self.context_summary_trigger_tokens, self.context_summary_keep_tokens
+        trigger = self._branch_context_limit // 4
+        return trigger, trigger // 4
+
     def _build_graph(self, role):
         # Override the native slot by its public name.  Its profile default is
         # 85% of 128k, which is later than our independent 24k transport fence.
@@ -260,7 +293,7 @@ class RuntimeEngine:
             def _should_summarize(self, messages, total_tokens):
                 # Native reported usage includes fixed system/tool tokens; it
                 # must not override our compressible-message-only policy.
-                return total_tokens >= engine.context_summary_trigger_tokens and summary_pressure.get()
+                return total_tokens >= engine.summary_tokens_for(role)[0] and summary_pressure.get()
 
             def _input_budget(self, request):
                 # Native defaults derive from the advertised 128k profile;
@@ -301,7 +334,7 @@ class RuntimeEngine:
                 cutoff = super()._determine_cutoff_index(messages)
                 if (cutoff > 0 and messages
                         and getattr(messages[0], "additional_kwargs", {}).get("lc_source") == "summarization"
-                        and count_tokens(messages[1:cutoff]) < engine.context_summary_keep_tokens):
+                        and count_tokens(messages[1:cutoff]) < engine.summary_tokens_for(role)[1]):
                     # The safe turn boundary can leave a large tool batch in
                     # the tail. Rewriting just the existing summary (or a tiny
                     # new prefix) cannot remove that batch and causes paid
@@ -359,24 +392,24 @@ class RuntimeEngine:
                     model_name=engine.model_name, model_settings=request.model_settings))
                 m3_tokens = engine._estimate_payload(preview_request_payload([trusted_context_message(text)], [],
                     model_name=engine.model_name, model_settings=request.model_settings))
-                if fixed_tokens > engine.context_input_token_limit:
+                if fixed_tokens > engine.context_limit_for(role):
                     engine._emit(scope.run_id, "context.window_rejected", {
                         "title": "固定上下文与工具已超过本地预算，未调用摘要或主模型",
                         "status": "rejected_before_send", "stage": "fixed_context_precheck",
-                        "fixed_wire_tokens": fixed_tokens, "input_token_limit": engine.context_input_token_limit,
+                        "fixed_wire_tokens": fixed_tokens, "input_token_limit": engine.context_limit_for(role),
                         "working_set": working_set_metrics,
                         "trusted_context_field_tokens": {key: engine._estimate_payload({"context_field": value})
                             for key, value in projection.items()},
                         "note": "字段分量为独立序列化估计，不可相加替代完整wire；不含原文或私有推理。"}, scope)
                     raise LocalContextLimit("CONTEXT_LIMIT", "当前工具schema与精确业务上下文本身已超过本地预算，未调用摘要或主模型",
-                        details={"fixed_input_tokens": fixed_tokens, "limit": engine.context_input_token_limit})
+                        details={"fixed_input_tokens": fixed_tokens, "limit": engine.context_limit_for(role)})
                 full_payload = preview_request_payload([fixed_messages[0], *effective_before, *fixed_messages[1:]], visible_tools,
                     model_name=engine.model_name, model_settings=request.model_settings)
                 projected_tokens = engine._estimate_payload(full_payload)
                 # 12k is a minimum soft trigger, not a reason to discard a
                 # working set that still fits. Reserve 1k for payload changes;
                 # the exact final provider fence remains authoritative.
-                pressure = projected_tokens > engine.context_input_token_limit - 1024
+                pressure = projected_tokens > engine.context_limit_for(role) - 1024
                 before_tokens = count_tokens(effective_before)
                 after_tokens = before_tokens
                 original_tools = {message.tool_call_id: message for message in effective_before if isinstance(message, ToolMessage)}
@@ -458,10 +491,10 @@ class RuntimeEngine:
                             "status": "rejected_before_send", "stage": "conversation_budget_precheck",
                             **(gate or {}).get("measurements", {}),
                             "conversation_wire_tokens_after": after_tokens, "conversation_wire_budget": remaining,
-                            "input_token_limit": engine.context_input_token_limit}, scope)
+                            "input_token_limit": engine.context_limit_for(role)}, scope)
                         raise LocalContextLimit("CONTEXT_LIMIT", "归档与安全分页后仍超过本轮完整请求的剩余预算，未发送模型",
                             details={"conversation_wire_tokens": after_tokens, "conversation_wire_budget": remaining,
-                                "input_token_limit": engine.context_input_token_limit})
+                                "input_token_limit": engine.context_limit_for(role)})
                     # 6k is a soft compression trigger, not a second input
                     # limit. A safe retained tool turn can dominate the input,
                     # making a correct summary slightly longer. Only the real
@@ -472,12 +505,12 @@ class RuntimeEngine:
                 # The 1k margin above is an early-warning threshold. Do not
                 # subtract it a second time from the hard fence and evict an
                 # otherwise valid no-gain tail merely for being in that margin.
-                remaining_tokens = max(0, engine.context_input_token_limit - fixed_tokens)
+                remaining_tokens = max(0, engine.context_limit_for(role) - fixed_tokens)
                 budget_token = conversation_budget.set(remaining_tokens)
                 recovery_token = recovery_gate.set({"pending": None, "scope": scope, "measurements": {
                     "fixed_wire_tokens": fixed_tokens, "projected_wire_tokens_before": projected_tokens,
                     "conversation_wire_tokens_before": before_tokens, "conversation_wire_budget": remaining_tokens,
-                    "input_token_limit": engine.context_input_token_limit, "working_set": working_set_metrics,
+                    "input_token_limit": engine.context_limit_for(role), "working_set": working_set_metrics,
                     "trusted_context_field_tokens": {key: engine._estimate_payload({"context_field": value})
                         for key, value in projection.items()} if pressure else {}}})
                 cache_token = remember_projection(scope, projection, working_set_metrics, text, projection_ms)
@@ -496,7 +529,7 @@ class RuntimeEngine:
                         "tool_schema_tokens": max(0, fixed_tokens - system_only_tokens - (m3_tokens if placement == "tail" else 0)),
                         "visible_tool_count": len(visible_tools), "trusted_context_placement": placement,
                         "conversation_tokens_before": before_tokens, "conversation_tokens_after": after_tokens,
-                        "projected_wire_tokens": projected_tokens, "input_token_limit": engine.context_input_token_limit,
+                        "projected_wire_tokens": projected_tokens, "input_token_limit": engine.context_limit_for(role),
                         "summary_pressure": pressure, "projection_duration_ms": projection_ms,
                         "note": "本地估算分量，仅供定位；以供应商usage为准。"},
                         invocation_id=scope.invocation_id, branch_task_id=scope.branch_task_id)
@@ -512,7 +545,7 @@ class RuntimeEngine:
                             "title": "超出预算的工具原文已离线保留，可按路径分段回读",
                             "status": "offloaded", "tool_call_ids": list(compacted_tools),
                             "replacement_count": len(compacted_tools), "recovery": "native_single_smaller_tail_recovery",
-                            "full_budget_authority": f"provider_final_payload_{engine.context_input_token_limit}_including_system_M3_tools"},
+                            "full_budget_authority": f"provider_final_payload_{engine.context_limit_for(role)}_including_system_M3_tools"},
                             invocation_id=scope.invocation_id, branch_task_id=scope.branch_task_id)
                     except Exception:
                         pass  # A tail log must not invalidate a completed model request.
@@ -525,14 +558,14 @@ class RuntimeEngine:
                                 "compacted" if after_tokens < before_tokens else "retained_no_gain",
                             "cutoff_index": event["cutoff_index"], "history_path": event.get("file_path"),
                             "summary_hash": canonical_hash(event["summary_message"].content),
-                            "trigger_tokens": engine.context_summary_trigger_tokens, "keep_tokens": engine.context_summary_keep_tokens,
+                            "trigger_tokens": engine.summary_tokens_for(role)[0], "keep_tokens": engine.summary_tokens_for(role)[1],
                             "projected_wire_tokens_before": projected_tokens, "fixed_wire_tokens": fixed_tokens,
                             "conversation_wire_budget": remaining_tokens,
                             "conversation_counter": "provider_preview_including_opaque_replay_occupancy",
-                            "input_token_limit": engine.context_input_token_limit, "pressure_margin_tokens": 1024,
+                            "input_token_limit": engine.context_limit_for(role), "pressure_margin_tokens": 1024,
                             "compressible_tokens_before": before_tokens, "compressible_tokens_after": after_tokens,
                             "token_reduction": before_tokens - after_tokens,
-                            "full_budget_authority": f"provider_final_payload_{engine.context_input_token_limit}_including_system_M3_tools",
+                            "full_budget_authority": f"provider_final_payload_{engine.context_limit_for(role)}_including_system_M3_tools",
                             "authoritative_context": "M3每轮重读精确Goal、授权、金额、待决问题和未知副作用，不以摘要替代业务正本"},
                             invocation_id=scope.invocation_id, branch_task_id=scope.branch_task_id)
                     except Exception:
@@ -555,7 +588,7 @@ M3以外尚未正式保存且影响下一步的关键信息须保留，不能因
 </shengbo_summary_rules>
 \n<messages>\n""", 1).replace("__SUMMARY_ROLE__", role)
         summarization = AuditedSummarization(model=getattr(self, "summary_model", None) or self.model, backend=backend,
-            trigger=("tokens", self.context_summary_trigger_tokens), keep=("tokens", self.context_summary_keep_tokens), token_counter=count_tokens,
+            trigger=("tokens", engine.summary_tokens_for(role)[0]), keep=("tokens", engine.summary_tokens_for(role)[1]), token_counter=count_tokens,
             # start_on="human" trimming can discard an entire large tool-only
             # prefix and yield the SDK's empty placeholder. The full summary
             # input instead uses the unchanged final-wire fence and native
@@ -1650,15 +1683,16 @@ M3以外尚未正式保存且影响下一步的关键信息须保留，不能因
         if scope is None:
             raise ContractError("MODEL_SCOPE_REQUIRED", "模型调用缺少可信上下文", status=403)
         estimate = self._estimate_payload(payload)
-        if estimate > self.context_input_token_limit:
+        limit = self.context_limit_for(scope.role)
+        if estimate > limit:
             self._emit(scope.run_id, "model.window_rejected", {"title": "请求超出预算，尚未发送模型",
-                "estimated_input_tokens": estimate, "limit": self.context_input_token_limit, "status": "rejected_before_send"}, scope)
+                "estimated_input_tokens": estimate, "limit": limit, "status": "rejected_before_send"}, scope)
             raise LocalContextLimit("CONTEXT_LIMIT", "当前请求超过本地上下文预算，请按商品或模块缩小范围",
-                details={"estimated_input_tokens": estimate, "limit": self.context_input_token_limit})
+                details={"estimated_input_tokens": estimate, "limit": limit})
         ticket = self.store.reserve_attempt(scope.run_id, scope.invocation_id, scope.role)
         CURRENT_ATTEMPT.set(ticket["id"])
         self._emit(scope.run_id, "model.window_checked", {"title": "请求预算检查", "estimated_input_tokens": estimate,
-                    "input_token_limit": self.context_input_token_limit,
+                    "input_token_limit": limit,
                     "attempt_id": ticket["id"], "status": "passed"}, scope)
 
     @staticmethod
@@ -1673,8 +1707,15 @@ M3以外尚未正式保存且影响下一步的关键信息须保留，不能因
         scope = CURRENT_SCOPE.get()
         if scope:
             ref = self.trace.payload(scope.run_id, event)
-            self._emit(scope.run_id, "model.request", {"title": "发送模型请求", "payload_ref": ref,
-                                                      "model": self.model_name}, scope)
+            payload = event.get("payload") if isinstance(event.get("payload"), dict) else {}
+            options = payload.get("provider_options") if isinstance(payload.get("provider_options"), dict) else {}
+            # The model actually sent (e.g. flash for summaries), not the configured main name.
+            actual = {"model": payload.get("provider_model") or self.model_name}
+            if isinstance(options.get("reasoning_effort"), str):
+                actual["reasoning_effort"] = options["reasoning_effort"]
+            if isinstance(options.get("thinking"), dict) and isinstance(options["thinking"].get("type"), str):
+                actual["thinking"] = options["thinking"]["type"]
+            self._emit(scope.run_id, "model.request", {"title": "发送模型请求", "payload_ref": ref, **actual}, scope)
             # Development measurement is separate from the request/usage
             # ledger and user event stream. It cannot replan, reject, retry or
             # alter a model request. Original mandatory trace errors above
@@ -1733,6 +1774,12 @@ M3以外尚未正式保存且影响下一步的关键信息须保留，不能因
                 self.store.settle_attempt(ticket, connection_retry_count=1, connection_retry_at=now_iso(),
                     connection_retry_diagnostic=safe)
                 self.trace.try_emit(scope.run_id, kind, {"title": "模型连接失败，进行一次有限重连", **safe},
+                    invocation_id=scope.invocation_id, branch_task_id=scope.branch_task_id)
+                return
+            if kind == "model.tool_call_rejected":
+                safe = {key: event[key] for key in ("tool_name", "arguments_chars", "reason", "has_id", "finish_reason")
+                        if key in event}
+                self.trace.try_emit(scope.run_id, kind, {"title": "模型工具调用格式不合法", **safe},
                     invocation_id=scope.invocation_id, branch_task_id=scope.branch_task_id)
                 return
             if kind not in {"model.sent", "model.response_observed", "model.completed", "model.failed"}:
@@ -4676,7 +4723,9 @@ M3以外尚未正式保存且影响下一步的关键信息须保留，不能因
             run = self.store.get("run", identity)
             if run["status"] not in TERMINAL | {"FINALIZING", "CANCELLING"}:
                 code = getattr(error, "code", type(error).__name__)
-                self.store.update("run", identity, error={"code": code, "message": "任务执行遇到问题，已保留已完成成果与安全记录"})
+                message = ("DeepSeek账户余额不足，充值后可从已保留的成果继续" if code == "model_provider_balance_insufficient"
+                           else "任务执行遇到问题，已保留已完成成果与安全记录")
+                self.store.update("run", identity, error={"code": code, "message": message})
                 self.trace.try_emit(identity, "run.error", {"title": "执行遇到问题", "status": "FAILED", "error_code": code})
                 await self._finalize(identity, "BLOCKED" if isinstance(error, ContractError) else "FAILED", code)
 

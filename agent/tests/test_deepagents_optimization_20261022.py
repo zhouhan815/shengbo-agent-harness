@@ -314,3 +314,29 @@ def test_provider_wire_puts_tail_m3_last_as_developer_after_tool_output():
     assert items[0]["role"] == "developer" and "shengbo_trusted_context" not in str(items[0])
     assert items[-2]["type"] == "function_call_output"
     assert items[-1]["role"] == "developer" and "shengbo_trusted_context" in str(items[-1])
+
+
+def _limit_engine(model, explicit=False):
+    engine = SimpleNamespace(_explicit_context_limit=explicit, model=model, context_input_token_limit=48000,
+                             _branch_context_limit=None, context_summary_trigger_tokens=12000,
+                             context_summary_keep_tokens=3000)
+    for name in ("context_limit_for", "summary_tokens_for"):
+        setattr(engine, name, getattr(RuntimeEngine, name).__get__(engine))
+    RuntimeEngine._apply_model_context_limits(engine)
+    return engine
+
+
+def test_context_fence_follows_the_actual_model():
+    """Batch 3 A2: DeepSeek (1M window) runs main at 128k and branches at 64k; others keep 48k."""
+    from shengbo_prelive.providers.deepseek import DeepSeekAgentModel
+    deepseek = _limit_engine(DeepSeekAgentModel())
+    assert deepseek.context_limit_for("main") == 128000 and deepseek.context_limit_for("product_facts") == 64000
+    assert deepseek.summary_tokens_for("main") == (32000, 8000)
+    assert deepseek.summary_tokens_for("audience_scenes") == (16000, 4000)
+    other = _limit_engine(FakeListChatModel(responses=["x"]))
+    assert other.context_limit_for("main") == other.context_limit_for("session_config") == 48000
+    assert other.summary_tokens_for("session_config") == (12000, 3000)
+    explicit = _limit_engine(DeepSeekAgentModel(), explicit=True)
+    assert explicit.context_limit_for("product_facts") == 48000
+    with pytest.raises(ValueError):
+        RuntimeEngine(ROOT / "unused", None, context_input_token_limit=2_000_000)

@@ -133,6 +133,7 @@ async def test_streamed_response_is_folded_like_non_streaming_body():
                                async_transport=_sse_transport(SSE_CHUNKS, seen=seen), key_reader=lambda: "test-key")
     result = await model.bind_tools([read_context]).ainvoke([HumanMessage("读")])
     assert seen[0]["stream"] is True and seen[0]["stream_options"] == {"include_usage": True}
+    assert seen[0]["max_tokens"] == 32000  # bounds one call's worst-case reasoning cost
     assert result.tool_calls == [{"type": "tool_call", "name": "read_context", "args": {"ref": "a"}, "id": "call_1"}]
     assert result.additional_kwargs["reasoning_content"] == "想一想"
     assert result.usage_metadata == {"input_tokens": 1000, "output_tokens": 50, "total_tokens": 1050}
@@ -192,3 +193,30 @@ def test_voice_script_thinking_options(monkeypatch):
     monkeypatch.setenv("DEEPSEEK_REASONING_EFFORT", "high")
     assert script_thinking_options() == {"thinking": {"type": "enabled"}, "reasoning_effort": "high"}
     assert script_max_tokens(24000) == 40000 and script_timeout_seconds() == 300.0
+
+
+@pytest.mark.asyncio
+async def test_balance_exhausted_is_a_named_known_rejection():
+    """Batch 3 A3: 402 Insufficient Balance must not look like a transport failure."""
+    events = []
+    model = DeepSeekAgentModel(observer=events.append, key_reader=lambda: "test-key", async_transport=_transport(
+        {"error": {"message": "Insufficient Balance", "type": "unknown_error", "code": "invalid_request_error"}}, status=402))
+    with pytest.raises(Exception) as error:
+        await model.ainvoke([HumanMessage("x")])
+    assert error.value.code == "model_provider_balance_insufficient" and error.value.outcome_unknown is False
+    assert events[-1]["type"] == "model.failed" and events[-1]["http_status"] == 402
+
+
+@pytest.mark.asyncio
+async def test_malformed_tool_call_records_shape_but_not_arguments():
+    events = []
+    bad = [SSE_CHUNKS[0], {"id": "resp-s", "choices": [{"index": 0, "delta": {"tool_calls": [{"index": 0, "id": "call_1",
+           "type": "function", "function": {"name": "read_context", "arguments": "{\"ref\": \"秘密内容"}}]}}]},
+           {"id": "resp-s", "choices": [{"index": 0, "delta": {}, "finish_reason": "tool_calls"}]}, "[DONE]"]
+    model = DeepSeekAgentModel(observer=events.append, async_transport=_sse_transport(bad), key_reader=lambda: "test-key")
+    with pytest.raises(Exception) as error:
+        await model.bind_tools([read_context]).ainvoke([HumanMessage("读")])
+    assert error.value.code == "model_tool_call_invalid"
+    rejected = next(event for event in events if event["type"] == "model.tool_call_rejected")
+    assert rejected["tool_name"] == "read_context" and rejected["arguments_chars"] == len("{\"ref\": \"秘密内容")
+    assert "秘密内容" not in json.dumps(events, ensure_ascii=False)

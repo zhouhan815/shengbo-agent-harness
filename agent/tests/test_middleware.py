@@ -194,6 +194,41 @@ async def test_budget_timeout_does_not_reserve_duplicate_provider_attempts():
     assert engine.trace.events[-1]["data"]["reason_code"] == "MODEL_TIMEOUT"
 
 
+def _streaming(seconds, gap=0.02, silent_after=None):
+    from shengbo_prelive.providers.deepseek import note_stream_activity
+
+    async def handler(request):
+        loop = asyncio.get_running_loop()
+        started = loop.time()
+        while loop.time() - started < seconds:
+            if silent_after is None or loop.time() - started < silent_after:
+                note_stream_activity()
+            await asyncio.sleep(gap)
+        return "done"
+    return handler
+
+
+@pytest.mark.asyncio
+async def test_budget_lets_a_live_stream_run_past_the_legacy_total_limit():
+    """2026-10-22: a streaming branch call was cut at 180 s while still sending data."""
+    engine = FakeEngine()
+    budget = Budget(engine, timeout_seconds=0.15, idle_seconds=0.2, max_seconds=2)
+    assert await budget.awrap_model_call(model_request(), _streaming(0.6)) == "done"
+
+
+@pytest.mark.asyncio
+async def test_budget_cancels_a_silent_stream_and_caps_total_time():
+    engine = FakeEngine()
+    with pytest.raises(ContractError, match="MODEL_TIMEOUT"):
+        await Budget(engine, timeout_seconds=5, idle_seconds=0.15, max_seconds=5).awrap_model_call(
+            model_request(), _streaming(2, silent_after=0.1))
+    assert engine.trace.events[-1]["data"]["timeout_kind"] == "idle"
+    with pytest.raises(ContractError, match="MODEL_TIMEOUT"):
+        await Budget(engine, timeout_seconds=5, idle_seconds=0.2, max_seconds=0.4).awrap_model_call(
+            model_request(), _streaming(2))
+    assert engine.trace.events[-1]["data"]["timeout_kind"] == "total"
+
+
 @pytest.mark.asyncio
 async def test_main_completion_needs_saved_assessment_and_real_finish_receipt():
     engine = FakeEngine()
@@ -259,7 +294,16 @@ def test_factories_have_nine_distinct_boundaries_and_no_native_task_entry():
     engine = FakeEngine()
     main = main_middleware(engine)
     workers = worker_middleware(engine)
-    assert len({type(item).__name__ for item in main + workers}) == 9
+    from langchain.agents.middleware import ModelRetryMiddleware
+    from shengbo_prelive.middleware import _Boundary
+    # Nine project boundaries; the only addition is one native malformed-tool-call retry (batch 3 A4).
+    assert len({type(item).__name__ for item in main + workers if isinstance(item, _Boundary)}) == 9
+    for chain in (main, workers):
+        retries = [item for item in chain if isinstance(item, ModelRetryMiddleware)]
+        assert len(retries) == 1 and retries[0].max_retries == 1
+        assert retries[0].retry_on(type("E", (Exception,), {"code": "model_tool_call_invalid"})())
+        assert not retries[0].retry_on(type("E", (Exception,), {"code": "model_transport_failed"})())
+        assert not any(type(item).__name__ not in {"ModelRetryMiddleware"} and not isinstance(item, _Boundary) for item in chain)
     assert all(isinstance(item, AgentMiddleware) for item in main + workers)
 
 

@@ -56,7 +56,8 @@ async def test_counter_uses_provider_wire_and_does_not_mutate_or_double_count_pr
     engine, _, _, _, _ = setup
     messages = replay_pair(4, 8000)
     before = deepcopy(messages)
-    expected = preview_request_payload(messages, [])
+    # The counter previews with the engine's own model name (DeepSeek by default since 2026-10-22).
+    expected = preview_request_payload(messages, [], model_name=engine.model_name)
     assert engine._conversation_wire_tokens(messages) == engine._estimate_payload(expected)
     assert engine._conversation_wire_tokens(messages) > engine._conversation_wire_tokens([
         AIMessage(content="", tool_calls=messages[0].tool_calls), messages[1]]) + 3000

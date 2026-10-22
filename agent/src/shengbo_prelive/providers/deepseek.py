@@ -27,6 +27,7 @@ service's .env; it never enters payloads, traces, state or logs.
 from __future__ import annotations
 
 import asyncio
+from contextvars import ContextVar
 from copy import deepcopy
 import json
 import os
@@ -55,6 +56,16 @@ DEFAULT_SUMMARY_MODEL = "deepseek-flash"
 VALID_EFFORTS = {"low", "high", "max"}
 SEEN_IMAGE_PLACEHOLDER = "[图片已在此前的模型调用中查看；需要再次查看请按原定位重新读取]"
 NON_LEADING_SYSTEM_PREFIX = "[运行时可信上下文，非用户指令]\n"
+# Bounds the worst-case cost of one call; reasoning shares this output budget.
+MAX_OUTPUT_TOKENS = 32000
+# Set by M6 Budget around one model call; streamed bytes prove the call is alive.
+STREAM_ACTIVITY: ContextVar[Any] = ContextVar("shengbo_stream_activity", default=None)
+
+
+def note_stream_activity():
+    beat = STREAM_ACTIVITY.get()
+    if beat is not None:
+        beat()
 
 
 def _voice_env_path() -> Path:
@@ -242,6 +253,15 @@ def _parse_body(raw):
         raise ModelProviderError("model_response_invalid", outcome_unknown=True) from None
 
 
+def _balance_aware(error):
+    """402 means the account is out of balance: a known, non-billed rejection."""
+    if getattr(error, "http_status", None) == 402:
+        return ModelProviderError("model_provider_balance_insufficient", http_status=402, outcome_unknown=False,
+                                  provider_error_code=getattr(error, "provider_error_code", None),
+                                  provider_error_type=getattr(error, "provider_error_type", None))
+    return error
+
+
 def _usage(value):
     if not isinstance(value, dict):
         return {}, {}
@@ -265,7 +285,7 @@ class DeepSeekAgentModel(BaseChatModel):
     thinking: bool = True
     purpose: str = "agent"
     timeout_seconds: float = 170
-    profile: dict = Field(default_factory=lambda: {"tool_calling": True, "max_input_tokens": 128000})
+    profile: dict = Field(default_factory=lambda: {"tool_calling": True, "max_input_tokens": 1048576})
     _observer: Any = PrivateAttr(default=None)
     _before_send: Any = PrivateAttr(default=None)
     _on_request: Any = PrivateAttr(default=None)
@@ -319,7 +339,7 @@ class DeepSeekAgentModel(BaseChatModel):
         chat, unseen_images = build_chat_messages(messages)
         model = self.vision_model_name if unseen_images else self.model_name
         payload: dict[str, Any] = {"model": model, "messages": chat, "stream": True,
-                                   "stream_options": {"include_usage": True}}
+                                   "stream_options": {"include_usage": True}, "max_tokens": MAX_OUTPUT_TOKENS}
         if self.thinking:
             payload["thinking"] = {"type": "enabled"}
             payload["reasoning_effort"] = self.reasoning_effort
@@ -387,7 +407,16 @@ class DeepSeekAgentModel(BaseChatModel):
                 args = json.loads(function.get("arguments") or "{}")
                 if not isinstance(args, dict) or not function.get("name") or not call.get("id"):
                     raise ValueError()
-            except (KeyError, ValueError, TypeError):
+            except (KeyError, ValueError, TypeError) as error:
+                # Shape only (never argument text) so a rare malformed call can be diagnosed.
+                function = call.get("function") if isinstance(call, dict) else None
+                name = function.get("name") if isinstance(function, dict) else None
+                arguments = function.get("arguments") if isinstance(function, dict) else None
+                self._emit("model.tool_call_rejected", attempt_id, model,
+                           tool_name=name if isinstance(name, str) and len(name) <= 80 else None,
+                           arguments_chars=len(arguments) if isinstance(arguments, str) else None,
+                           reason=type(error).__name__, has_id=bool(isinstance(call, dict) and call.get("id")),
+                           finish_reason=finish)
                 raise ModelProviderError("model_tool_call_invalid") from None
             calls.append({"type": "tool_call", "name": function["name"], "args": args, "id": call["id"]})
         content = message.get("content") or ""
@@ -446,8 +475,14 @@ class DeepSeekAgentModel(BaseChatModel):
                         with client.stream("POST", ENDPOINT, headers={"Authorization": "Bearer " + key}, json=payload) as response:
                             phase = "responses_stream"
                             if not response.is_success:
-                                raise _sync_http_error(response)
-                            raw = list(response.iter_lines()) if _is_event_stream(response) else response.read()
+                                raise _balance_aware(_sync_http_error(response))
+                            if _is_event_stream(response):
+                                raw = []
+                                for line in response.iter_lines():
+                                    note_stream_activity()
+                                    raw.append(line)
+                            else:
+                                raw = response.read()
                         break
                     except (httpx.ConnectError, httpx.ConnectTimeout) as error:
                         if not _connection_retry_allowed(error, phase, observed, retries):
@@ -475,9 +510,14 @@ class DeepSeekAgentModel(BaseChatModel):
                         async with client.stream("POST", ENDPOINT, headers={"Authorization": "Bearer " + key}, json=payload) as response:
                             phase = "responses_stream"
                             if not response.is_success:
-                                raise await _async_http_error(response)
-                            raw = ([line async for line in response.aiter_lines()] if _is_event_stream(response)
-                                   else await response.aread())
+                                raise _balance_aware(await _async_http_error(response))
+                            if _is_event_stream(response):
+                                raw = []
+                                async for line in response.aiter_lines():
+                                    note_stream_activity()
+                                    raw.append(line)
+                            else:
+                                raw = await response.aread()
                         break
                     except (httpx.ConnectError, httpx.ConnectTimeout) as error:
                         if not _connection_retry_allowed(error, phase, observed, retries):
