@@ -136,9 +136,12 @@ async def test_projection_preserves_structured_system_and_does_not_mutate_reques
         return ModelResponse(result=[AIMessage(content="ok")])
     await ContextProjection(engine).awrap_model_call(request, handler)
     assert captured[0].system_message.id == "sys1"
-    assert captured[0].system_message.content[0] == original.content[0]
-    assert "p1@2" in captured[0].system_message.content[-1]["text"]
+    # Default tail placement: structured system content is passed through unchanged.
+    assert captured[0].system_message.content == original.content
+    assert "p1@2" in captured[0].messages[-1].content
+    assert captured[0].messages[-1].additional_kwargs["lc_source"] == "shengbo_trusted_context"
     assert request.system_message.content == [{"type": "text", "text": "SDK Skill规则"}]
+    assert len(request.messages) == 1
 
 
 @pytest.mark.asyncio

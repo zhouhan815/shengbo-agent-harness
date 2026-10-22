@@ -25,3 +25,5 @@
 
 - 2026-10-21点赞新增规则覆盖此前互动全部busy丢弃的约定：欢迎仍滚动60秒；点赞不设全场60秒，`app/like_thanks.py`唯一负责按用户3秒静默/最多8秒封口合并、不同用户FIFO待感谢、原始本次count求和，禁止将total累计赞归属个人。Room仅持有该文本批次收集器，所有声音仍经原单一insertion句尾槽，不新增并行声音播放器。排队不因busy丢弃；仅实际插播槽可用才准备TTS，结束恢复主稿下一句。价格来自commerce正本，未知不报金额；切品/改价的未播音频退回重建，TTS失败明确记录failed_unconfirmed且不自动重复付费。ensure_like_worker同时处理重新入队和新场次交接；已started的暂停恢复不重复准入。stop取消旧场批次但保留事件去重。
 - 本批已由真实播前Agent内部preview_script_audio合成完整r27，四模块原文连续WAV431.304秒，1次MiniMax请求、供应商公开用量4220；修订/本场/第2版未改、未批准正式整包。详情顶部音频卡可试听；上方“完整语音尚未生成”只适用于上一批记录。整段试听本身不支持精确句尾插播，正式播出仍用句级预录。短互动保持45秒HTTP等待上限，超过1000字符的整篇试听180秒；未知结果沿原operation查询，不自动重发。最新完整记录见Agent项目output/20261021-full-audio-and-likes/完整试听与点赞联测报告.md。
+
+- 2026-10-22用户决定：正式话术（整版/模块）改用`DEEPSEEK_MODEL=deepseek-v4-pro`并开启思考`DEEPSEEK_SCRIPT_THINKING=enabled`、`DEEPSEEK_REASONING_EFFORT=high`；统一入口app/prelive/deepseek_options.py（思考时max_tokens+16000、超时300秒；未设置时保持原关闭思考/120秒）。实时欢迎与评论回复保持`DEEPSEEK_REPLY_MODEL=deepseek-flash`且关闭思考。播前Agent同时改用同一DeepSeek账户（见Agent项目AGENTS.md）。

@@ -256,6 +256,23 @@ def _public_usage(value):
             if type(value.get(key)) is int and value[key] >= 0}
 
 
+def _public_usage_details(value):
+    """Numeric cache/reasoning breakdown only; kept apart from the strict usage triple.
+
+    ``usage`` stays exactly input/output/total for ledgers and usage_metadata.
+    Missing details remain absent (unknown), never zero.
+    """
+    if not isinstance(value, dict):
+        return {}
+    result = {}
+    for source, field, name in (("input_tokens_details", "cached_tokens", "cached_input_tokens"),
+                                ("output_tokens_details", "reasoning_tokens", "reasoning_output_tokens")):
+        details = value.get(source)
+        if isinstance(details, dict) and type(details.get(field)) is int and details[field] >= 0:
+            result[name] = details[field]
+    return result
+
+
 def _public_output(value):
     """Only published text and local call arguments, never reasoning blocks."""
     output = []
@@ -370,6 +387,9 @@ class _ResponseAccumulator:
                 "text_segments": len(self.text_parts), "argument_segments": len(self.argument_parts)}
 
 
+HARNESS_PROVIDER_KEY = "shengbo_chatgpt"
+
+
 class ChatGPTPlanModel(BaseChatModel):
     model_name: str = "gpt-6.1-sol"
     timeout_seconds: float = 120
@@ -398,6 +418,15 @@ class ChatGPTPlanModel(BaseChatModel):
     @property
     def _llm_type(self):
         return "shengbo-chatgpt-plan-responses"
+
+    def _get_ls_params(self, stop=None, **kwargs):
+        # Stable provider key so deepagents resolves this app's HarnessProfile
+        # (see runtime.HARNESS_PROVIDER_KEY); otherwise it is derived from the
+        # class name. LangSmith tracing itself stays disabled by the service.
+        params = super()._get_ls_params(stop=stop, **kwargs)
+        params["ls_provider"] = HARNESS_PROVIDER_KEY
+        params["ls_model_name"] = self.model_name
+        return params
 
     @property
     def _identifying_params(self):
@@ -445,6 +474,10 @@ class ChatGPTPlanModel(BaseChatModel):
                 if replay:
                     inputs.extend(deepcopy(replay))
                 else:
+                    reasoning = message.additional_kwargs.get("reasoning_content")
+                    if isinstance(reasoning, str) and reasoning:
+                        # DeepSeek thinking text is replayed as input; count it in previews.
+                        inputs.append({"type": "reasoning", "summary": [{"type": "summary_text", "text": reasoning}]})
                     if message.content:
                         inputs.append({"role": "assistant", "content": _content(message.content, "assistant")})
                     for call in message.tool_calls:
@@ -512,6 +545,9 @@ class ChatGPTPlanModel(BaseChatModel):
         usage = _public_usage(response.get("usage"))
         if usage:
             observed["usage"] = {**observed.get("usage", {}), **usage}
+        details = _public_usage_details(response.get("usage"))
+        if details:
+            observed["usage_details"] = {**observed.get("usage_details", {}), **details}
         status = response.get("status")
         if status in {"completed", "failed", "incomplete", "in_progress", "queued", "cancelled"}:
             observed["response_status"] = status
@@ -528,6 +564,7 @@ class ChatGPTPlanModel(BaseChatModel):
             self._on_response({"attempt_id": attempt_id, "status": observed.get("response_status", "unknown"),
                                "model": self.model_name, "output": _public_output(response.get("output")),
                                "usage": observed.get("usage"),
+                               "usage_details": observed.get("usage_details"),
                                "provider_response_id": observed.get("provider_response_id"),
                                "response_received": True, "content_status": "pending_validation"})
 

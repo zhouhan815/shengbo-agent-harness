@@ -1,0 +1,14 @@
+---
+name: prelive-recovery
+description: 工具或工作流校验失败、可纠正输入、未知结果的恢复；报错时读。
+---
+
+## 已返回但校验失败的恢复
+
+话术任务部分失败时，可选wf_script_execution(action=status,job_id=原任务ID)或read_job。先看失败attempt的validation_state/validation_error、public_response以及该item的committed_modules精确引用；已成功的模块保留，不为读取结果重复查询同一段历史。public_response只含业务后端核验job/item/attempt归档关联后的公开内容，不代表通过校验或已经保存为module。短content直接审阅；长内容按真实runtime_context result_ref和result_path（新响应/output/content，旧output为/output）调用read_run_history，不把业务provider_response_ref冒充历史快照，也不猜路径。
+
+也可从script工具组展开read_generation_output，给job_id/item_id/module_key与view='latest_failed_response'读取该模块最新失败公开原文，或view='accepted_module'读取有提交证明的归档逐句视图。程序沿当前已核验reader读取，不需要猜provider_attempts下标或混用新旧snapshot；未知/未就绪/无正文不会被补成成功。返回的committed_module_ref与归档视图分开，视图不是正式Module正文或批准；只修改一个模块时read_script(ref=真实script_revision,sections=[模块key])可真正节选。需要通用历史或完整上下文时旧工具继续可用。
+
+由主Agent根据原Goal与具体校验问题，自主选择修正失败模块的合法计划或原任务受控重试。显式reuse/patch的base_module_ref须属于完整base_script_ref；部分失败的版本尚无整版基稿时，不能仅拿partial模块引用拼新计划。可以选原job的受控retry；若要修改失败模块指令，可建合法生成计划，未变模块保持原输入，由后台现有缓存规则核验复用，以真实回执为准。已提交成果仍保留，不能伪造基稿或把rejected原文当正式ModuleRef/已批准话术。是否需要新模型调用取决于修订计划和真实缺项，本入口不自动发起生成。unknown/sent状态不能按“校验失败”处理，须先核对原请求；缺少公开响应会明确给public_response_error/精确记录定位，不靠反复读取相同空记录补出原文。
+
+语义校验失败先检查本模块生成要求是否与其职责或原Goal冲突；要求未变的原job重试未必解决语义问题。cta因重复报价而漏活动条件时，可选择新计划移除重复优惠或补全必要条件，保留campaign完整说明；促单的篇幅用于场景化选择建议和行动邀请，不为了通过校验堆叠活动说明。是否局改、重试或另作计划仍由你判断，既有合法工具和完整原文继续可用。

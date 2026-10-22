@@ -195,7 +195,7 @@ def check_tool_allowed(scope, run, name):
     else:
         allowed = READ_TOOLS | EXECUTE_READ_TOOLS | set(run.get("allowed_tools", [])) | {
             "save_task_assessment", "request_user_decision", "dispatch_analysis_batch", "accept_analysis_reports",
-            "finish_turn", "write_todos", "ls", "read_file", "glob", "grep", "validate_product_assembly", "tool_catalog", "activate_tools"}
+            "finish_turn", "ls", "read_file", "glob", "grep", "validate_product_assembly", "tool_catalog", "activate_tools"}
         # These are optional capabilities, not stage gates. A flow cannot grant
         # its internal write permission: business_command rechecks every step.
         from .workflows import WORKFLOW_EFFECTS

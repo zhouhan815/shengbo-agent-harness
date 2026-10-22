@@ -207,7 +207,9 @@ async def test_512_real_public_schemas_m3_skill_and_wake_fit_unsent_wire(scale51
     wake = c.engine._resume_event_view(c.run, {"kind": "job_progress", "jobs": observation})
     fs = FilesystemMiddleware(backend=StateBackend(), tools=["ls", "read_file", "glob", "grep"])
     tools = [*build_tools(c.engine), *fs.tools, *TodoListMiddleware().tools]
-    skill = Path(__file__).resolve().parents[1].joinpath("skills/main/prelive/SKILL.md").read_text(encoding="utf-8")
+    # Main manuals are split since 2026-10-22; keep the conservative full set.
+    skill = "\n\n".join(path.read_text(encoding="utf-8") for path in
+        sorted(Path(__file__).resolve().parents[1].joinpath("skills/main").glob("prelive*/SKILL.md")))
     messages = [HumanMessage(c.run["input"]["text"]),
         AIMessage(content="", tool_calls=[{"id": "read-512", "name": "read_job", "args": {"job_id": c.job["ref"]["id"]}}]),
         ToolMessage(content=canonical_json(view), tool_call_id="read-512"), HumanMessage(canonical_json(wake))]
@@ -233,8 +235,9 @@ async def test_512_real_public_schemas_m3_skill_and_wake_fit_unsent_wire(scale51
     payload = captured["payload"]
     schemas = payload["tools"][0]["tools"]
     names = {tool["name"] for tool in schemas}
-    assert {"read_job", "read_run_history", "wf_required_audio", "wf_finalize_preparation", "read_file", "write_todos"} <= names
-    assert {"execute", "task", "write_file", "edit_file", "delete"}.isdisjoint(names)
+    assert {"read_job", "read_run_history", "wf_required_audio", "wf_finalize_preparation", "read_file"} <= names
+    # deepagents 0.7.25 has no todo tool; the stale policy name was removed.
+    assert {"execute", "task", "write_file", "edit_file", "delete", "write_todos"}.isdisjoint(names)
     assert len(schemas) >= 49 and all(tool.get("parameters") for tool in schemas)
     wire = canonical_json(payload)
     assert "shengbo_trusted_context" in wire and "unknown_side_effects" in wire

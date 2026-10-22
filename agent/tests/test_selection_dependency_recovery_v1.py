@@ -146,7 +146,15 @@ class ScriptedModel(BaseChatModel):
     def _generate(self, *args, **kwargs):
         raise AssertionError("async only")
     async def _agenerate(self, messages, stop=None, run_manager=None, **kwargs):
-        return ChatResult(generations=[ChatGeneration(message=await self._logic(messages))])
+        # M3 is delivered as a per-request trailing developer message (2026-10-22).
+        # Scripted logic inspects the latest conversation turn, so drop that tail.
+        conversation = [m for m in messages if getattr(m, "additional_kwargs", {}).get("lc_source") != "shengbo_trusted_context"]
+        if (len(conversation) == 1 and isinstance(conversation[0].content, str)
+                and "Context Extraction Assistant" in conversation[0].content):
+            # Native summarization near the 48k edge is incidental to these
+            # scripted flows; answer it without advancing the scripted stage.
+            return ChatResult(generations=[ChatGeneration(message=AIMessage(content="测试摘要：保留当前任务与最近工具结果。"))])
+        return ChatResult(generations=[ChatGeneration(message=await self._logic(conversation))])
 
 
 @pytest.mark.asyncio

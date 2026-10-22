@@ -184,8 +184,9 @@ async def test_context_projection_preserves_native_system_and_observes_real_savi
         captured.append(modified)
         return ModelResponse(result=[AIMessage("本地完成")])
     await ContextProjection(engine).awrap_model_call(request, handler)
-    sent = captured[0].system_message.content
-    assert sent.startswith("保留原系统规则") and request.system_message.content == "保留原系统规则"
+    # M3 is now a per-request trailing developer message; system stays byte-stable.
+    assert captured[0].system_message.content == "保留原系统规则" and request.system_message.content == "保留原系统规则"
+    sent = captured[0].messages[-1].content
     actual = json.loads(re.search(r"<shengbo_trusted_context>\s*(.*?)\s*</shengbo_trusted_context>", sent, re.S)[1])
     assert actual == project_context_working_set(raw)
     assert len(canonical_json(actual)) < len(canonical_json(raw))
@@ -205,7 +206,8 @@ async def test_native_budget_precheck_and_delivered_m3_use_identical_working_set
     scope = RunScope(run["id"], "m3-budget-equivalence", "execute")
     observed = []
     async def delivered(modified):
-        fixed = preview_request_payload([modified.system_message], modified.tools,
+        trusted = [m for m in modified.messages if getattr(m, "additional_kwargs", {}).get("lc_source") == "shengbo_trusted_context"]
+        fixed = preview_request_payload([modified.system_message, *trusted], modified.tools,
             model_name=engine.model_name, model_settings=modified.model_settings)
         observed.append((slot._input_budget(modified), engine.context_input_token_limit-engine._estimate_payload(fixed)))
         return ModelResponse(result=[AIMessage("只读预算对等")])

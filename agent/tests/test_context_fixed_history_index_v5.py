@@ -162,9 +162,10 @@ async def test_fixed_history_indices_are_identical_in_m3_and_native_budget(setup
     slot, observed = capture_slot(engine), []
     scope = RunScope(run["id"], "fixed-history-budget-equivalence", "execute")
     async def delivered(modified):
-        m = re.search(r"<shengbo_trusted_context>\s*(.*?)\s*</shengbo_trusted_context>", modified.system_message.content, re.S)
+        trusted = [m for m in modified.messages if getattr(m, "additional_kwargs", {}).get("lc_source") == "shengbo_trusted_context"]
+        m = re.search(r"<shengbo_trusted_context>\s*(.*?)\s*</shengbo_trusted_context>", trusted[-1].content, re.S)
         assert json.loads(m[1]) == project_context_working_set(raw)
-        fixed = preview_request_payload([modified.system_message], modified.tools,
+        fixed = preview_request_payload([modified.system_message, *trusted], modified.tools,
             model_name=engine.model_name, model_settings=modified.model_settings)
         observed.append((slot._input_budget(modified), engine.context_input_token_limit-engine._estimate_payload(fixed)))
         return ModelResponse(result=[AIMessage("只读预算对照")])

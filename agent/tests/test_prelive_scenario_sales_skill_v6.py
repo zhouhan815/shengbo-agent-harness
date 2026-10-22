@@ -15,11 +15,16 @@ from shengbo_prelive.runtime import RuntimeEngine
 
 
 SKILL_PATH = "/skills/main/prelive-orchestration/SKILL.md"
+# 2026-10-22: the main manual is split verbatim into role-local manuals that the
+# runtime pins by objective. These checks read the exported manuals in their
+# original section order (core, materials, script plan, delivery, recovery).
+MAIN_MANUALS = ("prelive-orchestration", "prelive-materials", "prelive-script-plan", "prelive-delivery", "prelive-recovery")
+SOURCE_DIRS = {"prelive-orchestration": "prelive"}
 
 
 def exported_skill():
     files = RuntimeEngine._initial_files(None, "main")
-    return files, file_data_to_string(files[SKILL_PATH])
+    return files, "\n".join(file_data_to_string(files[f"/skills/main/{name}/SKILL.md"]) for name in MAIN_MANUALS)
 
 
 def writing_scope(text):
@@ -28,10 +33,11 @@ def writing_scope(text):
 
 def test_actual_main_skill_exports_updated_body_and_native_discovery(monkeypatch):
     files, body = exported_skill()
-    source = Path(__file__).resolve().parents[1] / "skills/main/prelive/SKILL.md"
-    # StateBackend keeps the file's CRLF bytes; read_text would normalize them
-    # to LF on Windows and manufacture a false content-loss failure.
-    assert body == source.read_bytes().decode("utf-8")
+    for name in MAIN_MANUALS:
+        source = Path(__file__).resolve().parents[1] / "skills/main" / SOURCE_DIRS.get(name, name) / "SKILL.md"
+        # StateBackend keeps the file's CRLF bytes; read_text would normalize them
+        # to LF on Windows and manufacture a false content-loss failure.
+        assert file_data_to_string(files[f"/skills/main/{name}/SKILL.md"]) == source.read_bytes().decode("utf-8")
     backend = StateBackend()
     monkeypatch.setattr(backend, "_read_files", lambda: files)
     metadata = SkillsMiddleware(backend=backend, sources=["/skills/main/"]).before_agent({"files": files}, None, {})

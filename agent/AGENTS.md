@@ -53,3 +53,12 @@
 - 本次已部署并实测整版r27：1987有效口播字，文字估时8分16.75秒，run268.549秒，其中DeepSeek一次15.140秒；第二版精确ref不变。真实客户端已确认逐句编辑入口并取消验证编辑，未写改稿。颜色三色清单3处、价格组成2处仍重复，run按内容质量收尾BLOCKED，不是权限/断连失败；没有全面达标或90%文风证明，不自动再生成/逐句润色。交付与未解决项：output/20261021-scenario-sales-v6/本次整版重写与客户端编辑交付.md。
 - 2026-10-21按用户新指令保存r27评分/优化方向，未改正文；完成声音实时欢迎与评论闭环修复和隔离真实浏览器MiniMax验证。实时欢迎/回复走Voice已有Room句尾调度＋一次短回复检索/模型，不经播前主Agent多轮规划；提前准备音频不阻塞当前主稿，ready后句尾插入并恢复下一句，欢迎至少60秒，单槽不堆积。真实2欢迎/3回复均恢复正确主句，首2回复的无据附加场景与后台措辞另修prompt并以第3条复测。正式完整r27语音仍未生成，未连真实平台/OBS，不能把三句循环验证冒充整版听感验收。完整记录：output/20261021-live-interaction/欢迎语与自动回复切换测试报告.md。
 - 2026-10-21后续整篇试听及点赞：完整r27已在现有Agent内部preview_script_audio按本次精确人工授权一次MiniMax Turbo合成，431.304秒；这是试听，不改变话术/本场或批准正式整包。原“未生成”是上一批历史状态。点赞最新要求不设全场60秒，按用户连续赞短合并、不同人逐个排队；Voice app/like_thanks.py是策略唯一入口，Room复用既有单一插播槽。3条点赞事件/2人真实MiniMax+浏览器播放验证2次感谢并恢复正确主句。事件模拟和protobuf消息路由通过，真实平台/OBS音轨仍待联测。证据与剩余边界：output/20261021-full-audio-and-likes/完整试听与点赞联测报告.md。保持Agent规划灵活性，本批不添加大模型点赞判断、Skill或强制总工作流。
+
+## 2026-10-22 Deep Agents优化批次（Claude Code）
+
+- 用户决定覆盖2026-10-16模型来源：Agent默认改用DeepSeek（providers/deepseek.py）。主/分支思考`deepseek-v4-pro`、reasoning_effort=high；请求中仍有模型未看过的图片时该次改用视觉模型`deepseek-flash`，已看过的图片以占位文字替代；自动摘要用`deepseek-flash`且关闭思考。密钥只从环境变量DEEPSEEK_API_KEY或声播`.env`在发送时读取，不进payload、trace、state或日志。`SHENGBO_AGENT_MODEL_PROVIDER=chatgpt_plan`可切回原ChatGPT套餐；SHENGBO_AGENT_MODEL/VISION_MODEL/SUMMARY_MODEL/REASONING_EFFORT可覆盖。适配器保持原before_send预算门、尝试账本、审计与usage结算钩子；thinking+工具时必须回传所有历史reasoning_content，回传内容计入本地预算预估。
+- 主Skill按原文拆为prelive-orchestration（核心）及prelive-materials/script-plan/delivery/recovery分册，规则正文未改写；执行阶段首轮按冻结Goal.objective用原生`pinned_skills`预加载（映射SKILL_PINS_BY_OBJECTIVE），分析分支按角色预加载自身Skill，均登记为完整skill_read。新增规则写入对应分册，不再回堆到核心文件。
+- M3可信上下文默认作为每次请求末尾的独立消息（不写入state），系统提示与历史保持逐字稳定以便供应商前缀缓存；`SHENGBO_TRUSTED_CONTEXT_PLACEMENT=system`可回退旧布局。摘要包装与M3每次模型调用共用一次投影，摘要发生后强制重算。
+- 话术作业完成唤醒时，事件附review_entry指向`wf_script_execution(action=review)`（仅本run提交的作业，可选入口，不代表验收）。
+- 为DeepSeek/ChatGPT两种模型注册HarnessProfile：关闭默认通用`task`子Agent，排除write_file/edit_file/execute；删除已不存在的write_todos名称。
+- 新监控：context.budget（固定上下文分量）、skills.pinned、M3字段字符数与缓存复用、model.response.usage_details（cached_input_tokens/reasoning_output_tokens）。测试入口verification/claude-opt-20261022/；备份backups/20261022-deepagents-optimization/。

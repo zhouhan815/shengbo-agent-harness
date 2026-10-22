@@ -19,6 +19,7 @@ from pydantic import BaseModel, ConfigDict, Field, ValidationError, field_valida
 
 from ..copywriting_quality import SIMPLIFY, content_issues
 from ..commerce_config import active_context_products, active_product_fields
+from .deepseek_options import script_max_tokens, script_thinking_options, script_timeout_seconds
 from .storage import BusinessError, digest
 from .live_script_writing import (LIVE_COMMERCE_WRITING_GUIDANCE,
     STYLE_EXAMPLE_CONTRACT, module_examples_revision, module_style_examples)
@@ -209,7 +210,7 @@ def build_request(product, context, module_key, previous, *, model):
         raise BusinessError("MODULE_CONTEXT_TOO_LARGE", "完整模块上下文过大，未发送供应商，请缩小本次材料范围", status=422)
     return {"model": model, "messages": [{"role": "system", "content": SYSTEM}, {"role": "user", "content": user}],
             "response_format": {"type": "json_object"}, "stream": False,
-            "thinking": {"type": "disabled"}, "max_tokens": 1000 if module_key in _SHORT else 6000}
+            **script_thinking_options(), "max_tokens": script_max_tokens(1000 if module_key in _SHORT else 6000)}
 
 
 def validate_output(raw, product, module_key):
@@ -389,7 +390,7 @@ async def generate_one_module(product, context, module_key, previous, *, api_key
     product = active_product_fields(product)
     body = build_request(product, context, module_key, previous, model=model)
     try:
-        async with httpx.AsyncClient(transport=transport, timeout=httpx.Timeout(120, connect=20), follow_redirects=False, trust_env=False) as client:
+        async with httpx.AsyncClient(transport=transport, timeout=httpx.Timeout(script_timeout_seconds(), connect=20), follow_redirects=False, trust_env=False) as client:
             async with client.stream("POST", ENDPOINT, json=body, headers={"Authorization": "Bearer " + api_key, "Content-Type": "application/json"}) as response:
                 if not 200 <= response.status_code < 300:
                     unknown = response.status_code >= 500 or response.status_code in {408, 504}
