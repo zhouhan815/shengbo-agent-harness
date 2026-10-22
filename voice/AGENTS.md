@@ -27,3 +27,4 @@
 - 本批已由真实播前Agent内部preview_script_audio合成完整r27，四模块原文连续WAV431.304秒，1次MiniMax请求、供应商公开用量4220；修订/本场/第2版未改、未批准正式整包。详情顶部音频卡可试听；上方“完整语音尚未生成”只适用于上一批记录。整段试听本身不支持精确句尾插播，正式播出仍用句级预录。短互动保持45秒HTTP等待上限，超过1000字符的整篇试听180秒；未知结果沿原operation查询，不自动重发。最新完整记录见Agent项目output/20261021-full-audio-and-likes/完整试听与点赞联测报告.md。
 
 - 2026-10-22用户决定：正式话术（整版/模块）改用`DEEPSEEK_MODEL=deepseek-v4-pro`并开启思考`DEEPSEEK_SCRIPT_THINKING=enabled`、`DEEPSEEK_REASONING_EFFORT=high`；统一入口app/prelive/deepseek_options.py（思考时max_tokens+16000、超时300秒；未设置时保持原关闭思考/120秒）。实时欢迎与评论回复保持`DEEPSEEK_REPLY_MODEL=deepseek-flash`且关闭思考。播前Agent同时改用同一DeepSeek账户（见Agent项目AGENTS.md）。
+- 2026-10-22晚：整版与模块话术请求改为流式接收（deepseek_options.py的`streamed`与`read_provider_body`），本地拼回非流式结构后走原校验；请求指纹（input_hash）仍按原body计算，大小上限只计答案正文。原因：开思考的非流式请求在本机约60秒被切断，记为timeout_unknown并触发对账停机。tests/test_module_generation.py中test_fact_reference_failures_are_not_swallowed失败、test_missing_key_or_oversize_context_never_sends长时间不结束，均在此改动前已存在。

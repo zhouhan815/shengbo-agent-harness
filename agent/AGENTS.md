@@ -64,4 +64,14 @@
 - 新监控：context.budget（固定上下文分量）、skills.pinned、M3字段字符数与缓存复用、model.response.usage_details（cached_input_tokens/reasoning_output_tokens）。测试入口verification/claude-opt-20261022/；备份backups/20261022-deepagents-optimization/。
 - DeepSeek适配器必须流式接收（`stream:true`+`include_usage`，本地把SSE拼回非流式结构再走原审计/结算/校验）。根因已对照实验确认：本机网络路径会切断60秒无数据的TLS连接，非流式思考请求同步/异步都在60.4–60.5秒断开，流式同步/异步均可跑完79–189秒；与async无关。流中途断开未见finish_reason时按未完成拒收，不重试。修复前副本`backups/20261022-deepagents-optimization/deepseek.py.before-stream-fix`。语音端`whole_script_generation.py`/`module_generation.py`开思考后仍是非流式，同样有60秒风险（待用户决定是否修）。
 - 计划纠错（2026-10-22用户批准）：PLAN_CAPABILITY_DENIED与PLAN_BEFORE_READ为可纠正输入错误，上限各1次（middleware `_CORRECTION_LIMITS`），计划未保存时退回invalid_capabilities/allowed_values；第二次错误仍硬停止。执行阶段首份计划若与READ_TOOLS同轮并行发出，退回一次要求读后单独提交，第二次放行。起因：DeepSeek把业务命令ID（save_product、save_script_plan等）写进capabilities，修复前2/2硬停止，修复后实测纠正1次通过。
-- 已知未修（2026-10-22实测）：固定上下文涨到约3.3万tokens（工具schema 1.56万、M3 1.39万）使48k上限下9次摘要后CONTEXT_LIMIT，流程停在分析验收后；分支v4-pro+high单次调用可超M6的180秒被取消。另有2个旧测试未跟上新默认：test_runtime_context压缩用例仍在系统提示找M3（tail M3所致），test_context_wire_replay_budget按ChatGPT请求体计数差2 token（默认DeepSeek所致）。
+- 第三批（2026-10-22晚，用户批准“先保证运行，再靠上下文省token”；方案见output/20261022-deepagents-optimization/下一批修复方案-运行稳定与省token.md）：
+  - M6改为空闲超时：未收到流式字节前沿用180秒总限；有流后连续60秒无字节才取消，总上限600秒（timeout_kind记录idle/total）；DeepSeek单次max_tokens=32000。
+  - 上下文围栏跟随实际模型：DeepSeek主Agent 128k、分支64k（模型窗口1M）；显式传参或非DeepSeek仍48k。`context_limit_for(role)`/`summary_tokens_for(role)`调用时读取。
+  - 思考档位按阶段：主Agent execute=high；intent与三分析分支=low（SHENGBO_INTENT/BRANCH_REASONING_EFFORT可改），M6按可信scope设置。
+  - 402余额不足报model_provider_balance_insufficient（已知拒收、不重试）；实测脚本跑前查余额，前后余额文件在round目录旁（*.balance-before/after.json）给出真实扣费。
+  - 格式不合法的工具调用：只记形状（名称、参数长度）到model.tool_call_rejected，原生ModelRetryMiddleware仅对model_tool_call_invalid重试1次。
+  - 业务命令ID被当工具调用（如save_script_plan）：M4退回一次并给出对应真实工具，不执行；第二次、禁用或陌生名称仍硬拒绝（COMMAND_ID_AS_TOOL）。
+  - 语音端整版/模块话术改为流式接收（app/prelive/deepseek_options.py `streamed`/`read_provider_body`），请求指纹仍按原body；大小上限只计答案正文。根因：非流式思考请求在本机60秒被切断成timeout_unknown→RECONCILIATION_REQUIRED。
+  - 省token（上下文管理）：M3默认split——阶段固定字段（Goal、授权、原始请求、资料引用、约束）进系统前缀可缓存，变化状态留末尾；被重派替代的失败分支只留一行；核心手册正文并入主Agent系统提示（记为delivery=system_prompt），只预加载分册；分册frontmatter `metadata.shengbo_tool_groups`在预加载时一次展开工具组，运行中工具列表不变（未用原生include_tools：其随手册在上下文才出现，摘要后会变）；原生ContextEditingMiddleware(ClearToolUsesEdit)只清理可按ref重读的读取结果（主>3万、分支>2万tokens，保留最近6条）。
+  - 监控：model.request记录实际模型/思考档（thinking_mode）；对比脚本新增milestones（scripts_ready目标≤600秒）、skill读取只计/skills/。
+- 已知未修：DeepSeek在格式/规则遵守上出错多于ChatGPT（分支越权读资料SOURCE_SCOPE_DENIED会硬停并重派）；语音端test_module_generation两条旧用例（fact_reference失败、oversize用例卡住）在改动前即存在。
