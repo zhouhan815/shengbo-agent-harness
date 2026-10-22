@@ -62,6 +62,20 @@ MAX_OUTPUT_TOKENS = 32000
 STREAM_ACTIVITY: ContextVar[Any] = ContextVar("shengbo_stream_activity", default=None)
 
 
+# Set by M6 Budget per model call (by trusted scope); None keeps the model's own effort.
+REASONING_EFFORT: ContextVar[str | None] = ContextVar("shengbo_reasoning_effort", default=None)
+
+
+def effort_for(role, phase, settings=None):
+    """Reasoning effort for one call: intent and branches low, main execute high (defaults)."""
+    settings = settings or agent_model_settings()
+    if phase == "intent":
+        return settings["intent_effort"]
+    if role != "main":
+        return settings["branch_effort"]
+    return settings["effort"]
+
+
 def note_stream_activity():
     beat = STREAM_ACTIVITY.get()
     if beat is not None:
@@ -97,7 +111,13 @@ def agent_model_settings() -> dict:
     """Provider selection for the Agent; environment overrides, safe defaults."""
     provider = os.environ.get("SHENGBO_AGENT_MODEL_PROVIDER", "deepseek").strip() or "deepseek"
     effort = os.environ.get("SHENGBO_AGENT_REASONING_EFFORT", "high").strip()
+    # 2026-10-22 user decision: the main Agent plans/reviews at high; intent
+    # assessment and the analysis branches run at low to meet the 10-minute target.
+    intent = os.environ.get("SHENGBO_INTENT_REASONING_EFFORT", "low").strip()
+    branch = os.environ.get("SHENGBO_BRANCH_REASONING_EFFORT", "low").strip()
     return {"provider": provider if provider in {"deepseek", "chatgpt_plan"} else "deepseek",
+            "intent_effort": intent if intent in VALID_EFFORTS else "low",
+            "branch_effort": branch if branch in VALID_EFFORTS else "low",
             "model": os.environ.get("SHENGBO_AGENT_MODEL", DEFAULT_REASONING_MODEL).strip() or DEFAULT_REASONING_MODEL,
             "vision_model": os.environ.get("SHENGBO_AGENT_VISION_MODEL", DEFAULT_VISION_MODEL).strip() or DEFAULT_VISION_MODEL,
             "summary_model": os.environ.get("SHENGBO_SUMMARY_MODEL", DEFAULT_SUMMARY_MODEL).strip() or DEFAULT_SUMMARY_MODEL,
@@ -342,7 +362,7 @@ class DeepSeekAgentModel(BaseChatModel):
                                    "stream_options": {"include_usage": True}, "max_tokens": MAX_OUTPUT_TOKENS}
         if self.thinking:
             payload["thinking"] = {"type": "enabled"}
-            payload["reasoning_effort"] = self.reasoning_effort
+            payload["reasoning_effort"] = REASONING_EFFORT.get() or self.reasoning_effort
         else:
             payload["thinking"] = {"type": "disabled"}
         tools = kwargs.get("tools") or []

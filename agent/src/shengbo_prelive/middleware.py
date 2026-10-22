@@ -600,7 +600,15 @@ class Budget(_Boundary):
         self._event(scope, "before_model_timeout", timeout_seconds=self.timeout_seconds,
                     idle_seconds=self.idle_seconds, max_seconds=self.max_seconds,
                     budget_authority="provider_final_payload_and_parent_run_ledger")
-        from .providers.deepseek import STREAM_ACTIVITY
+        from .providers.deepseek import REASONING_EFFORT, STREAM_ACTIVITY, effort_for
+        # Per-stage thinking depth for DeepSeek (summary model has thinking off and ignores it).
+        effort_token = REASONING_EFFORT.set(effort_for(scope.role, scope.phase))
+        try:
+            return await self._timed(scope, request, handler, STREAM_ACTIVITY)
+        finally:
+            REASONING_EFFORT.reset(effort_token)
+
+    async def _timed(self, scope, request, handler, STREAM_ACTIVITY):
         loop = asyncio.get_running_loop()
         started = loop.time()
         state = {"streaming": False, "next": 0.0}

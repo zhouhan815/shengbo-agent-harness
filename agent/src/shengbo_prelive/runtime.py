@@ -1713,9 +1713,9 @@ M3以外尚未正式保存且影响下一步的关键信息须保留，不能因
             actual = {"model": payload.get("provider_model") or self.model_name}
             if isinstance(options.get("reasoning_effort"), str):
                 actual["reasoning_effort"] = options["reasoning_effort"]
-                actual["thinking"] = "enabled"
+                actual["thinking_mode"] = "enabled"
             elif options:
-                actual["thinking"] = "disabled"  # the thinking dict itself is redacted in traces
+                actual["thinking_mode"] = "disabled"  # "thinking" keys are redacted by the trace sanitizer
             self._emit(scope.run_id, "model.request", {"title": "发送模型请求", "payload_ref": ref, **actual}, scope)
             # Development measurement is separate from the request/usage
             # ledger and user event stream. It cannot replan, reject, retry or

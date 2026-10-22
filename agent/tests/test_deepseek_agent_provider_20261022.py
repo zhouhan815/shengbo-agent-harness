@@ -26,8 +26,11 @@ def test_defaults_follow_user_decision(monkeypatch):
     for name in ("SHENGBO_AGENT_MODEL_PROVIDER", "SHENGBO_AGENT_MODEL", "SHENGBO_AGENT_VISION_MODEL",
                  "SHENGBO_SUMMARY_MODEL", "SHENGBO_AGENT_REASONING_EFFORT"):
         monkeypatch.delenv(name, raising=False)
+    for name in ("SHENGBO_INTENT_REASONING_EFFORT", "SHENGBO_BRANCH_REASONING_EFFORT"):
+        monkeypatch.delenv(name, raising=False)
     assert agent_model_settings() == {"provider": "deepseek", "model": "deepseek-v4-pro", "vision_model": "deepseek-flash",
-                                      "summary_model": "deepseek-flash", "effort": "high"}
+                                      "summary_model": "deepseek-flash", "effort": "high",
+                                      "intent_effort": "low", "branch_effort": "low"}
     main = build_agent_model(model="gpt-6.1-sol")
     summary = build_agent_model(purpose="summary")
     assert isinstance(main, DeepSeekAgentModel) and main.model_name == "deepseek-v4-pro" and main.thinking
@@ -220,3 +223,27 @@ async def test_malformed_tool_call_records_shape_but_not_arguments():
     rejected = next(event for event in events if event["type"] == "model.tool_call_rejected")
     assert rejected["tool_name"] == "read_context" and rejected["arguments_chars"] == len("{\"ref\": \"秘密内容")
     assert "秘密内容" not in json.dumps(events, ensure_ascii=False)
+
+
+
+@pytest.mark.asyncio
+async def test_reasoning_effort_follows_stage(monkeypatch):
+    """2026-10-22 user decision: main execute high; intent and analysis branches low."""
+    from shengbo_prelive.providers.deepseek import REASONING_EFFORT, effort_for
+    for name in ("SHENGBO_AGENT_REASONING_EFFORT", "SHENGBO_INTENT_REASONING_EFFORT", "SHENGBO_BRANCH_REASONING_EFFORT"):
+        monkeypatch.delenv(name, raising=False)
+    assert effort_for("main", "execute") == "high"
+    assert effort_for("main", "intent") == "low"
+    assert effort_for("product_facts", "execute") == effort_for("audience_scenes", "execute") == "low"
+    monkeypatch.setenv("SHENGBO_BRANCH_REASONING_EFFORT", "high")
+    assert effort_for("session_config", "execute") == "high"
+    seen = []
+    model = DeepSeekAgentModel(reasoning_effort="high", async_transport=_sse_transport(SSE_CHUNKS, seen=seen),
+                               key_reader=lambda: "test-key")
+    token = REASONING_EFFORT.set("low")
+    try:
+        await model.bind_tools([read_context]).ainvoke([HumanMessage("读")])
+    finally:
+        REASONING_EFFORT.reset(token)
+    await model.bind_tools([read_context]).ainvoke([HumanMessage("读")])
+    assert [item["reasoning_effort"] for item in seen] == ["low", "high"]
