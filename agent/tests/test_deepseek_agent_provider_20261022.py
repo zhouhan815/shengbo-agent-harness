@@ -100,6 +100,58 @@ async def test_round_trip_hooks_usage_details_and_tool_calls():
     assert seen[0]["model"] == "deepseek-v4-pro" and seen[0]["thinking"] == {"type": "enabled"}
 
 
+def _sse_transport(chunks, seen=None):
+    text = "".join(": keep-alive\n\n" if chunk is None else "data: " + (chunk if isinstance(chunk, str) else json.dumps(chunk)) + "\n\n"
+                   for chunk in chunks)
+
+    def handler(request):
+        if seen is not None:
+            seen.append(json.loads(request.content))
+        return httpx.Response(200, headers={"content-type": "text/event-stream"}, content=text.encode())
+    return httpx.MockTransport(handler)
+
+
+SSE_CHUNKS = [
+    {"id": "resp-s", "choices": [{"index": 0, "delta": {"reasoning_content": "想"}}]},
+    None,
+    {"id": "resp-s", "choices": [{"index": 0, "delta": {"reasoning_content": "一想"}}]},
+    {"id": "resp-s", "choices": [{"index": 0, "delta": {"tool_calls": [{"index": 0, "id": "call_1", "type": "function",
+                                                                          "function": {"name": "read_context", "arguments": "{\"ref\""}}]}}]},
+    {"id": "resp-s", "choices": [{"index": 0, "delta": {"tool_calls": [{"index": 0, "function": {"arguments": ": \"a\"}"}}]}}]},
+    {"id": "resp-s", "choices": [{"index": 0, "delta": {}, "finish_reason": "tool_calls"}]},
+    {"id": "resp-s", "choices": [], "usage": {"prompt_tokens": 1000, "completion_tokens": 50, "total_tokens": 1050,
+                                              "prompt_cache_hit_tokens": 640, "completion_tokens_details": {"reasoning_tokens": 30}}},
+    "[DONE]",
+]
+
+
+@pytest.mark.asyncio
+async def test_streamed_response_is_folded_like_non_streaming_body():
+    """Regression 2026-10-22: silent non-streaming calls were cut at 60.5 s on Windows; requests now stream."""
+    responses, seen = [], []
+    model = DeepSeekAgentModel(model_name="deepseek-v4-pro", on_response=responses.append,
+                               async_transport=_sse_transport(SSE_CHUNKS, seen=seen), key_reader=lambda: "test-key")
+    result = await model.bind_tools([read_context]).ainvoke([HumanMessage("读")])
+    assert seen[0]["stream"] is True and seen[0]["stream_options"] == {"include_usage": True}
+    assert result.tool_calls == [{"type": "tool_call", "name": "read_context", "args": {"ref": "a"}, "id": "call_1"}]
+    assert result.additional_kwargs["reasoning_content"] == "想一想"
+    assert result.usage_metadata == {"input_tokens": 1000, "output_tokens": 50, "total_tokens": 1050}
+    assert responses[0]["usage_details"] == {"cached_input_tokens": 640, "reasoning_output_tokens": 30}
+    assert responses[0]["provider_response_id"] == "resp-s"
+    sync = DeepSeekAgentModel(transport=_sse_transport(SSE_CHUNKS), key_reader=lambda: "test-key")
+    assert sync.bind_tools([read_context]).invoke([HumanMessage("读")]).tool_calls[0]["args"] == {"ref": "a"}
+
+
+@pytest.mark.asyncio
+async def test_stream_cut_before_finish_is_not_accepted():
+    events = []
+    model = DeepSeekAgentModel(observer=events.append, async_transport=_sse_transport(SSE_CHUNKS[:4]),
+                               key_reader=lambda: "test-key")
+    with pytest.raises(Exception):
+        await model.bind_tools([read_context]).ainvoke([HumanMessage("读")])
+    assert events[-1]["type"] == "model.failed" and events[-1]["code"] == "model_response_not_completed"
+
+
 @pytest.mark.asyncio
 async def test_http_rejection_is_known_failure_without_key_leak():
     events = []

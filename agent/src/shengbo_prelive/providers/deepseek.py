@@ -195,6 +195,53 @@ def build_chat_messages(messages):
     return result, unseen
 
 
+def _is_event_stream(response):
+    return response.headers.get("content-type", "").startswith("text/event-stream")
+
+
+def _fold_stream(lines):
+    """Rebuild the non-streaming body from SSE chunks.
+
+    Streaming keeps bytes flowing while the model thinks; a silent non-streaming
+    response was cut at ~60 s on this PC's network path.
+    """
+    body, message, calls, finish = {}, {"content": "", "reasoning_content": ""}, {}, None
+    for line in lines:
+        if not line.startswith("data:"):
+            continue
+        data = line[5:].strip()
+        if data == "[DONE]":
+            break
+        chunk = json.loads(data)
+        if chunk.get("id"):
+            body["id"] = chunk["id"]
+        if chunk.get("usage"):
+            body["usage"] = chunk["usage"]
+        for choice in chunk.get("choices") or []:
+            delta = choice.get("delta") or {}
+            for field in ("content", "reasoning_content"):
+                message[field] += delta.get(field) or ""
+            for call in delta.get("tool_calls") or []:
+                slot = calls.setdefault(call.get("index", len(calls)),
+                                        {"id": "", "type": "function", "function": {"name": "", "arguments": ""}})
+                slot["id"] = slot["id"] or call.get("id") or ""
+                function = call.get("function") or {}
+                slot["function"]["name"] += function.get("name") or ""
+                slot["function"]["arguments"] += function.get("arguments") or ""
+            finish = choice.get("finish_reason") or finish
+    if calls:
+        message["tool_calls"] = [calls[index] for index in sorted(calls)]
+    body["choices"] = [{"finish_reason": finish, "message": message}] if finish else []
+    return body
+
+
+def _parse_body(raw):
+    try:
+        return _fold_stream(raw) if isinstance(raw, list) else json.loads(raw)
+    except (ValueError, TypeError, AttributeError):
+        raise ModelProviderError("model_response_invalid", outcome_unknown=True) from None
+
+
 def _usage(value):
     if not isinstance(value, dict):
         return {}, {}
@@ -271,7 +318,8 @@ class DeepSeekAgentModel(BaseChatModel):
             raise ModelProviderError("model_request_option_unsupported")
         chat, unseen_images = build_chat_messages(messages)
         model = self.vision_model_name if unseen_images else self.model_name
-        payload: dict[str, Any] = {"model": model, "messages": chat, "stream": False}
+        payload: dict[str, Any] = {"model": model, "messages": chat, "stream": True,
+                                   "stream_options": {"include_usage": True}}
         if self.thinking:
             payload["thinking"] = {"type": "enabled"}
             payload["reasoning_effort"] = self.reasoning_effort
@@ -395,17 +443,18 @@ class DeepSeekAgentModel(BaseChatModel):
                 for retries in range(2):
                     phase, post_started = "responses_connect", True
                     try:
-                        response = client.post(ENDPOINT, headers={"Authorization": "Bearer " + key}, json=payload)
+                        with client.stream("POST", ENDPOINT, headers={"Authorization": "Bearer " + key}, json=payload) as response:
+                            phase = "responses_stream"
+                            if not response.is_success:
+                                raise _sync_http_error(response)
+                            raw = list(response.iter_lines()) if _is_event_stream(response) else response.read()
                         break
                     except (httpx.ConnectError, httpx.ConnectTimeout) as error:
                         if not _connection_retry_allowed(error, phase, observed, retries):
                             raise
                         time.sleep(_CONNECT_RETRY_DELAY_SECONDS)
-                phase = "responses_stream"
-                if not response.is_success:
-                    raise _sync_http_error(response)
                 phase = "response_parse"
-                return self._response(response.json(), attempt_id, model, observed)
+                return self._response(_parse_body(raw), attempt_id, model, observed)
         except BaseException as error:
             diagnostic = self._failure(error, attempt_id, model, phase=phase, post_started=post_started, observed=observed)
             self._raise(error, diagnostic, observed)
@@ -427,18 +476,15 @@ class DeepSeekAgentModel(BaseChatModel):
                             phase = "responses_stream"
                             if not response.is_success:
                                 raise await _async_http_error(response)
-                            raw = await response.aread()
+                            raw = ([line async for line in response.aiter_lines()] if _is_event_stream(response)
+                                   else await response.aread())
                         break
                     except (httpx.ConnectError, httpx.ConnectTimeout) as error:
                         if not _connection_retry_allowed(error, phase, observed, retries):
                             raise
                         await asyncio.sleep(_CONNECT_RETRY_DELAY_SECONDS)
                 phase = "response_parse"
-                try:
-                    body = json.loads(raw)
-                except ValueError:
-                    raise ModelProviderError("model_response_invalid", outcome_unknown=True) from None
-                return self._response(body, attempt_id, model, observed)
+                return self._response(_parse_body(raw), attempt_id, model, observed)
         except BaseException as error:
             diagnostic = self._failure(error, attempt_id, model, phase=phase, post_started=post_started, observed=observed)
             self._raise(error, diagnostic, observed)
