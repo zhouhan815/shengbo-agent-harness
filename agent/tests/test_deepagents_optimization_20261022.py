@@ -77,8 +77,13 @@ def pin_engine(tmp_path, objective):
     store = RuntimeStore(tmp_path / "agent.sqlite3")
     store.put("run", {"id": "run1", "status": "RUNNING", "phase": "execute", "goal": {"objective": objective}})
     events = []
-    engine = SimpleNamespace(store=store, _emit=lambda run_id, kind, data, scope=None: events.append((kind, data)))
+    engine = SimpleNamespace(store=store, _emit=lambda run_id, kind, data, scope=None: events.append((kind, data)),
+                             tool_presentation_enabled=True)
     engine._pin_skills = lambda *args, **kwargs: RuntimeEngine._pin_skills(engine, *args, **kwargs)
+    engine._record_skill_read = lambda *args, **kwargs: RuntimeEngine._record_skill_read(engine, *args, **kwargs)
+    engine._present_pinned_tools = lambda *args, **kwargs: RuntimeEngine._present_pinned_tools(engine, *args, **kwargs)
+    from shengbo_prelive.tool_presentation import GROUPS
+    engine.allowed_tool_names = lambda scope: set().union(*(names for _, names in GROUPS.values()))
     return engine, events
 
 
@@ -87,11 +92,21 @@ def test_pinning_is_objective_based_recorded_as_read_and_once_per_run(tmp_path):
     files = main_files()
     scope = RunScope("run1", "inv1", "execute", "main", None)
     names = RuntimeEngine._pin_execute_skills(engine, engine.store.get("run", "run1"), scope, files)
-    assert names == ["prelive-orchestration", "prelive-materials", "prelive-script-plan"]
-    reads = [item for item in engine.store.list("skill_read") if item["run_id"] == "run1"]
-    assert {item["path"] for item in reads} == {f"/skills/main/{name}/SKILL.md" for name in names}
-    assert all(item["line_ranges"] == [[1, item["line_count"]]] and item["delivery"] == "pinned_skill_message" for item in reads)
-    assert events[-1][0] == "skills.pinned" and events[-1][1]["skills"] == names
+    # Batch 3 B3: the core manual travels in the system prompt; only the volumes are pinned.
+    assert names == ["prelive-materials", "prelive-script-plan"]
+    reads = {item["path"]: item for item in engine.store.list("skill_read") if item["run_id"] == "run1"}
+    assert set(reads) == {f"/skills/main/{name}/SKILL.md" for name in ["prelive-orchestration", *names]}
+    assert all(item["line_ranges"] == [[1, item["line_count"]]] for item in reads.values())
+    assert reads["/skills/main/prelive-orchestration/SKILL.md"]["delivery"] == "system_prompt"
+    assert all(reads[f"/skills/main/{name}/SKILL.md"]["delivery"] == "pinned_skill_message" for name in names)
+    pinned = next(data for kind, data in events if kind == "skills.pinned")
+    assert pinned["skills"] == names
+    # Batch 3 B2: the pinned manuals' tool groups are shown once, before the first
+    # execute request, so the tool list stays fixed for the run (cache prefix).
+    from shengbo_prelive.tool_presentation import GROUPS, expanded_names
+    assert events[-1][0] == "tools.presentation.updated"
+    expected = set().union(*(GROUPS[group][1] for group in ("product", "session", "context", "script")))
+    assert expanded_names(engine, scope) == expected
     # A second execute turn of the same run never pins again.
     assert RuntimeEngine._pin_execute_skills(engine, engine.store.get("run", "run1"), scope, files) == []
 
@@ -100,7 +115,8 @@ def test_old_checkpoint_without_split_manuals_only_pins_what_it_has(tmp_path):
     engine, _ = pin_engine(tmp_path, "prepare_session")
     files = {path: value for path, value in main_files().items() if "/prelive-orchestration/" in path}
     scope = RunScope("run1", "inv1", "execute", "main", None)
-    assert RuntimeEngine._pin_execute_skills(engine, engine.store.get("run", "run1"), scope, files) == ["prelive-orchestration"]
+    # The core manual is delivered by the system prompt, so nothing is left to pin.
+    assert RuntimeEngine._pin_execute_skills(engine, engine.store.get("run", "run1"), scope, files) == []
 
 
 @pytest.mark.asyncio
@@ -340,3 +356,58 @@ def test_context_fence_follows_the_actual_model():
     assert explicit.context_limit_for("product_facts") == 48000
     with pytest.raises(ValueError):
         RuntimeEngine(ROOT / "unused", None, context_input_token_limit=2_000_000)
+
+
+
+def test_split_trusted_context_keeps_phase_stable_fields_in_the_cached_prefix():
+    """Batch 3 B1: Goal/authority/request travel in system; changing state is the tail."""
+    projection = {"phase": "execute", "role": "main", "goal": {"objective": "prepare_session"}, "allowed_effects": ["x"],
+                  "original_user_request": "做播前准备", "branches": {"items": []}, "business_receipts": [], "decisions": []}
+    stable, volatile = mw.split_projection(projection)
+    assert set(stable) == {"phase", "role", "goal", "allowed_effects", "original_user_request"}
+    assert set(volatile) == {"branches", "business_receipts", "decisions"}
+    request = ModelRequest(model=FakeListChatModel(responses=["x"]), messages=[HumanMessage("开始")],
+                           system_message=SystemMessage("规则"), tools=[], state={"messages": []}, runtime=None)
+    sent = mw.with_trusted_context(request, (mw.stable_context_text(stable), mw.trusted_context_text(volatile)), "split")
+    assert sent.system_message.content.startswith("规则") and "<shengbo_trusted_context_stable>" in sent.system_message.content
+    assert sent.messages[-1].content.startswith("<shengbo_trusted_context>")
+    assert mw.stable_context_text(stable) == mw.stable_context_text(dict(reversed(list(stable.items()))))  # byte-stable
+
+
+def test_core_manual_is_part_of_the_main_system_prompt():
+    """Batch 3 B3: core rules sit in the cached system prefix and are never summarized away."""
+    from shengbo_prelive.runtime import SYSTEM_MAIN
+    engine = SimpleNamespace(_initial_files=lambda role: RuntimeEngine._initial_files(None, role))
+    prompt = RuntimeEngine._main_system_prompt(engine)
+    core = file_data_to_string(main_files()["/skills/main/prelive-orchestration/SKILL.md"])
+    assert prompt.startswith(SYSTEM_MAIN) and "## 按任务预加载的分册" in prompt
+    assert "name: prelive-orchestration" not in prompt  # frontmatter stripped, body kept verbatim
+    assert core.split("---", 2)[2].strip() in prompt
+    assert prompt == RuntimeEngine._main_system_prompt(engine)  # byte-stable across calls
+
+
+def test_context_editing_clears_only_old_re_readable_results():
+    """Batch 3 B5: native ClearToolUsesEdit on the sent request; business results stay."""
+    from langchain_core.messages import ToolMessage
+    engine = SimpleNamespace(_conversation_wire_tokens=lambda messages: 40000 if len(messages) > 4 else 0)
+    middleware = RuntimeEngine._context_editing(engine, "main")
+    edit = middleware.edits[0]
+    assert edit.keep == 6 and edit.trigger == 30000 and "save_product" in edit.exclude_tools
+    assert "read_source" not in edit.exclude_tools and "read_context" not in edit.exclude_tools
+
+    def turn(index, name):
+        call = {"id": f"c{index}", "name": name, "args": {"i": index}}
+        return [AIMessage(content="", tool_calls=[call]), ToolMessage(content=f"正文{index}" * 50, tool_call_id=f"c{index}", name=name)]
+    messages = [HumanMessage("开始")]
+    for index in range(10):
+        messages += turn(index, "save_product" if index == 1 else "read_source")
+    first = list(messages)
+    edit.apply(first, count_tokens=engine._conversation_wire_tokens)
+    cleared = [message.tool_call_id for message in first if isinstance(message, ToolMessage)
+               and message.response_metadata.get("context_editing", {}).get("cleared")]
+    assert cleared == ["c0", "c2", "c3"]  # oldest reads only; save_product (c1) and the newest 6 stay
+    # One more turn: earlier placeholders are unchanged, so the cached prefix still matches.
+    second = list(messages) + turn(10, "read_source")
+    edit.apply(second, count_tokens=engine._conversation_wire_tokens)
+    assert [m.content for m in second[:len(first)] if isinstance(m, ToolMessage)][:3] == \
+        [m.content for m in first if isinstance(m, ToolMessage)][:3]

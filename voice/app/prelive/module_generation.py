@@ -19,7 +19,7 @@ from pydantic import BaseModel, ConfigDict, Field, ValidationError, field_valida
 
 from ..copywriting_quality import SIMPLIFY, content_issues
 from ..commerce_config import active_context_products, active_product_fields
-from .deepseek_options import read_provider_body, script_max_tokens, script_thinking_options, script_timeout_seconds, streamed
+from .deepseek_options import script_max_tokens, script_thinking_options, script_timeout_seconds
 from .storage import BusinessError, digest
 from .live_script_writing import (LIVE_COMMERCE_WRITING_GUIDANCE,
     STYLE_EXAMPLE_CONTRACT, module_examples_revision, module_style_examples)
@@ -391,16 +391,26 @@ async def generate_one_module(product, context, module_key, previous, *, api_key
     body = build_request(product, context, module_key, previous, model=model)
     try:
         async with httpx.AsyncClient(transport=transport, timeout=httpx.Timeout(script_timeout_seconds(), connect=20), follow_redirects=False, trust_env=False) as client:
-            async with client.stream("POST", ENDPOINT, json=streamed(body), headers={"Authorization": "Bearer " + api_key, "Content-Type": "application/json"}) as response:
+            async with client.stream("POST", ENDPOINT, json=body, headers={"Authorization": "Bearer " + api_key, "Content-Type": "application/json"}) as response:
                 if not 200 <= response.status_code < 300:
                     unknown = response.status_code >= 500 or response.status_code in {408, 504}
                     raise BusinessError("MODULE_PROVIDER_OUTCOME_UNKNOWN" if unknown else "MODULE_PROVIDER_REJECTED",
                                         "话术请求结果未知，请先核实，不能自动重复付费" if unknown else "话术服务拒绝了请求，请检查模型权限、余额或服务状态",
                                         status=503, details={"provider_http_status": response.status_code})
-                result, size = await read_provider_body(response, MAX_RESPONSE_BYTES,
-                    lambda: BusinessError("MODULE_RESPONSE_INVALID", "供应商返回内容过大，已有稿件保留"))
+                chunks, size = [], 0
+                async for chunk in response.aiter_bytes():
+                    size += len(chunk)
+                    if size > MAX_RESPONSE_BYTES:
+                        raise BusinessError("MODULE_RESPONSE_INVALID", "供应商返回内容过大，已有稿件保留")
+                    chunks.append(chunk)
     except httpx.HTTPError:
         raise BusinessError("MODULE_PROVIDER_OUTCOME_UNKNOWN", "话术请求结果未知，请先核实，不能自动重复付费", status=503) from None
+    try:
+        result = json.loads(b"".join(chunks))
+        if not isinstance(result, dict):
+            raise ValueError()
+    except (TypeError, ValueError, UnicodeError):
+        result = {}
     request_id = result.get("id", "")
     safe_id = request_id if (isinstance(request_id, str) and re.fullmatch(r"[A-Za-z0-9_.:-]{1,160}", request_id)
                              and api_key not in request_id) else ""

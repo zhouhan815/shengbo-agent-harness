@@ -1,6 +1,8 @@
 ---
 name: prelive-materials
 description: 资料理解、商品字段、商品与本场边界、补全卖点；整理资料或保存商品/本场时读。
+metadata:
+  shengbo_tool_groups: product session
 ---
 
 ## 资料到话术：一次理解、分级补料与按需继续

@@ -1,6 +1,8 @@
 ---
 name: prelive-delivery
 description: 编排、批准、试听、语音与候选发布；排序、批准或语音时读。
+metadata:
+  shengbo_tool_groups: playback audio
 ---
 
 ## 编排、批准与交付

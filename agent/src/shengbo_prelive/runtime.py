@@ -50,6 +50,14 @@ from .target_scope import completion_product_refs, guard_command_targets, ref_ke
 MAX_CONTEXT_INPUT_TOKEN_LIMIT = 1_000_000
 DEEPSEEK_CONTEXT_LIMITS = {"main": 128000, "branch": 64000}
 
+# B5: read tools whose results can be fetched again by exact ref/arguments.
+CLEARABLE_READ_TOOLS = frozenset({"read_source", "read_context", "read_preparation", "read_product", "read_room",
+    "read_business_schema", "read_capabilities", "read_run_history", "read_script", "read_job", "read_analysis_batch",
+    "read_voice_options", "read_session_history", "search_catalog", "read_text_review", "read_audio_readiness",
+    "read_generation_output", "read_asset_checklist", "read_recap", "read_script_usage", "find_audience_research",
+    "read_file", "ls", "glob", "grep"})
+CONTEXT_EDIT_TRIGGER_TOKENS = {"main": 30000, "branch": 20000}
+
 # Role-local main manuals pinned at the first execute turn, by frozen objective.
 # Unlisted manuals remain discoverable through the native Skills list.
 _CORE = "prelive-orchestration"
@@ -144,8 +152,8 @@ class RuntimeEngine:
         # M3 placement: "tail" (default) keeps system/history byte-stable for
         # provider prefix caching; "system" restores the previous layout.
         import os
-        placement = os.environ.get("SHENGBO_TRUSTED_CONTEXT_PLACEMENT", "tail")
-        self.trusted_context_placement = placement if placement in {"tail", "system"} else "tail"
+        placement = os.environ.get("SHENGBO_TRUSTED_CONTEXT_PLACEMENT", "split")
+        self.trusted_context_placement = placement if placement in {"tail", "system", "split"} else "split"
         self.context_summary_trigger_tokens = context_input_token_limit // 4
         self.context_summary_keep_tokens = self.context_summary_trigger_tokens // 4
         self.root = Path(root).resolve()
@@ -382,6 +390,13 @@ class RuntimeEngine:
                 if placement == "system":
                     probe = with_trusted_context(probe, text, "system")
                     fixed_messages = [probe.system_message]
+                elif placement == "split" and isinstance(projection, dict):
+                    # Same split as M3 delivers: stable part inside system, the rest as tail.
+                    from .middleware import split_projection, stable_context_text, trusted_context_text
+                    stable, volatile = split_projection(projection)
+                    probe = with_trusted_context(probe, stable_context_text(stable), "system")
+                    text = trusted_context_text(volatile)
+                    fixed_messages = [probe.system_message, trusted_context_message(text)]
                 else:
                     # Tail M3 is per-request and never compressible: count it as fixed.
                     fixed_messages = [probe.system_message, trusted_context_message(text)]
@@ -526,7 +541,7 @@ class RuntimeEngine:
                         "title": "本次模型请求的上下文构成", "status": "measured",
                         "fixed_wire_tokens": fixed_tokens, "system_tokens": system_only_tokens,
                         "trusted_context_tokens": m3_tokens,
-                        "tool_schema_tokens": max(0, fixed_tokens - system_only_tokens - (m3_tokens if placement == "tail" else 0)),
+                        "tool_schema_tokens": max(0, fixed_tokens - system_only_tokens - (m3_tokens if placement in {"tail", "split"} else 0)),
                         "visible_tool_count": len(visible_tools), "trusted_context_placement": placement,
                         "conversation_tokens_before": before_tokens, "conversation_tokens_after": after_tokens,
                         "projected_wire_tokens": projected_tokens, "input_token_limit": engine.context_limit_for(role),
@@ -595,8 +610,9 @@ M3以外尚未正式保存且影响下一步的关键信息须保留，不能因
             # bounded overflow retry; original history is still offloaded.
             summary_prompt=summary_prompt, trim_tokens_to_summarize=None)
         return create_deep_agent(model=self.model, tools=build_tools(self, role),
-            system_prompt=SYSTEM_MAIN if role == "main" else SYSTEM_ROLE[role],
-            middleware=[summarization, *(main_middleware(self) if role == "main" else worker_middleware(self))],
+            system_prompt=self._main_system_prompt() if role == "main" else SYSTEM_ROLE[role],
+            middleware=[summarization, self._context_editing(role),
+                        *(main_middleware(self) if role == "main" else worker_middleware(self))],
             backend=backend, permissions=[FilesystemPermission(operations=["write"], paths=["/**"], mode="deny")],
             skills=[f"/skills/{role}/"], checkpointer=self.saver, context_schema=RunScope,
             name="prelive-" + role)
@@ -1540,6 +1556,12 @@ M3以外尚未正式保存且影响下一步的关键信息须保留，不能因
                 item.update(summary=(report or {}).get("summary", "")[:700], **anchored)
             branches.append(item)
         branches = project_branch_working_set(branches, branch_records, run_id=scope.run_id, conversation_id=run["conversation_id"])
+        # A failed branch whose role was dispatched again later has no working
+        # value; keep a one-line stub (its exact record stays readable by ref).
+        last_position = {item["role"]: position for position, item in enumerate(branches)}
+        branches = [{key: item.get(key) for key in ("branch_task_id", "role", "status", "error", "report_ref")} | {"superseded": True}
+                    if item.get("status") == "FAILED" and last_position[item["role"]] > position else item
+                    for position, item in enumerate(branches)]
         unknown_operations = [item for item in self.store.list("operation") if item.get("run_id") == scope.run_id
                               and item.get("status") in {"sent", "unknown"}]
         with self.store.tx() as db:
@@ -4568,9 +4590,88 @@ M3以外尚未正式保存且影响下一步的关键信息须保留，不能因
             return []
         objective = run["goal"].get("objective")
         wanted = SKILL_PINS_BY_OBJECTIVE.get(objective, SKILL_PINS_BY_OBJECTIVE["read_explain"])
-        names = self._pin_skills(run, scope, files, wanted, reason=objective, once_key="run")
+        # The core manual is already in the main system prompt (B3); record it as
+        # read so the model does not fetch it again, and pin only the volumes.
+        self._record_skill_read(scope, files, _CORE, delivery="system_prompt")
+        names = self._pin_skills(run, scope, files, [name for name in wanted if name != _CORE],
+                                 reason=objective, once_key="run")
         self.store.update("run", run["id"], skills_pinned_at=now_iso(), pinned_skills=names)
+        self._present_pinned_tools(scope, files, names)
         return names
+
+    def _context_editing(self, role):
+        """Batch 3 B5: drop older re-readable read results from the request sent.
+
+        Native LangChain ContextEditingMiddleware (ClearToolUsesEdit). It edits
+        only the request copy (checkpointed history is untouched) and only read
+        tools whose exact refs stay listed in M3 retrieved_documents, so the
+        model can read again by ref. Business results are never cleared. Once
+        over the trigger, each call clears just the result that left the
+        newest-``keep`` window, so the earlier prefix stays cache-identical.
+        Uses the same wire counter as summarization.
+        """
+        from langchain.agents.middleware import ClearToolUsesEdit, ContextEditingMiddleware
+        excluded = sorted({tool.name for tool in build_tools(self, role)} - CLEARABLE_READ_TOOLS)
+        trigger = CONTEXT_EDIT_TRIGGER_TOKENS["main" if role == "main" else "branch"]
+        return ContextEditingMiddleware(
+            edits=[ClearToolUsesEdit(trigger=trigger, keep=6, exclude_tools=excluded,
+                                     placeholder="[较早的读取结果已从本次请求中清理以节省成本；需要时按原参数或精确ref重新读取]")],
+            token_counter=self._conversation_wire_tokens)
+
+    def _main_system_prompt(self):
+        """SYSTEM_MAIN plus the core manual body (batch 3 B3).
+
+        The core rules apply to every task, so they live in the cached, never
+        summarized system prefix instead of a pinned message that a summary
+        could compact away (which caused re-reads). Same allowlisted export.
+        """
+        text = file_data_to_string(self._initial_files("main")[f"/skills/main/{_CORE}/SKILL.md"])
+        parts = text.split("---", 2)
+        body = parts[2].strip() if text.startswith("---") and len(parts) == 3 else text.strip()
+        return SYSTEM_MAIN + "\n\n<核心手册 " + _CORE + "（已在系统提示中，无需read_file）>\n" + body + "\n</核心手册>"
+
+    def _present_pinned_tools(self, scope, files, names):
+        """Show the pinned manuals' tool groups from the first execute call on.
+
+        Each manual declares ``metadata.shengbo_tool_groups``. Expanding them
+        once, before the first execute request, keeps the tool list unchanged
+        for the rest of the run so the provider prefix cache keeps hitting.
+        (Native ``include_tools`` ties tools to the manual staying in context,
+        so a summary would change the tool list again.) Display only; no new
+        permission. ``activate_tools`` stays available as the fallback.
+        """
+        if not self.tool_presentation_enabled:
+            return []
+        import yaml
+        from .tool_presentation import GROUPS, activate
+        groups = []
+        for name in names:
+            text = file_data_to_string(files[f"/skills/{scope.role}/{name}/SKILL.md"])
+            parts = text.split("---", 2)
+            try:
+                meta = (yaml.safe_load(parts[1]) or {}).get("metadata") or {} if len(parts) == 3 else {}
+            except yaml.YAMLError:
+                meta = {}
+            groups += str(meta.get("shengbo_tool_groups", "")).split()
+        groups = [group for group in dict.fromkeys(groups) if group in GROUPS]
+        if groups:
+            activate(self, scope, groups=groups)
+        return groups
+
+    def _record_skill_read(self, scope, files, name, *, delivery):
+        """Record a manual body delivered without read_file exactly like a complete read."""
+        path = f"/skills/{scope.role}/{name}/SKILL.md"
+        if path not in files:
+            return None
+        text = file_data_to_string(files[path])
+        content_hash = canonical_hash(text)
+        line_count = len(text.splitlines()) or 1
+        identity = "read_" + canonical_hash([scope.run_id, scope.branch_task_id, path, content_hash]).split(":")[1]
+        self.store.put("skill_read", {"id": identity, "run_id": scope.run_id, "branch_task_id": scope.branch_task_id,
+            "role": scope.role, "path": path, "content_hash": content_hash,
+            "line_ranges": [[1, line_count]], "line_count": line_count,
+            "delivery": delivery, "recorded_at": now_iso()})
+        return len(text)
 
     def _pin_skills(self, run, scope, files, wanted, *, reason, once_key):
         """Record pinned Skill bodies exactly like complete reads.
@@ -4581,19 +4682,11 @@ M3以外尚未正式保存且影响下一步的关键信息须保留，不能因
         """
         names, total = [], 0
         for name in wanted:
-            path = f"/skills/{scope.role}/{name}/SKILL.md"
-            if path not in files:
+            size = self._record_skill_read(scope, files, name, delivery="pinned_skill_message")
+            if size is None:
                 continue
-            text = file_data_to_string(files[path])
-            content_hash = canonical_hash(text)
-            line_count = len(text.splitlines()) or 1
-            identity = "read_" + canonical_hash([scope.run_id, scope.branch_task_id, path, content_hash]).split(":")[1]
-            self.store.put("skill_read", {"id": identity, "run_id": scope.run_id, "branch_task_id": scope.branch_task_id,
-                "role": scope.role, "path": path, "content_hash": content_hash,
-                "line_ranges": [[1, line_count]], "line_count": line_count,
-                "delivery": "pinned_skill_message", "recorded_at": now_iso()})
             names.append(name)
-            total += len(text)
+            total += size
         if names:
             self._emit(run["id"], "skills.pinned", {"title": "已按任务预加载Skill", "status": "SUCCEEDED",
                 "role": scope.role, "reason": reason, "skills": names, "characters": total,

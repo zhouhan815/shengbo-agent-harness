@@ -184,10 +184,10 @@ async def test_context_projection_preserves_native_system_and_observes_real_savi
         captured.append(modified)
         return ModelResponse(result=[AIMessage("本地完成")])
     await ContextProjection(engine).awrap_model_call(request, handler)
-    # M3 is now a per-request trailing developer message; system stays byte-stable.
-    assert captured[0].system_message.content == "保留原系统规则" and request.system_message.content == "保留原系统规则"
-    sent = captured[0].messages[-1].content
-    actual = json.loads(re.search(r"<shengbo_trusted_context>\s*(.*?)\s*</shengbo_trusted_context>", sent, re.S)[1])
+    # Split M3 (default since 2026-10-22 batch 3): the original system rules stay
+    # first and unchanged, the phase-stable part follows them, the rest is the tail.
+    assert captured[0].system_message.content.startswith("保留原系统规则") and request.system_message.content == "保留原系统规则"
+    actual = delivered_projection(captured[0].system_message, captured[0].messages[-1])
     assert actual == project_context_working_set(raw)
     assert len(canonical_json(actual)) < len(canonical_json(raw))
 
@@ -219,3 +219,13 @@ async def test_native_budget_precheck_and_delivered_m3_use_identical_working_set
 
 
 from test_context_window_budget import setup  # noqa: E402,F401 - network-free SDK/provider fixture
+
+
+def delivered_projection(system_message, tail_message):
+    """M3 as delivered: split placement puts the stable part in system, the rest in the tail."""
+    def block(text, tag):
+        found = re.search(r"<" + tag + r">\s*(.*?)\s*</" + tag + ">", text, re.S)
+        return json.loads(found[1]) if found else {}
+    system = system_message.content if isinstance(system_message.content, str) else "\n".join(
+        part.get("text", "") for part in system_message.content)
+    return {**block(system, "shengbo_trusted_context_stable"), **block(tail_message.content, "shengbo_trusted_context")}

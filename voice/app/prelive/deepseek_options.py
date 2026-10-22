@@ -8,7 +8,6 @@ behaviour (thinking disabled, 120 s), so nothing changes silently.
 """
 from __future__ import annotations
 
-import json
 import os
 
 VALID_EFFORTS = {"low", "high", "max"}
@@ -32,67 +31,3 @@ def script_max_tokens(base: int) -> int:
 
 def script_timeout_seconds() -> float:
     return 300.0 if script_thinking_enabled() else 120.0
-
-
-# 2026-10-22: a thinking request is silent for minutes when non-streamed, and
-# this PC's network path cuts any TLS connection idle for ~60 s (both observed
-# failures: 60.7 s and 62 s, timeout_unknown). Streaming keeps bytes flowing.
-# The hashed request body is unchanged; only the sent copy asks for a stream.
-STREAM_FIELDS = {"stream": True, "stream_options": {"include_usage": True}}
-
-
-def streamed(body: dict) -> dict:
-    return {**body, **STREAM_FIELDS}
-
-
-async def read_provider_body(response, max_bytes, too_large):
-    """Return (non-streaming body shape, counted bytes) from a JSON or SSE response.
-
-    The size limit counts answer text, not SSE framing or reasoning, so a long
-    thinking stream is not rejected for its wrapper bytes. A stream that ends
-    without finish_reason yields no choices (an invalid, not a parsed, answer).
-    """
-    if not response.headers.get("content-type", "").startswith("text/event-stream"):
-        chunks, size = [], 0
-        async for chunk in response.aiter_bytes():
-            size += len(chunk)
-            if size > max_bytes:
-                raise too_large()
-            chunks.append(chunk)
-        try:
-            result = json.loads(b"".join(chunks))
-        except (TypeError, ValueError, UnicodeError):
-            return {}, size
-        return (result if isinstance(result, dict) else {}), size
-    body, content, finish, size, tool_calls = {}, [], None, 0, False
-    async for line in response.aiter_lines():
-        if not line.startswith("data:"):
-            continue
-        data = line[5:].strip()
-        if data == "[DONE]":
-            break
-        try:
-            chunk = json.loads(data)
-        except ValueError:
-            return {}, size
-        if not isinstance(chunk, dict):
-            return {}, size
-        if chunk.get("id"):
-            body["id"] = chunk["id"]
-        if chunk.get("usage"):
-            body["usage"] = chunk["usage"]
-        for choice in chunk.get("choices") or []:
-            delta = choice.get("delta") or {}
-            piece = delta.get("content") or ""
-            if piece:
-                size += len(piece.encode("utf-8"))
-                if size > max_bytes:
-                    raise too_large()
-                content.append(piece)
-            tool_calls = tool_calls or bool(delta.get("tool_calls"))
-            finish = choice.get("finish_reason") or finish
-    message = {"content": "".join(content) if content else None}
-    if tool_calls:
-        message["tool_calls"] = [{}]
-    body["choices"] = [{"message": message, "finish_reason": finish}] if finish else []
-    return body, size

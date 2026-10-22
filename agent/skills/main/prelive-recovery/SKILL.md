@@ -1,6 +1,8 @@
 ---
 name: prelive-recovery
 description: 工具或工作流校验失败、可纠正输入、未知结果的恢复；报错时读。
+metadata:
+  shengbo_tool_groups: script audio
 ---
 
 ## 已返回但校验失败的恢复

@@ -163,8 +163,7 @@ async def test_fixed_history_indices_are_identical_in_m3_and_native_budget(setup
     scope = RunScope(run["id"], "fixed-history-budget-equivalence", "execute")
     async def delivered(modified):
         trusted = [m for m in modified.messages if getattr(m, "additional_kwargs", {}).get("lc_source") == "shengbo_trusted_context"]
-        m = re.search(r"<shengbo_trusted_context>\s*(.*?)\s*</shengbo_trusted_context>", trusted[-1].content, re.S)
-        assert json.loads(m[1]) == project_context_working_set(raw)
+        assert delivered_projection(modified.system_message, trusted[-1]) == project_context_working_set(raw)
         fixed = preview_request_payload([modified.system_message, *trusted], modified.tools,
             model_name=engine.model_name, model_settings=modified.model_settings)
         observed.append((slot._input_budget(modified), engine.context_input_token_limit-engine._estimate_payload(fixed)))
@@ -200,3 +199,13 @@ def test_archived_v4_public_context_has_net_reduction_without_mutation():
     assert stats["indexed_historical_preparations"] == 1 and stats["indexed_answered_previews"] == 2
     assert tokens(raw) - tokens(projected) > 1000
     assert canonical_hash(raw) == original_hash
+
+
+def delivered_projection(system_message, tail_message):
+    """M3 as delivered: split placement puts the stable part in system, the rest in the tail."""
+    def block(text, tag):
+        found = re.search(r"<" + tag + r">\s*(.*?)\s*</" + tag + ">", text, re.S)
+        return json.loads(found[1]) if found else {}
+    system = system_message.content if isinstance(system_message.content, str) else "\n".join(
+        part.get("text", "") for part in system_message.content)
+    return {**block(system, "shengbo_trusted_context_stable"), **block(tail_message.content, "shengbo_trusted_context")}

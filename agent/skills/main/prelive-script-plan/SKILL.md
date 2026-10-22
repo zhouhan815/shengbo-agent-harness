@@ -1,6 +1,8 @@
 ---
 name: prelive-script-plan
 description: 上下文汇合、整版/局改计划、文本分支恢复；生成或修改话术时读。
+metadata:
+  shengbo_tool_groups: context script
 ---
 
 ## 完整上下文与模块计划
