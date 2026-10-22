@@ -2358,8 +2358,12 @@ M3以外尚未正式保存且影响下一步的关键信息须保留，不能因
                        "decision_basis": [proposal.authorization_quote], "requires_clarification": validation["requires_decision"]}, scope)
             return {"assessment_saved": True, "validation": validation, "next": "coordinator_freeze_or_clarify"}
         proposal = TaskAssessment.model_validate(assessment)
-        if not set(proposal.capabilities) <= self.allowed_tool_names(scope) | set(ROLES):
-            raise ContractError("PLAN_CAPABILITY_DENIED", "计划包含当前任务不允许的能力")
+        allowed = self.allowed_tool_names(scope) | set(ROLES)
+        if not set(proposal.capabilities) <= allowed:
+            # Nothing is saved; the model may correct the list once (M5 one-shot limit).
+            raise ContractError("PLAN_CAPABILITY_DENIED", "计划包含当前任务不允许的能力", status=422,
+                                details={"invalid_capabilities": sorted(set(proposal.capabilities) - allowed),
+                                         "allowed_values": sorted(allowed), "commit_state": "not_committed"})
         self.store.update("run", scope.run_id, task_assessment=proposal.model_dump())
         self._emit(scope.run_id, "plan.updated", {"title": "主 Agent 制定计划", "status": "planned", **proposal.model_dump()}, scope)
         return {"assessment_saved": True, "plan": proposal.model_dump()}

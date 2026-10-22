@@ -30,6 +30,19 @@ _LOCAL_NON_BUSINESS = {"save_task_assessment", "request_user_decision", "finish_
 from .action_contracts import recoverable_input_error
 
 _EFFECT_INPUT = TypeAdapter(list[BusinessEffect])
+# Plan corrections are one-shot: a second wrong plan keeps the original hard stop.
+_CORRECTION_LIMITS = {"PLAN_CAPABILITY_DENIED": 1, "PLAN_BEFORE_READ": 1}
+
+
+def _sibling_read_calls(request) -> list[str]:
+    """Read tools sent in the same model turn as this tool call."""
+    state = getattr(request, "state", None) or {}
+    call_id = request.tool_call.get("id")
+    for message in reversed(state.get("messages") or []):
+        calls = getattr(message, "tool_calls", None) or []
+        if any(call.get("id") == call_id for call in calls):
+            return sorted({call["name"] for call in calls if call.get("name") in READ_TOOLS})
+    return []
 
 
 def _scope(runtime) -> RunScope:
@@ -402,6 +415,16 @@ class ActionBoundary(_Boundary):
 
     async def _invoke_correctable(self, scope, request, handler):
         try:
+            if (scope.phase == "execute" and scope.role == "main"
+                    and request.tool_call.get("name") == "save_task_assessment"):
+                current = self.engine.store.get("run", scope.run_id)
+                reads = [] if current.get("task_assessment") or (current.get("correctable_tool_errors") or {}).get(
+                    "PLAN_BEFORE_READ") else _sibling_read_calls(request)
+                if reads:
+                    # Read before plan: the first execute plan sent in parallel with
+                    # reads is returned once, unsaved; a second attempt goes through.
+                    raise ContractError("PLAN_BEFORE_READ", "首份执行计划须在本轮读取结果返回后再提交", status=422,
+                        details={"parallel_reads": reads, "commit_state": "not_committed"})
             if scope.phase == "intent" and request.tool_call.get("name") == "save_task_assessment":
                 assessment = request.tool_call.get("args", {}).get("assessment")
                 if isinstance(assessment, dict) and "proposed_effects" in assessment:
@@ -466,12 +489,15 @@ class ActionBoundary(_Boundary):
                 error = ContractError(error.code, "局改计划未提交：显式复用模块需要其所属整版基稿", status=422, details=details)
             counters = dict(run.get("correctable_tool_errors") or {})
             count = int(counters.get(error.code, 0))
-            if count >= 3:
+            limit = _CORRECTION_LIMITS.get(error.code, 3)
+            if count >= limit:
                 self._event(scope, "correctable_tool_limit", "DENIED", tail=True, reason_code=error.code, correction_count=count)
                 raise
             counters[error.code] = count + 1
             await _await(self.engine.store.update("run", scope.run_id, correctable_tool_errors=counters))
-            hint = ("本次整模块修改未提交，原稿完整保留。若只改一句，按details.reader读取精确原句，用对应single_sentence_edit_targets的sentence_ids和selected_text_hash替换；多个句子须连续并使用其实际原句数组hash。确实有意大幅替换完整模块时才显式intentional_full_module_replacement=true并保留整模块hash；该声明不增加商品/模块/UI选区权限，不构成人工批准。" if error.code == "PATCH_SCOPE_COLLAPSE_REQUIRES_EXPLICIT_INTENT" else
+            hint = ("计划未保存。capabilities只能逐项使用details.allowed_values中的工具ID或分析角色ID；details.invalid_capabilities是业务命令ID或尚不可用的名称，删除或换成对应的可用工具ID，自然语言步骤写入steps。只有这一次修正机会，不要扩大Goal。" if error.code == "PLAN_CAPABILITY_DENIED" else
+                    "首份执行计划未保存，同轮读取照常执行。先查看details.parallel_reads的读取结果，再依据结果单独提交save_task_assessment；不要在同一轮再并行读取与提交计划。" if error.code == "PLAN_BEFORE_READ" else
+                    "本次整模块修改未提交，原稿完整保留。若只改一句，按details.reader读取精确原句，用对应single_sentence_edit_targets的sentence_ids和selected_text_hash替换；多个句子须连续并使用其实际原句数组hash。确实有意大幅替换完整模块时才显式intentional_full_module_replacement=true并保留整模块hash；该声明不增加商品/模块/UI选区权限，不构成人工批准。" if error.code == "PATCH_SCOPE_COLLAPSE_REQUIRES_EXPLICIT_INTENT" else
                     "本次动作未提交。保留冻结Goal的指定研究精确refs，使用read_context受控核验后，通过wf_context_bundle(action=save,analysis_refs=[指定refs])或原save_context_bundle绑定完整正文，再基于新context保存计划。复用不等于重做，不能仅在user_decisions写ID、换用其他研究、扩大权限或重试未知付费请求。" if error.code in {"REQUIRED_ANALYSIS_BINDING_MISSING", "ANALYSIS_BINDING_INVALID", "INTENT_RESEARCH_REUSE_INVALID"} else
                     "本次只读未返回研究正文，未产生业务写入。程序已按当前授权商品尝试受限发现，但未找到该精确引用。可按冻结商品ref调用find_audience_research，核对返回research_ref、compatibility和商品版本后再read_context；旧版本只作待复核证据，不能自动当本次事实。也可核对当前本场analysis_refs或向用户说明缺失。不要扩大商品/场次权限，不要重跑全部研究或重试未知付费请求。" if error.code == "ANALYSIS_REFERENCE_UNRESOLVED" else
                     "proposed_effects必须逐项使用allowed_values中的业务命令ID；不要把自然语言自动映射为更多动作，不需要提议时可留空。有效ID仍须符合原用户请求；自然语言步骤写入TaskAssessment.steps。" if error.code == "INVALID_EFFECT_ENUM" else
@@ -488,7 +514,7 @@ class ActionBoundary(_Boundary):
             self._event(scope, "correctable_tool_input", "CORRECTING", reason_code=error.code,
                         correction_count=count + 1, error=safe_error)
             value = {"status": "error", "error": safe_error, "corrective_hint": hint,
-                     "correction_count": count + 1, "correction_limit": 3}
+                     "correction_count": count + 1, "correction_limit": limit}
             if error.code == "ANALYSIS_REFERENCE_UNRESOLVED":
                 value["recovery"] = {"read_state": "not_read", "business_write_performed": False,
                     "explicit_model_action_required": True, "preserve_product_and_preparation_fences": True}

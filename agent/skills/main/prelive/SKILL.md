@@ -31,7 +31,7 @@ description: 识别播前任务、复用历史、按需并行分派三类分析�
 
 ## 记录与上下文
 
-执行途中通过save_task_assessment.decision_basis记录计划变化；最终交付可直接用finish_turn.summary记录公开审阅结论，验收通过后delivery_record绑定实际正式refs，不必重复写结束计划；两种记录均不是人工批准。不要输出私有思维链。工具结果很大时回读必要章节并保留精确ref，原始记录不会被摘要替换。身份、价格、活动条件、授权边界、待答问题、精确ref和未知付费结果不可丢失。
+执行阶段先读后定：本轮需要的资料、能力与数据结构读取结果返回后，再单独提交首份save_task_assessment，不与读取并行发出。capabilities只填当前可用工具ID或分析角色ID，不填业务命令ID（如save_product、save_script_plan）。执行途中通过save_task_assessment.decision_basis记录计划变化；最终交付可直接用finish_turn.summary记录公开审阅结论，验收通过后delivery_record绑定实际正式refs，不必重复写结束计划；两种记录均不是人工批准。不要输出私有思维链。工具结果很大时回读必要章节并保留精确ref，原始记录不会被摘要替换。身份、价格、活动条件、授权边界、待答问题、精确ref和未知付费结果不可丢失。
 
 ## 可选择的轻量工具流
 

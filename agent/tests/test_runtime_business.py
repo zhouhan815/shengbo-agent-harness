@@ -461,6 +461,67 @@ async def test_actual_engine_native_sdk_intent_execute_and_closure(env):
     assert any(event['type'] == 'model.completed' for event in engine.events(run['id'])['events'])
 
 
+def _execute_plan(identity, capabilities):
+    return {'id': identity, 'name': 'save_task_assessment', 'args': {'assessment': {
+        'summary': '按真实状态回答', 'capabilities': capabilities, 'steps': [], 'decision_basis': []}}}
+
+
+async def _run_plan_script(engine, execute_turns):
+    text = '查看当前声播状态'
+    engine._provided_model = BindableFakeModel(responses=[
+        AIMessage(content='', tool_calls=[{'id': 'intent-assess', 'name': 'save_task_assessment', 'args': {'assessment': {'objective': 'read_explain', 'summary': '读取状态', 'authorization_quote': text}}}]),
+        AIMessage(content='任务识别完成'),
+        *[AIMessage(content='', tool_calls=calls) for calls in execute_turns],
+        AIMessage(content='', tool_calls=[{'id': 'finish-plan', 'name': 'finish_turn', 'args': {'outcome': 'COMPLETED', 'summary': '当前无待处理本场任务'}}]),
+        AIMessage(content='当前无待处理本场任务')])
+    await engine.start()
+    run = await new_run(engine, text)
+    for _ in range(180):
+        current = engine.get_run(run['id'])
+        if current['status'] in {'COMPLETED', 'BLOCKED', 'FAILED'}:
+            break
+        await asyncio.sleep(.05)
+    return current
+
+
+@pytest.mark.asyncio
+async def test_execute_plan_with_command_ids_is_corrected_once(env):
+    """2026-10-22 DeepSeek wrote business command IDs as capabilities; one correction, nothing saved meanwhile."""
+    engine, service = env
+    current = await _run_plan_script(engine, [[_execute_plan('bad-plan', ['compile_playback_plan'])],
+                                              [_execute_plan('fixed-plan', [])]])
+    assert current['status'] == 'COMPLETED', (current.get('error'), current.get('correctable_tool_errors'))
+    assert current['correctable_tool_errors']['PLAN_CAPABILITY_DENIED'] == 1
+    assert current['task_assessment']['capabilities'] == []
+    correction = next(event for event in engine.events(current['id'])['events']
+                      if event['data'].get('reason_code') == 'PLAN_CAPABILITY_DENIED')
+    assert correction['data']['error']['details']['invalid_capabilities'] == ['compile_playback_plan']
+
+
+@pytest.mark.asyncio
+async def test_second_wrong_execute_plan_keeps_hard_stop(env):
+    engine, service = env
+    current = await _run_plan_script(engine, [[_execute_plan('bad-plan-1', ['compile_playback_plan'])],
+                                              [_execute_plan('bad-plan-2', ['prepare_required_audio'])]])
+    assert current['status'] == 'BLOCKED'
+    assert current['error']['code'] == 'PLAN_CAPABILITY_DENIED'
+    assert current['correctable_tool_errors']['PLAN_CAPABILITY_DENIED'] == 1
+    assert not current.get('task_assessment')
+
+
+@pytest.mark.asyncio
+async def test_first_execute_plan_sent_with_reads_waits_for_read_results_once(env):
+    engine, service = env
+    parallel = [_execute_plan('early-plan', []), {'id': 'read-cap', 'name': 'read_capabilities', 'args': {}}]
+    current = await _run_plan_script(engine, [parallel, [_execute_plan('after-read-plan', [])]])
+    assert current['status'] == 'COMPLETED', (current.get('error'), current.get('correctable_tool_errors'))
+    assert current['correctable_tool_errors']['PLAN_BEFORE_READ'] == 1
+    assert current['task_assessment']['summary'] == '按真实状态回答'
+    events = engine.events(current['id'])['events']
+    assert any(event['type'] == 'tool.completed' and 'read_capabilities' in str(event['data']) for event in events) or \
+        any(event['type'] == 'tool.started' and event['data'].get('tool_name') == 'read_capabilities' for event in events)
+
+
 @pytest.mark.asyncio
 async def test_actual_engine_corrects_bad_quote_via_error_tool_message(env):
     engine, service = env
