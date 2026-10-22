@@ -17,6 +17,9 @@ from shengbo_prelive.providers.chatgpt import build_chatgpt_model
 from shengbo_prelive.runtime import CURRENT_SCOPE, RuntimeEngine
 from shengbo_prelive.tools import COMMAND_MAP
 
+# 48k scenario + 4096 for the core manual now inside the system prompt (batch 3, 2026-10-22).
+LIMIT = 48000 + 4096
+
 
 ENCODING = tiktoken.get_encoding("o200k_base")
 # Relative sizes, not a promise that today's evolving schemas leave a fixed
@@ -82,6 +85,7 @@ async def working_set(tmp_path):
     engine = RuntimeEngine(tmp_path, client, context_input_token_limit=48000)
     assert engine.context_summary_trigger_tokens == 12000
     assert engine.context_summary_keep_tokens == 3000
+    engine.context_input_token_limit = LIMIT  # same 12k/3k summary policy, room for the core manual
     conversation = engine.create_conversation({"scope": {"kind": "catalog"}})
     work_scope = WorkScope(kind="preparation", preparation_id="prep-working-set").model_dump()
     effects = sorted(EFFECTS["prepare_session"])
@@ -107,7 +111,7 @@ async def working_set(tmp_path):
 
     def respond(request):
         payload = json.loads(request.content)
-        assert engine._estimate_payload(payload) <= 48000, "check the complete serialized wire on every send"
+        assert engine._estimate_payload(payload) <= LIMIT, "check the complete serialized wire on every send"
         sent.append(payload)
         assert payload.get("tools"), "a fitting working set must not cause a separate summary model call"
         output = rounds.pop(0) if rounds else [{"type": "message", "role": "assistant",
@@ -149,7 +153,7 @@ async def working_set(tmp_path):
         # receipts, and 2k for the soft-pressure margin/UUID variation. Only
         # public synthetic filler scales; reports, markers, refs and policy do
         # not. The final test still checks every complete sent wire.
-        filler_budget = 48000 - fixed_tokens - token_count(schema) - 3000 - 2048
+        filler_budget = LIMIT - fixed_tokens - token_count(schema) - 3000 - 2048
         assert 12000 <= filler_budget <= 36000, "unexpected fixed-schema growth must remain visible"
         for role, weight in REPORT_SIZES.items():
             report = sized_document(reports[role], int(filler_budget * weight / sum(REPORT_SIZES.values())))
@@ -182,7 +186,7 @@ async def test_three_reports_and_schema_survive_separate_tool_rounds_when_comple
     assert len(sent) == credentials.calls == 4, "three tool batches and their final response need four main calls"
     estimates = [engine._estimate_payload(payload) for payload in sent]
     assert estimates == sorted(estimates)
-    assert 35000 < estimates[-1] < 48000 - 1024, "exercise the large but fitting working set, below soft pressure"
+    assert 35000 < estimates[-1] < LIMIT - 1024, "exercise the large but fitting working set, below soft pressure"
     assert token_count(sent[-1]["tools"]) > 10000, "include real visible tool schemas rather than a tiny stub"
 
     expected = {"read-facts-once": "product_facts", "read-session-once": "session_config",

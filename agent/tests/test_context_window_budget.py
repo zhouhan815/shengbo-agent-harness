@@ -17,6 +17,12 @@ from shengbo_prelive.providers.chatgpt import build_chatgpt_model, preview_reque
 from shengbo_prelive.runtime import CURRENT_SCOPE, RuntimeEngine
 from shengbo_prelive.tools import COMMAND_MAP, build_tools
 
+# Batch 3 (2026-10-22): the core manual (~2.4k tokens) moved from a pinned
+# message into the main system prompt, so it is now part of the measured fixed
+# wire. Test budgets grow by this allowance; the growth guards stay in force.
+CORE_MANUAL_ALLOWANCE = 4096
+TEST_FIXED_LIMIT = 32000 + CORE_MANUAL_ALLOWANCE
+
 
 class OfflineClient:
     async def close(self):
@@ -82,7 +88,7 @@ async def setup(tmp_path):
 
     probe_scope = RunScope(run['id'], 'fixture-fixed-budget-probe', 'execute')
     token = CURRENT_SCOPE.set(probe_scope)
-    engine.context_input_token_limit = 32000
+    engine.context_input_token_limit = TEST_FIXED_LIMIT
     try:
         with patch.object(engine.model, '_before_send', capture_fixed):
             with pytest.raises(FixedWireReady):
@@ -96,7 +102,7 @@ async def setup(tmp_path):
         assert db.execute('SELECT COUNT(*) FROM attempts WHERE run_id=?', (run['id'],)).fetchone()[0] == 0
     fixed_wire = {**fixed_probe[0], 'input': [item for item in fixed_probe[0]['input'] if item.get('role') == 'developer']}
     fixed_tokens = engine._estimate_payload(fixed_wire)
-    assert fixed_tokens <= 32000 - 4096, 'fixed schema growth must not silently consume the test working set'
+    assert fixed_tokens <= TEST_FIXED_LIMIT - 4096, 'fixed schema growth must not silently consume the test working set'
     engine.context_input_token_limit = fixed_tokens + 4096
     assert engine.context_summary_trigger_tokens == 6000
     assert engine.context_summary_keep_tokens == 1500
@@ -130,7 +136,7 @@ async def test_six_parallel_tool_results_fit_real_wire_and_remain_exactly_readab
         # The shared fixture already measured the actual SDK fixed wire and
         # lent this scenario 4k for its retained tool turn and two page reads.
         # Do not repeat that probe or make this depend on an old schema size.
-        assert 8000 <= engine.context_input_token_limit <= 32000, 'unexpected fixed-schema growth must remain visible'
+        assert 8000 <= engine.context_input_token_limit <= TEST_FIXED_LIMIT, 'unexpected fixed-schema growth must remain visible'
         assert engine.context_summary_trigger_tokens == 6000, 'keep the original 6k pressure/summary policy'
         await graph.ainvoke({'messages': messages, 'files': engine._initial_files('main')}, config, context=scope)
         snapshot = await graph.aget_state(config)
@@ -281,7 +287,7 @@ async def test_no_gain_summary_fits_wire_and_does_not_summarize_same_tool_tail_a
     # Added optional workflow schemas increase the fixed part. This case needs
     # a compressible tail larger than the 6k trigger; the bounded-workset tests
     # continue checking overflow/offload. Stay below production's 48k ceiling.
-    engine.context_input_token_limit = 32000
+    engine.context_input_token_limit = TEST_FIXED_LIMIT
     engine.test_summary_text = '已读取工具结果，后续按用户要求继续，所有事实仍以精确原文为准。' * 5
     call = {'id': 'retained-batch', 'name': 'read_source', 'args': {}}
     messages = [HumanMessage('最早请求。'), AIMessage(content='', tool_calls=[call])]
