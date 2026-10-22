@@ -62,3 +62,5 @@
 - 话术作业完成唤醒时，事件附review_entry指向`wf_script_execution(action=review)`（仅本run提交的作业，可选入口，不代表验收）。
 - 为DeepSeek/ChatGPT两种模型注册HarnessProfile：关闭默认通用`task`子Agent，排除write_file/edit_file/execute；删除已不存在的write_todos名称。
 - 新监控：context.budget（固定上下文分量）、skills.pinned、M3字段字符数与缓存复用、model.response.usage_details（cached_input_tokens/reasoning_output_tokens）。测试入口verification/claude-opt-20261022/；备份backups/20261022-deepagents-optimization/。
+- DeepSeek适配器必须流式接收（`stream:true`+`include_usage`，本地把SSE拼回非流式结构再走原审计/结算/校验）。根因已对照实验确认：本机网络路径会切断60秒无数据的TLS连接，非流式思考请求同步/异步都在60.4–60.5秒断开，流式同步/异步均可跑完79–189秒；与async无关。流中途断开未见finish_reason时按未完成拒收，不重试。修复前副本`backups/20261022-deepagents-optimization/deepseek.py.before-stream-fix`。语音端`whole_script_generation.py`/`module_generation.py`开思考后仍是非流式，同样有60秒风险（待用户决定是否修）。
+- 已知未修（2026-10-22实测）：DeepSeek在execute的save_task_assessment.capabilities里填写业务命令ID（save_product、save_script_plan、compile_playback_plan、prepare_required_audio等）而非当前工具ID，触发PLAN_CAPABILITY_DENIED硬停止，2/2复现，完整实测因此无法走完；ChatGPT历史从未出现。另有2个旧测试未跟上新默认：test_runtime_context压缩用例仍在系统提示找M3（tail M3所致），test_context_wire_replay_budget按ChatGPT请求体计数差2 token（默认DeepSeek所致）。
