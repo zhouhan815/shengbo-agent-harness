@@ -1,0 +1,70 @@
+{
+  "versions": [
+    {
+      "index": 1,
+      "scores": {
+        "natural_live_speech": 13,
+        "benefit_scene_expansion": 15,
+        "coherent_flow": 8,
+        "non_repetition": 8,
+        "purchase_guidance": 3
+      },
+      "score_reasons": [
+        "口语自然，如“今天想跟你聊一双在家里会经常穿到的拖鞋”，但“专为女性足部曲线量身打造”和“风格上走的是居家休闲、高级简约”偏资料语。",
+        "卖点情境化不错，如“洗澡后鞋子沾了水，放在通风处会干得比较快”“旅行出游或者去海边漫步”“日常出门散步、倒垃圾”，但“轻便耐磨”只简单带过，没有具体生活画面。",
+        "结构完整，痛点→特点→场景→规格→价格→总结，但总结段落“最重要的几个特点就是……”重复了前面内容，稍显套路。",
+        "基本无空话凑字，但“防臭快干易清洗”等表述在前文多次出现。",
+        "有价格和尺码引导，但同样缺少促销推动或自然行动号召。"
+      ],
+      "unsupported_claims": [],
+      "price_and_terms_correct": true,
+      "knowledge_leaks": [],
+      "main_gaps": [
+        "价格部分只是陈述原价和活动价，缺乏购买理由强化。",
+        "颜色和尺码只是罗列，没有结合场景做选择建议。",
+        "总结段落重复前文特点，收口力度不足。"
+      ]
+    },
+    {
+      "index": 2,
+      "scores": {
+        "natural_live_speech": 12,
+        "benefit_scene_expansion": 15,
+        "coherent_flow": 8,
+        "non_repetition": 8,
+        "purchase_guidance": 3
+      },
+      "score_reasons": [
+        "自然口语化较好，如“今天咱们看一双夏天穿起来很顺手的凉拖鞋”等，但仍有“专为女性足部曲线打造的”这种产品资料直搬式表达，略偏说明书。",
+        "卖点展开较充分：足弓支撑、厚底软弹、静音防滑、快干易清洗、轻便防臭等均有情境化描述，如“洗澡后鞋子沾了水，放在通风的地方干起来比较快”“旅行出游装箱的时候，它不占太多地方”，但部分场景较简略。",
+        "结构连贯，从生活痛点→商品→特点→规格→价格→收口，过渡自然，但收口处“最重要的就是那份足弓支撑和厚底软弹，加上好冲洗、快干”与前面重复，略显机械。",
+        "整体重复不多，但“防臭快干”“一冲即净”等信息在前后多次出现，略显冗余。",
+        "有价格和尺码选择引导，但缺少自然的选购问询或行动号召，仅说“按需要选择就行”，引导感较弱。"
+      ],
+      "unsupported_claims": [],
+      "price_and_terms_correct": true,
+      "knowledge_leaks": [],
+      "main_gaps": [
+        "价格引导不够自然，仅罗列价格，未强化下单动力或选购逻辑。",
+        "颜色和尺码的展开较机械，缺少针对不同人群的推荐。",
+        "收口部分重复卖点，缺乏有力收尾。"
+      ]
+    }
+  ],
+  "pair_diversity": {
+    "score": 3,
+    "reason": "两版开场不同（“今天咱们看” vs “今天想跟你聊”），但卖点展开顺序和结构基本一致，均为逐一介绍功能，情境描述有部分差异（如版1强调装行李箱，版2强调日常出门），但整体差异不够鲜明，属于换开场但同样逐点模板。"
+  },
+  "judge_model": "deepseek-flash",
+  "judge_protocol": "v2-core-facts-only-no-unsupported-reference-priming",
+  "usage": {
+    "prompt_tokens": 2664,
+    "completion_tokens": 861,
+    "total_tokens": 3525,
+    "prompt_tokens_details": {
+      "cached_tokens": 2432
+    },
+    "prompt_cache_hit_tokens": 2432,
+    "prompt_cache_miss_tokens": 232
+  }
+}

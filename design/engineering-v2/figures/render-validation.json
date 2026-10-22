@@ -1,0 +1,46 @@
+{
+  "kind": "diagram_layout_validation",
+  "checks": [
+    {
+      "figure": "01-architecture",
+      "dimensions": [
+        2200,
+        1600
+      ],
+      "nodes": 23,
+      "text_fit": "pass",
+      "node_overlap": "pass"
+    },
+    {
+      "figure": "02-control-loop",
+      "dimensions": [
+        1700,
+        1720
+      ],
+      "nodes": 13,
+      "text_fit": "pass",
+      "node_overlap": "pass"
+    },
+    {
+      "figure": "03-toolflows-context",
+      "dimensions": [
+        2000,
+        1880
+      ],
+      "nodes": 14,
+      "text_fit": "pass",
+      "node_overlap": "pass"
+    },
+    {
+      "figure": "04-final-review-boundaries",
+      "dimensions": [
+        2200,
+        1580
+      ],
+      "nodes": 15,
+      "text_fit": "pass",
+      "node_overlap": "pass"
+    }
+  ],
+  "scope": "text bounds and node rectangles, plus human visual inspection required"
+}

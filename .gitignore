@@ -1,0 +1,4 @@
+.sync-state/
+*.log
+.DS_Store
+Thumbs.db

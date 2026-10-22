@@ -1,0 +1,63 @@
+{
+  "audit_date": "2026-10-20",
+  "mode": "read_only_existing_code_and_evidence",
+  "started_collector": false,
+  "new_live_room_requests": 0,
+  "recommended_source": "jwwsjlm/douyinLive v2.3.1 + existing app/live_source.py single websocket adapter",
+  "report": "本地抖音监控能力只读核查.md",
+  "historical_real_probe": {
+    "date": "2026-10-15",
+    "duration_seconds": 45.0,
+    "sample_scope": "one publicly visible room, anonymous, bounded probe",
+    "event_message_counts": {"comment": 29, "member_enter": 71, "like_message": 18, "audience_snapshot": 16, "stats_display": 15},
+    "raw_method_counts_not_semantically_validated": {"WebcastSocialMessage": 20, "WebcastLiveShoppingMessage": 20, "WebcastLiveEcomGeneralMessage": 31},
+    "no_platform_writes": true,
+    "no_llm_calls": true,
+    "no_login_cookie": true,
+    "source_evidence": "D:/Codex project/ecommerce-voice-agent/github-research-output/douyin-io-20261015/verification/public-room-probe/result.json"
+  },
+  "capabilities": {
+    "comment": "real_probe_observed",
+    "like_count_and_total": "real_probe_observed_distinct_fields",
+    "member_enter_message": "real_probe_observed_not_complete_entrance_uv",
+    "online_count": "candidate_snapshot_observed_not_backoffice_verified",
+    "cumulative_visits": "raw_values_observed_not_uv_verified_display_text_can_be_rounded",
+    "follow_share": "raw_social_observed_action_semantics_unverified",
+    "gift": "adapter_and_fixture_supported_not_observed_in_probe",
+    "leave_event": "not_available_in_adapter",
+    "exact_person_retention": "not_derivable",
+    "product_impression_click_cart": "not_available_in_adapter",
+    "order_payment_gmv_refund": "not_available_in_adapter_require_authorized_merchant_source"
+  },
+  "archive_contract": {
+    "database_hard_cap_or_cleanup_found": false,
+    "statement_limit": "not found in inspected app/tools; not a claim of retention policy completeness",
+    "in_memory_ui_max": 120,
+    "api_page_max": 200,
+    "after_zero": "latest_200_tail_not_from_beginning",
+    "after_positive": "seq_greater_than_cursor_ascending_limit_200",
+    "cursor": "global_sqlite_autoincrement_monotonic_not_contiguous_per_room",
+    "raw_payload_persisted": false,
+    "raw_method_persisted": "only_normalized_supported_event_types",
+    "unknown_message_handling": "in_memory_counter_only_no_full_payload_archive",
+    "history_counts_scope": "shengbo_room_and_external_room_across_sessions",
+    "active_counts_scope": "current_connect_state_resets_on_explicit_connect_continues_on_automatic_retry",
+    "session_id_in_event_body": true,
+    "session_filter_on_existing_event_query": false,
+    "connection_gap_history_durable": false,
+    "recommended_extension": "same_ingest_loop normalize+persist with transactional archive outbox, resumable sink, explicit historical from_start/window read; no second websocket collector"
+  },
+  "other_projects": {
+    "saermart/DouyinLiveWebFetcher": "local static source only; alternate event fetcher mostly print callbacks; no new live proof",
+    "ihmily/DouyinLiveRecorder": "installed at D:/Codex project/DouyinLiveRecorder; v4.0.7 ffmpeg audio/video recorder with existing validation files; optional media replay evidence, not commerce analytics"
+  },
+  "critical_design_additions": [
+    "immutable review_session binds own room, actual platform session and publication/script revisions",
+    "millisecond UTC and monotonic ingest/playback timestamps with source lag uncertainty",
+    "actual player occurrence log for product/version/module/sentence/cycle; no schedule-only attribution",
+    "durable capture status and missing intervals; missing is not zero",
+    "controlled own-room validation of follow/share/count semantics",
+    "authorized merchant exports for conversion evidence, capability-tiered reports",
+    "pseudonymized minimally necessary viewer fields and untrusted-comment treatment"
+  ]
+}

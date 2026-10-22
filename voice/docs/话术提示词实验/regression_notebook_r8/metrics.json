@@ -1,0 +1,87 @@
+{
+  "versions": [
+    {
+      "han_characters": 775,
+      "sentences": 25,
+      "coverage_groups": {
+        "尺寸": true,
+        "页数": true,
+        "封面": true,
+        "内页": true,
+        "用途": true,
+        "颜色": true,
+        "优惠门槛": true,
+        "不可叠加": true
+      },
+      "coverage_rate": 1.0,
+      "natural_sentence_ratio": 1.0,
+      "duplicate_sentences": [],
+      "reference_5gram_overlap": 0.003,
+      "program_scores": {
+        "selling_point_coverage": 12.0,
+        "flow": 8.0,
+        "speakability": 10.0,
+        "length_fit": 5,
+        "fact_references": 5.0
+      },
+      "program_total": 40.0,
+      "invalid_references": false,
+      "app_issues": []
+    },
+    {
+      "han_characters": 526,
+      "sentences": 19,
+      "coverage_groups": {
+        "尺寸": true,
+        "页数": true,
+        "封面": true,
+        "内页": true,
+        "用途": true,
+        "颜色": true,
+        "优惠门槛": true,
+        "不可叠加": true
+      },
+      "coverage_rate": 1.0,
+      "natural_sentence_ratio": 1.0,
+      "duplicate_sentences": [],
+      "reference_5gram_overlap": 0.002,
+      "program_scores": {
+        "selling_point_coverage": 12.0,
+        "flow": 8.0,
+        "speakability": 10.0,
+        "length_fit": 5,
+        "fact_references": 5.0
+      },
+      "program_total": 40.0,
+      "invalid_references": false,
+      "app_issues": []
+    }
+  ],
+  "pair": [
+    {
+      "a": 1,
+      "b": 2,
+      "fivegram_jaccard": 0.189,
+      "shared_narrative_sentences": [],
+      "near_copy_ratio": 0.231,
+      "near_copies": [
+        {
+          "a": "出门去图书馆或者咖啡馆，往包里一塞就行，不像硬壳本那么占地方。",
+          "b": "出门去图书馆或者咖啡馆，往包里一塞就行，不像硬壳本那样支棱着占地方。",
+          "similarity": 0.923
+        },
+        {
+          "a": "因为内页是点阵的，所以它不限定你只能写字，也可以画点简单的小图、做个打卡表。",
+          "b": "因为内页是点阵的，所以它不限定你只能写字，也可以画点简单的小图或者做个打卡格子。",
+          "similarity": 0.923
+        },
+        {
+          "a": "封面是软面的，拿在手里比较柔软，放在包里也能稍微贴合包内空间。",
+          "b": "封面是软面的，拿在手里比较柔软，放在包里也能稍微弯一弯。",
+          "similarity": 0.847
+        }
+      ],
+      "opening_similarity": 0.19
+    }
+  ]
+}

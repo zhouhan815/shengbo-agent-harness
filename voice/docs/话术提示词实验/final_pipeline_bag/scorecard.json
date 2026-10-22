@@ -1,0 +1,44 @@
+{
+  "run": "final_pipeline_bag",
+  "versions": [
+    {
+      "version": 1,
+      "program": 40.0,
+      "semantic": 50.0,
+      "total": 90.0,
+      "hard_gate": true,
+      "rule_issues": [],
+      "serious_claims": 0,
+      "cross_version_copy_pass": true,
+      "pass": true,
+      "gaps": [
+        "数据多但缺少把尺寸翻译成具体可放物品的细项，用户难判断日常实际容量。",
+        "颜色选择只给风格方向，没有结合通勤/购物等场景给出快速二选一建议。",
+        "长肩带只提可手提可单肩，未说肩带是否可调或长度，单肩适配性信息不足。"
+      ]
+    },
+    {
+      "version": 2,
+      "program": 40.0,
+      "semantic": 53.0,
+      "total": 93.0,
+      "hard_gate": false,
+      "rule_issues": [
+        "促销输入没有明确限时，不能把普通活动价说成限时价"
+      ],
+      "serious_claims": 0,
+      "cross_version_copy_pass": true,
+      "pass": false,
+      "gaps": [
+        "规格换算不够直观，只说38×30×12厘米，未给出现场可感知的容量说明（如A4纸、水杯等）。",
+        "颜色选择建议较笼统，黑色/米色只给搭配方向，未帮用户按通勤/购物场景快速选色。",
+        "全篇未明确‘长肩带’能否调节或长度信息，用户无法判断单肩背是否适合自己身高。"
+      ]
+    }
+  ],
+  "pair_diversity": {
+    "score": 3,
+    "reason": "两版开场痛点不同，一版从小包/大包纠结切入，一版从上班买菜场景切入；重点展开顺序和节奏也有差异，比如第一版先折叠后内部口袋，第二版先拉链和内部口袋再折叠，但核心卖点和收口结构仍较接近，未达到4分要求的至少两项明显不同且均完整。"
+  },
+  "rubric": "20261007.4-uniform-coverage-content-and-near-copy-checks"
+}

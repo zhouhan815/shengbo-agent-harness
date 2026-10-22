@@ -1,0 +1,75 @@
+{
+  "versions": [
+    {
+      "index": 1,
+      "scores": {
+        "natural_live_speech": 14,
+        "benefit_scene_expansion": 16,
+        "coherent_flow": 9,
+        "non_repetition": 9,
+        "purchase_guidance": 5
+      },
+      "score_reasons": [
+        "natural_live_speech：口语化程度高，如“姐妹平时上班或者出门买东西，喜欢用手提包还是单肩包？”“想象一下工作日早晨”，互动感强，自然流畅。",
+        "benefit_scene_expansion：卖点展开丰富，拉链开合、内部小口袋、长肩带、可折叠、颜色、尺寸均有具体场景，如“早高峰挤地铁或者公交，包身难免被碰到，有拉链就能把主袋里的东西收拢在里面”“短途出行的时候，把它折起来放在行李箱里，到了目的地再拿出来用，不占太多空间”。",
+        "coherent_flow：从提问互动到痛点分析，再到卖点展开、价格提示，逻辑顺畅。",
+        "non_repetition：表述多样，无凑字现象，各卖点独立展开。",
+        "purchase_guidance：明确价格、活动价，并引导“觉得合适再下单”，同时提示缺失信息，指导性强。"
+      ],
+      "unsupported_claims": [],
+      "price_and_terms_correct": true,
+      "knowledge_leaks": [],
+      "main_gaps": [
+        "未提及包体具体重量，轻便性缺乏量化支撑。",
+        "促销活动细节不足，仅给出活动价，无优惠券、赠品等信息。",
+        "缺少对目标人群的具体建议，如通勤距离、常用物品类型。"
+      ]
+    },
+    {
+      "index": 2,
+      "scores": {
+        "natural_live_speech": 12,
+        "benefit_scene_expansion": 15,
+        "coherent_flow": 8,
+        "non_repetition": 8,
+        "purchase_guidance": 4
+      },
+      "score_reasons": [
+        "natural_live_speech：语言自然口语，如“咱们不急着看价格”“把这个小纠结往下捋一捋”，但部分表达偏书面如“日常携带用途”，整体流畅易懂。",
+        "benefit_scene_expansion：对可折叠、长肩带、颜色、尺寸、拉链开合、内部小口袋、涤纶面料等卖点有场景展开，如“周末出门只想带手机和钥匙，又担心临时买东西没地方装，就可以把它折好放在手边备用”“早上赶时间，手提起来就走，过闸机、进电梯不用一直调整肩带”，但涤纶面料展开较泛，按有据卖点比例评15分。",
+        "coherent_flow：从出门小习惯痛点切入，逐步展开卖点、规格、价格，收口自然，结构清晰。",
+        "non_repetition：无空话，表述多样，但‘轻行可折叠’多次出现，稍显重复。",
+        "purchase_guidance：提供价格、活动条件，自然引导如“合适再下单，不急的话也可以先把颜色和尺寸想清楚”，但未说明购买方式。"
+      ],
+      "unsupported_claims": [
+        {
+          "quote": "活动限时，具体截止时间以页面为准。",
+          "reason": "promotion仅提供活动价79元，未提供限时或截止时间信息，此处添加限时宣称，但未具体化，属minor。",
+          "severity": "minor"
+        }
+      ],
+      "price_and_terms_correct": true,
+      "knowledge_leaks": [],
+      "main_gaps": [
+        "未提及包体具体重量，轻便性缺乏量化支撑。",
+        "促销活动细节不足，仅给出活动价，无优惠券、赠品等信息。",
+        "购买渠道和售后服务未涉及，影响购买决策。"
+      ]
+    }
+  ],
+  "pair_diversity": {
+    "score": 3,
+    "reason": "两版开场方式不同（第一版从出门习惯切入，第二版以提问互动开始），痛点表述和部分卖点展开顺序有差异（如第二版先讲拉链开合，第一版先讲可折叠），但整体结构相似，均为痛点-卖点-价格-收口模式，属于开场和重点展开有效不同。"
+  },
+  "judge_model": "deepseek-flash",
+  "usage": {
+    "prompt_tokens": 2321,
+    "completion_tokens": 977,
+    "total_tokens": 3298,
+    "prompt_tokens_details": {
+      "cached_tokens": 640
+    },
+    "prompt_cache_hit_tokens": 640,
+    "prompt_cache_miss_tokens": 1681
+  }
+}

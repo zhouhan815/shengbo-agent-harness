@@ -1,0 +1,28 @@
+{
+  "id": "fc5054fe-41f1-4b2c-9d3b-b7d8f01c7cf9",
+  "object": "chat.completion",
+  "created": 1791365458,
+  "model": "deepseek-flash",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "{\"versions\":[{\"label\":\"1\",\"angle\":\"从旅行携带与外观选择切入，再讲小蛮腰厚底与足弓支撑，最后回到打理、静音防滑和尺码颜色。\",\"blocks\":[{\"stage\":\"welcome\",\"focus\":\"开场\",\"sentences\":[{\"display_text\":\"欢迎来到直播间，今天聊一双出门和在家都能穿的凉拖鞋。\",\"spoken_text\":\"欢迎来到直播间，今天聊一双出门和在家都能穿的凉拖鞋。\",\"kind\":\"engagement\",\"fact_ids\":[]},{\"display_text\":\"先问一句，你出门旅行会自己带拖鞋吗？\",\"spoken_text\":\"先问一句，你出门旅行会自己带拖鞋吗？\",\"kind\":\"engagement\",\"fact_ids\":[]}]},{\"stage\":\"pain\",\"focus\":\"旅行与居家的换鞋困扰\",\"sentences\":[{\"display_text\":\"住酒店时想换上自己的拖鞋，又怕箱子多塞一双会占地方。\",\"spoken_text\":\"住酒店时想换上自己的拖鞋，又怕箱子多塞一双会占地方。\",\"kind\":\"engagement\",\"fact_ids\":[]},{\"display_text\":\"在家呢，夏天脚底容易闷，去浴室、去阳台、倒个垃圾，也想直接踩一双顺脚的。\",\"spoken_text\":\"在家呢，夏天脚底容易闷，去浴室、去阳台、倒个垃圾，也想直接踩一双顺脚的。\",\"kind\":\"engagement\",\"fact_ids\":[]}]},{\"stage\":\"identity\",\"focus\":\"商品身份\",\"sentences\":[{\"display_text\":\"这双是【Joy Share 生活选物】全新上架的足弓支撑静音防滑厚底凉拖鞋，小蛮腰女款。\",\"spoken_text\":\"这双是【Joy Share 生活选物】全新上架的足弓支撑静音防滑厚底凉拖鞋，小蛮腰女款。\",\"kind\":\"product_claim\",\"fact_ids\":[\"NAME\"]},{\"display_text\":\"它走的是居家休闲、高级简约、夏日轻便、旅行便携的路线。\",\"spoken_text\":\"它走的是居家休闲、高级简约、夏日轻便、旅行便携的路线。\",\"kind\":\"product_claim\",\"fact_ids\":[\"SELLING\"]}]},{\"stage\":\"benefit\",\"focus\":\"轻便与旅行携带\",\"sentences\":[{\"display_text\":\"先看轻便这一点，整双鞋不压脚，走动时不拖脚，鞋底还耐磨。\",\"spoken_text\":\"先看轻便这一点，整双鞋不压脚，走动时不拖脚，鞋底还耐磨。\",\"kind\":\"product_claim\",\"fact_ids\":[\"SELLING\"]},{\"display_text\":\"旅行出游时收进行李，到了住处换上，去海边踩沙、日常散步、下楼倒垃圾，都能接着穿。\",\"spoken_text\":\"旅行出游时收进行李，到了住处换上，去海边踩沙、日常散步、下楼倒垃圾，都能接着穿。\",\"kind\":\"product_claim\",\"fact_ids\":[\"SELLING\"]}]},{\"stage\":\"benefit\",\"focus\":\"小蛮腰厚底的外观与软弹\",\"sentences\":[{\"display_text\":\"再说外形，它用了独特的“小蛮腰”厚底设计。\",\"spoken_text\":\"再说外形，它用了独特的“小蛮腰”厚底设计。\",\"kind\":\"product_claim\",\"fact_ids\":[\"SELLING\"]},{\"display_text\":\"这个线条在视觉上能修饰脚型，配居家服、简单夏装，看起来比较利落。\",\"spoken_text\":\"这个线条在视觉上能修饰脚型，配居家服、简单夏装，看起来比较利落。\",\"kind\":\"product_claim\",\"fact_ids\":[\"SELLING\"]},{\"display_text\":\"厚底不是单纯加高，它带一点软弹缓震，在厨房站一会儿、在客厅来回走，脚底压力感会舒缓一些。\",\"spoken_text\":\"厚底不是单纯加高，它带一点软弹缓震，在厨房站一会儿、在客厅来回走，脚底压力感会舒缓一些。\",\"kind\":\"product_claim\",\"fact_ids\":[\"SELLING\"]}]},{\"stage\":\"benefit\",\"focus\":\"足弓支撑\",\"sentences\":[{\"display_text\":\"接着看核心设计，它有足弓支撑。\",\"spoken_text\":\"接着看核心设计，它有足弓支撑。\",\"kind\":\"product_claim\",\"fact_ids\":[\"SELLING\"]},{\"display_text\":\"脚底足弓的位置有承托，站久一点，脚心没那么空落落。\",\"spoken_text\":\"脚底足弓的位置有承托，站久一点，脚心没那么空落落。\",\"kind\":\"product_claim\",\"fact_ids\":[\"SELLING\"]},{\"display_text\":\"它是专为女性足部曲线量身打造的，一般版型、厚底平底，追求足部舒适可以重点看这一组。\",\"spoken_text\":\"它是专为女性足部曲线量身打造的，一般版型、厚底平底，追求足部舒适可以重点看这一组。\",\"kind\":\"product_claim\",\"fact_ids\":[\"SELLING\"]}]},{\"stage\":\"benefit\",\"focus\":\"静音防滑与浴室室内走动\",\"sentences\":[{\"display_text\":\"鞋底具备静音特性，夜里起来倒水、去洗手间，走动声音小一些，减少打扰家人。\",\"spoken_text\":\"鞋底具备静音特性，夜里起来倒水、去洗手间，走动声音小一些，减少打扰家人。\",\"kind\":\"product_claim\",\"fact_ids\":[\"SELLING\"]},{\"display_text\":\"同时它有防滑特性，在浴室或室内走动，多一层抓地感；浴室走动还是要留意地面。\",\"spoken_text\":\"同时它有防滑特性，在浴室或室内走动，多一层抓地感；浴室走动还是要留意地面。\",\"kind\":\"product_claim\",\"fact_ids\":[\"SELLING\"]}]},{\"stage\":\"benefit\",\"focus\":\"EVA材质与快干易清洗\",\"sentences\":[{\"display_text\":\"材质是优选EVA环保材质，一体成型制成。\",\"spoken_text\":\"材质是优选E V A环保材质，一体成型制成。\",\"kind\":\"product_claim\",\"fact_ids\":[\"SELLING\"]},{\"display_text\":\"夏天穿拖鞋容易出汗，它具备防臭快干的特点，冲一冲就干净，洗完放通风处，下一回接着穿。\",\"spoken_text\":\"夏天穿拖鞋容易出汗，它具备防臭快干的特点，冲一冲就干净，洗完放通风处，下一回接着穿。\",\"kind\":\"product_claim\",\"fact_ids\":[\"SELLING\"]},{\"display_text\":\"颜色有粉色、红色、绿色、蓝色、橙色等，一共十种颜色。\",\"spoken_text\":\"颜色有粉色、红色、绿色、蓝色、橙色等，一共十种颜色。\",\"kind\":\"product_claim\",\"fact_ids\":[\"SELLING\"]}]},{\"stage\":\"specification\",\"focus\":\"颜色规格选择\",\"sentences\":[{\"display_text\":\"颜色选择上，喜欢温柔一点的可以看粉色、烟熏紫；想要清爽感，绿色、蓝色、白色都不错；黑色则比较利落好搭。\",\"spoken_text\":\"颜色选择上，喜欢温柔一点的可以看粉色、烟熏紫；想要清爽感，绿色、蓝色、白色都不错；黑色则比较利落好搭。\",\"kind\":\"product_claim\",\"fact_ids\":[\"SELLING\"]},{\"display_text\":\"尺码有三十六码到三十七码、三十八码到三十九码、四十码到四十一码、四十二码到四十三码、四十四码到四十五码。\",\"spoken_text\":\"尺码有三十六码到三十七码、三十八码到三十九码、四十码到四十一码、四十二码到四十三码、四十四码到四十五码。\",\"kind\":\"product_claim\",\"fact_ids\":[\"SELLING\"]},{\"display_text\":\"它是标准码，脚背较宽或脚型偏肉，建议斟酌大一号。\",\"spoken_text\":\"它是标准码，脚背较宽或脚型偏肉，建议斟酌大一号。\",\"kind\":\"product_claim\",\"fact_ids\":[\"SELLING\"]}]},{\"stage\":\"price\",\"focus\":\"价格\",\"sentences\":[{\"display_text\":\"价格方面，原价一百七十八新台币，活动价一百零七新台币。\",\"spoken_text\":\"价格方面，原价一百七十八新台币，活动价一百零七新台币。\",\"kind\":\"product_claim\",\"fact_ids\":[\"PRICE\"]}]},{\"stage\":\"promotion\",\"focus\":\"限时优惠\",\"sentences\":[{\"display_text\":\"现在有限时下杀，一百零七新台币就能带走这双。\",\"spoken_text\":\"现在有限时下杀，一百零七新台币就能带走这双。\",\"kind\":\"product_claim\",\"fact_ids\":[\"PROMOTION\"]}]},{\"stage\":\"cta\",\"focus\":\"购买引导\",\"sentences\":[{\"display_text\":\"最值得关注的是足弓支撑、小蛮腰厚底软弹，还有快干易清洗。\",\"spoken_text\":\"最值得关注的是足弓支撑、小蛮腰厚底软弹，还有快干易清洗。\",\"kind\":\"product_claim\",\"fact_ids\":[\"SELLING\"]},{\"display_text\":\"你可以根据自己的颜色喜好和脚型选规格，合适再下单。\",\"spoken_text\":\"你可以根据自己的颜色喜好和脚型选规格，合适再下单。\",\"kind\":\"engagement\",\"fact_ids\":[]}]}],\"missing_information\":[\"脚背较宽或脚型偏肉以外的其他尺码建议未提供。\",\"各颜色库存情况未提供。\",\"是否包邮、退换货政策、优惠截止时间、下播后价格是否恢复均未提供。\",\"鞋底具体防滑结构、材质是否可进微波炉、是否防水防烫等未提供。\"]}]}"
+      },
+      "logprobs": null,
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 2178,
+    "completion_tokens": 2060,
+    "total_tokens": 4238,
+    "prompt_tokens_details": {
+      "cached_tokens": 1792
+    },
+    "prompt_cache_hit_tokens": 1792,
+    "prompt_cache_miss_tokens": 386
+  },
+  "system_fingerprint": "aeb56401ca74e127821c4f9126dcb669"
+}

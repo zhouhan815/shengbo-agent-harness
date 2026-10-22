@@ -1,0 +1,44 @@
+{
+  "run": "release10_slippers",
+  "versions": [
+    {
+      "version": 1,
+      "program": 39.74,
+      "semantic": 52.0,
+      "total": 91.74,
+      "hard_gate": true,
+      "rule_issues": [],
+      "serious_claims": 0,
+      "cross_version_copy_pass": true,
+      "pass": true,
+      "gaps": [
+        "部分描述如“拿在手里能感觉到”带有模拟实测感。",
+        "卖点重复出现次数略多。",
+        "整体信息密度高但个别句子偏长，直播节奏可再优化。"
+      ]
+    },
+    {
+      "version": 2,
+      "program": 40.0,
+      "semantic": 51.0,
+      "total": 91.0,
+      "hard_gate": false,
+      "rule_issues": [
+        "一体成型或软弹不能推导出不磨脚；删除未提供的不磨脚性能承诺"
+      ],
+      "serious_claims": 0,
+      "cross_version_copy_pass": true,
+      "pass": false,
+      "gaps": [
+        "部分书面化表达削弱直播口语感。",
+        "“不磨脚”属于无资料支持的附加好处。",
+        "颜色尺码信息较罗列，与场景卖点结合不够紧密。"
+      ]
+    }
+  ],
+  "pair_diversity": {
+    "score": 3,
+    "reason": "两版开场痛点不同（旅行/居家 vs 厨房/浴室），但后续卖点展开顺序和结构高度相似，均按足弓支撑、静音防滑、材质轻便、打理、颜色尺码、价格收口推进；情境略有差异但模板化明显，属于换开场但同样逐点模板，未达到两项以上明显不同且均完整。"
+  },
+  "rubric": "20261007.4-uniform-coverage-content-and-near-copy-checks"
+}

@@ -1,0 +1,34 @@
+{
+  "run": "release81_bag",
+  "versions": [
+    {
+      "version": 1,
+      "program": 40.0,
+      "semantic": 48.0,
+      "total": 88.0,
+      "hard_gate": true,
+      "rule_issues": [],
+      "serious_claims": 0,
+      "cross_version_copy_pass": true,
+      "pass": false,
+      "gaps": []
+    },
+    {
+      "version": 2,
+      "program": 40.0,
+      "semantic": 53.0,
+      "total": 93.0,
+      "hard_gate": true,
+      "rule_issues": [],
+      "serious_claims": 0,
+      "cross_version_copy_pass": true,
+      "pass": false,
+      "gaps": []
+    }
+  ],
+  "pair_diversity": {
+    "score": 1,
+    "reason": "两版仅换开场和少量排序，卖点展开几乎逐点对应，如折叠、长肩带、拉链主袋、小口袋的场景描述高度相似，属于换词级别，缺乏有效差异。"
+  },
+  "rubric": "20261007.4-uniform-coverage-content-and-near-copy-checks"
+}

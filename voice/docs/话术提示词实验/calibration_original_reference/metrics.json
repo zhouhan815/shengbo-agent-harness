@@ -1,0 +1,75 @@
+{
+  "versions": [
+    {
+      "han_characters": 1035,
+      "sentences": 24,
+      "coverage_groups": {
+        "材质成型": false,
+        "足弓": true,
+        "厚底软弹": true,
+        "静音防滑": true,
+        "清洗快干防臭": true,
+        "轻便场景": false,
+        "规格": false,
+        "选码": false
+      },
+      "coverage_rate": 0.5,
+      "natural_sentence_ratio": 1.0,
+      "duplicate_sentences": [],
+      "reference_5gram_overlap": 1.0,
+      "program_scores": {
+        "selling_point_coverage": 6.0,
+        "flow": 8.0,
+        "speakability": 10.0,
+        "length_fit": 5,
+        "fact_references": 5.0
+      },
+      "program_total": 34.0,
+      "invalid_references": false,
+      "app_issues": []
+    },
+    {
+      "han_characters": 1170,
+      "sentences": 24,
+      "coverage_groups": {
+        "材质成型": false,
+        "足弓": true,
+        "厚底软弹": false,
+        "静音防滑": true,
+        "清洗快干防臭": false,
+        "轻便场景": false,
+        "规格": false,
+        "选码": true
+      },
+      "coverage_rate": 0.375,
+      "natural_sentence_ratio": 0.958,
+      "duplicate_sentences": [],
+      "reference_5gram_overlap": 1.0,
+      "program_scores": {
+        "selling_point_coverage": 4.5,
+        "flow": 8.0,
+        "speakability": 9.58,
+        "length_fit": 5,
+        "fact_references": 5.0
+      },
+      "program_total": 32.08,
+      "invalid_references": false,
+      "app_issues": [
+        "第11句有待核实的保证、体验或促销说法",
+        "第13句有待核实的保证、体验或促销说法",
+        "第23句有待核实的保证、体验或促销说法"
+      ]
+    }
+  ],
+  "pair": [
+    {
+      "a": 1,
+      "b": 2,
+      "fivegram_jaccard": 0.035,
+      "shared_narrative_sentences": [],
+      "near_copy_ratio": 0.0,
+      "near_copies": [],
+      "opening_similarity": 0.323
+    }
+  ]
+}

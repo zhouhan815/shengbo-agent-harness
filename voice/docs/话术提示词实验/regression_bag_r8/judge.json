@@ -1,0 +1,87 @@
+{
+  "versions": [
+    {
+      "index": 1,
+      "scores": {
+        "natural_live_speech": 14,
+        "benefit_scene_expansion": 14,
+        "coherent_flow": 8,
+        "non_repetition": 8,
+        "purchase_guidance": 4
+      },
+      "score_reasons": [
+        "natural_live_speech: 口语感较强，'是不是总在……来回纠结''拿不准就多看看再决定'等表达自然，但部分描述如'包的大小是三十八乘三十乘十二厘米'偏平实。",
+        "benefit_scene_expansion: 展开早高峰、周末超市、换乘、行李箱备用包等场景，涵盖可折叠、尺寸、肩带、拉链、小口袋；但小口袋收益仅一句带过，颜色展开较浅，有效展开约4个。",
+        "coherent_flow: 从纠结痛点、通勤场景到商品介绍、规格价格收口，衔接自然，但规格介绍和颜色选择顺序稍显机械。",
+        "non_repetition: 无空话凑字，内容有变化，但尺寸和颜色在不同部分重复出现一次。",
+        "purchase_guidance: 明确价格币种，活动限时引导自然，提示按颜色选择，未假设购物车或库存，但未强调活动价的截止条件。"
+      ],
+      "unsupported_claims": [
+        {
+          "quote": "临时买多了东西，拿出来展开就能装，不用另外花钱买袋子",
+          "reason": "暗示可替代购物袋省钱，属于对产品用途的合理延伸，但资料未提及环保或省钱效益，略显夸张。",
+          "severity": "minor"
+        },
+        {
+          "quote": "东西装进去拉上拉链，心里会踏实一些",
+          "reason": "同上，暗示拉链有防盗安心效果，资料未提供防盗性能。",
+          "severity": "minor"
+        }
+      ],
+      "price_and_terms_correct": true,
+      "knowledge_leaks": [],
+      "main_gaps": [
+        "未提及内部小口袋适合放置日常小物这一卖点",
+        "未明确涤纶面料的轻便性",
+        "尺寸数字重复出现，略显冗余"
+      ]
+    },
+    {
+      "index": 2,
+      "scores": {
+        "natural_live_speech": 13,
+        "benefit_scene_expansion": 15,
+        "coherent_flow": 8,
+        "non_repetition": 8,
+        "purchase_guidance": 4
+      },
+      "score_reasons": [
+        "natural_live_speech: 整体口语化，像'欢迎来到直播间''可以在心里选一个'自然亲切，但部分表述偏书面如'包口是主袋拉链开合''尺寸是三十八乘三十乘十二厘米'，不够生动。",
+        "benefit_scene_expansion: 展开了酒店换包、通勤购物、短途出行、拉链安全、小口袋找物、肩带切换等情境，对可折叠、尺寸、拉链、小口袋、肩带、颜色多角度展开；但颜色情境较简略，有据卖点基本覆盖，有效展开约5个。",
+        "coherent_flow: 从痛点（大包重、小包不便）到商品介绍、规格、价格、收口，结构完整，但规格介绍集中在后半段，略有模块感。",
+        "non_repetition: 内容较丰富，无明显空话，但颜色和尺寸在开头和结尾重复提及一次，属轻微重复。",
+        "purchase_guidance: 给出明确价格和币种，提示活动价限时但截止时间'以页面为准'，引导按颜色尺寸选择，未假设购物车，但引导力度一般。"
+      ],
+      "unsupported_claims": [
+        {
+          "quote": "走在人多的地方心里会踏实一点",
+          "reason": "暗示拉链有防盗安心效果，但商品资料仅说明主袋拉链开合，未提供防盗性能，属擅自添加的安心效果。",
+          "severity": "minor"
+        }
+      ],
+      "price_and_terms_correct": true,
+      "knowledge_leaks": [],
+      "main_gaps": [
+        "未提及内部小口袋适合放置日常小物这一卖点",
+        "颜色仅简单带过搭配建议，未结合场景展开",
+        "活动限时表述正确但缺少具体截止时间，虽不是错但可更明确"
+      ]
+    }
+  ],
+  "pair_diversity": {
+    "score": 3,
+    "reason": "两版开场痛点角度不同（通勤换包 vs 大小包纠结），卖点展开情境和顺序有明显差异（版1酒店场景与拉链先后不同，版2早高峰与超市场景），节奏略有不同，但均完整覆盖相同卖点，整体结构相似，属有效不同。"
+  },
+  "judge_model": "deepseek-flash",
+  "judge_protocol": "v2-core-facts-only-no-unsupported-reference-priming",
+  "usage": {
+    "prompt_tokens": 1959,
+    "completion_tokens": 1093,
+    "total_tokens": 3052,
+    "prompt_tokens_details": {
+      "cached_tokens": 512
+    },
+    "prompt_cache_hit_tokens": 512,
+    "prompt_cache_miss_tokens": 1447
+  }
+}

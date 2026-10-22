@@ -1,0 +1,598 @@
+{
+  "reviewer": "独立 AI 朗读自然度与分段语气审查（tts_expression）",
+  "review_type": "text_only_peer_review",
+  "input_file": "docs/话术提示词实验/v14-R16-slippers/scripts.json",
+  "independence": "只读取候选scripts.json，未读取评分文件、总分或另一位评审意见；审查目标限于朗读自然度、段落语气及TTS风险。",
+  "audio_listened": false,
+  "limitation": "未试听真实音频；文本不能证明没有唱腔、噪声或句尾拖音，也不能据此判断原投诉已解决。以下是文本风险和最少必要建议，不是已测得的音频缺陷。",
+  "overall": "两稿总体是日常说明语体，没有整篇押韵、等长歌词段或密集感叹号。仍有长尺码串、十色名单及三段近似句式；优先处理规格段，保留段落间热情与平稳的区分。促销/促单文本较克制，可用有限happy表达，不应通过持续高音量/高音高补足渲染力。",
+  "priority_changes": [
+    {
+      "version": 1,
+      "ordinal": 19,
+      "reason": "十个尺码数字集中在同一条语音，先拆句。"
+    },
+    {
+      "version": 2,
+      "ordinal": 5,
+      "reason": "“轻便打理”搭配不自然，修正语义。"
+    },
+    {
+      "version": 2,
+      "ordinal": 24,
+      "reason": "三个相近句式和密集色名，按现有分号拆为三条。"
+    },
+    {
+      "version": 2,
+      "ordinal": 25,
+      "reason": "长尺码串，先拆句。"
+    }
+  ],
+  "acceptance_recommendation": "文本可作为进入小样试听的候选，规格长串建议处理后再批量生成。听感验收必须复测用户原投诉句，以及规格、价格、促单；唱腔与杂音分别记录，不能用本审查替代。",
+  "versions": [
+    {
+      "version": 1,
+      "script_id": "script_585afdf8098f4984",
+      "sentence_count": 24,
+      "sentence_reviews": [
+        {
+          "sentence_id": "script_585afdf8098f4984_s001",
+          "ordinal": 1,
+          "stage": "welcome",
+          "quote": "欢迎来到直播间，今天咱们来看一双适合日常穿的凉拖鞋。",
+          "risk_level": "low",
+          "assessment": "问候加商品主题是自然完整句；无押韵、重复口号或长串数字。招呼应明亮，结尾落稳。",
+          "minimum_edit_or_direction": null,
+          "audio_verified": false
+        },
+        {
+          "sentence_id": "script_585afdf8098f4984_s002",
+          "ordinal": 2,
+          "stage": "pain",
+          "quote": "在家做饭、收拾房间，一站就是大半个小时，脚底没有支撑会很不舒服。",
+          "risk_level": "low",
+          "assessment": "生活场景与选择问题是正常叙述；不用每个逗号都升调，也不持续高兴亢奋。",
+          "minimum_edit_or_direction": null,
+          "audio_verified": false
+        },
+        {
+          "sentence_id": "script_585afdf8098f4984_s003",
+          "ordinal": 3,
+          "stage": "pain",
+          "quote": "挑居家拖鞋的时候，除了看软不软，也可以留意足弓位置有没有托住脚底。",
+          "risk_level": "low",
+          "assessment": "生活场景与选择问题是正常叙述；不用每个逗号都升调，也不持续高兴亢奋。",
+          "minimum_edit_or_direction": null,
+          "audio_verified": false
+        },
+        {
+          "sentence_id": "script_585afdf8098f4984_s004",
+          "ordinal": 4,
+          "stage": "identity",
+          "quote": "这双是足弓支撑静音防滑厚底凉拖鞋，小蛮腰女款，来自Joy Share生活选物。",
+          "risk_level": "low",
+          "assessment": "中文长商品名接英文品牌，可能重音拥挤或品牌发音不稳；没有歌词式押韵。",
+          "minimum_edit_or_direction": "在“小蛮腰女款”后完整停顿；品牌发音需试听，必要时设发音字典。",
+          "audio_verified": false
+        },
+        {
+          "sentence_id": "script_585afdf8098f4984_s005",
+          "ordinal": 5,
+          "stage": "benefit",
+          "quote": "它的足弓位置做了支撑设计，厚底又带软弹缓震，穿上以后脚底会感觉比较有依托。",
+          "risk_level": "low",
+          "assessment": "卖点与使用说明语义完整，未见连续等长押韵；宜自然讲解，不把所有短语读成促销口号。",
+          "minimum_edit_or_direction": null,
+          "audio_verified": false
+        },
+        {
+          "sentence_id": "script_585afdf8098f4984_s006",
+          "ordinal": 6,
+          "stage": "benefit",
+          "quote": "平时在厨房备菜、在阳台晾衣服，需要来回走动的时候，这种支撑和缓震就能帮你分担久站带来的足部压力。",
+          "risk_level": "low",
+          "assessment": "含两项场景和较长的后半句，需在“时候”后停顿；不是等长排比。",
+          "minimum_edit_or_direction": "可保持文本，按逗号自然断开。",
+          "audio_verified": false
+        },
+        {
+          "sentence_id": "script_585afdf8098f4984_s007",
+          "ordinal": 7,
+          "stage": "benefit",
+          "quote": "小蛮腰厚底的设计，视觉上也能修饰脚型，居家穿也显得利落。",
+          "risk_level": "low",
+          "assessment": "卖点与使用说明语义完整，未见连续等长押韵；宜自然讲解，不把所有短语读成促销口号。",
+          "minimum_edit_or_direction": null,
+          "audio_verified": false
+        },
+        {
+          "sentence_id": "script_585afdf8098f4984_s008",
+          "ordinal": 8,
+          "stage": "benefit",
+          "quote": "整双鞋用的是优选E V A环保材质，一体成型，拼接少，结构上比较完整。",
+          "risk_level": "low",
+          "assessment": "E V A三字母接中文材质名，存在字母连读或异常停顿的待试听点。",
+          "minimum_edit_or_direction": "不提高音高；固定试听字母读法，必要时用发音字典。",
+          "audio_verified": false
+        },
+        {
+          "sentence_id": "script_585afdf8098f4984_s009",
+          "ordinal": 9,
+          "stage": "benefit",
+          "quote": "E V A材质本身比较轻，一体成型的结构也让它更适合日常居家和短途外出穿。",
+          "risk_level": "low",
+          "assessment": "句首E V A字母需确认读法；后半句为普通说明，没有明显旋律化文字诱因。",
+          "minimum_edit_or_direction": "字母发音与上一句保持一致。",
+          "audio_verified": false
+        },
+        {
+          "sentence_id": "script_585afdf8098f4984_s010",
+          "ordinal": 10,
+          "stage": "benefit",
+          "quote": "鞋底有静音和防滑两个特性，晚上在家走动，声音会小一些，减少打扰家人。",
+          "risk_level": "low",
+          "assessment": "卖点与使用说明语义完整，未见连续等长押韵；宜自然讲解，不把所有短语读成促销口号。",
+          "minimum_edit_or_direction": null,
+          "audio_verified": false
+        },
+        {
+          "sentence_id": "script_585afdf8098f4984_s011",
+          "ordinal": 11,
+          "stage": "benefit",
+          "quote": "浴室洗澡或者室内走动时，鞋底有防滑特性，湿地面行走可以多留意一下脚下。",
+          "risk_level": "low",
+          "assessment": "卖点与使用说明语义完整，未见连续等长押韵；宜自然讲解，不把所有短语读成促销口号。",
+          "minimum_edit_or_direction": null,
+          "audio_verified": false
+        },
+        {
+          "sentence_id": "script_585afdf8098f4984_s012",
+          "ordinal": 12,
+          "stage": "benefit",
+          "quote": "这双鞋很轻便，出去旅行时放在行李里带着，到了酒店换上自己的拖鞋会比较习惯。",
+          "risk_level": "low",
+          "assessment": "卖点与使用说明语义完整，未见连续等长押韵；宜自然讲解，不把所有短语读成促销口号。",
+          "minimum_edit_or_direction": null,
+          "audio_verified": false
+        },
+        {
+          "sentence_id": "script_585afdf8098f4984_s013",
+          "ordinal": 13,
+          "stage": "benefit",
+          "quote": "鞋底有耐磨特性，日常室内外穿，散步、倒垃圾、下楼拿快递都可以应付。",
+          "risk_level": "low",
+          "assessment": "“散步、倒垃圾、下楼拿快递”是三项自然列举，可有轻节奏但无需每项抬调。",
+          "minimum_edit_or_direction": "每个顿号短停，最后“都可以应付”自然落调。",
+          "audio_verified": false
+        },
+        {
+          "sentence_id": "script_585afdf8098f4984_s014",
+          "ordinal": 14,
+          "stage": "benefit",
+          "quote": "材质防臭快干，脏了用水冲洗，一冲即净，平时打理起来比较省事。",
+          "risk_level": "low",
+          "assessment": "“防臭快干”“一冲即净”有短促口号感，但未形成连续押韵；强情绪时应避免念成广告歌。",
+          "minimum_edit_or_direction": "卖点段采用自然讲解，不给每个四字短语同样的强重音。",
+          "audio_verified": false
+        },
+        {
+          "sentence_id": "script_585afdf8098f4984_s015",
+          "ordinal": 15,
+          "stage": "benefit",
+          "quote": "洗完放在通风处，干得快，日常换穿也更方便。",
+          "risk_level": "low",
+          "assessment": "卖点与使用说明语义完整，未见连续等长押韵；宜自然讲解，不把所有短语读成促销口号。",
+          "minimum_edit_or_direction": null,
+          "audio_verified": false
+        },
+        {
+          "sentence_id": "script_585afdf8098f4984_s016",
+          "ordinal": 16,
+          "stage": "scene",
+          "quote": "它适合居家室内、浴室洗澡，也可以旅行出游、沙滩漫步，或者日常外穿散步、倒垃圾。",
+          "risk_level": "moderate",
+          "assessment": "连续列举六类场景，朗读易形成均匀报菜名节奏；不是歌词，但可以缩短。",
+          "minimum_edit_or_direction": "可改为“在家里、浴室里可以穿，旅行时带着也方便。日常散步、倒垃圾，也能用得上。”",
+          "audio_verified": false
+        },
+        {
+          "sentence_id": "script_585afdf8098f4984_s017",
+          "ordinal": 17,
+          "stage": "scene",
+          "quote": "周末去海边走走，换上这双轻便的拖鞋，脚底有软弹缓震，走在沙滩上也比较轻松。",
+          "risk_level": "low",
+          "assessment": "场景说明有完整主谓，未见歌词式韵脚；各逗号自然短停，句末正常落调。",
+          "minimum_edit_or_direction": null,
+          "audio_verified": false
+        },
+        {
+          "sentence_id": "script_585afdf8098f4984_s018",
+          "ordinal": 18,
+          "stage": "specification",
+          "quote": "颜色有粉色、黑色、白色、卡其、蓝色等，一共十个颜色，大家可以根据自己的喜好来挑。",
+          "risk_level": "low",
+          "assessment": "五个颜色加总数，信息较密但无长串数字；逐项升调会显得机械。",
+          "minimum_edit_or_direction": "每个颜色短停；“一共十个颜色”落稳。",
+          "audio_verified": false
+        },
+        {
+          "sentence_id": "script_585afdf8098f4984_s019",
+          "ordinal": 19,
+          "stage": "specification",
+          "quote": "尺码从三十六码到三十七码、三十八码到三十九码、四十码到四十一码、四十二码到四十三码，一直到四十四码到四十五码。",
+          "risk_level": "high",
+          "assessment": "五个尺码区间共十个数字串在一句中，读者难跟上，反复“码到”可能产生机械节拍。",
+          "minimum_edit_or_direction": "拆成“三十六到三十七码、三十八到三十九码。四十到四十一码、四十二到四十三码。还有四十四到四十五码。”保留全部区间。",
+          "audio_verified": false
+        },
+        {
+          "sentence_id": "script_585afdf8098f4984_s020",
+          "ordinal": 20,
+          "stage": "specification",
+          "quote": "这是标准码，脚背比较宽或者脚型偏肉的话，建议斟酌大一号。",
+          "risk_level": "low",
+          "assessment": "选购说明是普通陈述；数字和选择条件应稍慢说明，未见需强情绪的文字依据。",
+          "minimum_edit_or_direction": null,
+          "audio_verified": false
+        },
+        {
+          "sentence_id": "script_585afdf8098f4984_s021",
+          "ordinal": 21,
+          "stage": "price",
+          "quote": "这双鞋原价一百七十八新台币，现在活动价一百零七新台币。",
+          "risk_level": "low",
+          "assessment": "一句含原价与活动价两个三位数及同一币种，事实容易听清但应在“现在”前明确停顿。",
+          "minimum_edit_or_direction": "可拆为“这双鞋原价一百七十八新台币。现在活动价一百零七新台币。”",
+          "audio_verified": false
+        },
+        {
+          "sentence_id": "script_585afdf8098f4984_s022",
+          "ordinal": 22,
+          "stage": "promotion",
+          "quote": "这次是限时下杀优惠，想找一双兼顾足弓支撑和软弹脚感的凉拖鞋，可以重点看看这双。",
+          "risk_level": "low",
+          "assessment": "促销段后半句较长，重音应只落在优惠和核心特点，避免全句持续高昂。",
+          "minimum_edit_or_direction": "“这次是限时下杀优惠”后稍停；后半句回到自然推荐语气。",
+          "audio_verified": false
+        },
+        {
+          "sentence_id": "script_585afdf8098f4984_s023",
+          "ordinal": 23,
+          "stage": "cta",
+          "quote": "想要一双日常好穿、打理省事的凉拖鞋，先把喜欢的颜色选好，再核对自己的尺码。",
+          "risk_level": "low",
+          "assessment": "购买动作清楚，属于正常建议句；句末落稳，不为了渲染力拖长“下单”。",
+          "minimum_edit_or_direction": null,
+          "audio_verified": false
+        },
+        {
+          "sentence_id": "script_585afdf8098f4984_s024",
+          "ordinal": 24,
+          "stage": "cta",
+          "quote": "看中的话，合适就下单。",
+          "risk_level": "low",
+          "assessment": "简短收口适合落调；如果TTS在“下单”延长尾音，属于待听感验证而非可从文字认定的问题。",
+          "minimum_edit_or_direction": "句末正常收住，不用拖长“单”。",
+          "audio_verified": false
+        }
+      ]
+    },
+    {
+      "version": 2,
+      "script_id": "script_e7fa5c440672412d",
+      "sentence_count": 31,
+      "sentence_reviews": [
+        {
+          "sentence_id": "script_e7fa5c440672412d_s001",
+          "ordinal": 1,
+          "stage": "welcome",
+          "quote": "欢迎来到直播间，今天咱们看一双出门和在家都用得上的凉拖鞋。",
+          "risk_level": "low",
+          "assessment": "问候加商品主题是自然完整句；无押韵、重复口号或长串数字。招呼应明亮，结尾落稳。",
+          "minimum_edit_or_direction": null,
+          "audio_verified": false
+        },
+        {
+          "sentence_id": "script_e7fa5c440672412d_s002",
+          "ordinal": 2,
+          "stage": "pain",
+          "quote": "出门旅行住酒店，很多人会想换上自己的拖鞋，穿着更习惯，走动也自在些。",
+          "risk_level": "low",
+          "assessment": "生活场景与选择问题是正常叙述；不用每个逗号都升调，也不持续高兴亢奋。",
+          "minimum_edit_or_direction": null,
+          "audio_verified": false
+        },
+        {
+          "sentence_id": "script_e7fa5c440672412d_s003",
+          "ordinal": 3,
+          "stage": "pain",
+          "quote": "这时候一双轻便、好收纳、干得快又不容易有味道的凉拖，就成了行李里值得留个位置的东西。",
+          "risk_level": "low",
+          "assessment": "四项修饰语集中在主语中，有轻排比感；“位置的东西”偏书面但不是歌词。",
+          "minimum_edit_or_direction": "在“凉拖”后停顿，不把四个形容词读成同一旋律。",
+          "audio_verified": false
+        },
+        {
+          "sentence_id": "script_e7fa5c440672412d_s004",
+          "ordinal": 4,
+          "stage": "identity",
+          "quote": "这双是 Joy Share 生活选物全新上架的足弓支撑静音防滑厚底凉拖鞋，小蛮腰女款。",
+          "risk_level": "low",
+          "assessment": "英文品牌加长中文商品名，名称密度较高。",
+          "minimum_edit_or_direction": "品牌与商品名之间自然停顿，试听Joy Share读法。",
+          "audio_verified": false
+        },
+        {
+          "sentence_id": "script_e7fa5c440672412d_s005",
+          "ordinal": 5,
+          "stage": "identity",
+          "quote": "它主打的是足弓支撑、厚底软弹，还有适合居家和旅行的轻便打理。",
+          "risk_level": "moderate",
+          "assessment": "“适合居家和旅行的轻便打理”搭配不自然，TTS只能照读，听者可能不理解修饰关系。",
+          "minimum_edit_or_direction": "建议改为“它主打足弓支撑、厚底软弹，鞋子轻便，日常也好打理。”",
+          "audio_verified": false
+        },
+        {
+          "sentence_id": "script_e7fa5c440672412d_s006",
+          "ordinal": 6,
+          "stage": "benefit",
+          "quote": "E V A 材质本身比较轻，整双鞋拿在手里不会沉甸甸的。",
+          "risk_level": "low",
+          "assessment": "E V A字母与“沉甸甸”的叠词需要自然读法；叠词本身不能证明会唱歌。",
+          "minimum_edit_or_direction": "避免拖长“甸甸”，保持正常讲解速度。",
+          "audio_verified": false
+        },
+        {
+          "sentence_id": "script_e7fa5c440672412d_s007",
+          "ordinal": 7,
+          "stage": "benefit",
+          "quote": "出发前把它塞进行李，到了酒店换上，在房间里走动或者去海边散步，脚上轻松一些。",
+          "risk_level": "low",
+          "assessment": "卖点与使用说明语义完整，未见连续等长押韵；宜自然讲解，不把所有短语读成促销口号。",
+          "minimum_edit_or_direction": null,
+          "audio_verified": false
+        },
+        {
+          "sentence_id": "script_e7fa5c440672412d_s008",
+          "ordinal": 8,
+          "stage": "benefit",
+          "quote": "平时在家穿，从客厅到阳台来回走，也不会觉得脚底拖着一双很重的鞋。",
+          "risk_level": "low",
+          "assessment": "卖点与使用说明语义完整，未见连续等长押韵；宜自然讲解，不把所有短语读成促销口号。",
+          "minimum_edit_or_direction": null,
+          "audio_verified": false
+        },
+        {
+          "sentence_id": "script_e7fa5c440672412d_s009",
+          "ordinal": 9,
+          "stage": "benefit",
+          "quote": "这双鞋的材质有快干和防臭的特性，日常穿完不用老惦记着打理。",
+          "risk_level": "low",
+          "assessment": "卖点与使用说明语义完整，未见连续等长押韵；宜自然讲解，不把所有短语读成促销口号。",
+          "minimum_edit_or_direction": null,
+          "audio_verified": false
+        },
+        {
+          "sentence_id": "script_e7fa5c440672412d_s010",
+          "ordinal": 10,
+          "stage": "benefit",
+          "quote": "在浴室洗完澡，或者去海边踩了沙，回来用水冲一冲，一冲即净，再晾着就行。",
+          "risk_level": "low",
+          "assessment": "“冲一冲，一冲即净”相邻重复，可能带出广告口号节奏。",
+          "minimum_edit_or_direction": "可删一次重复，改为“回来用水冲洗，一冲即净，再晾着就行。”",
+          "audio_verified": false
+        },
+        {
+          "sentence_id": "script_e7fa5c440672412d_s011",
+          "ordinal": 11,
+          "stage": "benefit",
+          "quote": "夏天出汗多，鞋面不容易闷出味道，日常换着穿心里也清爽些。",
+          "risk_level": "low",
+          "assessment": "卖点与使用说明语义完整，未见连续等长押韵；宜自然讲解，不把所有短语读成促销口号。",
+          "minimum_edit_or_direction": null,
+          "audio_verified": false
+        },
+        {
+          "sentence_id": "script_e7fa5c440672412d_s012",
+          "ordinal": 12,
+          "stage": "benefit",
+          "quote": "整双鞋用的是优选 E V A 环保材质，一体成型，拼接的地方少。",
+          "risk_level": "low",
+          "assessment": "E V A字母读法需与前文一致，其他部分是清楚的说明句。",
+          "minimum_edit_or_direction": "固定字母发音，不额外叠加强烈语气。",
+          "audio_verified": false
+        },
+        {
+          "sentence_id": "script_e7fa5c440672412d_s013",
+          "ordinal": 13,
+          "stage": "benefit",
+          "quote": "鞋底有耐磨特性，平时在室内穿，或者下楼散步、倒垃圾、去沙滩走走，都适合。",
+          "risk_level": "low",
+          "assessment": "三项外出场景列举，正常口语可读；均匀重拍会显得机械。",
+          "minimum_edit_or_direction": "短停顿分列，句尾“都适合”自然落稳。",
+          "audio_verified": false
+        },
+        {
+          "sentence_id": "script_e7fa5c440672412d_s014",
+          "ordinal": 14,
+          "stage": "benefit",
+          "quote": "一体成型的结构让鞋身线条利落，带出门也省得担心拼接处藏灰。",
+          "risk_level": "low",
+          "assessment": "卖点与使用说明语义完整，未见连续等长押韵；宜自然讲解，不把所有短语读成促销口号。",
+          "minimum_edit_or_direction": null,
+          "audio_verified": false
+        },
+        {
+          "sentence_id": "script_e7fa5c440672412d_s015",
+          "ordinal": 15,
+          "stage": "benefit",
+          "quote": "回到脚感本身，这双鞋在足弓位置做了支撑设计，搭配小蛮腰厚底。",
+          "risk_level": "low",
+          "assessment": "卖点与使用说明语义完整，未见连续等长押韵；宜自然讲解，不把所有短语读成促销口号。",
+          "minimum_edit_or_direction": null,
+          "audio_verified": false
+        },
+        {
+          "sentence_id": "script_e7fa5c440672412d_s016",
+          "ordinal": 16,
+          "stage": "benefit",
+          "quote": "厚底带来软弹缓震的体验，平时在厨房备菜、站着收拾房间，脚底能感觉到缓冲。",
+          "risk_level": "low",
+          "assessment": "卖点与使用说明语义完整，未见连续等长押韵；宜自然讲解，不把所有短语读成促销口号。",
+          "minimum_edit_or_direction": null,
+          "audio_verified": false
+        },
+        {
+          "sentence_id": "script_e7fa5c440672412d_s017",
+          "ordinal": 17,
+          "stage": "benefit",
+          "quote": "足弓有支撑、鞋底又软弹，久站的时候脚底压力能缓解一些，这两点就是挑家居拖鞋值得留意的部分。",
+          "risk_level": "low",
+          "assessment": "前部两项特点并列，后部解释较长；没有等长韵脚。",
+          "minimum_edit_or_direction": "“软弹”后短停，“缓解一些”后再停，避免整句抢读。",
+          "audio_verified": false
+        },
+        {
+          "sentence_id": "script_e7fa5c440672412d_s018",
+          "ordinal": 18,
+          "stage": "benefit",
+          "quote": "鞋底还有静音和防滑两个特性，晚上在家走动，声音会小一些，不容易打扰家人休息。",
+          "risk_level": "low",
+          "assessment": "卖点与使用说明语义完整，未见连续等长押韵；宜自然讲解，不把所有短语读成促销口号。",
+          "minimum_edit_or_direction": null,
+          "audio_verified": false
+        },
+        {
+          "sentence_id": "script_e7fa5c440672412d_s019",
+          "ordinal": 19,
+          "stage": "benefit",
+          "quote": "进浴室洗澡或者从浴室出来，踩在湿地面上，鞋底有防滑特性，行走时可以多留意脚下。",
+          "risk_level": "low",
+          "assessment": "多个逗号串起位置和提醒，后半句重心较晚。",
+          "minimum_edit_or_direction": "“踩在湿地面上”后停顿；提醒语气平稳。",
+          "audio_verified": false
+        },
+        {
+          "sentence_id": "script_e7fa5c440672412d_s020",
+          "ordinal": 20,
+          "stage": "benefit",
+          "quote": "在室内木地板或者瓷砖上走，静音这一点也让居家氛围更安静。",
+          "risk_level": "low",
+          "assessment": "卖点与使用说明语义完整，未见连续等长押韵；宜自然讲解，不把所有短语读成促销口号。",
+          "minimum_edit_or_direction": null,
+          "audio_verified": false
+        },
+        {
+          "sentence_id": "script_e7fa5c440672412d_s021",
+          "ordinal": 21,
+          "stage": "scene",
+          "quote": "这双鞋的适用场景挺多的，居家室内、浴室洗澡、旅行出游、沙滩漫步，日常外穿散步倒垃圾也行。",
+          "risk_level": "moderate",
+          "assessment": "六类场景连续列举，容易读成均匀功能清单；需控制列举长度。",
+          "minimum_edit_or_direction": "可拆为“在家里和浴室里可以穿。旅行出游、沙滩漫步，日常散步、倒垃圾，也能用得上。”",
+          "audio_verified": false
+        },
+        {
+          "sentence_id": "script_e7fa5c440672412d_s022",
+          "ordinal": 22,
+          "stage": "scene",
+          "quote": "一双鞋能从家里穿到旅行路上，出门前不用再为带哪双拖鞋纠结。",
+          "risk_level": "low",
+          "assessment": "场景说明有完整主谓，未见歌词式韵脚；各逗号自然短停，句末正常落调。",
+          "minimum_edit_or_direction": null,
+          "audio_verified": false
+        },
+        {
+          "sentence_id": "script_e7fa5c440672412d_s023",
+          "ordinal": 23,
+          "stage": "specification",
+          "quote": "颜色有粉色、红色、绿色、蓝色、橙色、葡萄紫、烟熏紫、卡其、黑色、白色，一共十个颜色可选。",
+          "risk_level": "moderate",
+          "assessment": "十个颜色连续报出，听觉记忆负担大；不构成歌词证据，但逐个抬调会像名单播报。",
+          "minimum_edit_or_direction": "保留完整颜色信息时拆成两句：先五种基本亮色，再五种紫色及中性色。",
+          "audio_verified": false
+        },
+        {
+          "sentence_id": "script_e7fa5c440672412d_s024",
+          "ordinal": 24,
+          "stage": "specification",
+          "quote": "喜欢清爽一点的可以看白色、蓝色、绿色；想低调百搭，卡其和黑色都很好搭衣服；想要亮眼一点，粉色、红色、橙色可以试试。",
+          "risk_level": "high",
+          "assessment": "三个“想/喜欢…可以…”选择句连在一条语音中，结构近似、色名密集，容易产生等节拍排比与句尾拖音。",
+          "minimum_edit_or_direction": "按分号拆成三句独立语音：“喜欢清爽一点的，可以看白色、蓝色、绿色。”“想低调百搭，卡其和黑色都很好搭衣服。”“想要亮眼一点，粉色、红色、橙色可以试试。”",
+          "audio_verified": false
+        },
+        {
+          "sentence_id": "script_e7fa5c440672412d_s025",
+          "ordinal": 25,
+          "stage": "specification",
+          "quote": "尺码从三十六码到三十七码、三十八码到三十九码、四十码到四十一码、四十二码到四十三码、四十四码到四十五码都有。",
+          "risk_level": "high",
+          "assessment": "五个尺码区间连续十个数字，重复“码到”明显；是数字可懂度的优先处理项。",
+          "minimum_edit_or_direction": "拆成“三十六到三十七码、三十八到三十九码。四十到四十一码、四十二到四十三码。还有四十四到四十五码。”",
+          "audio_verified": false
+        },
+        {
+          "sentence_id": "script_e7fa5c440672412d_s026",
+          "ordinal": 26,
+          "stage": "specification",
+          "quote": "版型是标准码，脚背比较宽或者脚型偏肉的话，建议斟酌大一号。",
+          "risk_level": "low",
+          "assessment": "选购说明是普通陈述；数字和选择条件应稍慢说明，未见需强情绪的文字依据。",
+          "minimum_edit_or_direction": null,
+          "audio_verified": false
+        },
+        {
+          "sentence_id": "script_e7fa5c440672412d_s027",
+          "ordinal": 27,
+          "stage": "price",
+          "quote": "价格方面，这双原价是一百七十八新台币。",
+          "risk_level": "low",
+          "assessment": "只有一个准确三位数及币种，适合稍慢说明；不应为原价营造唱腔。",
+          "minimum_edit_or_direction": "在“原价是”之后留自然节奏，数字不拆成逐字念。",
+          "audio_verified": false
+        },
+        {
+          "sentence_id": "script_e7fa5c440672412d_s028",
+          "ordinal": 28,
+          "stage": "price",
+          "quote": "活动价是一百零七新台币。",
+          "risk_level": "low",
+          "assessment": "简短活动价容易听清，但短句若强happy、长尾音会影响价格清楚度。",
+          "minimum_edit_or_direction": "保持price的自然稍慢配置，币种结尾收住。",
+          "audio_verified": false
+        },
+        {
+          "sentence_id": "script_e7fa5c440672412d_s029",
+          "ordinal": 29,
+          "stage": "promotion",
+          "quote": "这次是限时优惠，想找一双兼顾足弓支撑和软弹脚感的凉拖，可以重点看看这双。",
+          "risk_level": "low",
+          "assessment": "促销引导中句偏长，持续高情绪不利于核心特点听清。",
+          "minimum_edit_or_direction": "优惠说明后短停，后半段自然推荐，不抬高全句音量。",
+          "audio_verified": false
+        },
+        {
+          "sentence_id": "script_e7fa5c440672412d_s030",
+          "ordinal": 30,
+          "stage": "cta",
+          "quote": "想选一双居家、旅行都能穿的凉拖，先把喜欢的颜色选好，再按自己的尺码挑合适的一双。",
+          "risk_level": "low",
+          "assessment": "购买动作清楚，属于正常建议句；句末落稳，不为了渲染力拖长“下单”。",
+          "minimum_edit_or_direction": null,
+          "audio_verified": false
+        },
+        {
+          "sentence_id": "script_e7fa5c440672412d_s031",
+          "ordinal": 31,
+          "stage": "cta",
+          "quote": "看中这双的轻便、好冲洗和足弓支撑，合适就下单。",
+          "risk_level": "low",
+          "assessment": "三项卖点接下单动作，有轻清单节奏；文本没有押韵口号。",
+          "minimum_edit_or_direction": "重点落在“合适就下单”，正常收尾，不能拖长尾字。",
+          "audio_verified": false
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "id": "418e7f15-88f7-41ea-9379-d4e6d9aaf702",
+  "object": "chat.completion",
+  "created": 1791365091,
+  "model": "deepseek-flash",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "{\"versions\":[{\"label\":\"1\",\"angle\":\"从旅行收纳和日常选择切入，先讲可折叠携带与外观容量，再回到拉链主袋和内部小口袋等核心设计，最后讲肩带与尺寸。\",\"blocks\":[{\"stage\":\"welcome\",\"focus\":\"开场互动\",\"sentences\":[{\"display_text\":\"欢迎来到直播间，今天咱们看一款出门能折起来带着走的托特包。\",\"spoken_text\":\"欢迎来到直播间，今天咱们看一款出门能折起来带着走的托特包。\",\"kind\":\"engagement\",\"fact_ids\":[]},{\"display_text\":\"你平时出门会背大包还是小包，可以在心里选一个。\",\"spoken_text\":\"你平时出门会背大包还是小包，可以在心里选一个。\",\"kind\":\"engagement\",\"fact_ids\":[]}]},{\"stage\":\"pain\",\"focus\":\"旅行备用包与日常背大包的纠结\",\"sentences\":[{\"display_text\":\"住酒店的时候想换上自己的拖鞋，或者到了目的地临时想出门逛逛，身边没有一只轻便的包，就有点不方便。\",\"spoken_text\":\"住酒店的时候想换上自己的拖鞋，或者到了目的地临时想出门逛逛，身边没有一只轻便的包，就有点不方便。\",\"kind\":\"engagement\",\"fact_ids\":[]},{\"display_text\":\"但平时上班已经背了通勤包，再往行李箱里塞一只硬挺的大包，又占地方又添重量。\",\"spoken_text\":\"但平时上班已经背了通勤包，再往行李箱里塞一只硬挺的大包，又占地方又添重量。\",\"kind\":\"engagement\",\"fact_ids\":[]}]},{\"stage\":\"identity\",\"focus\":\"商品身份\",\"sentences\":[{\"display_text\":\"今天要讲的就是这款轻行可折叠通勤托特包。\",\"spoken_text\":\"今天要讲的就是这款轻行可折叠通勤托特包。\",\"kind\":\"product_claim\",\"fact_ids\":[\"NAME\"]}]},{\"stage\":\"benefit\",\"focus\":\"涤纶面料与可折叠携带\",\"sentences\":[{\"display_text\":\"它用的是涤纶面料，包身可以折叠。\",\"spoken_text\":\"它用的是涤纶面料，包身可以折叠。\",\"kind\":\"product_claim\",\"fact_ids\":[\"SELLING\"]},{\"display_text\":\"出门前把它折好放进箱子或大包里，到了地方再展开，就多了一只随手能用的包。\",\"spoken_text\":\"出门前把它折好放进箱子或大包里，到了地方再展开，就多了一只随手能用的包。\",\"kind\":\"product_claim\",\"fact_ids\":[\"SELLING\"]},{\"display_text\":\"坐车换乘或者临时去趟便利店，不用一直拎着空包走来走去。\",\"spoken_text\":\"坐车换乘或者临时去趟便利店，不用一直拎着空包走来走去。\",\"kind\":\"product_claim\",\"fact_ids\":[\"SELLING\"]}]},{\"stage\":\"benefit\",\"focus\":\"外观与容量尺寸\",\"sentences\":[{\"display_text\":\"包身尺寸是三十八乘三十乘十二厘米。\",\"spoken_text\":\"包身尺寸是三十八乘三十乘十二厘米。\",\"kind\":\"product_claim\",\"fact_ids\":[\"SELLING\"]},{\"display_text\":\"这个大小放在日常通勤、购物、短途出行的场景里，装随身物品比较合适。\",\"spoken_text\":\"这个大小放在日常通勤、购物、短途出行的场景里，装随身物品比较合适。\",\"kind\":\"product_claim\",\"fact_ids\":[\"SELLING\"]},{\"display_text\":\"颜色有黑色和米色两种。\",\"spoken_text\":\"颜色有黑色和米色两种。\",\"kind\":\"product_claim\",\"fact_ids\":[\"SELLING\"]},{\"display_text\":\"黑色搭配深色外套或牛仔类衣服比较沉稳，米色配浅色上衣会清爽一些，看你平时衣柜里哪种颜色多。\",\"spoken_text\":\"黑色搭配深色外套或牛仔类衣服比较沉稳，米色配浅色上衣会清爽一些，看你平时衣柜里哪种颜色多。\",\"kind\":\"product_claim\",\"fact_ids\":[\"SELLING\"]}]},{\"stage\":\"benefit\",\"focus\":\"主袋拉链与内部小口袋\",\"sentences\":[{\"display_text\":\"包口是主袋拉链开合。\",\"spoken_text\":\"包口是主袋拉链开合。\",\"kind\":\"product_claim\",\"fact_ids\":[\"SELLING\"]},{\"display_text\":\"东西装进去把拉链拉上，走在人多的地方心里会踏实一点。\",\"spoken_text\":\"东西装进去把拉链拉上，走在人多的地方心里会踏实一点。\",\"kind\":\"product_claim\",\"fact_ids\":[\"SELLING\"]},{\"display_text\":\"里面还做了一个小口袋，适合放钥匙、门禁卡这类日常小物。\",\"spoken_text\":\"里面还做了一个小口袋，适合放钥匙、门禁卡这类日常小物。\",\"kind\":\"product_claim\",\"fact_ids\":[\"SELLING\"]},{\"display_text\":\"要开门或者进地铁的时候，手往固定位置一摸就能找到，不用把整个包翻一遍。\",\"spoken_text\":\"要开门或者进地铁的时候，手往固定位置一摸就能找到，不用把整个包翻一遍。\",\"kind\":\"product_claim\",\"fact_ids\":[\"SELLING\"]}]},{\"stage\":\"benefit\",\"focus\":\"长肩带与两种背法\",\"sentences\":[{\"display_text\":\"它配的是长肩带，可以手提，也可以单肩背着。\",\"spoken_text\":\"它配的是长肩带，可以手提，也可以单肩背着。\",\"kind\":\"product_claim\",\"fact_ids\":[\"SELLING\"]},{\"display_text\":\"东西多的时候手提稳当些，走一段路想放松手，就换成单肩背。\",\"spoken_text\":\"东西多的时候手提稳当些，走一段路想放松手，就换成单肩背。\",\"kind\":\"product_claim\",\"fact_ids\":[\"SELLING\"]}]},{\"stage\":\"specification\",\"focus\":\"颜色与规格确认\",\"sentences\":[{\"display_text\":\"颜色就是黑色和米色两种，尺寸是三十八乘三十乘十二厘米。\",\"spoken_text\":\"颜色就是黑色和米色两种，尺寸是三十八乘三十乘十二厘米。\",\"kind\":\"product_claim\",\"fact_ids\":[\"SELLING\"]},{\"display_text\":\"下单前看一眼颜色选项，选你平时更好搭衣服的那一个。\",\"spoken_text\":\"下单前看一眼颜色选项，选你平时更好搭衣服的那一个。\",\"kind\":\"engagement\",\"fact_ids\":[]}]},{\"stage\":\"price\",\"focus\":\"准确价格\",\"sentences\":[{\"display_text\":\"价格方面，原价是九十九元，现在活动价是七十九元。\",\"spoken_text\":\"价格方面，原价是九十九元，现在活动价是七十九元。\",\"kind\":\"product_claim\",\"fact_ids\":[\"PRICE\"]}]},{\"stage\":\"promotion\",\"focus\":\"限时活动\",\"sentences\":[{\"display_text\":\"七十九元是活动价，活动限时，具体截止时间以页面为准。\",\"spoken_text\":\"七十九元是活动价，活动限时，具体截止时间以页面为准。\",\"kind\":\"product_claim\",\"fact_ids\":[\"PROMOTION\",\"PRICE\"]}]},{\"stage\":\"cta\",\"focus\":\"自然购买引导\",\"sentences\":[{\"display_text\":\"如果你需要一只出门临时展开、能装日常小物的包，可以看看它。\",\"spoken_text\":\"如果你需要一只出门临时展开、能装日常小物的包，可以看看它。\",\"kind\":\"engagement\",\"fact_ids\":[]},{\"display_text\":\"根据黑色或米色、尺寸是否符合你的习惯来选，合适再下单。\",\"spoken_text\":\"根据黑色或米色、尺寸是否符合你的习惯来选，合适再下单。\",\"kind\":\"engagement\",\"fact_ids\":[]}]}],\"missing_information\":[\"未提供电脑适配尺寸\",\"未提供承重性能\",\"未提供防水性能\",\"未提供防盗性能\",\"未提供活动截止时间\",\"未提供包邮、退换售后等履约条件\"]}]}"
+      },
+      "logprobs": null,
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 1930,
+    "completion_tokens": 1680,
+    "total_tokens": 3610,
+    "prompt_tokens_details": {
+      "cached_tokens": 1536
+    },
+    "prompt_cache_hit_tokens": 1536,
+    "prompt_cache_miss_tokens": 394
+  },
+  "system_fingerprint": "aeb56401ca74e127821c4f9126dcb669"
+}

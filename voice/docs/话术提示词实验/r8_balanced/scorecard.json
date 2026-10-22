@@ -1,0 +1,45 @@
+{
+  "run": "r8_balanced",
+  "versions": [
+    {
+      "version": 1,
+      "program": 39.01,
+      "semantic": 53.0,
+      "total": 92.01,
+      "hard_gate": true,
+      "rule_issues": [],
+      "serious_claims": 0,
+      "cross_version_copy_pass": true,
+      "pass": true,
+      "gaps": [
+        "“全新上架”属于品牌宣传，但商品资料未提供上架时间，需谨慎核对。",
+        "提到“耐磨”但商品资料有“轻便耐磨”，表述一致。",
+        "整体无明显实际缺点。"
+      ]
+    },
+    {
+      "version": 2,
+      "program": 38.93,
+      "semantic": 47.0,
+      "total": 85.93,
+      "hard_gate": false,
+      "rule_issues": [
+        "遗漏输入中明确的重要特点：耐磨",
+        "丰富商品展开过短，请把重要卖点放入具体生活场景展开，不靠重复参数凑字"
+      ],
+      "serious_claims": 0,
+      "cross_version_copy_pass": true,
+      "pass": false,
+      "gaps": [
+        "痛点引入较弱，开头未深入描述足部不适，直接进入商品介绍。",
+        "卖点展开的机械感稍强，描述略显书面化。",
+        "颜色和尺码列举占用篇幅较多，节奏略拖。"
+      ]
+    }
+  ],
+  "pair_diversity": {
+    "score": 4,
+    "reason": "两版卖点展开顺序、情境和节奏明显不同：版本1以旅行和夜间场景为主，结构较逐点；版本2以互动提问切入，按足弓支撑、静音、轻便等顺序展开，情境更生活化，节奏更流畅。两版均完整，差异鲜明。"
+  },
+  "rubric": "20261007.4-uniform-coverage-content-and-near-copy-checks"
+}

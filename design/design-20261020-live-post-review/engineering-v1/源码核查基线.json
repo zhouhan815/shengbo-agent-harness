@@ -1,0 +1,42 @@
+[
+  {
+    "path": "D:\\Codex project\\ecommerce-voice-agent\\app\\live_source.py",
+    "sha256": "97844d3817fe4a98bc24635f1f08485e95bf2543182ec75385666764ca6c2c6e",
+    "length": 26007
+  },
+  {
+    "path": "D:\\Codex project\\ecommerce-voice-agent\\app\\server.py",
+    "sha256": "bc94c4181b024485b81fa297a60bea683bf6633539f4e310f4fb2a871aca197f",
+    "length": 78612
+  },
+  {
+    "path": "D:\\Codex project\\ecommerce-voice-agent\\app\\prelive\\service.py",
+    "sha256": "783d21cb7c667f7cea3d7f08a57cf284bf8f7866e6585f35a16dd19af55208b4",
+    "length": 211186
+  },
+  {
+    "path": "D:\\Codex project\\ecommerce-voice-agent\\app\\prelive_bridge.py",
+    "sha256": "546e4af67e91d0102ee8fb20aa81afa98406dcdf2614f76948afa7163f0f1a80",
+    "length": 26882
+  },
+  {
+    "path": "D:\\Codex project\\shengbo-ops-agent\\src\\shengbo_prelive\\runtime.py",
+    "sha256": "4fd49f9d392bb7e10992fd7258ee04592da07b81f405e220d5c097e7e544e26a",
+    "length": 329929
+  },
+  {
+    "path": "D:\\Codex project\\shengbo-ops-agent\\src\\shengbo_prelive\\middleware.py",
+    "sha256": "43f208e5b81524b5ea830305b1ad53fc1bfbaf5cfb785b9ff1c2eed895617521",
+    "length": 36576
+  },
+  {
+    "path": "D:\\Codex project\\shengbo-ops-agent\\src\\shengbo_contracts\\common.py",
+    "sha256": "b9c59f507e1ee85b1db49f34447f28a7d3018c1af86bb5d812734ce0d340bbb5",
+    "length": 4563
+  },
+  {
+    "path": "D:\\Codex project\\shengbo-ops-agent\\src\\shengbo_prelive\\__main__.py",
+    "sha256": "05abd1169a7e99e9fc9d34661069c00aed6ed2c055ba5f2bce708acde0aeb624",
+    "length": 1770
+  }
+]

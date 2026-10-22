@@ -1,0 +1,42 @@
+{
+  "run": "holdout_mug_r4",
+  "versions": [
+    {
+      "version": 1,
+      "program": 39.05,
+      "semantic": 51.0,
+      "total": 90.05,
+      "hard_gate": true,
+      "rule_issues": [],
+      "serious_claims": 0,
+      "cross_version_copy_pass": true,
+      "pass": true,
+      "gaps": [
+        "未提示陶瓷杯易碎，需避免磕碰。",
+        "未说明杯子是否适合盛放热饮或冷饮的耐温信息。",
+        "缺少对杯口设计、杯身厚度等使用细节的描述。"
+      ]
+    },
+    {
+      "version": 2,
+      "program": 39.11,
+      "semantic": 51.0,
+      "total": 90.11,
+      "hard_gate": true,
+      "rule_issues": [],
+      "serious_claims": 0,
+      "cross_version_copy_pass": true,
+      "pass": true,
+      "gaps": [
+        "未提及陶瓷材质需注意轻拿轻放等日常使用注意事项。",
+        "缺少对杯身具体形状、重量等外观细节的描述。",
+        "未说明是否可用于微波炉或洗碗机，虽然资料未提供，但未提示消费者注意。"
+      ]
+    }
+  ],
+  "pair_diversity": {
+    "score": 3,
+    "reason": "版本2以更互动的问题开场，卖点展开顺序有调整，情境描述也略有不同，但整体结构相似，属于开场和重点展开有效不同。"
+  },
+  "rubric": "20261007.4-uniform-coverage-content-and-near-copy-checks"
+}

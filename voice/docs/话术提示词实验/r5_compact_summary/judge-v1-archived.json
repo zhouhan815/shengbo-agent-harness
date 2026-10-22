@@ -1,0 +1,69 @@
+{
+  "versions": [
+    {
+      "index": 1,
+      "scores": {
+        "natural_live_speech": 14,
+        "benefit_scene_expansion": 17,
+        "coherent_flow": 9,
+        "non_repetition": 9,
+        "purchase_guidance": 4
+      },
+      "score_reasons": [
+        "语言自然，如“如果你平时在家做饭、收拾、洗澡进进出出，脚底那种累和闷，其实很影响一天的状态。”等，但部分句式稍显重复。",
+        "卖点展开更全面：足弓支撑、静音防滑、快干防臭、轻便旅行等均有具体情境，且对湿滑地面有安全提醒，收益表述有限度。",
+        "结构清晰：从居家痛点切入，按特点、颜色、尺码、价格顺序展开，连贯不机械。",
+        "无冗余凑字，但颜色场景描述略有模板化。",
+        "价格正确，有选择引导“选的时候先看尺码，再看颜色”，不假设购物车已挂。"
+      ],
+      "unsupported_claims": [],
+      "price_and_terms_correct": true,
+      "knowledge_leaks": [],
+      "main_gaps": [
+        "未提及“小蛮腰”设计对脚型的修饰效果。",
+        "颜色适用场景描述较笼统，缺乏个性化。",
+        "价格条件未强调限时具体截止时间，但未编造。"
+      ]
+    },
+    {
+      "index": 2,
+      "scores": {
+        "natural_live_speech": 14,
+        "benefit_scene_expansion": 16,
+        "coherent_flow": 9,
+        "non_repetition": 9,
+        "purchase_guidance": 4
+      },
+      "score_reasons": [
+        "语言自然口语化，如“你最近有出游计划吗？”“酒店一般只提供一次性拖鞋，去海边或者下楼散步，穿自己的鞋才踏实。”等，像聊天一样亲切。",
+        "至少4个卖点展开：轻便旅行、足弓支撑久站、静音防滑、快干易清洗，均有具体情境和收益，但部分收益略有保留（如“久站会舒服一些”），符合有据卖点比例。",
+        "结构连贯：从旅行场景痛点切入，自然过渡到产品特点、颜色、尺码、价格，最后总结，无机械贴标签。",
+        "无空话凑字，无重复方便舒适，但颜色列举较平铺直叙。",
+        "价格币种正确，有选择引导“根据自己平时的穿着习惯来挑”，不假设已挂购物车。"
+      ],
+      "unsupported_claims": [],
+      "price_and_terms_correct": true,
+      "knowledge_leaks": [],
+      "main_gaps": [
+        "未提及防臭功能的具体场景展开。",
+        "颜色描述仅简单列举，未与适用场景深入结合。",
+        "尺码转换建议虽正确，但未强调标准码依据。"
+      ]
+    }
+  ],
+  "pair_diversity": {
+    "score": 3,
+    "reason": "两版开场分别聚焦旅行和居家场景，重点展开顺序不同，版1侧重旅行便携，版2侧重居家细节，但整体结构仍相似，差异中等。"
+  },
+  "judge_model": "deepseek-flash",
+  "usage": {
+    "prompt_tokens": 4067,
+    "completion_tokens": 736,
+    "total_tokens": 4803,
+    "prompt_tokens_details": {
+      "cached_tokens": 2560
+    },
+    "prompt_cache_hit_tokens": 2560,
+    "prompt_cache_miss_tokens": 1507
+  }
+}

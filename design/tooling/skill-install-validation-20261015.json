@@ -1,0 +1,431 @@
+{
+  "date": "2026-10-15",
+  "repo": "langchain-ai/langchain-skills",
+  "installed_ref_for_new_skills": "16a992f09ab3ccfb642dd4f08d350d833d1990bf",
+  "official_skills": [
+    {
+      "name": "deep-agents-core",
+      "path": "C:\\Users\\lizhe\\.agents\\skills\\deep-agents-core",
+      "action": "retained_existing",
+      "valid": true,
+      "validation": "Skill is valid!",
+      "files": [
+        {
+          "path": "SKILL.md",
+          "sha256": "590e86e15b7be4e6f4efbfe90832a3675de37d732c37a723e8517f8c10e275de"
+        }
+      ]
+    },
+    {
+      "name": "deep-agents-memory",
+      "path": "C:\\Users\\lizhe\\.agents\\skills\\deep-agents-memory",
+      "action": "installed",
+      "valid": true,
+      "validation": "Skill is valid!",
+      "files": [
+        {
+          "path": "SKILL.md",
+          "sha256": "3549b750ca9625dc73e0c4bee87133f57fab374ba0202daa74a2d28c91cb3bf4"
+        }
+      ]
+    },
+    {
+      "name": "deep-agents-orchestration",
+      "path": "C:\\Users\\lizhe\\.agents\\skills\\deep-agents-orchestration",
+      "action": "installed",
+      "valid": true,
+      "validation": "Skill is valid!",
+      "files": [
+        {
+          "path": "SKILL.md",
+          "sha256": "76f4c5c9ed0773a0008e753422b3e2f5849b7748c18a9ab84e8e2d4dbbd66ebf"
+        }
+      ]
+    },
+    {
+      "name": "deepagents-python-quickstart",
+      "path": "C:\\Users\\lizhe\\.agents\\skills\\deepagents-python-quickstart",
+      "action": "installed",
+      "valid": true,
+      "validation": "Skill is valid!",
+      "files": [
+        {
+          "path": "SKILL.md",
+          "sha256": "a7a7c80cc3320c9a3efcef817f44949e17f8fcc2e428f695dffa5912cf64c80d"
+        }
+      ]
+    },
+    {
+      "name": "deepagents-typescript-quickstart",
+      "path": "C:\\Users\\lizhe\\.agents\\skills\\deepagents-typescript-quickstart",
+      "action": "installed",
+      "valid": true,
+      "validation": "Skill is valid!",
+      "files": [
+        {
+          "path": "SKILL.md",
+          "sha256": "fbdde0b9416e06c0c8e135015d777652471dac2f972655db3c25748cc157a062"
+        }
+      ]
+    },
+    {
+      "name": "ecosystem-primer",
+      "path": "C:\\Users\\lizhe\\.agents\\skills\\ecosystem-primer",
+      "action": "installed",
+      "valid": true,
+      "validation": "Skill is valid!",
+      "files": [
+        {
+          "path": "SKILL.md",
+          "sha256": "cc786e2a06096142f93bda47bd9e9419338b21fead8d5c3d7b997cef43ed32cb"
+        }
+      ]
+    },
+    {
+      "name": "eval-engineering",
+      "path": "C:\\Users\\lizhe\\.agents\\skills\\eval-engineering",
+      "action": "installed",
+      "valid": true,
+      "validation": "Skill is valid!",
+      "files": [
+        {
+          "path": "agents/openai.yaml",
+          "sha256": "197313de881f9a2cc98cf1a90a98f4e582049e2c2025b396443796c4480edfff"
+        },
+        {
+          "path": "assets/task/Task.md.template",
+          "sha256": "e20b7f9744b0baa18a1d8823deb5f06189222919dc74117c8ca38be2ad373a6d"
+        },
+        {
+          "path": "assets/world-skill/SKILL.md.template",
+          "sha256": "ee3f58bfbb67c6f5b5c4e8751213ab522369b472b11c6ed7df33845617f2cfb7"
+        },
+        {
+          "path": "references/calibration.md",
+          "sha256": "f2bb620404cca0ee8f1aa56bc2585cb2e0cfc05c4d76b3b16c04a03cd130e27a"
+        },
+        {
+          "path": "references/discovery.md",
+          "sha256": "50ea0b7ad4aa391a8e1cb31cbadb6426014cf72a1ec08d05d873fb160bb80aef"
+        },
+        {
+          "path": "references/environment-building.md",
+          "sha256": "eacafa2f8b67645efb3cf34be18166bdb476fc7e5f0845382e4e102f5a51e093"
+        },
+        {
+          "path": "references/examples/service-desk.md",
+          "sha256": "c33d84e1d9e4f2801500c1f64e451d1fd4886a0b7b61e9a25f76b3c2f4242a03"
+        },
+        {
+          "path": "references/harbor.md",
+          "sha256": "e7c211f933a1dc6ae606f8ecaf9ca3c025bd84e7bcb50fe0888942f1e7567089"
+        },
+        {
+          "path": "references/multi-turn-simulation/guide.md",
+          "sha256": "e6f26fbd7d8e3dcc3e0a5f2c05ad4d6906a75534e8738f6ec8acb2f80c0c124e"
+        },
+        {
+          "path": "references/multi-turn-simulation/harbor_example.py",
+          "sha256": "0443c3b4b2c4104a79253435f5b47286f3cb66a49ca8dbb3259ed346b6fb46d6"
+        },
+        {
+          "path": "references/multi-turn-simulation/model_user.py",
+          "sha256": "37293c671c8b5bf00bc088f4340eb5fc6801f20a2b4be0010ef105f89e343a8e"
+        },
+        {
+          "path": "references/multi-turn-simulation/runner.py",
+          "sha256": "d05c6f89510dd580ce222ae7dd013c64a529b4be67e3d9d938cfb3f6ae41db8b"
+        },
+        {
+          "path": "references/patterns.md",
+          "sha256": "39e717bbca17e3c847ad424c4dda53a17e7575444b9fc781395dacfa8af5dade"
+        },
+        {
+          "path": "references/synthetic-data.md",
+          "sha256": "70047f998821cfaa24f08e1528b5924b206e2f0fda5dcc2fee8a1d6dee1795f0"
+        },
+        {
+          "path": "references/task-design.md",
+          "sha256": "75e73907b50dfe3422d2673ea18b22dd1d622a938f2f160dbc33d55333bdda63"
+        },
+        {
+          "path": "references/task-implementation.md",
+          "sha256": "1f5be2d0ba6e17777475b42bed35985f0dbd6d2842f15b7654b528be0a4d62a3"
+        },
+        {
+          "path": "references/verifier-design.md",
+          "sha256": "5626ab0b70dde72017a98ea2646712ea1090f2080f6a234fd3661fadd5282a1f"
+        },
+        {
+          "path": "references/world-knowledge.md",
+          "sha256": "5136a54ed8c33ead56c9e7a3fbafecc6dbab2cdcf6d56dd32e95533e66adbf16"
+        },
+        {
+          "path": "scripts/compare_tool_schemas.py",
+          "sha256": "777b18270035e0fd0037712f0b5fb6e0218e8f11cc0218a48bc63f1e0da5b4b8"
+        },
+        {
+          "path": "scripts/snapshot_sqlite_state.py",
+          "sha256": "c44cf7137fe66a40b61ceedc91618b6154c2fe2eb86e5ae95318e094063f787e"
+        },
+        {
+          "path": "SKILL.md",
+          "sha256": "47c93e705a3a21ab28ab0b2289488cb5e02da0e52729ca857a0c1d008a401c0b"
+        }
+      ]
+    },
+    {
+      "name": "langchain-dependencies",
+      "path": "C:\\Users\\lizhe\\.agents\\skills\\langchain-dependencies",
+      "action": "installed",
+      "valid": true,
+      "validation": "Skill is valid!",
+      "files": [
+        {
+          "path": "SKILL.md",
+          "sha256": "e099bf710d55bac77bdb3aa3e0b76e3da249f0ba910f37ba6a87c524d14dd8bf"
+        }
+      ]
+    },
+    {
+      "name": "langchain-fundamentals",
+      "path": "C:\\Users\\lizhe\\.agents\\skills\\langchain-fundamentals",
+      "action": "installed",
+      "valid": true,
+      "validation": "Skill is valid!",
+      "files": [
+        {
+          "path": "SKILL.md",
+          "sha256": "00dc50a19d6eec308e3c4a5b8ca237fdddeb00195e7e29d009049f5d0566f5c2"
+        }
+      ]
+    },
+    {
+      "name": "langchain-middleware",
+      "path": "C:\\Users\\lizhe\\.agents\\skills\\langchain-middleware",
+      "action": "installed",
+      "valid": true,
+      "validation": "Skill is valid!",
+      "files": [
+        {
+          "path": "SKILL.md",
+          "sha256": "2c5e499a818d1b17bdcbe8b827c69679aab175f772e89c6180fe01fedf435968"
+        }
+      ]
+    },
+    {
+      "name": "langchain-python-quickstart",
+      "path": "C:\\Users\\lizhe\\.agents\\skills\\langchain-python-quickstart",
+      "action": "installed",
+      "valid": true,
+      "validation": "Skill is valid!",
+      "files": [
+        {
+          "path": "SKILL.md",
+          "sha256": "061761566c9495a1e01c912d7813468e44988cfdb584857589e951fa1be3d783"
+        }
+      ]
+    },
+    {
+      "name": "langchain-rag",
+      "path": "C:\\Users\\lizhe\\.agents\\skills\\langchain-rag",
+      "action": "installed",
+      "valid": true,
+      "validation": "Skill is valid!",
+      "files": [
+        {
+          "path": "SKILL.md",
+          "sha256": "4ebd791aeaaf8a4c3b9fc164404bf51de66e94e8d98cae6f34e73e533df4afb2"
+        }
+      ]
+    },
+    {
+      "name": "langchain-typescript-quickstart",
+      "path": "C:\\Users\\lizhe\\.agents\\skills\\langchain-typescript-quickstart",
+      "action": "installed",
+      "valid": true,
+      "validation": "Skill is valid!",
+      "files": [
+        {
+          "path": "SKILL.md",
+          "sha256": "4de20dcd32087c6ed7e740e83ba3794329d1d066d097ba009175d2b5c0d86790"
+        }
+      ]
+    },
+    {
+      "name": "langgraph-cli",
+      "path": "C:\\Users\\lizhe\\.agents\\skills\\langgraph-cli",
+      "action": "installed",
+      "valid": true,
+      "validation": "Skill is valid!",
+      "files": [
+        {
+          "path": "SKILL.md",
+          "sha256": "59bfeb9204cf63a22b117f01b0c581b5f99d63d0720df35c2fb0fafcbd92f344"
+        }
+      ]
+    },
+    {
+      "name": "langgraph-decision-models",
+      "path": "C:\\Users\\lizhe\\.agents\\skills\\langgraph-decision-models",
+      "action": "installed",
+      "valid": true,
+      "validation": "Skill is valid!",
+      "files": [
+        {
+          "path": "references/conversion-playbook.md",
+          "sha256": "e3b7191adaadc6e08aca681535257dd62efc10c1b8e4b60a81877b2cac409726"
+        },
+        {
+          "path": "SKILL.md",
+          "sha256": "aed6f94f1b4e9ac841b4929e7f497229d59095c6e61ea28c4f1257af3bbea9cd"
+        }
+      ]
+    },
+    {
+      "name": "langgraph-fundamentals",
+      "path": "C:\\Users\\lizhe\\.agents\\skills\\langgraph-fundamentals",
+      "action": "installed",
+      "valid": true,
+      "validation": "Skill is valid!",
+      "files": [
+        {
+          "path": "references/python.md",
+          "sha256": "3d30871a6463f955452fdebe607248c39b6806cf07c0fe655e3783b48acc6d91"
+        },
+        {
+          "path": "references/typescript.md",
+          "sha256": "8cf8577265a75a1e46a5e1dfc7599c63efb60059591593dbb92dbd51acd5d22a"
+        },
+        {
+          "path": "SKILL.md",
+          "sha256": "193bea142c9df04abc44917fb96c0be53ec9b5c77f56670004d3c03c117fb990"
+        }
+      ]
+    },
+    {
+      "name": "langgraph-human-in-the-loop",
+      "path": "C:\\Users\\lizhe\\.agents\\skills\\langgraph-human-in-the-loop",
+      "action": "installed",
+      "valid": true,
+      "validation": "Skill is valid!",
+      "files": [
+        {
+          "path": "SKILL.md",
+          "sha256": "ce56e8ce58548dd1d7cb0d3e524cf546cef0c712e3c35d63fdd4ae354b40d3c1"
+        }
+      ]
+    },
+    {
+      "name": "langgraph-persistence",
+      "path": "C:\\Users\\lizhe\\.agents\\skills\\langgraph-persistence",
+      "action": "installed",
+      "valid": true,
+      "validation": "Skill is valid!",
+      "files": [
+        {
+          "path": "SKILL.md",
+          "sha256": "0a9a4f36e6d7895a273ce0882655e57023d2d992d4fde8e033e2936ac1df789e"
+        }
+      ]
+    },
+    {
+      "name": "langgraph-python-quickstart",
+      "path": "C:\\Users\\lizhe\\.agents\\skills\\langgraph-python-quickstart",
+      "action": "installed",
+      "valid": true,
+      "validation": "Skill is valid!",
+      "files": [
+        {
+          "path": "SKILL.md",
+          "sha256": "0f111b6d23be0fe1279217ddee83117cd533467428e0302b339538aa031d35ab"
+        }
+      ]
+    },
+    {
+      "name": "langgraph-typescript-quickstart",
+      "path": "C:\\Users\\lizhe\\.agents\\skills\\langgraph-typescript-quickstart",
+      "action": "installed",
+      "valid": true,
+      "validation": "Skill is valid!",
+      "files": [
+        {
+          "path": "SKILL.md",
+          "sha256": "fb6382b2927a7fde0de2071c98c1c800a66cd9378bdc19c72eaaa27743e687d0"
+        }
+      ]
+    },
+    {
+      "name": "managed-deep-agents",
+      "path": "C:\\Users\\lizhe\\.agents\\skills\\managed-deep-agents",
+      "action": "installed",
+      "valid": true,
+      "validation": "Skill is valid!",
+      "files": [
+        {
+          "path": "SKILL.md",
+          "sha256": "fe1020c6727002aaade34ec23ca0ebab9c9b455b59a3ac0b50485059c566c200"
+        }
+      ]
+    },
+    {
+      "name": "swarm",
+      "path": "C:\\Users\\lizhe\\.agents\\skills\\swarm",
+      "action": "installed",
+      "valid": true,
+      "validation": "Skill is valid!",
+      "files": [
+        {
+          "path": "scripts/batching.ts",
+          "sha256": "55c5ee7ab7f7db6888aeb9a22db6ab7bf744cc82b0947431518687ad38421f85"
+        },
+        {
+          "path": "scripts/executor.ts",
+          "sha256": "b6d4930b6f7b4b7b7a7d3dbc345870cec80c8192a5ea0d500942bfde50adca11"
+        },
+        {
+          "path": "scripts/filter.ts",
+          "sha256": "2881a8291fff7dea04de3846bf92cee0fa44b33c91e9c73aea62a9384313b032"
+        },
+        {
+          "path": "scripts/index.ts",
+          "sha256": "6bf8fc4f6a952baaee3f0d0974ee610f983b376312fd5bd0e6596396e4fa7fa6"
+        },
+        {
+          "path": "scripts/interpolate.ts",
+          "sha256": "8f55565dd69558e153a2cdbb58d1e8448c2a037d7d05ff3c4a849983f793eefa"
+        },
+        {
+          "path": "scripts/table.ts",
+          "sha256": "1f381429a24b107659060a7813cdd1e86fcad5778ee3b3044c4c3d539b37023d"
+        },
+        {
+          "path": "scripts/types.ts",
+          "sha256": "02afa106d51439ed8e142a716b382eb7c5e49216f388b06be3c9c46662482929"
+        },
+        {
+          "path": "scripts/utils.ts",
+          "sha256": "47f8025119565e178241420ee8aa022d895657087ef19de5124e7fa0c460bbb7"
+        },
+        {
+          "path": "SKILL.md",
+          "sha256": "e3653709b3b0a4fd7630802bfc3c92153ec4a754b429fa86ff6514fdbd2f224f"
+        }
+      ]
+    }
+  ],
+  "custom": {
+    "name": "agent-harness-design",
+    "path": "C:\\Users\\lizhe\\.codex\\skills\\agent-harness-design",
+    "valid": true,
+    "validation": "Skill is valid!"
+  },
+  "retained_core_matches_pinned_upstream": true,
+  "issues": [],
+  "compatibility_patch": {
+    "skill": "swarm",
+    "change": "Moved top-level compatibility into metadata.compatibility for built-in Codex validator; retained text and runtime requirements",
+    "original": "D:\\Codex project\\shengbo-ops-agent-plan\\tooling\\upstream-snapshots\\swarm\\SKILL.md",
+    "semantics_preserved": true
+  }
+}

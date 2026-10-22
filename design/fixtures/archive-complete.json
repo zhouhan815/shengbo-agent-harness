@@ -1,0 +1,874 @@
+{
+  "schema_version": "shengbo.ops.v2",
+  "kind": "SessionArchive",
+  "id": "archive_demo",
+  "revision": 1,
+  "created_at": "2026-10-07T10:01:05+08:00",
+  "data_origin": "simulated",
+  "archive_id": "archive_demo",
+  "room_id": "room_demo",
+  "session_id": "session_demo",
+  "started_at": "2026-10-07T10:00:00+08:00",
+  "ended_at": "2026-10-07T10:01:00+08:00",
+  "sealed_at": "2026-10-07T10:01:05+08:00",
+  "end_reason": "fixture_queue_completed",
+  "preparation_ref": {
+    "plan_id": "plan_demo",
+    "revision": 1
+  },
+  "catalog_snapshots": [
+    {
+      "product_id": "product_slippers",
+      "product_revision": "fixture-sha256:1ea774084031f4d1904755a5b61e011c926d814c98d5c44f9685d95ba639ca73",
+      "fields": {
+        "name": "足弓支撑静音防滑厚底凉拖鞋",
+        "price": "178",
+        "promo_price": null,
+        "currency": "TWD",
+        "selling_points": "EVA材质，足弓支撑，厚底；地面有水时仍须小心行走。",
+        "promotion": "历史活动价未核实有效期，本轮演示不启用优惠承诺。",
+        "knowledge": "尺码36-37至44-45；脚背宽或脚型偏肉可斟酌大一码。\n历史样例配送9月21日至9月30日，当前日期不可直接沿用。"
+      },
+      "facts": [
+        {
+          "id": "NAME",
+          "text": "足弓支撑静音防滑厚底凉拖鞋"
+        },
+        {
+          "id": "PRICE",
+          "text": "标价178 TWD。"
+        },
+        {
+          "id": "SELLING",
+          "text": "EVA材质、足弓支撑和厚底设计。"
+        },
+        {
+          "id": "SIZE",
+          "text": "尺码36-37、38-39、40-41、42-43、44-45；脚背宽可斟酌大一码。"
+        },
+        {
+          "id": "CARE",
+          "text": "浴室地面遇水仍请小心行走。"
+        },
+        {
+          "id": "PROMOTION",
+          "text": "历史样例活动价107 TWD，当前有效期未核实，不作现行优惠承诺。"
+        },
+        {
+          "id": "DELIVERY",
+          "text": "历史资料含9月21日至9月30日，不能当成当前配送承诺。"
+        }
+      ],
+      "source": "design_fixture_not_current_offer",
+      "data_origin": "simulated",
+      "verified_at": null,
+      "valid_until": null,
+      "missing_fields": [
+        "inventory",
+        "promotion_valid_until",
+        "current_delivery_date"
+      ]
+    },
+    {
+      "product_id": "product_bag",
+      "product_revision": "fixture-sha256:11c3842d1b96627ef3fba63ac132dafee0399243a63b175c3755d69233d1e1d3",
+      "fields": {
+        "name": "演示收纳袋",
+        "price": "59",
+        "promo_price": null,
+        "currency": "TWD",
+        "selling_points": "仅用于测试的聚酯材质收纳袋。",
+        "promotion": "历史活动价未核实有效期，本轮演示不启用优惠承诺。",
+        "knowledge": "本商品完全为构造样例，不表示真实在售商品。"
+      },
+      "facts": [
+        {
+          "id": "NAME",
+          "text": "演示收纳袋"
+        },
+        {
+          "id": "PRICE",
+          "text": "构造标价59 TWD。"
+        },
+        {
+          "id": "MATERIAL",
+          "text": "构造资料标明聚酯材质。"
+        }
+      ],
+      "source": "design_fixture_not_current_offer",
+      "data_origin": "simulated",
+      "verified_at": null,
+      "valid_until": null,
+      "missing_fields": [
+        "inventory",
+        "promotion_valid_until",
+        "current_delivery_date"
+      ]
+    }
+  ],
+  "script_snapshots": [
+    {
+      "script_id": "script_shoe",
+      "script_revision": 1,
+      "product_ref": {
+        "product_id": "product_slippers",
+        "product_revision": "fixture-sha256:1ea774084031f4d1904755a5b61e011c926d814c98d5c44f9685d95ba639ca73"
+      },
+      "status": "approved",
+      "sentences": [
+        {
+          "sentence_id": "sentence_price",
+          "stage": "introduction",
+          "display_text": "这款凉拖鞋标价一百七十八新台币。",
+          "spoken_text": "这款凉拖鞋标价一百七十八新台币。",
+          "kind": "product_claim",
+          "fact_refs": [
+            {
+              "product_id": "product_slippers",
+              "product_revision": "fixture-sha256:1ea774084031f4d1904755a5b61e011c926d814c98d5c44f9685d95ba639ca73",
+              "fact_id": "NAME"
+            },
+            {
+              "product_id": "product_slippers",
+              "product_revision": "fixture-sha256:1ea774084031f4d1904755a5b61e011c926d814c98d5c44f9685d95ba639ca73",
+              "fact_id": "PRICE"
+            }
+          ]
+        },
+        {
+          "sentence_id": "sentence_benefit",
+          "stage": "benefit",
+          "display_text": "它采用EVA材质，带有足弓支撑和厚底设计。",
+          "spoken_text": "它采用EVA材质，带有足弓支撑和厚底设计。",
+          "kind": "product_claim",
+          "fact_refs": [
+            {
+              "product_id": "product_slippers",
+              "product_revision": "fixture-sha256:1ea774084031f4d1904755a5b61e011c926d814c98d5c44f9685d95ba639ca73",
+              "fact_id": "SELLING"
+            }
+          ]
+        },
+        {
+          "sentence_id": "sentence_size",
+          "stage": "specification",
+          "display_text": "尺码从三十六码到四十五码，脚背宽可以斟酌大一码。",
+          "spoken_text": "尺码从三十六码到四十五码，脚背宽可以斟酌大一码。",
+          "kind": "product_claim",
+          "fact_refs": [
+            {
+              "product_id": "product_slippers",
+              "product_revision": "fixture-sha256:1ea774084031f4d1904755a5b61e011c926d814c98d5c44f9685d95ba639ca73",
+              "fact_id": "SIZE"
+            }
+          ]
+        }
+      ],
+      "approval_source": "fixture_operator"
+    },
+    {
+      "script_id": "script_bag",
+      "script_revision": 1,
+      "product_ref": {
+        "product_id": "product_bag",
+        "product_revision": "fixture-sha256:11c3842d1b96627ef3fba63ac132dafee0399243a63b175c3755d69233d1e1d3"
+      },
+      "status": "approved",
+      "sentences": [
+        {
+          "sentence_id": "sentence_material",
+          "stage": "specification",
+          "display_text": "这款演示收纳袋的构造资料标明为聚酯材质。",
+          "spoken_text": "这款演示收纳袋的构造资料标明为聚酯材质。",
+          "kind": "product_claim",
+          "fact_refs": [
+            {
+              "product_id": "product_bag",
+              "product_revision": "fixture-sha256:11c3842d1b96627ef3fba63ac132dafee0399243a63b175c3755d69233d1e1d3",
+              "fact_id": "MATERIAL"
+            }
+          ]
+        }
+      ],
+      "approval_source": "fixture_operator"
+    }
+  ],
+  "events": [
+    {
+      "schema_version": "shengbo.ops.v2",
+      "kind": "NormalizedEvent",
+      "id": "playback_price_start",
+      "revision": 1,
+      "created_at": "2026-10-07T10:00:00+08:00",
+      "data_origin": "simulated",
+      "event_id": "playback_price_start",
+      "room_id": "room_demo",
+      "session_id": "session_demo",
+      "seq": 1,
+      "occurred_at": "2026-10-07T10:00:00+08:00",
+      "received_at": "2026-10-07T10:00:00+08:00",
+      "event_type": "playback_started",
+      "source": "fixture",
+      "product_id": "product_slippers",
+      "payload": {
+        "source_event_id": "playback_price_start",
+        "attempt_id": "attempt_price"
+      }
+    },
+    {
+      "schema_version": "shengbo.ops.v2",
+      "kind": "NormalizedEvent",
+      "id": "question_size_1",
+      "revision": 1,
+      "created_at": "2026-10-07T10:00:10+08:00",
+      "data_origin": "simulated",
+      "event_id": "question_size_1",
+      "room_id": "room_demo",
+      "session_id": "session_demo",
+      "seq": 2,
+      "occurred_at": "2026-10-07T10:00:10+08:00",
+      "received_at": "2026-10-07T10:00:10+08:00",
+      "event_type": "question",
+      "source": "fixture",
+      "product_id": "product_slippers",
+      "payload": {
+        "source_event_id": "question_size_1",
+        "text": "脚背宽选多大？",
+        "topic": "size"
+      }
+    },
+    {
+      "schema_version": "shengbo.ops.v2",
+      "kind": "NormalizedEvent",
+      "id": "question_size_2",
+      "revision": 1,
+      "created_at": "2026-10-07T10:00:11+08:00",
+      "data_origin": "simulated",
+      "event_id": "question_size_2",
+      "room_id": "room_demo",
+      "session_id": "session_demo",
+      "seq": 3,
+      "occurred_at": "2026-10-07T10:00:11+08:00",
+      "received_at": "2026-10-07T10:00:11+08:00",
+      "event_type": "question",
+      "source": "fixture",
+      "product_id": "product_slippers",
+      "payload": {
+        "source_event_id": "question_size_2",
+        "text": "有多少码，脚背宽怎么选？",
+        "topic": "size"
+      }
+    },
+    {
+      "schema_version": "shengbo.ops.v2",
+      "kind": "NormalizedEvent",
+      "id": "action_size_accepted",
+      "revision": 1,
+      "created_at": "2026-10-07T10:00:11+08:00",
+      "data_origin": "simulated",
+      "event_id": "action_size_accepted",
+      "room_id": "room_demo",
+      "session_id": "session_demo",
+      "seq": 4,
+      "occurred_at": "2026-10-07T10:00:11+08:00",
+      "received_at": "2026-10-07T10:00:11+08:00",
+      "event_type": "action_accepted",
+      "source": "fixture",
+      "product_id": "product_slippers",
+      "payload": {
+        "source_event_id": "action_size_accepted",
+        "action_id": "action_size"
+      }
+    },
+    {
+      "schema_version": "shengbo.ops.v2",
+      "kind": "NormalizedEvent",
+      "id": "playback_price_end",
+      "revision": 1,
+      "created_at": "2026-10-07T10:00:12+08:00",
+      "data_origin": "simulated",
+      "event_id": "playback_price_end",
+      "room_id": "room_demo",
+      "session_id": "session_demo",
+      "seq": 5,
+      "occurred_at": "2026-10-07T10:00:12+08:00",
+      "received_at": "2026-10-07T10:00:12+08:00",
+      "event_type": "playback_ended",
+      "source": "fixture",
+      "product_id": "product_slippers",
+      "payload": {
+        "source_event_id": "playback_price_end",
+        "attempt_id": "attempt_price"
+      }
+    },
+    {
+      "schema_version": "shengbo.ops.v2",
+      "kind": "NormalizedEvent",
+      "id": "playback_answer_start",
+      "revision": 1,
+      "created_at": "2026-10-07T10:00:20+08:00",
+      "data_origin": "simulated",
+      "event_id": "playback_answer_start",
+      "room_id": "room_demo",
+      "session_id": "session_demo",
+      "seq": 6,
+      "occurred_at": "2026-10-07T10:00:20+08:00",
+      "received_at": "2026-10-07T10:00:20+08:00",
+      "event_type": "playback_started",
+      "source": "fixture",
+      "product_id": "product_slippers",
+      "payload": {
+        "source_event_id": "playback_answer_start",
+        "attempt_id": "attempt_answer",
+        "action_id": "action_size"
+      }
+    },
+    {
+      "schema_version": "shengbo.ops.v2",
+      "kind": "NormalizedEvent",
+      "id": "playback_answer_end",
+      "revision": 1,
+      "created_at": "2026-10-07T10:00:24+08:00",
+      "data_origin": "simulated",
+      "event_id": "playback_answer_end",
+      "room_id": "room_demo",
+      "session_id": "session_demo",
+      "seq": 7,
+      "occurred_at": "2026-10-07T10:00:24+08:00",
+      "received_at": "2026-10-07T10:00:24+08:00",
+      "event_type": "playback_ended",
+      "source": "fixture",
+      "product_id": "product_slippers",
+      "payload": {
+        "source_event_id": "playback_answer_end",
+        "attempt_id": "attempt_answer",
+        "action_id": "action_size"
+      }
+    },
+    {
+      "schema_version": "shengbo.ops.v2",
+      "kind": "NormalizedEvent",
+      "id": "playback_benefit_start",
+      "revision": 1,
+      "created_at": "2026-10-07T10:00:24+08:00",
+      "data_origin": "simulated",
+      "event_id": "playback_benefit_start",
+      "room_id": "room_demo",
+      "session_id": "session_demo",
+      "seq": 8,
+      "occurred_at": "2026-10-07T10:00:24+08:00",
+      "received_at": "2026-10-07T10:00:24+08:00",
+      "event_type": "playback_started",
+      "source": "fixture",
+      "product_id": "product_slippers",
+      "payload": {
+        "source_event_id": "playback_benefit_start",
+        "attempt_id": "attempt_benefit"
+      }
+    },
+    {
+      "schema_version": "shengbo.ops.v2",
+      "kind": "NormalizedEvent",
+      "id": "question_stock",
+      "revision": 1,
+      "created_at": "2026-10-07T10:00:25+08:00",
+      "data_origin": "simulated",
+      "event_id": "question_stock",
+      "room_id": "room_demo",
+      "session_id": "session_demo",
+      "seq": 9,
+      "occurred_at": "2026-10-07T10:00:25+08:00",
+      "received_at": "2026-10-07T10:00:25+08:00",
+      "event_type": "question",
+      "source": "fixture",
+      "product_id": "product_slippers",
+      "payload": {
+        "source_event_id": "question_stock",
+        "text": "现在还剩多少库存？",
+        "topic": "inventory"
+      }
+    },
+    {
+      "schema_version": "shengbo.ops.v2",
+      "kind": "NormalizedEvent",
+      "id": "playback_benefit_end",
+      "revision": 1,
+      "created_at": "2026-10-07T10:00:44+08:00",
+      "data_origin": "simulated",
+      "event_id": "playback_benefit_end",
+      "room_id": "room_demo",
+      "session_id": "session_demo",
+      "seq": 10,
+      "occurred_at": "2026-10-07T10:00:44+08:00",
+      "received_at": "2026-10-07T10:00:44+08:00",
+      "event_type": "playback_ended",
+      "source": "fixture",
+      "product_id": "product_slippers",
+      "payload": {
+        "source_event_id": "playback_benefit_end",
+        "attempt_id": "attempt_benefit"
+      }
+    },
+    {
+      "schema_version": "shengbo.ops.v2",
+      "kind": "NormalizedEvent",
+      "id": "playback_size_start",
+      "revision": 1,
+      "created_at": "2026-10-07T10:00:44+08:00",
+      "data_origin": "simulated",
+      "event_id": "playback_size_start",
+      "room_id": "room_demo",
+      "session_id": "session_demo",
+      "seq": 11,
+      "occurred_at": "2026-10-07T10:00:44+08:00",
+      "received_at": "2026-10-07T10:00:44+08:00",
+      "event_type": "playback_started",
+      "source": "fixture",
+      "product_id": "product_slippers",
+      "payload": {
+        "source_event_id": "playback_size_start",
+        "attempt_id": "attempt_size"
+      }
+    },
+    {
+      "schema_version": "shengbo.ops.v2",
+      "kind": "NormalizedEvent",
+      "id": "playback_size_end",
+      "revision": 1,
+      "created_at": "2026-10-07T10:00:52+08:00",
+      "data_origin": "simulated",
+      "event_id": "playback_size_end",
+      "room_id": "room_demo",
+      "session_id": "session_demo",
+      "seq": 12,
+      "occurred_at": "2026-10-07T10:00:52+08:00",
+      "received_at": "2026-10-07T10:00:52+08:00",
+      "event_type": "playback_ended",
+      "source": "fixture",
+      "product_id": "product_slippers",
+      "payload": {
+        "source_event_id": "playback_size_end",
+        "attempt_id": "attempt_size"
+      }
+    },
+    {
+      "schema_version": "shengbo.ops.v2",
+      "kind": "NormalizedEvent",
+      "id": "playback_bag_start",
+      "revision": 1,
+      "created_at": "2026-10-07T10:00:52+08:00",
+      "data_origin": "simulated",
+      "event_id": "playback_bag_start",
+      "room_id": "room_demo",
+      "session_id": "session_demo",
+      "seq": 13,
+      "occurred_at": "2026-10-07T10:00:52+08:00",
+      "received_at": "2026-10-07T10:00:52+08:00",
+      "event_type": "playback_started",
+      "source": "fixture",
+      "product_id": "product_bag",
+      "payload": {
+        "source_event_id": "playback_bag_start",
+        "attempt_id": "attempt_bag"
+      }
+    },
+    {
+      "schema_version": "shengbo.ops.v2",
+      "kind": "NormalizedEvent",
+      "id": "playback_bag_end",
+      "revision": 1,
+      "created_at": "2026-10-07T10:01:00+08:00",
+      "data_origin": "simulated",
+      "event_id": "playback_bag_end",
+      "room_id": "room_demo",
+      "session_id": "session_demo",
+      "seq": 14,
+      "occurred_at": "2026-10-07T10:01:00+08:00",
+      "received_at": "2026-10-07T10:01:00+08:00",
+      "event_type": "playback_ended",
+      "source": "fixture",
+      "product_id": "product_bag",
+      "payload": {
+        "source_event_id": "playback_bag_end",
+        "attempt_id": "attempt_bag"
+      }
+    }
+  ],
+  "proposals": [
+    {
+      "schema_version": "shengbo.ops.v2",
+      "kind": "Proposal",
+      "id": "proposal_size",
+      "revision": 1,
+      "created_at": "2026-10-07T10:00:11+08:00",
+      "data_origin": "simulated",
+      "proposal_id": "proposal_size",
+      "room_id": "room_demo",
+      "session_id": "session_demo",
+      "plan_ref": {
+        "plan_id": "plan_demo",
+        "revision": 1
+      },
+      "based_on": {
+        "boot_id": "boot_demo",
+        "queue_revision": 1,
+        "control_revision": 0,
+        "product_ref": {
+          "product_id": "product_slippers",
+          "product_revision": "fixture-sha256:1ea774084031f4d1904755a5b61e011c926d814c98d5c44f9685d95ba639ca73"
+        }
+      },
+      "event_refs": [
+        "question_size_1",
+        "question_size_2"
+      ],
+      "fact_refs": [
+        {
+          "product_id": "product_slippers",
+          "product_revision": "fixture-sha256:1ea774084031f4d1904755a5b61e011c926d814c98d5c44f9685d95ba639ca73",
+          "fact_id": "SIZE"
+        }
+      ],
+      "decision": "propose_action",
+      "reason": "合并同商品尺码问题，使用已审核FAQ",
+      "tool": "insert_after_sentence",
+      "tool_args": {
+        "text": "这款尺码从三十六码到四十五码，脚背较宽可以斟酌大一码。",
+        "faq_id": "faq_size",
+        "content_hash": "9c0d79a0433b843643bd7e7fe3ba62589cd07b698a9cccde2aadcd5664af42ec"
+      },
+      "expires_at": "2026-10-07T10:00:26+08:00",
+      "approval_state": "approved",
+      "approval_source": "fixture_operator",
+      "policy_revision": 1
+    },
+    {
+      "schema_version": "shengbo.ops.v2",
+      "kind": "Proposal",
+      "id": "proposal_stock",
+      "revision": 1,
+      "created_at": "2026-10-07T10:00:26+08:00",
+      "data_origin": "simulated",
+      "proposal_id": "proposal_stock",
+      "room_id": "room_demo",
+      "session_id": "session_demo",
+      "plan_ref": {
+        "plan_id": "plan_demo",
+        "revision": 1
+      },
+      "based_on": {
+        "boot_id": "boot_demo",
+        "queue_revision": 1,
+        "control_revision": 1,
+        "product_ref": {
+          "product_id": "product_slippers",
+          "product_revision": "fixture-sha256:1ea774084031f4d1904755a5b61e011c926d814c98d5c44f9685d95ba639ca73"
+        }
+      },
+      "event_refs": [
+        "question_stock"
+      ],
+      "fact_refs": [],
+      "decision": "ask_operator",
+      "reason": "无库存来源，不编造数量。",
+      "tool": null,
+      "tool_args": null,
+      "expires_at": "2026-10-07T10:00:41+08:00",
+      "approval_state": "not_required",
+      "policy_revision": 1
+    }
+  ],
+  "actions": [
+    {
+      "schema_version": "shengbo.ops.v2",
+      "kind": "ActionRecord",
+      "id": "action_size",
+      "revision": 1,
+      "created_at": "2026-10-07T10:00:11+08:00",
+      "data_origin": "simulated",
+      "action_id": "action_size",
+      "proposal_id": "proposal_size",
+      "room_id": "room_demo",
+      "session_id": "session_demo",
+      "boot_id": "boot_demo",
+      "actor": "agent",
+      "tool": "insert_after_sentence",
+      "tool_args": {
+        "text": "这款尺码从三十六码到四十五码，脚背较宽可以斟酌大一码。",
+        "faq_id": "faq_size",
+        "content_hash": "9c0d79a0433b843643bd7e7fe3ba62589cd07b698a9cccde2aadcd5664af42ec"
+      },
+      "payload_hash": "1eac4b30a6622f7c0a1eb2471e091dba59f27ccb4d488b15a6bf9628b2bd9d16",
+      "preconditions": {
+        "boot_id": "boot_demo",
+        "queue_revision": 1,
+        "control_revision": 0,
+        "product_ref": {
+          "product_id": "product_slippers",
+          "product_revision": "fixture-sha256:1ea774084031f4d1904755a5b61e011c926d814c98d5c44f9685d95ba639ca73"
+        }
+      },
+      "status": "completed",
+      "submitted_at": "2026-10-07T10:00:11+08:00",
+      "accepted_at": "2026-10-07T10:00:11+08:00",
+      "started_at": "2026-10-07T10:00:20+08:00",
+      "completed_at": "2026-10-07T10:00:24+08:00",
+      "attempt_refs": [
+        "attempt_answer"
+      ],
+      "result_evidence_refs": [
+        "playback_answer_end"
+      ],
+      "error": null
+    }
+  ],
+  "playback_attempts": [
+    {
+      "attempt_id": "attempt_price",
+      "product_ref": {
+        "product_id": "product_slippers",
+        "product_revision": "fixture-sha256:1ea774084031f4d1904755a5b61e011c926d814c98d5c44f9685d95ba639ca73"
+      },
+      "script_id": "script_shoe",
+      "script_revision": 1,
+      "sentence_id": "sentence_price",
+      "queue_id": "queue_price",
+      "action_id": null,
+      "started_at": "2026-10-07T10:00:00+08:00",
+      "ended_at": "2026-10-07T10:00:12+08:00",
+      "status": "completed",
+      "source": "fake_player",
+      "data_origin": "simulated",
+      "fact_refs": [
+        {
+          "product_id": "product_slippers",
+          "product_revision": "fixture-sha256:1ea774084031f4d1904755a5b61e011c926d814c98d5c44f9685d95ba639ca73",
+          "fact_id": "PRICE"
+        }
+      ]
+    },
+    {
+      "attempt_id": "attempt_answer",
+      "product_ref": {
+        "product_id": "product_slippers",
+        "product_revision": "fixture-sha256:1ea774084031f4d1904755a5b61e011c926d814c98d5c44f9685d95ba639ca73"
+      },
+      "script_id": "script_shoe",
+      "script_revision": 1,
+      "sentence_id": "sentence_answer",
+      "queue_id": "queue_answer",
+      "action_id": "action_size",
+      "started_at": "2026-10-07T10:00:20+08:00",
+      "ended_at": "2026-10-07T10:00:24+08:00",
+      "status": "completed",
+      "source": "fake_player",
+      "data_origin": "simulated",
+      "fact_refs": [
+        {
+          "product_id": "product_slippers",
+          "product_revision": "fixture-sha256:1ea774084031f4d1904755a5b61e011c926d814c98d5c44f9685d95ba639ca73",
+          "fact_id": "SIZE"
+        }
+      ]
+    },
+    {
+      "attempt_id": "attempt_benefit",
+      "product_ref": {
+        "product_id": "product_slippers",
+        "product_revision": "fixture-sha256:1ea774084031f4d1904755a5b61e011c926d814c98d5c44f9685d95ba639ca73"
+      },
+      "script_id": "script_shoe",
+      "script_revision": 1,
+      "sentence_id": "sentence_benefit",
+      "queue_id": "queue_benefit",
+      "action_id": null,
+      "started_at": "2026-10-07T10:00:24+08:00",
+      "ended_at": "2026-10-07T10:00:44+08:00",
+      "status": "completed",
+      "source": "fake_player",
+      "data_origin": "simulated",
+      "fact_refs": [
+        {
+          "product_id": "product_slippers",
+          "product_revision": "fixture-sha256:1ea774084031f4d1904755a5b61e011c926d814c98d5c44f9685d95ba639ca73",
+          "fact_id": "SELLING"
+        }
+      ]
+    },
+    {
+      "attempt_id": "attempt_size",
+      "product_ref": {
+        "product_id": "product_slippers",
+        "product_revision": "fixture-sha256:1ea774084031f4d1904755a5b61e011c926d814c98d5c44f9685d95ba639ca73"
+      },
+      "script_id": "script_shoe",
+      "script_revision": 1,
+      "sentence_id": "sentence_size",
+      "queue_id": "queue_size",
+      "action_id": null,
+      "started_at": "2026-10-07T10:00:44+08:00",
+      "ended_at": "2026-10-07T10:00:52+08:00",
+      "status": "completed",
+      "source": "fake_player",
+      "data_origin": "simulated",
+      "fact_refs": [
+        {
+          "product_id": "product_slippers",
+          "product_revision": "fixture-sha256:1ea774084031f4d1904755a5b61e011c926d814c98d5c44f9685d95ba639ca73",
+          "fact_id": "SIZE"
+        }
+      ]
+    },
+    {
+      "attempt_id": "attempt_bag",
+      "product_ref": {
+        "product_id": "product_bag",
+        "product_revision": "fixture-sha256:11c3842d1b96627ef3fba63ac132dafee0399243a63b175c3755d69233d1e1d3"
+      },
+      "script_id": "script_bag",
+      "script_revision": 1,
+      "sentence_id": "sentence_material",
+      "queue_id": "queue_material",
+      "action_id": null,
+      "started_at": "2026-10-07T10:00:52+08:00",
+      "ended_at": "2026-10-07T10:01:00+08:00",
+      "status": "completed",
+      "source": "fake_player",
+      "data_origin": "simulated",
+      "fact_refs": [
+        {
+          "product_id": "product_bag",
+          "product_revision": "fixture-sha256:11c3842d1b96627ef3fba63ac132dafee0399243a63b175c3755d69233d1e1d3",
+          "fact_id": "MATERIAL"
+        }
+      ]
+    }
+  ],
+  "business_metrics": null,
+  "completeness": {
+    "events": {
+      "status": "complete",
+      "coverage": {
+        "start": "2026-10-07T10:00:00+08:00",
+        "end": "2026-10-07T10:01:00+08:00"
+      },
+      "gaps": []
+    },
+    "actions": {
+      "status": "complete",
+      "coverage": {
+        "start": "2026-10-07T10:00:00+08:00",
+        "end": "2026-10-07T10:01:00+08:00"
+      },
+      "gaps": []
+    },
+    "playback": {
+      "status": "complete",
+      "coverage": {
+        "start": "2026-10-07T10:00:00+08:00",
+        "end": "2026-10-07T10:01:00+08:00"
+      },
+      "gaps": []
+    },
+    "catalog": {
+      "status": "complete",
+      "coverage": {
+        "start": "2026-10-07T10:00:00+08:00",
+        "end": "2026-10-07T10:01:00+08:00"
+      },
+      "gaps": []
+    },
+    "business": {
+      "status": "missing",
+      "coverage": {
+        "start": "2026-10-07T10:00:00+08:00",
+        "end": "2026-10-07T10:01:00+08:00"
+      },
+      "gaps": [
+        "no_business_source"
+      ]
+    }
+  },
+  "evidence_index": {
+    "playback_price_start": {
+      "collection": "events",
+      "index": 0
+    },
+    "question_size_1": {
+      "collection": "events",
+      "index": 1
+    },
+    "question_size_2": {
+      "collection": "events",
+      "index": 2
+    },
+    "action_size_accepted": {
+      "collection": "events",
+      "index": 3
+    },
+    "playback_price_end": {
+      "collection": "events",
+      "index": 4
+    },
+    "playback_answer_start": {
+      "collection": "events",
+      "index": 5
+    },
+    "playback_answer_end": {
+      "collection": "events",
+      "index": 6
+    },
+    "playback_benefit_start": {
+      "collection": "events",
+      "index": 7
+    },
+    "question_stock": {
+      "collection": "events",
+      "index": 8
+    },
+    "playback_benefit_end": {
+      "collection": "events",
+      "index": 9
+    },
+    "playback_size_start": {
+      "collection": "events",
+      "index": 10
+    },
+    "playback_size_end": {
+      "collection": "events",
+      "index": 11
+    },
+    "playback_bag_start": {
+      "collection": "events",
+      "index": 12
+    },
+    "playback_bag_end": {
+      "collection": "events",
+      "index": 13
+    },
+    "attempt_price": {
+      "collection": "playback_attempts",
+      "index": 0
+    },
+    "attempt_answer": {
+      "collection": "playback_attempts",
+      "index": 1
+    },
+    "attempt_benefit": {
+      "collection": "playback_attempts",
+      "index": 2
+    },
+    "attempt_size": {
+      "collection": "playback_attempts",
+      "index": 3
+    },
+    "attempt_bag": {
+      "collection": "playback_attempts",
+      "index": 4
+    },
+    "action_size": {
+      "collection": "actions",
+      "index": 0
+    }
+  }
+}

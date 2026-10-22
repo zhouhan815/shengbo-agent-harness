@@ -1,0 +1,130 @@
+{
+  "retrieved_at_utc": "2026-10-15T10:55:35.7661975Z",
+  "packages": [
+    {
+      "name": "deepagents",
+      "version": "0.7.25",
+      "requires_python": "<4.0,>=3.11",
+      "requires_dist": [
+        "langchain<2.0.0,>=1.4.5",
+        "langchain-core<2.0.0,>=1.6.10",
+        "langchain-anthropic<2.0.0,>=1.7.6",
+        "langchain-google-genai<5.0.0,>=4.4.1",
+        "langsmith>=0.14.8",
+        "packaging>=23.2",
+        "wcmatch>=11.0",
+        "langchain-aws<2.0.0,>=1.8.2; extra == \"aws\"",
+        "langchain-quickjs>=0.3.8; extra == \"quickjs\"",
+        "av<19.0.0,>=18.0.0; extra == \"video\"",
+        "pillow<13.0.0,>=12.3.0; extra == \"video\""
+      ],
+      "project_urls": {
+        "Documentation": "https://reference.langchain.com/python/deepagents/",
+        "Homepage": "https://docs.langchain.com/oss/python/deepagents/overview",
+        "Issues": "https://github.com/langchain-ai/deepagents/issues",
+        "Reddit": "https://www.reddit.com/r/LangChain/",
+        "Repository": "https://github.com/langchain-ai/deepagents",
+        "Slack": "https://www.langchain.com/join-community",
+        "Twitter": "https://x.com/langchain_oss"
+      },
+      "metadata_url": "https://pypi.org/pypi/deepagents/json"
+    },
+    {
+      "name": "langchain",
+      "version": "1.4.6",
+      "requires_python": "<4.0.0,>=3.10.0",
+      "requires_dist": [
+        "langchain-core<2.0.0,>=1.6.10",
+        "langgraph<1.3.0,>=1.2.12",
+        "pydantic<3.0.0,>=2.7.4",
+        "langchain-anthropic; extra == \"anthropic\"",
+        "langchain-aws; extra == \"aws\"",
+        "langchain-azure-ai; extra == \"azure-ai\"",
+        "langchain-baseten>=0.2.0; extra == \"baseten\"",
+        "langchain-community; extra == \"community\"",
+        "langchain-deepseek; extra == \"deepseek\"",
+        "langchain-fireworks; extra == \"fireworks\"",
+        "langchain-google-genai; extra == \"google-genai\"",
+        "langchain-google-vertexai; extra == \"google-vertexai\"",
+        "langchain-groq; extra == \"groq\"",
+        "langchain-huggingface; extra == \"huggingface\"",
+        "fastmcp<5.0.0,>=4.0.11; extra == \"mcp\"",
+        "langchain-meta; extra == \"meta\"",
+        "langchain-mistralai; extra == \"mistralai\"",
+        "langchain-ollama; extra == \"ollama\"",
+        "langchain-openai; extra == \"openai\"",
+        "langchain-perplexity; extra == \"perplexity\"",
+        "langchain-together; extra == \"together\"",
+        "langchain-xai; extra == \"xai\""
+      ],
+      "project_urls": {
+        "Changelog": "https://github.com/langchain-ai/langchain/releases?q=tag%3A%22langchain%3D%3D1%22",
+        "Documentation": "https://reference.langchain.com/python/langchain/langchain/",
+        "Homepage": "https://docs.langchain.com/",
+        "Issues": "https://github.com/langchain-ai/langchain/issues",
+        "Reddit": "https://www.reddit.com/r/LangChain/",
+        "Repository": "https://github.com/langchain-ai/langchain",
+        "Slack": "https://www.langchain.com/join-community",
+        "Twitter": "https://x.com/langchain_oss"
+      },
+      "metadata_url": "https://pypi.org/pypi/langchain/json"
+    },
+    {
+      "name": "langgraph",
+      "version": "1.2.15",
+      "requires_python": ">=3.10",
+      "requires_dist": [
+        "langchain-core<2,>=1.4.7",
+        "langgraph-checkpoint<5.0.0,>=4.3.0",
+        "langgraph-prebuilt<1.2.0,>=1.1.0",
+        "langgraph-sdk<0.5.0,>=0.4.6",
+        "pydantic>=2.7.4",
+        "xxhash>=3.5.0"
+      ],
+      "project_urls": {
+        "Changelog": "https://github.com/langchain-ai/langgraph/releases",
+        "Documentation": "https://reference.langchain.com/python/langgraph/",
+        "Homepage": "https://docs.langchain.com/oss/python/langgraph/overview",
+        "Reddit": "https://www.reddit.com/r/LangChain/",
+        "Slack": "https://www.langchain.com/join-community",
+        "Source": "https://github.com/langchain-ai/langgraph/tree/main/libs/langgraph",
+        "Twitter": "https://x.com/langchain_oss"
+      },
+      "metadata_url": "https://pypi.org/pypi/langgraph/json"
+    },
+    {
+      "name": "langchain-deepseek",
+      "version": "1.1.1",
+      "requires_python": "<4.0.0,>=3.10.0",
+      "requires_dist": [
+        "langchain-core<2.0.0,>=1.4.7",
+        "langchain-openai<2.0.0,>=1.3.1"
+      ],
+      "project_urls": {
+        "Changelog": "https://github.com/langchain-ai/langchain/releases?q=%22langchain-deepseek%22",
+        "Documentation": "https://reference.langchain.com/python/integrations/langchain_deepseek/",
+        "Homepage": "https://docs.langchain.com/oss/python/integrations/providers/deepseek",
+        "Issues": "https://github.com/langchain-ai/langchain/issues",
+        "Reddit": "https://www.reddit.com/r/LangChain/",
+        "Repository": "https://github.com/langchain-ai/langchain",
+        "Slack": "https://www.langchain.com/join-community",
+        "Twitter": "https://x.com/langchain_oss"
+      },
+      "metadata_url": "https://pypi.org/pypi/langchain-deepseek/json"
+    },
+    {
+      "name": "langchain-mcp-adapters",
+      "version": "0.3.2",
+      "requires_python": ">=3.10",
+      "requires_dist": [
+        "langchain-core<2.0.0,>=1.3.3",
+        "mcp<2.0.0,>=1.24.0",
+        "typing-extensions>=4.14.0"
+      ],
+      "project_urls": {
+        "repository": "https://www.github.com/langchain-ai/langchain-mcp-adapters"
+      },
+      "metadata_url": "https://pypi.org/pypi/langchain-mcp-adapters/json"
+    }
+  ]
+}

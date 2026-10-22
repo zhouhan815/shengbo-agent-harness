@@ -1,0 +1,181 @@
+{
+  "versions": [
+    {
+      "index": 1,
+      "scores": {
+        "natural_live_speech": 8,
+        "benefit_scene_expansion": 11,
+        "coherent_flow": 7,
+        "non_repetition": 7,
+        "purchase_guidance": 3
+      },
+      "score_reasons": [
+        "整体口语，但含“我自己前前后后换了不下七八双拖鞋，穿了大半个月”这类编造体验，降低自然可信度",
+        "足弓、小蛮腰、静音、防滑、轻便、旅行都有情境展开，但多处绝对化，如“不会再也不想换别的”“不用担心脚下一滑”",
+        "按踩雷痛点、产品、足弓、小蛮腰、静音防滑、价格收口，较顺",
+        "部分表达重复参考稿式承诺，且“品质特别靠谱”“完全不会像普通厚底拖”略空",
+        "价格正确，但库存、售后、下单引导偏模板化，缺少颜色尺码选择帮助"
+      ],
+      "unsupported_claims": [
+        {
+          "quote": "我自己前前后后换了不下七八双拖鞋，直到碰上这双……穿了大半个月真的再也不想换别的了",
+          "reason": "编造主播亲身试用和长期穿着体验，资料未提供",
+          "severity": "serious"
+        },
+        {
+          "quote": "耐穿不容易坏，品质特别靠谱",
+          "reason": "品质和耐穿保证超出资料，资料只写轻便耐磨",
+          "severity": "minor"
+        },
+        {
+          "quote": "完全不会像普通厚底拖那样显得脚笨重",
+          "reason": "对比性绝对化，资料无此承诺",
+          "severity": "minor"
+        },
+        {
+          "quote": "走路的时候不会震得脚底板发疼，对膝盖也友好",
+          "reason": "膝盖友好和减震保证超出资料",
+          "severity": "serious"
+        },
+        {
+          "quote": "在屋里走路几乎没什么声响",
+          "reason": "接近绝对静音，资料只写静音特性",
+          "severity": "minor"
+        },
+        {
+          "quote": "沾了水也不容易打滑",
+          "reason": "防滑保证偏绝对，knowledge提示浴室遇水仍请小心",
+          "severity": "minor"
+        },
+        {
+          "quote": "穿很久鞋底都不会磨平",
+          "reason": "耐磨绝对化保证，资料未提供此等级承诺",
+          "severity": "serious"
+        },
+        {
+          "quote": "这双拖鞋平时专柜卖一百七十八新台币",
+          "reason": "商品资料写原价178，未说明专柜价",
+          "severity": "minor"
+        },
+        {
+          "quote": "过了今天的直播时段就会恢复原价一百七十八新台币了",
+          "reason": "活动截止时间未在商品资料中提供",
+          "severity": "serious"
+        },
+        {
+          "quote": "热门的奶白色、樱花粉还有大码的库存本来就不多",
+          "reason": "具体颜色库存紧张无法由资料支持，且奶白色、樱花粉不在资料颜色列表中",
+          "severity": "serious"
+        },
+        {
+          "quote": "收到货之后有任何非人为的质量问题，都可以直接联系客服处理，完全没有试错的风险",
+          "reason": "售后零风险承诺超出商品资料",
+          "severity": "serious"
+        }
+      ],
+      "price_and_terms_correct": true,
+      "knowledge_leaks": [],
+      "main_gaps": [
+        "编造亲身试用和穿了大半个月体验，影响可信度",
+        "未准确完整讲颜色，且加入资料没有的奶白色、樱花粉",
+        "未说明标准码及宽脚/肉脚建议斟酌大一号"
+      ]
+    },
+    {
+      "index": 2,
+      "scores": {
+        "natural_live_speech": 9,
+        "benefit_scene_expansion": 10,
+        "coherent_flow": 7,
+        "non_repetition": 8,
+        "purchase_guidance": 3
+      },
+      "score_reasons": [
+        "口语自然，如“要嘛穿久了脚底板酸痛，要嘛走路声音大吵到家人，浴室穿还容易打滑”听得懂",
+        "卖点有情境但部分断言过绝对，例如“穿多久都不会觉得脚底发胀”“一点撞鞋的声音都没有”“绝对不会惊醒睡眠浅的家人”",
+        "结构按痛点、材质、足弓、静音防滑、场景、价格收口推进，较连贯",
+        "空话不多，卖点覆盖足弓、小蛮腰、静音、防滑、快干、轻便，但“暂不感兴趣点点关注”略插播打断",
+        "传达了107/178新台币，但没讲清优惠条件，也没有自然引导选颜色尺码下单"
+      ],
+      "unsupported_claims": [
+        {
+          "quote": "不会像那种粘起来的拖鞋，穿几天就开胶",
+          "reason": "商品资料未提供对比其他材质或承诺不开胶的依据",
+          "severity": "minor"
+        },
+        {
+          "quote": "完全不会有卡脚磨红的情况",
+          "reason": "绝对化保证，资料只写一般版型和材质，无此承诺",
+          "severity": "minor"
+        },
+        {
+          "quote": "你站多久都不会觉得脚底发胀",
+          "reason": "过度保证足弓支撑效果，资料无此绝对效果",
+          "severity": "serious"
+        },
+        {
+          "quote": "一点撞鞋的声音都没有，绝对不会惊醒睡眠浅的家人",
+          "reason": "绝对静音效果和打扰承诺，资料仅写静音",
+          "severity": "serious"
+        },
+        {
+          "quote": "不用担心脚下一滑摔著",
+          "reason": "防滑被绝对化，资料也提醒浴室遇水仍需小心",
+          "severity": "serious"
+        },
+        {
+          "quote": "穿很久鞋底都不会磨平",
+          "reason": "耐磨绝对化保证，资料未提供此等级承诺",
+          "severity": "serious"
+        },
+        {
+          "quote": "这个价格大家去实体店买普通的厚底拖鞋都不一定拿下来",
+          "reason": "实体店比价无法由商品资料支持",
+          "severity": "minor"
+        },
+        {
+          "quote": "这个优惠只有今天直播这段时间才有，下了直播就立刻恢复原价",
+          "reason": "活动截止时间未在商品资料中提供",
+          "severity": "serious"
+        },
+        {
+          "quote": "现在库存也不是特别足，热门的颜色和尺码本来就紧张",
+          "reason": "库存紧张无法由资料支持",
+          "severity": "serious"
+        },
+        {
+          "quote": "再晚一步说不定你喜欢的款就被抢光了，到时候想补都补不到",
+          "reason": "补货和售罄承诺无法由资料支持",
+          "severity": "serious"
+        },
+        {
+          "quote": "有任何问题都能及时处理，相当于零风险试穿",
+          "reason": "售后零风险承诺超出资料，售后服务未保证及时处理",
+          "severity": "serious"
+        }
+      ],
+      "price_and_terms_correct": true,
+      "knowledge_leaks": [],
+      "main_gaps": [
+        "未说明标准码、脚背较宽或脚型偏肉建议斟酌大一号",
+        "颜色仅说浅色深色，未列明商品资料中的粉色、红色、绿色、蓝色、橙色、葡萄紫、烟熏紫、卡其、黑色、白色",
+        "未讲清原价178与限时107的优惠条件，也未自然引导按颜色和尺码选择下单"
+      ]
+    }
+  ],
+  "pair_diversity": {
+    "score": 3,
+    "reason": "两版开场、痛点组织、卖点展开顺序和节奏有有效不同：版本1先列核心优点再逐点讲，版本2用个人换鞋经验切入并更多场景化；但核心足弓、小蛮腰、静音防滑、价格收口仍高度相似，且版本2加入不合规个人体验与库存承诺，因此整体差异明显但未达两版均自然完整。"
+  },
+  "judge_model": "deepseek-flash",
+  "usage": {
+    "prompt_tokens": 4490,
+    "completion_tokens": 1480,
+    "total_tokens": 5970,
+    "prompt_tokens_details": {
+      "cached_tokens": 2560
+    },
+    "prompt_cache_hit_tokens": 2560,
+    "prompt_cache_miss_tokens": 1930
+  }
+}

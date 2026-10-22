@@ -1,0 +1,327 @@
+{
+  "schema_version": "shengbo.ops.v2",
+  "kind": "PreparationBundle",
+  "id": "plan_demo",
+  "revision": 1,
+  "created_at": "2026-10-07T10:00:00+08:00",
+  "data_origin": "simulated",
+  "plan_id": "plan_demo",
+  "room_id": "room_demo",
+  "source_request_id": "request_demo",
+  "status": "published",
+  "objective": {
+    "goal": "验证资料诊断和商品规格答疑闭环",
+    "priority_product_ids": [
+      "product_slippers",
+      "product_bag"
+    ],
+    "constraints": [
+      "简体中文普通话",
+      "不猜库存",
+      "不承诺历史物流日期",
+      "不启用未核实活动"
+    ]
+  },
+  "catalog_refs": [
+    {
+      "product_id": "product_slippers",
+      "product_revision": "fixture-sha256:1ea774084031f4d1904755a5b61e011c926d814c98d5c44f9685d95ba639ca73",
+      "fields": {
+        "name": "足弓支撑静音防滑厚底凉拖鞋",
+        "price": "178",
+        "promo_price": null,
+        "currency": "TWD",
+        "selling_points": "EVA材质，足弓支撑，厚底；地面有水时仍须小心行走。",
+        "promotion": "历史活动价未核实有效期，本轮演示不启用优惠承诺。",
+        "knowledge": "尺码36-37至44-45；脚背宽或脚型偏肉可斟酌大一码。\n历史样例配送9月21日至9月30日，当前日期不可直接沿用。"
+      },
+      "facts": [
+        {
+          "id": "NAME",
+          "text": "足弓支撑静音防滑厚底凉拖鞋"
+        },
+        {
+          "id": "PRICE",
+          "text": "标价178 TWD。"
+        },
+        {
+          "id": "SELLING",
+          "text": "EVA材质、足弓支撑和厚底设计。"
+        },
+        {
+          "id": "SIZE",
+          "text": "尺码36-37、38-39、40-41、42-43、44-45；脚背宽可斟酌大一码。"
+        },
+        {
+          "id": "CARE",
+          "text": "浴室地面遇水仍请小心行走。"
+        },
+        {
+          "id": "PROMOTION",
+          "text": "历史样例活动价107 TWD，当前有效期未核实，不作现行优惠承诺。"
+        },
+        {
+          "id": "DELIVERY",
+          "text": "历史资料含9月21日至9月30日，不能当成当前配送承诺。"
+        }
+      ],
+      "source": "design_fixture_not_current_offer",
+      "data_origin": "simulated",
+      "verified_at": null,
+      "valid_until": null,
+      "missing_fields": [
+        "inventory",
+        "promotion_valid_until",
+        "current_delivery_date"
+      ]
+    },
+    {
+      "product_id": "product_bag",
+      "product_revision": "fixture-sha256:11c3842d1b96627ef3fba63ac132dafee0399243a63b175c3755d69233d1e1d3",
+      "fields": {
+        "name": "演示收纳袋",
+        "price": "59",
+        "promo_price": null,
+        "currency": "TWD",
+        "selling_points": "仅用于测试的聚酯材质收纳袋。",
+        "promotion": "历史活动价未核实有效期，本轮演示不启用优惠承诺。",
+        "knowledge": "本商品完全为构造样例，不表示真实在售商品。"
+      },
+      "facts": [
+        {
+          "id": "NAME",
+          "text": "演示收纳袋"
+        },
+        {
+          "id": "PRICE",
+          "text": "构造标价59 TWD。"
+        },
+        {
+          "id": "MATERIAL",
+          "text": "构造资料标明聚酯材质。"
+        }
+      ],
+      "source": "design_fixture_not_current_offer",
+      "data_origin": "simulated",
+      "verified_at": null,
+      "valid_until": null,
+      "missing_fields": [
+        "inventory",
+        "promotion_valid_until",
+        "current_delivery_date"
+      ]
+    }
+  ],
+  "issues": [
+    {
+      "issue_id": "issue_delivery",
+      "severity": "warning",
+      "field_ref": "DELIVERY",
+      "reason": "历史配送日期不能沿用",
+      "required_action": "不作配送日期承诺；实际销售需确认新日期",
+      "blocking_scope": "delivery_claim_only"
+    }
+  ],
+  "script_candidates": [
+    {
+      "draft_id": "draft_script_shoe",
+      "script_id": "script_shoe",
+      "script_revision": 1,
+      "product_ref": {
+        "product_id": "product_slippers",
+        "product_revision": "fixture-sha256:1ea774084031f4d1904755a5b61e011c926d814c98d5c44f9685d95ba639ca73"
+      },
+      "status": "approved",
+      "sentences": [
+        {
+          "sentence_id": "sentence_price",
+          "stage": "introduction",
+          "display_text": "这款凉拖鞋标价一百七十八新台币。",
+          "spoken_text": "这款凉拖鞋标价一百七十八新台币。",
+          "kind": "product_claim",
+          "fact_refs": [
+            {
+              "product_id": "product_slippers",
+              "product_revision": "fixture-sha256:1ea774084031f4d1904755a5b61e011c926d814c98d5c44f9685d95ba639ca73",
+              "fact_id": "NAME"
+            },
+            {
+              "product_id": "product_slippers",
+              "product_revision": "fixture-sha256:1ea774084031f4d1904755a5b61e011c926d814c98d5c44f9685d95ba639ca73",
+              "fact_id": "PRICE"
+            }
+          ]
+        },
+        {
+          "sentence_id": "sentence_benefit",
+          "stage": "benefit",
+          "display_text": "它采用EVA材质，带有足弓支撑和厚底设计。",
+          "spoken_text": "它采用EVA材质，带有足弓支撑和厚底设计。",
+          "kind": "product_claim",
+          "fact_refs": [
+            {
+              "product_id": "product_slippers",
+              "product_revision": "fixture-sha256:1ea774084031f4d1904755a5b61e011c926d814c98d5c44f9685d95ba639ca73",
+              "fact_id": "SELLING"
+            }
+          ]
+        },
+        {
+          "sentence_id": "sentence_size",
+          "stage": "specification",
+          "display_text": "尺码从三十六码到四十五码，脚背宽可以斟酌大一码。",
+          "spoken_text": "尺码从三十六码到四十五码，脚背宽可以斟酌大一码。",
+          "kind": "product_claim",
+          "fact_refs": [
+            {
+              "product_id": "product_slippers",
+              "product_revision": "fixture-sha256:1ea774084031f4d1904755a5b61e011c926d814c98d5c44f9685d95ba639ca73",
+              "fact_id": "SIZE"
+            }
+          ]
+        }
+      ],
+      "approval_source": "fixture_operator",
+      "angle": "规格和材料说明",
+      "blocks": [],
+      "review_status": "approved"
+    },
+    {
+      "draft_id": "draft_script_bag",
+      "script_id": "script_bag",
+      "script_revision": 1,
+      "product_ref": {
+        "product_id": "product_bag",
+        "product_revision": "fixture-sha256:11c3842d1b96627ef3fba63ac132dafee0399243a63b175c3755d69233d1e1d3"
+      },
+      "status": "approved",
+      "sentences": [
+        {
+          "sentence_id": "sentence_material",
+          "stage": "specification",
+          "display_text": "这款演示收纳袋的构造资料标明为聚酯材质。",
+          "spoken_text": "这款演示收纳袋的构造资料标明为聚酯材质。",
+          "kind": "product_claim",
+          "fact_refs": [
+            {
+              "product_id": "product_bag",
+              "product_revision": "fixture-sha256:11c3842d1b96627ef3fba63ac132dafee0399243a63b175c3755d69233d1e1d3",
+              "fact_id": "MATERIAL"
+            }
+          ]
+        }
+      ],
+      "approval_source": "fixture_operator",
+      "angle": "规格和材料说明",
+      "blocks": [],
+      "review_status": "approved"
+    }
+  ],
+  "faq": [
+    {
+      "faq_id": "faq_size",
+      "product_ref": {
+        "product_id": "product_slippers",
+        "product_revision": "fixture-sha256:1ea774084031f4d1904755a5b61e011c926d814c98d5c44f9685d95ba639ca73"
+      },
+      "question": "有哪些尺码，脚背宽怎么选？",
+      "answer_text": "这款尺码从三十六码到四十五码，脚背较宽可以斟酌大一码。",
+      "fact_refs": [
+        {
+          "product_id": "product_slippers",
+          "product_revision": "fixture-sha256:1ea774084031f4d1904755a5b61e011c926d814c98d5c44f9685d95ba639ca73",
+          "fact_id": "SIZE"
+        }
+      ],
+      "unknown_policy": "ask_operator",
+      "review_status": "approved",
+      "content_hash": "9c0d79a0433b843643bd7e7fe3ba62589cd07b698a9cccde2aadcd5664af42ec"
+    }
+  ],
+  "lineup": [
+    {
+      "product_ref": {
+        "product_id": "product_slippers",
+        "product_revision": "fixture-sha256:1ea774084031f4d1904755a5b61e011c926d814c98d5c44f9685d95ba639ca73"
+      },
+      "script_refs": [
+        {
+          "script_id": "script_shoe",
+          "revision": 1
+        }
+      ],
+      "order": 1,
+      "must_cover_fact_refs": [
+        {
+          "product_id": "product_slippers",
+          "product_revision": "fixture-sha256:1ea774084031f4d1904755a5b61e011c926d814c98d5c44f9685d95ba639ca73",
+          "fact_id": "PRICE"
+        },
+        {
+          "product_id": "product_slippers",
+          "product_revision": "fixture-sha256:1ea774084031f4d1904755a5b61e011c926d814c98d5c44f9685d95ba639ca73",
+          "fact_id": "SIZE"
+        }
+      ],
+      "reason": "先介绍主要样例，再覆盖规格",
+      "estimated_duration": null,
+      "duration_basis": "not_measured"
+    },
+    {
+      "product_ref": {
+        "product_id": "product_bag",
+        "product_revision": "fixture-sha256:11c3842d1b96627ef3fba63ac132dafee0399243a63b175c3755d69233d1e1d3"
+      },
+      "script_refs": [
+        {
+          "script_id": "script_bag",
+          "revision": 1
+        }
+      ],
+      "order": 2,
+      "must_cover_fact_refs": [
+        {
+          "product_id": "product_bag",
+          "product_revision": "fixture-sha256:11c3842d1b96627ef3fba63ac132dafee0399243a63b175c3755d69233d1e1d3",
+          "fact_id": "MATERIAL"
+        }
+      ],
+      "reason": "验证第二商品隔离",
+      "estimated_duration": null,
+      "duration_basis": "not_measured"
+    }
+  ],
+  "live_policy": {
+    "mode": "manual_confirm",
+    "allowed_tools": [
+      "insert_after_sentence"
+    ],
+    "cooldown_seconds": 30,
+    "proposal_ttl_seconds": 15,
+    "revision": 1
+  },
+  "preflight": [
+    {
+      "scope": "fixture_environment",
+      "status": "pass",
+      "evidence_refs": [
+        "fixture:scenario_normal"
+      ]
+    }
+  ],
+  "approvals": [
+    {
+      "actor": "fixture_operator",
+      "object_id": "faq_size",
+      "content_hash": "9c0d79a0433b843643bd7e7fe3ba62589cd07b698a9cccde2aadcd5664af42ec",
+      "product_ref": {
+        "product_id": "product_slippers",
+        "product_revision": "fixture-sha256:1ea774084031f4d1904755a5b61e011c926d814c98d5c44f9685d95ba639ca73"
+      },
+      "at": "2026-10-07T09:59:50+08:00",
+      "result": "approved",
+      "data_origin": "simulated"
+    }
+  ],
+  "notice": "published和approved只模拟批准后的输入形态，不能代表真实人工批准，也不能直接发布到现用声播。"
+}

@@ -1,0 +1,260 @@
+{
+  "schema": "design-inventory-1.0",
+  "implementation_status": "planned_not_registered_runtime_api",
+  "metric_ids": [
+    "observed_time_ratio",
+    "confirmed_play_seconds",
+    "observed_member_messages",
+    "like_messages",
+    "verified_like_increments",
+    "online_time_weighted_mean",
+    "observed_online_person_minutes",
+    "official_average_watch_seconds",
+    "relevant_question_count",
+    "intent_observed_users",
+    "questions_per_100_observed_person_minutes",
+    "product_click_uv_rate",
+    "viewer_to_buyer_rate",
+    "clicker_to_buyer_rate",
+    "created_cohort_payment_rate",
+    "created_orders_per_observed_person_minute",
+    "paid_order_count",
+    "paid_amount_minor",
+    "successful_refund_minor",
+    "refund_amount_rate",
+    "net_paid_asof_minor",
+    "paid_amount_per_live_hour",
+    "net_amount_per_live_hour",
+    "paid_per_1000_viewers",
+    "intent_theme_density",
+    "confusion_theme_density",
+    "necessary_question_coverage",
+    "official_30s_retention",
+    "net_per_1000_viewers",
+    "first_identification_seconds",
+    "module_duration_seconds",
+    "playback_record_coverage",
+    "content_binding_coverage",
+    "time_association_coverage"
+  ],
+  "custom_middleware": [
+    "ReviewScopeMiddleware",
+    "EvidenceContextMiddleware",
+    "TraceBudgetMiddleware",
+    "ReviewCompletionMiddleware"
+  ],
+  "skills": [
+    "review_scope_and_data_eligibility",
+    "commercial_funnel_diagnosis",
+    "content_and_customer_feedback",
+    "next_session_experiment_and_feedback"
+  ],
+  "atomic_tools": [
+    {
+      "id": "K00",
+      "name": "set_review_task_assessment",
+      "signature_and_result": "(mode, scope_refs, required_deliverables, refresh_mode, required_calculations, public_interpretation)→GoalRef",
+      "behavior": "仅主；从已保存raw_request提出任务解释，服务核不扩大权限、不降低原必要要求后冻结Goal；API已明确可直接跳过此工具",
+      "timeout_cache_error": "analysis_local；5s；同assessment hash幂等；有实质歧义走K12，不为识别任务多调一个路由模型"
+    },
+    {
+      "id": "K01",
+      "name": "read_archive_manifest",
+      "signature_and_result": "(archive_ref, view='capabilities')→ManifestView",
+      "behavior": "解析固定归档，带数据来源、覆盖／缺口、实际发布、报表粒度、已存在成果索引",
+      "timeout_cache_error": "read_business；5s；同ref缓存；无归档不悄选latest"
+    },
+    {
+      "id": "K02",
+      "name": "get_metric_panel",
+      "signature_and_result": "(archive_ref, metric_ids[], dimensions, as_of, policy_ref?)→MetricPanel",
+      "behavior": "核资格及Goal重算义务，查缓存或创建唯一计算job；一次返回值、分母、cohort、缺项、分数引用、CalculationReceipt和drilldown",
+      "timeout_cache_error": "analysis_local；工具10s，响应预算8s，预计超预算立即登记job；deadline前返回waiting，不等30s才转异步；模型不自旋"
+    },
+    {
+      "id": "K03",
+      "name": "query_evidence",
+      "signature_and_result": "(archive_ref, time_range?, product_refs?, tags?, query?, limit≤100, cursor?)→EvidenceIndex",
+      "behavior": "SQLite索引／FTS、明确过滤，返回原件ID、有限片段、精度、商品归属及反例数量",
+      "timeout_cache_error": "read_business；5s；固定查询身份；不返回客户订单隐私字段"
+    },
+    {
+      "id": "K04",
+      "name": "read_evidence",
+      "signature_and_result": "(source_refs[], view, max_units, cursor?)→EvidenceBatch",
+      "behavior": "精确回读，逐件full／partial／not_delivered；记录实际交付hash和reader",
+      "timeout_cache_error": "read_business；5s；不按静默字符串截断假装全文已读；量超限列遗漏项"
+    },
+    {
+      "id": "K05",
+      "name": "read_content_snapshot",
+      "signature_and_result": "(publication_ref或script_ref, module_refs?, include_facts=true, view='selected')→ContentBatch",
+      "behavior": "用真实已采用稿件读所选模块和对应商品事实／本场要求；原稿标签native／derived分开",
+      "timeout_cache_error": "read_business；5s；带总项数与下一页；正文与spoken_text相同只交付一份并保留同义说明"
+    },
+    {
+      "id": "K06",
+      "name": "read_playback_span",
+      "signature_and_result": "(archive_ref, occurrence_ids?或time_range, include_sentences=true)→PlaybackSpan",
+      "behavior": "真实attempt／segment、暂停／跳播／长短开场、时钟和取声证据；需要时展开句子",
+      "timeout_cache_error": "read_business；5s；缺ended不补造时长；不输出排期当实播"
+    },
+    {
+      "id": "K07",
+      "name": "read_review_history",
+      "signature_and_result": "(same_merchant_product_scope, compatible_filters, before, limit≤20)→HistoryIndex",
+      "behavior": "只读受权历史指标／报告索引，保留不相容原因；不把摘要当正式数值",
+      "timeout_cache_error": "read_business；5s；当前场排除；不能借读历史扩大写权限"
+    },
+    {
+      "id": "K08",
+      "name": "compare_occurrences",
+      "signature_and_result": "(metric_spec, target_refs[], baseline_spec, comparison_profile)→ComparisonResult",
+      "behavior": "核对象／定义／价格／流量／成熟度、样本单位；程序算差异、可选区间；输出不匹配及假设",
+      "timeout_cache_error": "analysis_local；工具15s、响应预算13s，超预算前交唯一job＋WaitReceipt；不能自动用所有每秒行作独立样本"
+    },
+    {
+      "id": "K09",
+      "name": "classify_comment_batch",
+      "signature_and_result": "(evidence_batch_ref, label_policy_ref, product_context_ref, budget_limit)→ClassificationArtifact",
+      "behavior": "先去消息重复、保留未知用户／商品歧义，再一次模型批分类；每标签有原文ID和版本",
+      "timeout_cache_error": "analysis_local；共享模型attempt预算；不每条评论调用模型；安全响应先存再验；部分覆盖不得当全量密度"
+    },
+    {
+      "id": "K10",
+      "name": "submit_review_draft",
+      "signature_and_result": "(goal_ref, archive_ref, findings[], recommendations[], content_assessments:ContentAssessmentInput[], scorecard_refs[], limitations[], public_summary)→DraftReceipt",
+      "behavior": "主可一次提交四项typed审核；persist_content_assessments核证据并保存，程序score_content返回真实score refs；再存草稿和依据",
+      "timeout_cache_error": "analysis_local；10s；request hash稳定；无评论也可审核已播稿；错字段局部纠正，不另起强制审稿模型"
+    },
+    {
+      "id": "K11",
+      "name": "finish_review",
+      "signature_and_result": "(goal_ref, draft_ref或answer_ref, outcome, public_summary, expected_run_generation)→DeliveryReceipt",
+      "behavior": "唯一终态服务核原目标与正式证据；正式提交或说明部分；合法后直接结束SDK本轮，不再请求模型写结束语",
+      "timeout_cache_error": "analysis_local；10s；幂等；actual refs绑定delivery；unknown／缺稿／缺目标不能成功收尾"
+    },
+    {
+      "id": "K12",
+      "name": "request_review_input",
+      "signature_and_result": "(question_kind, missing_ids[], question, choices[], related_refs[])→DecisionRef",
+      "behavior": "保存本次必要缺项问题，转WAITING_INPUT； UI显示清楚影响，已有结果可保留",
+      "timeout_cache_error": "analysis_local；5s；同缺项去重；不重新询问用户已确认可手动导出这一事实"
+    },
+    {
+      "id": "K13",
+      "name": "submit_subreview_result",
+      "signature_and_result": "(delegation_id, archive_ref, findings[], metric／evidence_refs[], content_assessments:ContentAssessmentInput[], unknowns[])→SubReviewReceipt",
+      "behavior": "仅内容／经营子图；内容子走与K10同一persist_content_assessments服务并返assessment／score refs，经营子只可传空数组；核Goal后提交独立产物",
+      "timeout_cache_error": "analysis_local；10s；同delegation重复回原结果；不能提交主报告或把主state覆盖回去"
+    }
+  ],
+  "optional_flows": [
+    {
+      "id": "F01",
+      "name": "prepare_review_context",
+      "source_document": "03_工具与可调用工作流.md"
+    },
+    {
+      "id": "F02",
+      "name": "build_product_panel",
+      "source_document": "03_工具与可调用工作流.md"
+    },
+    {
+      "id": "F03",
+      "name": "build_module_panel",
+      "source_document": "03_工具与可调用工作流.md"
+    },
+    {
+      "id": "F04",
+      "name": "compare_compatible_history",
+      "source_document": "03_工具与可调用工作流.md"
+    },
+    {
+      "id": "F05",
+      "name": "package_review_delivery",
+      "source_document": "03_工具与可调用工作流.md"
+    }
+  ],
+  "work_packages": [
+    "W0",
+    "W1",
+    "W2",
+    "W3",
+    "W4",
+    "W5",
+    "W6"
+  ],
+  "planned_acceptance_ids": [
+    "R01",
+    "R02",
+    "R03",
+    "R04",
+    "R05",
+    "R06",
+    "R07",
+    "R08",
+    "R09",
+    "R10",
+    "R11",
+    "R12",
+    "R13",
+    "R14",
+    "R15",
+    "R16",
+    "R17",
+    "R18",
+    "R19",
+    "R20",
+    "R21",
+    "R22",
+    "R23",
+    "R24",
+    "R25",
+    "R26",
+    "R27",
+    "R28",
+    "R29",
+    "R30",
+    "R31",
+    "R32",
+    "R33",
+    "R34",
+    "R35",
+    "R36",
+    "R37",
+    "R38",
+    "R39",
+    "R40",
+    "R41",
+    "R42",
+    "R43",
+    "R44",
+    "R45",
+    "R46",
+    "R47",
+    "R48",
+    "R49",
+    "R50"
+  ],
+  "planned_prevention_ids": [
+    "PL01",
+    "PL02",
+    "PL03",
+    "PL04",
+    "PL05",
+    "PL06",
+    "PL07",
+    "PL08",
+    "PL09",
+    "PL10",
+    "PL11",
+    "PL12",
+    "PL13",
+    "PL14",
+    "PL15",
+    "PL16",
+    "PL17",
+    "PL18"
+  ]
+}

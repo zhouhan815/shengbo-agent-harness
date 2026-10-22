@@ -1,0 +1,42 @@
+{
+  "run": "release9_notebook",
+  "versions": [
+    {
+      "version": 1,
+      "program": 40.0,
+      "semantic": 52.0,
+      "total": 92.0,
+      "hard_gate": true,
+      "rule_issues": [],
+      "serious_claims": 0,
+      "cross_version_copy_pass": true,
+      "pass": true,
+      "gaps": [
+        "A5尺寸的具体大小对比未展开，如与A4或口袋本的差异，使卖点略显模糊。",
+        "颜色部分仅描述色调，缺乏与使用场景的深入关联，如浅灰适合办公、浅绿适合手账等。",
+        "购买引导中‘不着急的话也可以先看看’与第一版相似，未提供更细化的选择建议。"
+      ]
+    },
+    {
+      "version": 2,
+      "program": 40.0,
+      "semantic": 52.0,
+      "total": 92.0,
+      "hard_gate": true,
+      "rule_issues": [],
+      "serious_claims": 0,
+      "cross_version_copy_pass": true,
+      "pass": true,
+      "gaps": [
+        "对点阵内页的书写体验描述较笼统，如‘字可以顺着点来对齐’，未展开具体使用例子（如画图表、时间轴等），场景深度有限。",
+        "颜色部分仅说明浅灰低调、浅绿清爽，未进一步联系具体使用场景或人群偏好，拓展略少。",
+        "收尾‘不着急的话也可以先想想平时用它来记什么’虽自然，但购买决策引导可以更具体，例如区分学生党或手账爱好者。"
+      ]
+    }
+  ],
+  "pair_diversity": {
+    "score": 3,
+    "reason": "两版开场不同（1版直接问没纸没本，2版互动公屏并聊感受），但核心卖点展开顺序和模板结构仍相似，如都从痛点、商品介绍、规格、价格到收口，且点阵内页、软封面、A5尺寸、80页的展开角度和情境差异不大，未达到至少两项明显不同且均完整。"
+  },
+  "rubric": "20261007.4-uniform-coverage-content-and-near-copy-checks"
+}

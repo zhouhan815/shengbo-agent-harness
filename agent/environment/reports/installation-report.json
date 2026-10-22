@@ -1,0 +1,75 @@
+{
+  "schema_version": 1,
+  "status": "ready",
+  "created_at_utc": "2026-10-15T10:57:04.134362+00:00",
+  "scope": "SDK/environment preparation and offline technical probes only; no ecommerce business Agent",
+  "project_directory": "D:\\Codex project\\shengbo-ops-agent",
+  "python": {
+    "executable": "D:\\Codex project\\shengbo-ops-agent\\.venv\\Scripts\\python.exe",
+    "version": "3.12.14 (main, Aug 25 2026, 14:01:42) [MSC v.1944 64 bit (AMD64)]",
+    "base_prefix": "C:\\Users\\lizhe\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python",
+    "pip_version": "25.0.1"
+  },
+  "requested_sdk_versions": {
+    "deepagents": "0.7.25",
+    "langchain": "1.4.6",
+    "langgraph": "1.2.15",
+    "langchain-deepseek": "1.1.1",
+    "langchain-mcp-adapters": "0.3.2"
+  },
+  "additional_core_versions": {
+    "langchain-core": "1.6.10",
+    "mcp": "1.30.0"
+  },
+  "installed_package_count_including_pip": 79,
+  "locked_runtime_dependency_count": 78,
+  "validation": {
+    "passed": 8,
+    "total": 8,
+    "pip_check": {
+      "passed": true,
+      "evidence_file": "D:\\Codex project\\shengbo-ops-agent\\environment\\reports\\pip-check.txt",
+      "output": "No broken requirements found."
+    },
+    "offline_probe": {
+      "passed": true,
+      "evidence_file": "D:\\Codex project\\shengbo-ops-agent\\environment\\reports\\offline-probe.json",
+      "passed_checks": 7,
+      "total_checks": 7
+    },
+    "stub_model_calls": 2,
+    "local_tool_calls": 1,
+    "final_message": "SDK_OFFLINE_OK:42",
+    "network_connection_or_dns_attempts": 0,
+    "hosted_model_clients_constructed": 0,
+    "inherited_environment_discarded": true,
+    "tracing_disabled": true
+  },
+  "fingerprints": {
+    "requirements_lock_sha256": "704f138d0d850b61acdfeb79641743eb4b1987138d6b02aa7c1c5ee1480f3849",
+    "deepagents_graph_py": "D:\\Codex project\\shengbo-ops-agent\\.venv\\Lib\\site-packages\\deepagents\\graph.py",
+    "deepagents_graph_sha256": "b0a5e4bd56c07a35db2f4ee62666f28db99d1d78e60f3c5f8c52553c642ce2fc"
+  },
+  "official_sources": [
+    "https://docs.langchain.com/oss/python/deepagents/quickstart",
+    "https://reference.langchain.com/python/deepagents/graph/create_deep_agent",
+    "https://pypi.org/pypi/deepagents/json",
+    "https://docs.langchain.com/oss/python/integrations/chat/deepseek",
+    "https://docs.langchain.com/oss/python/langchain/mcp"
+  ],
+  "scope_boundaries": {
+    "business_agent_implemented": false,
+    "credentials_loaded_or_created": false,
+    "paid_model_api_calls": 0,
+    "existing_ecommerce_voice_agent_modified": false,
+    "user_global_skills_modified": false,
+    "global_python_packages_modified": false
+  },
+  "not_validated": [
+    "Real model inference",
+    "External MCP connectivity",
+    "Production credentials",
+    "Ecommerce business workflows"
+  ],
+  "remaining_required_work_for_sdk_preparation": []
+}

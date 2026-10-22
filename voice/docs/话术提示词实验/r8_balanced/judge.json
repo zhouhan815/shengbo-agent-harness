@@ -1,0 +1,70 @@
+{
+  "versions": [
+    {
+      "index": 1,
+      "scores": {
+        "natural_live_speech": 13,
+        "benefit_scene_expansion": 17,
+        "coherent_flow": 9,
+        "non_repetition": 9,
+        "purchase_guidance": 5
+      },
+      "score_reasons": [
+        "自然口语：以“姐妹平时在家走动多，还是站着做家务的时间长？”互动提问开场，口语感强，但“Joy Share 生活选物全新上架”品牌信息植入略突兀。",
+        "卖点展开：覆盖足弓支撑、软弹缓震、静音防滑、轻便、防臭快干、修饰脚型等，每个卖点都结合具体场景解释对使用者的意义，有效展开卖点达6个，且生活化。",
+        "连贯性：从互动提问切入痛点，自然过渡到商品介绍，再展开卖点、场景、规格、价格，结构流畅。",
+        "非重复：表达方式多样，无凑字。",
+        "购买引导：明确给出限时活动紧迫感，“看中颜色和尺码就早点下手”，引导自然。"
+      ],
+      "unsupported_claims": [],
+      "price_and_terms_correct": true,
+      "knowledge_leaks": [],
+      "main_gaps": [
+        "“全新上架”属于品牌宣传，但商品资料未提供上架时间，需谨慎核对。",
+        "提到“耐磨”但商品资料有“轻便耐磨”，表述一致。",
+        "整体无明显实际缺点。"
+      ]
+    },
+    {
+      "index": 2,
+      "scores": {
+        "natural_live_speech": 12,
+        "benefit_scene_expansion": 15,
+        "coherent_flow": 8,
+        "non_repetition": 8,
+        "purchase_guidance": 4
+      },
+      "score_reasons": [
+        "自然口语：以“欢迎来到直播间”“姐妹”等称呼开场，语气亲切，但部分如“优选 E V A 环保材质”字母播报稍显生硬。",
+        "卖点展开：覆盖轻便、防臭快干、静音防滑、足弓支撑、厚底软弹、修饰脚型等卖点，并放入旅行、居家、夜间等具体场景，有效展开卖点超过4个，但“修饰脚型”仅一句带过。",
+        "连贯性：有痛点引入、卖点展开、规格价格，但略显逐点罗列，机械感稍强。",
+        "非重复：无空话凑字，但尺码和颜色列举较枯燥，不过整体不算重复。",
+        "购买引导：给出价格和尺码选择建议，但最后“觉得合适再下单”较平淡，无紧迫感。"
+      ],
+      "unsupported_claims": [],
+      "price_and_terms_correct": true,
+      "knowledge_leaks": [],
+      "main_gaps": [
+        "痛点引入较弱，开头未深入描述足部不适，直接进入商品介绍。",
+        "卖点展开的机械感稍强，描述略显书面化。",
+        "颜色和尺码列举占用篇幅较多，节奏略拖。"
+      ]
+    }
+  ],
+  "pair_diversity": {
+    "score": 4,
+    "reason": "两版卖点展开顺序、情境和节奏明显不同：版本1以旅行和夜间场景为主，结构较逐点；版本2以互动提问切入，按足弓支撑、静音、轻便等顺序展开，情境更生活化，节奏更流畅。两版均完整，差异鲜明。"
+  },
+  "judge_model": "deepseek-flash",
+  "judge_protocol": "v2-core-facts-only-no-unsupported-reference-priming",
+  "usage": {
+    "prompt_tokens": 2475,
+    "completion_tokens": 807,
+    "total_tokens": 3282,
+    "prompt_tokens_details": {
+      "cached_tokens": 1024
+    },
+    "prompt_cache_hit_tokens": 1024,
+    "prompt_cache_miss_tokens": 1451
+  }
+}

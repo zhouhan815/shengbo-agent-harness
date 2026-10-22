@@ -1,0 +1,71 @@
+{
+  "versions": [
+    {
+      "han_characters": 507,
+      "sentences": 22,
+      "coverage_groups": {
+        "材质": true,
+        "折叠": true,
+        "尺寸": true,
+        "拉链": true,
+        "口袋": true,
+        "携带": true,
+        "颜色": true,
+        "场景": true
+      },
+      "coverage_rate": 1.0,
+      "natural_sentence_ratio": 1.0,
+      "duplicate_sentences": [],
+      "reference_5gram_overlap": 0.0,
+      "program_scores": {
+        "selling_point_coverage": 12.0,
+        "flow": 8.0,
+        "speakability": 10.0,
+        "length_fit": 5,
+        "fact_references": 5.0
+      },
+      "program_total": 40.0,
+      "invalid_references": false,
+      "app_issues": []
+    },
+    {
+      "han_characters": 698,
+      "sentences": 24,
+      "coverage_groups": {
+        "材质": true,
+        "折叠": true,
+        "尺寸": true,
+        "拉链": true,
+        "口袋": true,
+        "携带": true,
+        "颜色": true,
+        "场景": true
+      },
+      "coverage_rate": 1.0,
+      "natural_sentence_ratio": 1.0,
+      "duplicate_sentences": [],
+      "reference_5gram_overlap": 0.003,
+      "program_scores": {
+        "selling_point_coverage": 12.0,
+        "flow": 8.0,
+        "speakability": 10.0,
+        "length_fit": 5,
+        "fact_references": 5.0
+      },
+      "program_total": 40.0,
+      "invalid_references": false,
+      "app_issues": []
+    }
+  ],
+  "pair": [
+    {
+      "a": 1,
+      "b": 2,
+      "fivegram_jaccard": 0.123,
+      "shared_narrative_sentences": [],
+      "near_copy_ratio": 0.0,
+      "near_copies": [],
+      "opening_similarity": 0.207
+    }
+  ]
+}

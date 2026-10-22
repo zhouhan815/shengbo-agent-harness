@@ -1,0 +1,50 @@
+{
+  "audit_date": "2026-10-20",
+  "mode": "read_only_local_code_and_design_audit",
+  "business_source_changed": false,
+  "models_called": 0,
+  "services_restarted": false,
+  "installed_sdk": {
+    "deepagents": "0.7.25",
+    "langchain": "1.4.6",
+    "langchain-core": "1.6.10",
+    "langgraph": "1.2.15"
+  },
+  "actual_structure": {
+    "compatible_keys": ["opening_long", "opening_short", "product_intro", "selling_points", "campaign", "cta", "transition"],
+    "active_keys": ["opening_long", "opening_short", "product_intro", "selling_points", "campaign", "cta"],
+    "normal_played_module_count": 5,
+    "campaign_optional": true,
+    "opening_policy": "saved_position_every_five",
+    "long_positions": [1, 6, 11],
+    "loop_preserves_original_position": true,
+    "imported_original": "verbatim_script_as_product_intro_no_forced_module_split",
+    "independent_transition": false
+  },
+  "confirmed_monitoring_gaps": [
+    {"id": "P01", "gap": "attempt_id exists in current state but structured persisted attempt history is incomplete", "source": "app/server.py:477-482,685-715", "proposed": "append-only attempt-created/state-transition/terminal events with exact immutable identities"},
+    {"id": "P02", "gap": "playing/ended/failed room_log details contain sentence ID but no attempt/module/product refs", "source": "app/server.py:691-715", "proposed": "record exact reference chain at event emission rather than reconstruct from current product heads"},
+    {"id": "P03", "gap": "progress only updates memory; played capped at 1000 and memory only", "source": "app/server.py:694-699", "proposed": "bounded sampling with full attempt-terminal ledger and freshness metadata"},
+    {"id": "P04", "gap": "control_accepted only stores action name; no queue-before-after/skip reason", "source": "app/server.py:552-683", "proposed": "passively log human action ID, params projection, affected attempt, queue revisions and reason"},
+    {"id": "P05", "gap": "cycle count and interruption outcome not explicit", "source": "app/server.py:527-545", "proposed": "cycle_index plus attempt interruption reason; same sentence can have multiple valid attempts"},
+    {"id": "P06", "gap": "second-resolution log clock and no occurred/received separation", "source": "app/server.py:48-49,450-457", "proposed": "milliseconds-or-better receive clock, monotonic time, source time precision and uncertainty"},
+    {"id": "P07", "gap": "monitor websocket has no complete cursor-based telemetry replay", "source": "app/server.py:1294-1348", "proposed": "durable normalized event cursor, reconnect replay and explicit coverage gaps"},
+    {"id": "P08", "gap": "source=obs is a player URL label, not proof OBS is capturing/outputting", "source": "web/player.js:15;web/audio-player.js:92-97;app/audio_output.py:95", "proposed": "separate browser callback, device signal, OBS acquisition/output and platform receipt evidence"},
+    {"id": "P09", "gap": "SessionArchive and ReviewBundle old contracts are not full current implementations", "source": "01_统一数据与工具契约.md:66-76;app/server.py:1286-1291", "proposed": "new normalized immutable archive with per-source completeness and separate report revision"},
+    {"id": "P10", "gap": "current recap document/dispositions use dicts with partial validation; design typed schema stronger", "source": "src/shengbo_contracts/business.py:102-105,361;app/prelive/service.py:1499-1543,906-912", "proposed": "versioned export adapter, stable recap_ref+finding_id and explicit user adoption; no automatic business mutation"}
+  ],
+  "prelive_handoff": {
+    "existing_commands": ["import_recap", "link_recap_to_preparation", "save_context_bundle", "save_script_plan"],
+    "existing_read": "read_recap",
+    "requires_user_selection_for_next_session": true,
+    "automatic_catalog_script_or_queue_mutation": false
+  },
+  "limits": [
+    "not a real platform collector field audit",
+    "HTMLAudio callback does not prove OBS or platform audio delivery",
+    "no actual platform/order attribution test",
+    "no complete session archive acceptance test",
+    "old source evidence line numbers reflect 2026-10-20 read time"
+  ],
+  "detail_document": "old-plan-and-playback-audit.md"
+}

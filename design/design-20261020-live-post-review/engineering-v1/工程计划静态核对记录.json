@@ -1,0 +1,686 @@
+{
+  "checked_at_utc": "2026-10-20T04:56:19.852907+00:00",
+  "scope": "文档/链接/目录/负例与结构契约静态核对；不是新Review运行验收",
+  "checks": [
+    {
+      "name": "00_总开发计划与架构.md：代码围栏成对",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "00_总开发计划与架构.md：表格列数一致",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "00_总开发计划与架构.md：本地链接存在",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "01_数据契约与持久化.md：代码围栏成对",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "01_数据契约与持久化.md：表格列数一致",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "01_数据契约与持久化.md：本地链接存在",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "02_AgentHarness与上下文中间件.md：代码围栏成对",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "02_AgentHarness与上下文中间件.md：表格列数一致",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "02_AgentHarness与上下文中间件.md：本地链接存在",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "03_工具与可调用工作流.md：代码围栏成对",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "03_工具与可调用工作流.md：表格列数一致",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "03_工具与可调用工作流.md：本地链接存在",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "04_API前端与播前交接.md：代码围栏成对",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "04_API前端与播前交接.md：表格列数一致",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "04_API前端与播前交接.md：本地链接存在",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "05_验收与实施任务包.md：代码围栏成对",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "05_验收与实施任务包.md：表格列数一致",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "05_验收与实施任务包.md：本地链接存在",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "06_播前迭代教训预防矩阵.md：代码围栏成对",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "06_播前迭代教训预防矩阵.md：表格列数一致",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "06_播前迭代教训预防矩阵.md：本地链接存在",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "07_评价体系执行配方.md：代码围栏成对",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "07_评价体系执行配方.md：表格列数一致",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "07_评价体系执行配方.md：本地链接存在",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "K00工具有定义",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "K01工具有定义",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "K02工具有定义",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "K03工具有定义",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "K04工具有定义",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "K05工具有定义",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "K06工具有定义",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "K07工具有定义",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "K08工具有定义",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "K09工具有定义",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "K10工具有定义",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "K11工具有定义",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "K12工具有定义",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "K13工具有定义",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "F01工具流有详细步骤",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "F02工具流有详细步骤",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "F03工具流有详细步骤",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "F04工具流有详细步骤",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "F05工具流有详细步骤",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "评价配方34个metric_id唯一",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "工具注册目录与评价配方逐项一致",
+      "passed": true,
+      "detail": {
+        "missing_in_registry": [],
+        "extra_in_registry": []
+      }
+    },
+    {
+      "name": "R01验收用例存在",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "R02验收用例存在",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "R03验收用例存在",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "R04验收用例存在",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "R05验收用例存在",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "R06验收用例存在",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "R07验收用例存在",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "R08验收用例存在",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "R09验收用例存在",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "R10验收用例存在",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "R11验收用例存在",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "R12验收用例存在",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "R13验收用例存在",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "R14验收用例存在",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "R15验收用例存在",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "R16验收用例存在",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "R17验收用例存在",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "R18验收用例存在",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "R19验收用例存在",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "R20验收用例存在",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "R21验收用例存在",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "R22验收用例存在",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "R23验收用例存在",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "R24验收用例存在",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "R25验收用例存在",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "R26验收用例存在",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "R27验收用例存在",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "R28验收用例存在",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "R29验收用例存在",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "R30验收用例存在",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "R31验收用例存在",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "R32验收用例存在",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "R33验收用例存在",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "R34验收用例存在",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "R35验收用例存在",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "R36验收用例存在",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "R37验收用例存在",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "R38验收用例存在",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "R39验收用例存在",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "R40验收用例存在",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "R41验收用例存在",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "R42验收用例存在",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "R43验收用例存在",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "R44验收用例存在",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "R45验收用例存在",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "R46验收用例存在",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "R47验收用例存在",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "R48验收用例存在",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "R49验收用例存在",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "R50验收用例存在",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "PL01旧教训反例存在",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "PL02旧教训反例存在",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "PL03旧教训反例存在",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "PL04旧教训反例存在",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "PL05旧教训反例存在",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "PL06旧教训反例存在",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "PL07旧教训反例存在",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "PL08旧教训反例存在",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "PL09旧教训反例存在",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "PL10旧教训反例存在",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "PL11旧教训反例存在",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "PL12旧教训反例存在",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "PL13旧教训反例存在",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "PL14旧教训反例存在",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "PL15旧教训反例存在",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "PL16旧教训反例存在",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "PL17旧教训反例存在",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "PL18旧教训反例存在",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "重算与复用义务有正式回执",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "内容评级主子提交路径一致",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "等待有真正停止与续办协议",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "SDK工具显式白名单与计划配置",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "采纳分阶段幂等和命名空间",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "生产者fence与语义去重明确",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Job查询及超时可达",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "harness-architecture.svg：合法SVG",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "harness-model-cycle.svg：合法SVG",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "受保护业务源码未变：D:\\Codex project\\ecommerce-voice-agent\\app\\live_source.py",
+      "passed": true,
+      "detail": {
+        "expected": "97844d3817fe4a98bc24635f1f08485e95bf2543182ec75385666764ca6c2c6e",
+        "actual": "97844d3817fe4a98bc24635f1f08485e95bf2543182ec75385666764ca6c2c6e"
+      }
+    },
+    {
+      "name": "受保护业务源码未变：D:\\Codex project\\ecommerce-voice-agent\\app\\server.py",
+      "passed": true,
+      "detail": {
+        "expected": "bc94c4181b024485b81fa297a60bea683bf6633539f4e310f4fb2a871aca197f",
+        "actual": "bc94c4181b024485b81fa297a60bea683bf6633539f4e310f4fb2a871aca197f"
+      }
+    },
+    {
+      "name": "受保护业务源码未变：D:\\Codex project\\ecommerce-voice-agent\\app\\prelive\\service.py",
+      "passed": true,
+      "detail": {
+        "expected": "783d21cb7c667f7cea3d7f08a57cf284bf8f7866e6585f35a16dd19af55208b4",
+        "actual": "783d21cb7c667f7cea3d7f08a57cf284bf8f7866e6585f35a16dd19af55208b4"
+      }
+    },
+    {
+      "name": "受保护业务源码未变：D:\\Codex project\\ecommerce-voice-agent\\app\\prelive_bridge.py",
+      "passed": true,
+      "detail": {
+        "expected": "546e4af67e91d0102ee8fb20aa81afa98406dcdf2614f76948afa7163f0f1a80",
+        "actual": "546e4af67e91d0102ee8fb20aa81afa98406dcdf2614f76948afa7163f0f1a80"
+      }
+    },
+    {
+      "name": "受保护业务源码未变：D:\\Codex project\\shengbo-ops-agent\\src\\shengbo_prelive\\runtime.py",
+      "passed": true,
+      "detail": {
+        "expected": "4fd49f9d392bb7e10992fd7258ee04592da07b81f405e220d5c097e7e544e26a",
+        "actual": "4fd49f9d392bb7e10992fd7258ee04592da07b81f405e220d5c097e7e544e26a"
+      }
+    },
+    {
+      "name": "受保护业务源码未变：D:\\Codex project\\shengbo-ops-agent\\src\\shengbo_prelive\\middleware.py",
+      "passed": true,
+      "detail": {
+        "expected": "43f208e5b81524b5ea830305b1ad53fc1bfbaf5cfb785b9ff1c2eed895617521",
+        "actual": "43f208e5b81524b5ea830305b1ad53fc1bfbaf5cfb785b9ff1c2eed895617521"
+      }
+    },
+    {
+      "name": "受保护业务源码未变：D:\\Codex project\\shengbo-ops-agent\\src\\shengbo_contracts\\common.py",
+      "passed": true,
+      "detail": {
+        "expected": "b9c59f507e1ee85b1db49f34447f28a7d3018c1af86bb5d812734ce0d340bbb5",
+        "actual": "b9c59f507e1ee85b1db49f34447f28a7d3018c1af86bb5d812734ce0d340bbb5"
+      }
+    },
+    {
+      "name": "受保护业务源码未变：D:\\Codex project\\shengbo-ops-agent\\src\\shengbo_prelive\\__main__.py",
+      "passed": true,
+      "detail": {
+        "expected": "05abd1169a7e99e9fc9d34661069c00aed6ed2c055ba5f2bce708acde0aeb624",
+        "actual": "05abd1169a7e99e9fc9d34661069c00aed6ed2c055ba5f2bce708acde0aeb624"
+      }
+    }
+  ],
+  "total": 130,
+  "passed": 130,
+  "failed": 0
+}

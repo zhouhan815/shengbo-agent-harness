@@ -1,0 +1,70 @@
+{
+  "versions": [
+    {
+      "index": 1,
+      "scores": {
+        "natural_live_speech": 14,
+        "benefit_scene_expansion": 18,
+        "coherent_flow": 9,
+        "non_repetition": 8,
+        "purchase_guidance": 4
+      },
+      "score_reasons": [
+        "自然口语：开头痛点“很多姐妹回家换上拖鞋，站一会儿洗菜洗碗，脚底就开始发酸”非常生活化，表达自然。",
+        "卖点展开：足弓支撑、小蛮腰厚底、静音、防滑、EVA防臭快干、轻便、耐磨等均有情境和收益，如“在厨房来回走动、在阳台晾衣服，脚底压力会分散一些”，有效展开卖点超过4个。",
+        "连贯流程：从站久脚酸切入，再介绍商品、卖点、规格、价格，最后划重点，顺序合理。",
+        "非重复：语言变化多，没有空洞凑字，但部分情境与版本1有相似，整体尚可。",
+        "购买引导：明确原价、活动价、限时下杀，并引导“根据自己的脚型和日常场景，选喜欢的颜色和合适尺码，合适再下单”。"
+      ],
+      "unsupported_claims": [],
+      "price_and_terms_correct": true,
+      "knowledge_leaks": [],
+      "main_gaps": [
+        "未提及材质为EVA一体成型？实际已提。",
+        "未提及备注中脚背较宽建议大一号？实际已提。",
+        "无重大遗漏。"
+      ]
+    },
+    {
+      "index": 2,
+      "scores": {
+        "natural_live_speech": 13,
+        "benefit_scene_expansion": 18,
+        "coherent_flow": 9,
+        "non_repetition": 8,
+        "purchase_guidance": 4
+      },
+      "score_reasons": [
+        "自然口语：整体口播流畅，像“先问一句，你出门旅行会自己带拖鞋吗？”这种互动很自然，没有说明书感。",
+        "卖点展开：足弓支撑、小蛮腰厚底、静音、防滑、EVA材质、轻便、耐磨、快干易清洗等都有具体情境和有限收益，如“在厨房站一会儿、在客厅来回走，脚底压力感会舒缓一些”，至少4个卖点有效展开。",
+        "连贯流程：从旅行痛点切入，再介绍商品，然后分点展开，最后规格价格收口，逻辑连贯。",
+        "非重复：基本没有空话凑字，但颜色和尺码环节略有罗列感，整体重复度低。",
+        "购买引导：明确给出原价178、活动价107新台币和限时下杀，自然引导“根据自己的颜色喜好和脚型选规格，合适再下单”。"
+      ],
+      "unsupported_claims": [],
+      "price_and_terms_correct": true,
+      "knowledge_leaks": [],
+      "main_gaps": [
+        "未提及标准码及脚型建议？实际已提，此处留空。",
+        "颜色和尺码虽然列出，但颜色未全部列举完整（只举部分），但这不是核心缺点。",
+        "整体信息完整，无明显重大遗漏。"
+      ]
+    }
+  ],
+  "pair_diversity": {
+    "score": 3,
+    "reason": "两版开场痛点不同（旅行带拖鞋 vs 站久脚酸），重点展开顺序有差异，且情境描述不同，但整体结构和卖点覆盖高度相似，属于有效不同但未达4分标准。"
+  },
+  "judge_model": "deepseek-flash",
+  "judge_protocol": "v2-core-facts-only-no-unsupported-reference-priming",
+  "usage": {
+    "prompt_tokens": 2544,
+    "completion_tokens": 815,
+    "total_tokens": 3359,
+    "prompt_tokens_details": {
+      "cached_tokens": 1024
+    },
+    "prompt_cache_hit_tokens": 1024,
+    "prompt_cache_miss_tokens": 1520
+  }
+}

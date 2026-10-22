@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>声播 · 播前 Agent 工作台</title>
+  <link rel="icon" href="/assets/favicon.svg">
+  <link rel="stylesheet" href="/assets/assistant.css?v=20261020-script-cards-v4">
+  <link rel="stylesheet" href="/assets/agent-workbench.css?v=20261021-sentence-edit-v1">
+</head>
+<body class="wb-app" data-focus-mode="chat" data-mobile-panel="chat">
+  <a class="wb-skip" href="#assistant-container">跳转到 Agent 对话</a>
+  <header class="wb-header">
+    <div class="wb-header-main">
+      <a class="wb-brand" href="/" aria-label="声播，播前 Agent 工作台">
+        <span class="wb-brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M5 10v4m4-8v12m4-15v18m4-14v10m4-7v4" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></span>
+        <span>声播<small>直播工作笔记</small></span>
+      </a>
+      <nav class="wb-global-nav" aria-label="全局业务入口">
+        <button type="button" id="open-catalog" data-global-view="catalog">商品库</button>
+        <button type="button" id="open-rooms" data-global-view="rooms">直播间</button>
+      </nav>
+      <div class="wb-context-trail" aria-label="当前工作范围"><span id="context-room">全部工作区</span><span aria-hidden="true">/</span><strong id="context-preparation">尚未选择本场</strong></div>
+      <div class="wb-header-end">
+        <span class="wb-connection" id="service-status" role="status">正在连接服务</span>
+        <span class="wb-local-mark" title="资料和执行记录保存在本机">本机工作区</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="wb-shell" id="agent-workbench">
+    <div class="wb-workspace-bar">
+      <div class="wb-workspace-intro"><span class="wb-notebook-tag">WORKSPACE</span><h1>从资料到一场准备充分的直播</h1><p>右侧沟通，左侧检查、微调与执行。</p></div>
+      <div class="wb-focus-switch" role="group" aria-label="调整工作区布局">
+        <button type="button" id="focus-work" aria-pressed="false" aria-controls="work-panel">看成果</button>
+        <button type="button" id="focus-chat" aria-pressed="true" aria-controls="chat-panel">与 Agent 沟通</button>
+      </div>
+    </div>
+    <div class="wb-notice" id="workbench-notice" role="status" hidden><span id="workbench-notice-message"></span><button type="button" id="dismiss-workbench-notice" aria-label="关闭提示">×</button></div>
+    <div class="wb-mobile-tabs" role="tablist" aria-label="切换成果与对话">
+      <button type="button" id="mobile-work" role="tab" aria-selected="false" aria-controls="work-panel" data-mobile-target="work">成果与配置</button>
+      <button type="button" id="mobile-chat" role="tab" aria-selected="true" aria-controls="chat-panel" data-mobile-target="chat">Agent 对话</button>
+    </div>
+
+    <div class="wb-panels">
+      <section class="wb-work-panel" id="work-panel" tabindex="-1" aria-labelledby="workspace-title">
+        <header class="wb-panel-heading">
+          <div><span class="wb-eyebrow">资料与工作台</span><h2 id="workspace-title">准备概览</h2><p id="workspace-subtitle">已保存资料、准备进度与待处理事项。</p></div>
+          <div class="wb-heading-actions"><span class="wb-badge" id="workspace-status">正在读取</span><button type="button" class="wb-button wb-button--primary wb-start-preparation" id="start-preparation" title="通过所选设备播放声播声音，不会自动在抖音开播" hidden>▶ 开始播出</button><button type="button" class="wb-button wb-button--primary wb-start-preparation" id="pause-preparation" title="暂停或继续声播语音，保留播放位置" hidden>⏸ 暂停播出</button><button type="button" class="wb-button" id="review-preparation" hidden>检查并采用</button></div>
+        </header>
+        <section id="playback-strip" class="wb-playback-strip" aria-label="当前播放与输出设备" hidden>
+          <div class="wb-row wb-playback-summary"><strong id="audio-playback-status">等待播出</strong><span id="audio-local-status" class="wb-muted"></span></div>
+          <p id="audio-current-meta" class="wb-muted"></p>
+          <p id="audio-current-text" class="wb-now-speaking"></p>
+          <p id="audio-output-warning" class="wb-audio-warning" role="status" hidden></p>
+          <details id="audio-settings" class="wb-audio-settings"><summary>声音设置 · <strong id="audio-output-device">正在检测…</strong></summary>
+            <div class="wb-audio-settings-body">
+              <div id="audio-route-controls" class="wb-audio-routing" aria-label="音频连接设置"></div>
+              <div class="wb-output-device"><small id="audio-output-advice"></small></div>
+              <div class="wb-audio-signal"><meter id="audio-output-meter" min="0" max="1" value="0" aria-label="电脑端浏览器声音采样电平"></meter><small id="audio-output-signal"></small></div>
+              <details class="wb-output-diagnostic"><summary>设备检测详情</summary><pre id="audio-output-details"></pre></details>
+            </div>
+          </details>
+        </section>
+        <nav class="wb-view-tabs" role="tablist" aria-label="本场工作区视图">
+          <button type="button" id="tab-overview" role="tab" data-view="overview" aria-selected="true" aria-controls="workspace-editor">概览</button>
+          <button type="button" id="tab-products" role="tab" data-view="products" aria-selected="false" aria-controls="workspace-editor">本场商品</button>
+          <button type="button" id="tab-insights" role="tab" data-view="insights" aria-selected="false" aria-controls="workspace-editor">顾客与卖点</button>
+          <button type="button" id="tab-session" role="tab" data-view="session" aria-selected="false" aria-controls="workspace-editor">本场配置</button>
+          <button type="button" id="tab-scripts" role="tab" data-view="scripts" aria-selected="false" aria-controls="workspace-editor">话术与排序</button>
+          <button type="button" id="tab-changes" role="tab" data-view="changes" aria-selected="false" aria-controls="workspace-editor">变更记录</button>
+        </nav>
+        <nav class="wb-execution-tabs" aria-label="播出与调试">
+          <span>执行与调试</span>
+          <button type="button" data-execution-view="broadcast" aria-controls="execution-editor">播出监控</button>
+          <button type="button" data-execution-view="platform" aria-controls="execution-editor">平台接入</button>
+          <button type="button" data-execution-view="comments" aria-controls="execution-editor">评论测试</button>
+          <button type="button" data-execution-view="jobs" aria-controls="execution-editor">任务与评测</button>
+        </nav>
+        <div class="wb-editor" id="workspace-editor" role="tabpanel" aria-labelledby="tab-overview" tabindex="0">
+          <div class="wb-empty wb-loading"><span class="wb-loading-mark" aria-hidden="true"></span><h3>正在读取工作区</h3><p>商品资料和本场成果将在这里展示。</p></div>
+        </div>
+        <div class="wb-editor" id="execution-editor" role="region" aria-label="播出与调试工作区" hidden></div>
+        <footer class="wb-panel-footer"><span><span class="wb-footer-dot" aria-hidden="true"></span>资料、草案和执行记录保存在本机</span></footer>
+      </section>
+
+      <section class="wb-chat-panel" id="chat-panel" tabindex="-1" aria-label="播前 Agent 主对话">
+        <div id="assistant-container" class="wb-assistant-container" tabindex="-1"></div>
+      </section>
+    </div>
+  </main>
+  <div class="wb-sr-only" id="workbench-live" role="status" aria-live="polite"></div>
+  <noscript><p class="wb-noscript">请启用 JavaScript 后使用播前 Agent 工作台。</p></noscript>
+  <script src="/assets/assistant.js?v=20261020-script-cards-v4"></script>
+  <script src="/assets/audio-player.js"></script>
+  <script src="/assets/audio-output.js"></script>
+  <script src="/assets/audio-routing.js"></script>
+  <script src="/assets/workbench-api.js"></script>
+  <script src="/assets/workspace-editors.js?v=20261021-preparation-labels-v1"></script>
+  <script src="/assets/workbench-execution.js?v=20261020-script-cards-v4"></script>
+  <script src="/assets/agent-workbench.js?v=20261021-preparation-labels-v1"></script>
+</body>
+</html>

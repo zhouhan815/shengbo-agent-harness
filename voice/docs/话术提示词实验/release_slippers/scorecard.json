@@ -1,0 +1,42 @@
+{
+  "run": "release_slippers",
+  "versions": [
+    {
+      "version": 1,
+      "program": 39.4,
+      "semantic": 53.0,
+      "total": 92.4,
+      "hard_gate": true,
+      "rule_issues": [],
+      "serious_claims": 0,
+      "cross_version_copy_pass": true,
+      "pass": true,
+      "gaps": [
+        "未提及材质为EVA一体成型？实际已提。",
+        "未提及备注中脚背较宽建议大一号？实际已提。",
+        "无重大遗漏。"
+      ]
+    },
+    {
+      "version": 2,
+      "program": 39.12,
+      "semantic": 52.0,
+      "total": 91.12,
+      "hard_gate": true,
+      "rule_issues": [],
+      "serious_claims": 0,
+      "cross_version_copy_pass": true,
+      "pass": true,
+      "gaps": [
+        "未提及标准码及脚型建议？实际已提，此处留空。",
+        "颜色和尺码虽然列出，但颜色未全部列举完整（只举部分），但这不是核心缺点。",
+        "整体信息完整，无明显重大遗漏。"
+      ]
+    }
+  ],
+  "pair_diversity": {
+    "score": 3,
+    "reason": "两版开场痛点不同（旅行带拖鞋 vs 站久脚酸），重点展开顺序有差异，且情境描述不同，但整体结构和卖点覆盖高度相似，属于有效不同但未达4分标准。"
+  },
+  "rubric": "20261007.4-uniform-coverage-content-and-near-copy-checks"
+}

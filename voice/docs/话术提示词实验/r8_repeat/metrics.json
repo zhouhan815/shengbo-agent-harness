@@ -1,0 +1,79 @@
+{
+  "versions": [
+    {
+      "han_characters": 673,
+      "sentences": 24,
+      "coverage_groups": {
+        "材质成型": true,
+        "足弓": true,
+        "厚底软弹": true,
+        "静音防滑": true,
+        "清洗快干防臭": true,
+        "轻便场景": true,
+        "规格": true,
+        "选码": true
+      },
+      "coverage_rate": 1.0,
+      "natural_sentence_ratio": 1.0,
+      "duplicate_sentences": [],
+      "reference_5gram_overlap": 0.057,
+      "program_scores": {
+        "selling_point_coverage": 12.0,
+        "flow": 8.0,
+        "speakability": 10.0,
+        "length_fit": 3.96,
+        "fact_references": 5.0
+      },
+      "program_total": 38.96,
+      "invalid_references": false,
+      "app_issues": []
+    },
+    {
+      "han_characters": 707,
+      "sentences": 27,
+      "coverage_groups": {
+        "材质成型": true,
+        "足弓": true,
+        "厚底软弹": true,
+        "静音防滑": true,
+        "清洗快干防臭": true,
+        "轻便场景": true,
+        "规格": true,
+        "选码": true
+      },
+      "coverage_rate": 1.0,
+      "natural_sentence_ratio": 1.0,
+      "duplicate_sentences": [],
+      "reference_5gram_overlap": 0.06,
+      "program_scores": {
+        "selling_point_coverage": 12.0,
+        "flow": 8.0,
+        "speakability": 10.0,
+        "length_fit": 4.16,
+        "fact_references": 5.0
+      },
+      "program_total": 39.16,
+      "invalid_references": false,
+      "app_issues": []
+    }
+  ],
+  "pair": [
+    {
+      "a": 1,
+      "b": 2,
+      "fivegram_jaccard": 0.204,
+      "shared_narrative_sentences": [
+        "鞋底有静音和防滑特性，在家里走动时能减少对家人的打扰。"
+      ],
+      "near_copy_ratio": 0.067,
+      "near_copies": [
+        {
+          "a": "鞋底有静音和防滑特性，在家里走动时能减少对家人的打扰。",
+          "b": "鞋底有静音和防滑特性，在家里走动时能减少对家人的打扰。",
+          "similarity": 1.0
+        }
+      ],
+      "opening_similarity": 0.177
+    }
+  ]
+}

@@ -1,0 +1,70 @@
+{
+  "versions": [
+    {
+      "index": 1,
+      "scores": {
+        "natural_live_speech": 15,
+        "benefit_scene_expansion": 18,
+        "coherent_flow": 9,
+        "non_repetition": 8,
+        "purchase_guidance": 5
+      },
+      "score_reasons": [
+        "natural_live_speech: 15分。全篇像直播口播，'姐妹可以先想一想，你在家站得久的时候，脚底是什么感觉？'自然，价格读法口语化，没有说明书感。",
+        "benefit_scene_expansion: 18分。足弓支撑、厚底软弹、静音、防滑、快干防臭、轻便、颜色等多个卖点都有情境或收益，如'站着切菜、熨衣服的时候，脚心有个地方托着，压力分散开'、'在浴室或者室内走动，声音会轻一些，减少打扰家人'、'出门散步、倒垃圾、去海边漫步也能穿'、'塞进行李箱不占太多地方'。",
+        "coherent_flow: 9分。由久站、夜间扰人痛点引入，依次展开功能、材质、颜色、尺码、价格，收口自然。",
+        "non_repetition: 8分。各卖点没有无效重复，静音和防滑都配合场景区分说明；颜色段稍长但属于资料内容。",
+        "purchase_guidance: 5分。'原价一百七十八新台币''活动价一百零七新台币，优惠条件就是限时活动'清楚，并给出'颜色和尺码按自己的喜好和脚型选，合适再下单'的选择引导。"
+      ],
+      "unsupported_claims": [],
+      "price_and_terms_correct": true,
+      "knowledge_leaks": [],
+      "main_gaps": [
+        "对防臭特性的描述仅'材质本身防臭快干'一句，未结合脚汗、闷热等常见居家使用情境，卖点展开偏薄。",
+        "颜色建议虽给了冷暖方向，但未说明不同颜色在家居搭配中的差异，颜色卖点偏罗列。",
+        "对'静音防滑'的'静音'和'防滑'在不同地面上的表现没有进一步结合浴室、卧室等地板材质差异，场景延展空间未用足。"
+      ]
+    },
+    {
+      "index": 2,
+      "scores": {
+        "natural_live_speech": 14,
+        "benefit_scene_expansion": 17,
+        "coherent_flow": 9,
+        "non_repetition": 8,
+        "purchase_guidance": 5
+      },
+      "score_reasons": [
+        "natural_live_speech: 14分。整体口语化，有'姐妹平时出门旅行，会不会纠结要不要带自己的拖鞋？'等对话式表达，数字用中文读出，没有字段播报感；但'它整双鞋走的是轻便路线'和'一共十个颜色，每天按心情换着穿'略像文案口吻，仍属自然范围。",
+        "benefit_scene_expansion: 17分。对足弓支撑、厚底软弹缓震、静音、防滑、快干、轻便、颜色等卖点均有场景化展开，例如'你站着择菜、熨衣服的时候，脚心有个地方托着'、'晚上在室内走动，声音会轻一些'、'出门塞进行李箱不怎么添分量'、'洗澡沾了水，冲一冲就干净'，至少4个卖点有效展开，且未超出资料。",
+        "coherent_flow: 9分。从旅行、家门口场景切入，再讲功能、材质、颜色、尺码、价格和收口，结构自然，没有机械贴标签。",
+        "non_repetition: 8分。各段功能点基本独立，颜色列举虽稍长但为资料提供内容，未用空话凑字，仅颜色列举略拖沓。",
+        "purchase_guidance: 5分。明确给出币种、原价和限时下杀价，并以'颜色和尺码按自己平时的喜好来选，合适再下单'自然引导，没有假设已挂购物车。"
+      ],
+      "unsupported_claims": [],
+      "price_and_terms_correct": true,
+      "knowledge_leaks": [],
+      "main_gaps": [
+        "未提及材质一体成型的工艺优势，但资料本身未强调可讲，不构成缺点；实际较大的缺口是未说明日常外穿场景中'散步/倒垃圾'的具体收益，仅一笔带过。",
+        "对防臭特性几乎没有展开，仅与快干一起带过，降低了核心卖点密度。",
+        "对'旅行出游、海边漫步'的携带和踩沙场景只讲轻便，没有连接足弓支撑或静音等差异点，卖点与场景结合略浅。"
+      ]
+    }
+  ],
+  "pair_diversity": {
+    "score": 4,
+    "reason": "两版开场不同，第1版从旅行和出门场景切入，第2版从久站和夜间打扰切入；卖点展开顺序也不同，第1版先轻便旅行再足弓，第2版先足弓静音再轻便，情境与节奏有明显区别，且均较完整，符合卖点展开顺序/情境/节奏至少两项明显不同。"
+  },
+  "judge_model": "deepseek-flash",
+  "judge_protocol": "v2-core-facts-only-no-unsupported-reference-priming",
+  "usage": {
+    "prompt_tokens": 2381,
+    "completion_tokens": 1089,
+    "total_tokens": 3470,
+    "prompt_tokens_details": {
+      "cached_tokens": 1024
+    },
+    "prompt_cache_hit_tokens": 1024,
+    "prompt_cache_miss_tokens": 1357
+  }
+}

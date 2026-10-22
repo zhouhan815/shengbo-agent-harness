@@ -1,0 +1,27 @@
+# 声播业务后端开发约定
+
+- 2026-10-21正式TTS提效：`PreliveService.drain_jobs`仍由唯一coordinator持有`_worker_lock`；仅MiniMax正式audio按句批内默认3路，`PRELIVE_MINIMAX_AUDIO_CONCURRENCY`只允许1–3。每批全部收束后才重新扫描持久队列，脚本、试听、本机COM保持串行。每句沿原批准、外部request key、账本、WAV校验和CAS提交；`job.batch_claimed`记录实际批数。取消不能再次cancel正在写失败账本的child，须await全部收束；已提交success优先于迟到的取消。job失败终态需同时检查queued/running，不能让尾批早失败掩盖仍运行的句子。新增离线测试在`tests/test_formal_audio_concurrency_v1.py`，模拟计时不代表供应商真实加速比。
+
+- 2026-10-21连续试听：`app/prelive/script_audio_preview.py`持有独立精确人工授权，复用`voice_preview.py` durable attempt一次合成有序模块全文；未知结果不重发，回执缓存不重复计算本次usage。不得用局部试听授权批准整包或改manifest。`speech.minimax_request_body`为MiniMax唯一请求体入口；主播风格使用真实voice_setting，角色说明不进入朗读正文。新只读list查询及话术详情audio卡可刷新重读，正式整包音频编排保持既有路径。
+
+- 2026-10-20：消费者商品库不兼任采购档案。确切供货渠道/链接/店名/进价/供货库存及评价不进入商品、规格、FAQ或知识文档；来源与过程只留Agent审计。统一策略位于app/consumer_catalog.py，保存拒绝不得静默改批准内容，历史话术/回复输入同用消费者视图。平台选择不能自动编造发货小时数或退货承诺；产地不能推为发货地。
+
+## 多轮修改后的结构一致性复查（2026-10-19用户要求）
+
+- 每个有效修改与测试批次后，回查受影响入口、业务执行、持久化与返回契约，检查重复实现、新旧规则冲突、旧回退绕开新规则和状态正本分裂；不能仅以单元测试通过作为完成依据。
+- 与播前Agent联动时，核对工具/Skill/DTO/中间件/错误恢复能否按同一协议衔接；局部函数通过不代表完整Agent工具往返与恢复通过。
+- 区分已证实缺陷、维护风险、待验收范围，保留问题与测试证据。代码长或兼容路径存在本身不是故障证明。
+- 按共同根因合并修复和相关测试，避免每个小改都全量回归；先复用既有证据，再对新问题做定向检查，不增加无必要的模型调用。
+- 每批交付说明规则的唯一职责落点、旧路径保留或移除的理由、验证结果和遗留项。保持Agent选择工具/函数/工作流的规划灵活性。
+
+- 2026-10-20归类修正：问答型内容统一存faq，不再把FAQ作为knowledge_documents的主题；叙述型知识按已知事实覆盖，不为精简规格而丢弃可用知识。抖音默认说明唯一来源为Voice app/data/platform_rules/douyin-20261020.json，经schema.platform_policies共享；现行规则按商家承诺时效，48小时是可选商家承诺而非全平台默认。平台选择可自动填已核验模板，保留人工自定义，不静默改已保存/批准内容。
+
+- 2026-10-21脚本可靠性与欢迎批次：新whole请求仅写single-source-utterance-v1的text，收据text_contract先归档再严格验证；旧无marker按原协议恢复。事实ID闭集由prelive/fact_reference_contract统一装配，whole/module归档商品快照由archive_validation_product按固定draft完整核对。长模块大幅删除歧义由script_patch_scope在写入前检查，不扩大UI选区或批准权限。
+- 进场欢迎唯一规则在app/welcome.py，生成/导入准备5条商品名称关联模板，runtime以当前商品、session和滚动60秒门禁准入及播放复核，符号数字昵称过滤为空时播‘欢迎新来的朋友’。复用原TTS/插播；busy/过期/商品改变丢弃，不积压。测试与真实本机欢迎音频在Agent项目output/20261021-script-reliability，正式网球新稿尚未批准语音。
+
+- 2026-10-21用户最新要求开放客户端话术逐句编辑，覆盖历史“详情正文只读”的交互限制。仍使用既有patch_script版本、句子hash、幂等与区域锁保护，保存新修订后原编译/音频manifest/批准沿既有逻辑失效。共享写作正本v6.1先固定商品实际用途及商家明确目的，再允许有依据的场景扩展；其他品类按自己的用途判断。当前任务整版重写第1版，不执行Agent逐句润色循环，不改第2版。
+- 2026-10-21欢迎/评论实时插播：Room.queue_interaction/prepare_pending_insertion在主稿播放同时准备短音频，未ready继续下一主句，ready后只在自然ended切入，插播后恢复下一句；单槽busy跳过、过期/切品/切session/源版本变化不播，不新建第二队列。欢迎同时按准入和实际playing滚动60秒；昵称过滤在welcome.py。自己的抖音comment与test-events接comment_entry，live_reply.py复用原消费者BM25/DeepSeek引用校验，一次短回复后既有MiniMax；reply_lab带reply_turn_id的纯文字测试仍不自动播，防递归。唯一评论prompt限制只回答当前问题，不念后台配置或添无据场景。
+- 正式主稿仍句级预录WAV，连续试听整段音频不等于正式句级播放；MiniMax网络分块不是句界。r27前三句真实循环+2欢迎/3回复已真实浏览器验证，供应商冷短音频3.2—9.3秒、总响应7.5—16.3秒，非亚秒/非真实抖音OBS验收。失败/边界/播放器测试与部署入口在Agent项目output/20261021-live-interaction/欢迎语与自动回复切换测试报告.md。Room日志新增毫秒观测，客户端PLAYBACK-BOUNDARY-1无正文/昵称/URL/凭据。
+
+- 2026-10-21点赞新增规则覆盖此前互动全部busy丢弃的约定：欢迎仍滚动60秒；点赞不设全场60秒，`app/like_thanks.py`唯一负责按用户3秒静默/最多8秒封口合并、不同用户FIFO待感谢、原始本次count求和，禁止将total累计赞归属个人。Room仅持有该文本批次收集器，所有声音仍经原单一insertion句尾槽，不新增并行声音播放器。排队不因busy丢弃；仅实际插播槽可用才准备TTS，结束恢复主稿下一句。价格来自commerce正本，未知不报金额；切品/改价的未播音频退回重建，TTS失败明确记录failed_unconfirmed且不自动重复付费。ensure_like_worker同时处理重新入队和新场次交接；已started的暂停恢复不重复准入。stop取消旧场批次但保留事件去重。
+- 本批已由真实播前Agent内部preview_script_audio合成完整r27，四模块原文连续WAV431.304秒，1次MiniMax请求、供应商公开用量4220；修订/本场/第2版未改、未批准正式整包。详情顶部音频卡可试听；上方“完整语音尚未生成”只适用于上一批记录。整段试听本身不支持精确句尾插播，正式播出仍用句级预录。短互动保持45秒HTTP等待上限，超过1000字符的整篇试听180秒；未知结果沿原operation查询，不自动重发。最新完整记录见Agent项目output/20261021-full-audio-and-likes/完整试听与点赞联测报告.md。

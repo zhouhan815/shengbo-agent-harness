@@ -1,0 +1,71 @@
+{
+  "versions": [
+    {
+      "han_characters": 618,
+      "sentences": 20,
+      "coverage_groups": {
+        "材质": true,
+        "容量": true,
+        "把手": true,
+        "颜色": true,
+        "场景": true
+      },
+      "coverage_rate": 1.0,
+      "natural_sentence_ratio": 1.0,
+      "duplicate_sentences": [],
+      "reference_5gram_overlap": 0.002,
+      "program_scores": {
+        "selling_point_coverage": 12.0,
+        "flow": 8.0,
+        "speakability": 10.0,
+        "length_fit": 4.05,
+        "fact_references": 5.0
+      },
+      "program_total": 39.05,
+      "invalid_references": false,
+      "app_issues": []
+    },
+    {
+      "han_characters": 609,
+      "sentences": 20,
+      "coverage_groups": {
+        "材质": true,
+        "容量": true,
+        "把手": true,
+        "颜色": true,
+        "场景": true
+      },
+      "coverage_rate": 1.0,
+      "natural_sentence_ratio": 1.0,
+      "duplicate_sentences": [],
+      "reference_5gram_overlap": 0.003,
+      "program_scores": {
+        "selling_point_coverage": 12.0,
+        "flow": 8.0,
+        "speakability": 10.0,
+        "length_fit": 4.11,
+        "fact_references": 5.0
+      },
+      "program_total": 39.11,
+      "invalid_references": false,
+      "app_issues": []
+    }
+  ],
+  "pair": [
+    {
+      "a": 1,
+      "b": 2,
+      "fivegram_jaccard": 0.056,
+      "shared_narrative_sentences": [],
+      "near_copy_ratio": 0.083,
+      "near_copies": [
+        {
+          "a": "欢迎来到直播间，今天咱们来看一只日常用的陶瓷马克杯。",
+          "b": "欢迎来到直播间，今天咱们看一只日常用的陶瓷马克杯。",
+          "similarity": 0.98
+        }
+      ],
+      "opening_similarity": 0.375
+    }
+  ]
+}

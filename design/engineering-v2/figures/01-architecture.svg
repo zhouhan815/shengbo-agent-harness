@@ -1,0 +1,124 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2200" height="1600" viewBox="0 0 2200 1600">
+<defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 Z" fill="#617889"/></marker></defs>
+<rect width="2200" height="1600" fill="white"/>
+<text x="45.0" y="70" font-family="Microsoft YaHei,sans-serif" font-size="40" fill="#193447">声播播前 Agent · 整体架构（PRELIVE-2.3）</text>
+<text x="45.0" y="108" font-family="Microsoft YaHei,sans-serif" font-size="24" fill="#193447">工程设计待实现｜任务识别、并行分析、人工选择与审稿、可恢复收尾</text>
+<rect x="40" y="135" width="390" height="1360" rx="14" fill="#FFFBEA" stroke="#CFCBAC" stroke-width="2"/>
+<text x="62.0" y="178" font-family="Microsoft YaHei,sans-serif" font-size="28" fill="#193447">声播前端 / 同源入口</text>
+<rect x="490" y="135" width="1110" height="865" rx="14" fill="#FFFBEA" stroke="#CFCBAC" stroke-width="2"/>
+<text x="512.0" y="178" font-family="Microsoft YaHei,sans-serif" font-size="28" fill="#193447">本机 Agent 服务 / Deep Agents Harness</text>
+<rect x="1660" y="135" width="500" height="355" rx="14" fill="#FFFBEA" stroke="#CFCBAC" stroke-width="2"/>
+<text x="1682.0" y="178" font-family="Microsoft YaHei,sans-serif" font-size="28" fill="#193447">模型与语音供应商</text>
+<rect x="1660" y="555" width="500" height="445" rx="14" fill="#FFFBEA" stroke="#CFCBAC" stroke-width="2"/>
+<text x="1682.0" y="598" font-family="Microsoft YaHei,sans-serif" font-size="28" fill="#193447">本机原始调试记录</text>
+<rect x="490" y="1070" width="1670" height="425" rx="14" fill="#FFFBEA" stroke="#CFCBAC" stroke-width="2"/>
+<text x="512.0" y="1113" font-family="Microsoft YaHei,sans-serif" font-size="28" fill="#193447">声播业务后端 / 业务真值唯一</text>
+<rect x="75" y="215" width="320" height="165" rx="9" fill="#E6EDFF" stroke="#A7B7C3" stroke-width="2"/>
+<text x="130.5" y="269.5" font-family="Microsoft YaHei,sans-serif" font-size="26" fill="#193447">商品库 / 本场配置</text>
+<text x="104.5" y="307.5" font-family="Microsoft YaHei,sans-serif" font-size="26" fill="#193447">卡片拖拽 / 三模式重排</text>
+<text x="117.5" y="345.5" font-family="Microsoft YaHei,sans-serif" font-size="26" fill="#193447">素材清单 / 本次成果</text>
+<rect x="75" y="435" width="320" height="150" rx="9" fill="#E6EDFF" stroke="#A7B7C3" stroke-width="2"/>
+<text x="127.5" y="482.0" font-family="Microsoft YaHei,sans-serif" font-size="26" fill="#193447">Agent 对话 / 上传</text>
+<text x="130.5" y="520.0" font-family="Microsoft YaHei,sans-serif" font-size="26" fill="#193447">补资料 / 身份澄清</text>
+<text x="144.0" y="558.0" font-family="Microsoft YaHei,sans-serif" font-size="26" fill="#193447">查看运行与成果</text>
+<rect x="75" y="655" width="320" height="190" rx="9" fill="#FFF0DA" stroke="#A7B7C3" stroke-width="2"/>
+<text x="160.0" y="722.5" font-family="Microsoft YaHei,sans-serif" font-size="25" fill="#193447">人工文案审核</text>
+<text x="99.0" y="759.5" font-family="Microsoft YaHei,sans-serif" font-size="25" fill="#193447">批准精确文本/音色/顺序</text>
+<text x="122.5" y="796.5" font-family="Microsoft YaHei,sans-serif" font-size="25" fill="#193447">人工采用 / 人工开播</text>
+<rect x="75" y="930" width="320" height="220" rx="9" fill="#F0F4F6" stroke="#A7B7C3" stroke-width="2"/>
+<text x="157.0" y="993.0" font-family="Microsoft YaHei,sans-serif" font-size="26" fill="#193447">开发调试入口</text>
+<text x="117.5" y="1031.0" font-family="Microsoft YaHei,sans-serif" font-size="26" fill="#193447">执行树 / 并行时间线</text>
+<text x="130.5" y="1069.0" font-family="Microsoft YaHei,sans-serif" font-size="26" fill="#193447">原始调用 / 上下文</text>
+<text x="109.0" y="1107.0" font-family="Microsoft YaHei,sans-serif" font-size="26" fill="#193447">复盘影响 / diff / 导出</text>
+<rect x="530" y="200" width="1030" height="85" rx="9" fill="#F0F4F6" stroke="#A7B7C3" stroke-width="2"/>
+<text x="653.5" y="253.0" font-family="Microsoft YaHei,sans-serif" font-size="27" fill="#193447">RunCoordinator + Finalizer：排队 / 排他执行 / 撤权收尾 / 恢复</text>
+<rect x="530" y="330" width="1030" height="110" rx="9" fill="#E6EDFF" stroke="#A7B7C3" stroke-width="2"/>
+<text x="697.5" y="376.0" font-family="Microsoft YaHei,sans-serif" font-size="29" fill="#193447">同主 Agent：只读识别 → 首次冻结 Goal → 按需执行</text>
+<text x="768.0" y="417.0" font-family="Microsoft YaHei,sans-serif" font-size="29" fill="#193447">S1 · M1 / M3 / M4 / M5 / M6 / M7 / M9</text>
+<rect x="530" y="485" width="1030" height="80" rx="9" fill="#F0F4F6" stroke="#A7B7C3" stroke-width="2"/>
+<text x="632.5" y="535.5" font-family="Microsoft YaHei,sans-serif" font-size="27" fill="#193447">持久分析队列 + Supervisor：按需派发；最多同时运行 3 个分析任务</text>
+<rect x="530" y="615" width="310" height="130" rx="9" fill="#E3F3E8" stroke="#A7B7C3" stroke-width="2"/>
+<text x="595.5" y="671.0" font-family="Microsoft YaHei,sans-serif" font-size="25" fill="#193447">商品资料 Agent</text>
+<text x="560.5" y="708.0" font-family="Microsoft YaHei,sans-serif" font-size="25" fill="#193447">S2 · 事实 / 身份 / 缺项</text>
+<rect x="890" y="615" width="310" height="130" rx="9" fill="#E3F3E8" stroke="#A7B7C3" stroke-width="2"/>
+<text x="955.5" y="671.0" font-family="Microsoft YaHei,sans-serif" font-size="25" fill="#193447">本场配置 Agent</text>
+<text x="920.5" y="708.0" font-family="Microsoft YaHei,sans-serif" font-size="25" fill="#193447">S3 · 活动 / 继承 / 设置</text>
+<rect x="1250" y="615" width="310" height="130" rx="9" fill="#E3F3E8" stroke="#A7B7C3" stroke-width="2"/>
+<text x="1315.5" y="671.0" font-family="Microsoft YaHei,sans-serif" font-size="25" fill="#193447">顾客场景 Agent</text>
+<text x="1280.5" y="708.0" font-family="Microsoft YaHei,sans-serif" font-size="25" fill="#193447">S4 · 人群 / 场景 / 研究</text>
+<rect x="530" y="790" width="1030" height="75" rx="9" fill="#E3F3E8" stroke="#A7B7C3" stroke-width="2"/>
+<text x="613.0" y="838.0" font-family="Microsoft YaHei,sans-serif" font-size="27" fill="#193447">各自 PREPARED 报告 → 完成事件 → 主读取 / 校验 → 声播 ACCEPTED</text>
+<rect x="530" y="910" width="1030" height="60" rx="9" fill="#F0F4F6" stroke="#A7B7C3" stroke-width="2"/>
+<text x="646.0" y="950.5" font-family="Microsoft YaHei,sans-serif" font-size="27" fill="#193447">固定业务工具 + ShengboClient：类型化 HTTP 命令 / 查询 / 回执</text>
+<rect x="1700" y="205" width="420" height="100" rx="9" fill="#F1E7FB" stroke="#A7B7C3" stroke-width="2"/>
+<text x="1731.5" y="246.0" font-family="Microsoft YaHei,sans-serif" font-size="27" fill="#193447">Agent：gpt-6.1-sol（待接）</text>
+<text x="1724.0" y="285.0" font-family="Microsoft YaHei,sans-serif" font-size="27" fill="#193447">文案：DeepSeek（独立配置）</text>
+<rect x="1700" y="350" width="420" height="90" rx="9" fill="#F1E7FB" stroke="#A7B7C3" stroke-width="2"/>
+<text x="1745.5" y="405.5" font-family="Microsoft YaHei,sans-serif" font-size="27" fill="#193447">本机免费普通话 / MiniMax</text>
+<rect x="1700" y="635" width="420" height="120" rx="9" fill="#F0F4F6" stroke="#A7B7C3" stroke-width="2"/>
+<text x="1791.0" y="667.5" font-family="Microsoft YaHei,sans-serif" font-size="25" fill="#193447">M9 + SDK callbacks</text>
+<text x="1739.0" y="704.5" font-family="Microsoft YaHei,sans-serif" font-size="25" fill="#193447">调度检查 + 业务 Job / outbox</text>
+<text x="1785.0" y="741.5" font-family="Microsoft YaHei,sans-serif" font-size="25" fill="#193447">认证信息在采集前去除</text>
+<rect x="1700" y="815" width="420" height="135" rx="9" fill="#F0F4F6" stroke="#A7B7C3" stroke-width="2"/>
+<text x="1762.5" y="854.5" font-family="Microsoft YaHei,sans-serif" font-size="26" fill="#193447">独立 observability.sqlite</text>
+<text x="1762.5" y="892.5" font-family="Microsoft YaHei,sans-serif" font-size="26" fill="#193447">完整安全原文 + 追加事件</text>
+<text x="1779.5" y="930.5" font-family="Microsoft YaHei,sans-serif" font-size="26" fill="#193447">树 / 时间线是只读投影</text>
+<rect x="530" y="1155" width="280" height="175" rx="9" fill="#E6EDFF" stroke="#A7B7C3" stroke-width="2"/>
+<text x="566.0" y="1196.5" font-family="Microsoft YaHei,sans-serif" font-size="25" fill="#193447">完整上下文 + 复盘</text>
+<text x="570.0" y="1233.5" font-family="Microsoft YaHei,sans-serif" font-size="25" fill="#193447">商品 / 本场 / 研究</text>
+<text x="578.5" y="1270.5" font-family="Microsoft YaHei,sans-serif" font-size="25" fill="#193447">旧稿 + 用户决定</text>
+<text x="550.5" y="1307.5" font-family="Microsoft YaHei,sans-serif" font-size="25" fill="#193447">逐条复盘处置 → 计划</text>
+<rect x="850" y="1155" width="250" height="175" rx="9" fill="#E6EDFF" stroke="#A7B7C3" stroke-width="2"/>
+<text x="883.0" y="1196.5" font-family="Microsoft YaHei,sans-serif" font-size="25" fill="#193447">文案 JobRunner</text>
+<text x="887.5" y="1233.5" font-family="Microsoft YaHei,sans-serif" font-size="25" fill="#193447">生成 / 局部修改</text>
+<text x="887.5" y="1270.5" font-family="Microsoft YaHei,sans-serif" font-size="25" fill="#193447">只处理计划模块</text>
+<text x="900.0" y="1307.5" font-family="Microsoft YaHei,sans-serif" font-size="25" fill="#193447">保留未变引用</text>
+<rect x="1140" y="1155" width="260" height="175" rx="9" fill="#E6EDFF" stroke="#A7B7C3" stroke-width="2"/>
+<text x="1174.0" y="1197.5" font-family="Microsoft YaHei,sans-serif" font-size="24" fill="#193447">拖拽 / 三模式重排</text>
+<text x="1179.0" y="1233.5" font-family="Microsoft YaHei,sans-serif" font-size="24" fill="#193447">应用 → 编译开场</text>
+<text x="1187.0" y="1269.5" font-family="Microsoft YaHei,sans-serif" font-size="24" fill="#193447">第 1 / 6 / 11 项</text>
+<text x="1156.0" y="1305.5" font-family="Microsoft YaHei,sans-serif" font-size="24" fill="#193447">AudioRequirements</text>
+<rect x="1440" y="1155" width="300" height="175" rx="9" fill="#FFF0DA" stroke="#A7B7C3" stroke-width="2"/>
+<text x="1477.5" y="1196.5" font-family="Microsoft YaHei,sans-serif" font-size="25" fill="#193447">人工文案→语音批准</text>
+<text x="1452.0" y="1233.5" font-family="Microsoft YaHei,sans-serif" font-size="25" fill="#193447">精确 hash / voice / 编排</text>
+<text x="1517.0" y="1270.5" font-family="Microsoft YaHei,sans-serif" font-size="25" fill="#193447">M5 提前检查</text>
+<text x="1490.0" y="1307.5" font-family="Microsoft YaHei,sans-serif" font-size="25" fill="#193447">声播后端强制验证</text>
+<rect x="1780" y="1155" width="330" height="175" rx="9" fill="#E6EDFF" stroke="#A7B7C3" stroke-width="2"/>
+<text x="1857.0" y="1196.5" font-family="Microsoft YaHei,sans-serif" font-size="25" fill="#193447">TTS JobRunner</text>
+<text x="1807.5" y="1233.5" font-family="Microsoft YaHei,sans-serif" font-size="25" fill="#193447">受理 / 领取 / 绑定查批准</text>
+<text x="1870.0" y="1270.5" font-family="Microsoft YaHei,sans-serif" font-size="25" fill="#193447">只补缺失音频</text>
+<text x="1813.0" y="1307.5" font-family="Microsoft YaHei,sans-serif" font-size="25" fill="#193447">候选 → 人工采用 / 开播</text>
+<rect x="530" y="1390" width="1210" height="70" rx="9" fill="#E3F3E8" stroke="#A7B7C3" stroke-width="2"/>
+<text x="713.0" y="1435.5" font-family="Microsoft YaHei,sans-serif" font-size="27" fill="#193447">声播业务库：商品 / 历史研究 / 配置 / 复盘 / 素材 / 话术 / 批准 / 快照</text>
+<rect x="1780" y="1390" width="330" height="70" rx="9" fill="#E3F3E8" stroke="#A7B7C3" stroke-width="2"/>
+<text x="1797.0" y="1434.5" font-family="Microsoft YaHei,sans-serif" font-size="25" fill="#193447">播出链接 → OBS 浏览器源</text>
+<polyline points="395,505 465,505 465,385 530,385" fill="none" stroke="#617889" stroke-width="3" marker-end="url(#a)"/>
+<polyline points="1045,285 1045,330" fill="none" stroke="#617889" stroke-width="3" marker-end="url(#a)"/>
+<polyline points="1045,440 1045,485" fill="none" stroke="#617889" stroke-width="3" marker-end="url(#a)"/>
+<polyline points="685,565 685,615" fill="none" stroke="#617889" stroke-width="3" marker-end="url(#a)"/>
+<polyline points="685,745 685,790" fill="none" stroke="#617889" stroke-width="3" marker-end="url(#a)"/>
+<polyline points="1045,565 1045,615" fill="none" stroke="#617889" stroke-width="3" marker-end="url(#a)"/>
+<polyline points="1045,745 1045,790" fill="none" stroke="#617889" stroke-width="3" marker-end="url(#a)"/>
+<polyline points="1405,565 1405,615" fill="none" stroke="#617889" stroke-width="3" marker-end="url(#a)"/>
+<polyline points="1405,745 1405,790" fill="none" stroke="#617889" stroke-width="3" marker-end="url(#a)"/>
+<polyline points="1045,865 1045,910" fill="none" stroke="#617889" stroke-width="3" marker-end="url(#a)"/>
+<polyline points="530,825 510,825 510,242 530,242" fill="none" stroke="#617889" stroke-width="3" stroke-dasharray="10 8" marker-end="url(#a)"/>
+<polyline points="1560,380 1700,255" fill="none" stroke="#617889" stroke-width="3" marker-end="url(#a)"/>
+<text x="1570.0" y="322" font-family="Microsoft YaHei,sans-serif" font-size="22" fill="#193447">模型请求</text>
+<polyline points="1560,940 1660,940" fill="none" stroke="#617889" stroke-width="3" stroke-dasharray="10 8" marker-end="url(#a)"/>
+<polyline points="1910,755 1910,815" fill="none" stroke="#617889" stroke-width="3" marker-end="url(#a)"/>
+<polyline points="670,970 670,1155" fill="none" stroke="#617889" stroke-width="3" marker-end="url(#a)"/>
+<text x="700.0" y="1034" font-family="Microsoft YaHei,sans-serif" font-size="22" fill="#193447">正式命令 / 完整 refs</text>
+<polyline points="810,1240 850,1240" fill="none" stroke="#617889" stroke-width="3" marker-end="url(#a)"/>
+<polyline points="1100,1240 1140,1240" fill="none" stroke="#617889" stroke-width="3" marker-end="url(#a)"/>
+<polyline points="1400,1240 1440,1240" fill="none" stroke="#617889" stroke-width="3" marker-end="url(#a)"/>
+<polyline points="1740,1240 1780,1240" fill="none" stroke="#617889" stroke-width="3" marker-end="url(#a)"/>
+<polyline points="1945,1330 1945,1390" fill="none" stroke="#617889" stroke-width="3" marker-end="url(#a)"/>
+<polyline points="395,745 450,745 450,1048 1590,1048 1590,1155" fill="none" stroke="#617889" stroke-width="3" stroke-dasharray="10 8" marker-end="url(#a)"/>
+<text x="55.0" y="1226" font-family="Microsoft YaHei,sans-serif" font-size="21" fill="#193447">主栈：M1/M3/M4/M5/M6/M7/M9</text>
+<text x="55.0" y="1259" font-family="Microsoft YaHei,sans-serif" font-size="21" fill="#193447">分析栈：M2/M3/M4/M5/M6/M8/M9</text>
+<text x="55.0" y="1347" font-family="Microsoft YaHei,sans-serif" font-size="22" fill="#193447">Skill 是角色方法，按需读取；</text>
+<text x="55.0" y="1381" font-family="Microsoft YaHei,sans-serif" font-size="22" fill="#193447">Middleware 随模型/工具循环触发；</text>
+<text x="55.0" y="1415" font-family="Microsoft YaHei,sans-serif" font-size="22" fill="#193447">声播权限 / CAS / 批准不能绕过。</text>
+<text x="45.0" y="1556" font-family="Microsoft YaHei,sans-serif" font-size="26" fill="#193447">未来播后 Agent 通过同一复盘接口接回；本期先用模拟复盘，不实施播中 / 播后 Agent。</text>
+</svg>

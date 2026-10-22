@@ -1,0 +1,118 @@
+{
+  "versions": [
+    {
+      "han_characters": 697,
+      "sentences": 23,
+      "coverage_groups": {
+        "材质": true,
+        "折叠": true,
+        "尺寸": true,
+        "拉链": true,
+        "口袋": true,
+        "携带": true,
+        "颜色": true,
+        "场景": true
+      },
+      "coverage_rate": 1.0,
+      "natural_sentence_ratio": 1.0,
+      "duplicate_sentences": [],
+      "reference_5gram_overlap": 0.0,
+      "program_scores": {
+        "selling_point_coverage": 12.0,
+        "flow": 8.0,
+        "speakability": 10.0,
+        "length_fit": 5,
+        "fact_references": 5.0
+      },
+      "program_total": 40.0,
+      "invalid_references": false,
+      "app_issues": []
+    },
+    {
+      "han_characters": 799,
+      "sentences": 29,
+      "coverage_groups": {
+        "材质": true,
+        "折叠": true,
+        "尺寸": true,
+        "拉链": true,
+        "口袋": true,
+        "携带": true,
+        "颜色": true,
+        "场景": true
+      },
+      "coverage_rate": 1.0,
+      "natural_sentence_ratio": 1.0,
+      "duplicate_sentences": [],
+      "reference_5gram_overlap": 0.0,
+      "program_scores": {
+        "selling_point_coverage": 12.0,
+        "flow": 8.0,
+        "speakability": 10.0,
+        "length_fit": 5,
+        "fact_references": 5.0
+      },
+      "program_total": 40.0,
+      "invalid_references": false,
+      "app_issues": []
+    }
+  ],
+  "pair": [
+    {
+      "a": 1,
+      "b": 2,
+      "fivegram_jaccard": 0.414,
+      "shared_narrative_sentences": [
+        "一个包有两种拿法，出门可以根据当天穿什么、要带多少东西来换着用。",
+        "你先选好黑色或米色，确认尺寸符合自己的日常需要，合适再下单。",
+        "对喜欢轻装出门的人来说，这种能收能放的方式，比一直拎着一个空包要省事。",
+        "比如出门前想带个备用包，或者家里柜子空间有限，折起来收着就不占地方。",
+        "这样你找小物件的时候不用把整个包翻一遍，拿取会更有条理。"
+      ],
+      "near_copy_ratio": 0.444,
+      "near_copies": [
+        {
+          "a": "一个包有两种拿法，出门可以根据当天穿什么、要带多少东西来换着用。",
+          "b": "一个包有两种拿法，出门可以根据当天穿什么、要带多少东西来换着用。",
+          "similarity": 1.0
+        },
+        {
+          "a": "你上班赶路的时候单肩一挎，腾出手拿咖啡、刷手机；去超市买东西，手提也方便。",
+          "b": "你上班赶路的时候单肩一挎，腾出手来拿咖啡、刷门禁；去超市买东西，手提也方便。",
+          "similarity": 0.933
+        },
+        {
+          "a": "你先选好黑色或米色，确认尺寸符合自己的日常需要，合适再下单。",
+          "b": "你先选好黑色或米色，确认尺寸符合自己的日常需要，合适再下单。",
+          "similarity": 1.0
+        },
+        {
+          "a": "平时坐地铁、过安检，或者在人多的商场里，拉上拉链心里会踏实一些；小口袋可以放钥匙、耳机这类容易翻不到的东西。",
+          "b": "坐地铁、过安检或者在人多的商场里，拉上拉链会让包里的东西安稳一些；小口袋可以放钥匙、耳机这类容易翻不到的东西。",
+          "similarity": 0.862
+        },
+        {
+          "a": "对喜欢轻装出门的人来说，这种能收能放的方式，比一直拎着一个空包要省事。",
+          "b": "对喜欢轻装出门的人来说，这种能收能放的方式，比一直拎着一个空包要省事。",
+          "similarity": 1.0
+        },
+        {
+          "a": "比如出门前想带个备用包，或者家里柜子空间有限，折起来收着就不占地方。",
+          "b": "比如出门前想带个备用包，或者家里柜子空间有限，折起来收着就不占地方。",
+          "similarity": 1.0
+        },
+        {
+          "a": "比如通勤路上遇到一点小雨、包里蹭到灰尘，或者放在座位旁边沾了脏东西，涤纶面料打理起来相对简单。",
+          "b": "比如通勤路上包里蹭到一点灰，或者放在座位旁边沾了脏东西，涤纶面料打理起来相对简单。",
+          "similarity": 0.886
+        },
+        {
+          "a": "这样你找小物件的时候不用把整个包翻一遍，拿取会更有条理。",
+          "b": "这样你找小物件的时候不用把整个包翻一遍，拿取会更有条理。",
+          "similarity": 1.0
+        }
+      ],
+      "opening_similarity": 0.712
+    }
+  ]
+}

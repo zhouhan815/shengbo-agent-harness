@@ -1,0 +1,70 @@
+{
+  "versions": [
+    {
+      "index": 1,
+      "scores": {
+        "natural_live_speech": 15,
+        "benefit_scene_expansion": 19,
+        "coherent_flow": 10,
+        "non_repetition": 10,
+        "purchase_guidance": 4
+      },
+      "score_reasons": [
+        "natural_live_speech: 使用‘你可以先想想’、‘也不是说脚有多娇气’等口语，语气亲切自然，像朋友对话。",
+        "benefit_scene_expansion: 针对足弓支撑、小蛮腰厚底、静音防滑、防臭快干、轻便耐磨五个卖点，分别展开厨房久站、浴室洗漱、夜间走动、冲洗打理、旅行外穿等具体情境，并给出‘少一点硬着陆的冲击’、‘减少打扰’等有限度收益，至少4个卖点有效展开。",
+        "coherent_flow: 从居家外穿痛点提问引入，再逐一介绍鞋的卖点，最后收口总结，逻辑连贯不机械。",
+        "non_repetition: 全程无空话重复，每个卖点都结合不同场景展开，如静音针对夜间、防臭快干针对冲洗，表达丰富。",
+        "purchase_guidance: 报出原价178、活动价107新台币，并提示‘限时下杀的活动’、‘颜色和尺码按自己的喜好和脚型来选’，引导自然，符合条件。"
+      ],
+      "unsupported_claims": [],
+      "price_and_terms_correct": true,
+      "knowledge_leaks": [],
+      "main_gaps": [
+        "对‘防滑’特性仅提醒‘自己踩稳最重要’，未展开具体防滑场景中的收益，描述较保守。",
+        "‘小蛮腰厚底’的修饰脚型效果用‘修饰脚型’一句带过，未像其他卖点那样给出视觉或搭配上的具体例子。",
+        "‘轻便耐磨’中‘耐磨’只在‘出门带着没负担’提及，缺乏独立场景展开。"
+      ]
+    },
+    {
+      "index": 2,
+      "scores": {
+        "natural_live_speech": 14,
+        "benefit_scene_expansion": 17,
+        "coherent_flow": 9,
+        "non_repetition": 9,
+        "purchase_guidance": 4
+      },
+      "score_reasons": [
+        "natural_live_speech: 用日常口语如‘姐妹平时会不会遇到这种情况’、‘拎在手上，负担感会小一些’自然引出，非说明书式播报。",
+        "benefit_scene_expansion: 围绕轻便、小蛮腰厚底、足弓支撑、静音防滑、防臭快干等核心卖点，展开了旅行收纳、酒店换鞋、厨房久站、浴室防打扰等具体情境，有有限度收益，至少4个卖点有效展开。",
+        "coherent_flow: 从出门收纳痛点切入，依次介绍轻便、外观、足弓支撑、材质、防臭、静音防滑、颜色尺码、价格，最后收口，段落衔接自然不机械。",
+        "non_repetition: 各卖点说法有变化，如轻便场景从行李、酒店到海滩、散步，无空话凑字。",
+        "purchase_guidance: 报出原价178、活动价107新台币，并提示‘限时下杀’、‘根据自己喜欢的颜色和尺码来选，合适再下单’，引导自然，符合真实条件。"
+      ],
+      "unsupported_claims": [],
+      "price_and_terms_correct": true,
+      "knowledge_leaks": [],
+      "main_gaps": [
+        "整体节奏偏快，部分卖点如‘轻便耐磨’只一笔带过，未充分展开使用场景。",
+        "‘高级简约’作为风格描述出现在口播中，但未与具体设计或穿搭实例结合，略显空泛。",
+        "对‘防臭快干’仅单独提了一句‘洗完澡冲一冲’，没有像其他卖点那样融入生活场景深化。"
+      ]
+    }
+  ],
+  "pair_diversity": {
+    "score": 4,
+    "reason": "两版开场切入明显不同，版本1从出门收纳和旅行痛点切入，版本2从居家走动和久站脚酸切入；卖点展开顺序不同，版本1先轻便再外观再足弓支撑，版本2先足弓支撑再外观再静音；情境和节奏差异明显，均完整自然，符合4分标准。"
+  },
+  "judge_model": "deepseek-flash",
+  "judge_protocol": "v2-core-facts-only-no-unsupported-reference-priming",
+  "usage": {
+    "prompt_tokens": 2683,
+    "completion_tokens": 1029,
+    "total_tokens": 3712,
+    "prompt_tokens_details": {
+      "cached_tokens": 1024
+    },
+    "prompt_cache_hit_tokens": 1024,
+    "prompt_cache_miss_tokens": 1659
+  }
+}

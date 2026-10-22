@@ -1,0 +1,44 @@
+{
+  "run": "release10_repeat",
+  "versions": [
+    {
+      "version": 1,
+      "program": 40.0,
+      "semantic": 52.0,
+      "total": 92.0,
+      "hard_gate": true,
+      "rule_issues": [],
+      "serious_claims": 0,
+      "cross_version_copy_pass": true,
+      "pass": true,
+      "gaps": [
+        "对'快干'特性仅一句话带过，未说明在浴室或海边使用后的实际方便程度。",
+        "颜色推荐虽然较丰富，但缺乏对每种颜色与场景搭配的具体建议。",
+        "尺码部分虽提标准码和偏肉选大，但未说明若选错如何处理。"
+      ]
+    },
+    {
+      "version": 2,
+      "program": 39.76,
+      "semantic": 51.0,
+      "total": 90.76,
+      "hard_gate": false,
+      "rule_issues": [
+        "当前输入没有提供已开通的下单入口，不得说直播间就能拍或指定购物车位置；改为按需要选择、合适再下单"
+      ],
+      "serious_claims": 0,
+      "cross_version_copy_pass": true,
+      "pass": false,
+      "gaps": [
+        "知识库未提供的'快干易清洗、防臭'展开略显空泛，缺乏具体生活场景。",
+        "对'足弓支撑'的体验描述较笼统，未结合不同脚型说明。",
+        "颜色描述较简略，仅按色系分类，未逐一说明适合风格。"
+      ]
+    }
+  ],
+  "pair_diversity": {
+    "score": 4,
+    "reason": "两版开场完全不同（旅行 vs 居家痛点），卖点展开顺序不同（版1侧重旅行与户外，版2侧重居家），情境选择（酒店、海边 vs 厨房、卧室）和节奏有明显差异，均完整连贯，给4分。"
+  },
+  "rubric": "20261007.4-uniform-coverage-content-and-near-copy-checks"
+}

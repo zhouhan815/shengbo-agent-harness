@@ -1,0 +1,97 @@
+{
+  "versions": [
+    {
+      "han_characters": 704,
+      "sentences": 22,
+      "coverage_groups": {
+        "材质": true,
+        "折叠": true,
+        "尺寸": true,
+        "拉链": true,
+        "口袋": true,
+        "携带": true,
+        "颜色": true,
+        "场景": true
+      },
+      "coverage_rate": 1.0,
+      "natural_sentence_ratio": 1.0,
+      "duplicate_sentences": [],
+      "reference_5gram_overlap": 0.0,
+      "program_scores": {
+        "selling_point_coverage": 12.0,
+        "flow": 8.0,
+        "speakability": 10.0,
+        "length_fit": 5,
+        "fact_references": 5.0
+      },
+      "program_total": 40.0,
+      "invalid_references": false,
+      "app_issues": []
+    },
+    {
+      "han_characters": 686,
+      "sentences": 24,
+      "coverage_groups": {
+        "材质": true,
+        "折叠": true,
+        "尺寸": true,
+        "拉链": true,
+        "口袋": true,
+        "携带": true,
+        "颜色": true,
+        "场景": true
+      },
+      "coverage_rate": 1.0,
+      "natural_sentence_ratio": 1.0,
+      "duplicate_sentences": [],
+      "reference_5gram_overlap": 0.0,
+      "program_scores": {
+        "selling_point_coverage": 12.0,
+        "flow": 8.0,
+        "speakability": 10.0,
+        "length_fit": 5,
+        "fact_references": 5.0
+      },
+      "program_total": 40.0,
+      "invalid_references": false,
+      "app_issues": []
+    }
+  ],
+  "pair": [
+    {
+      "a": 1,
+      "b": 2,
+      "fivegram_jaccard": 0.19,
+      "shared_narrative_sentences": [],
+      "near_copy_ratio": 0.312,
+      "near_copies": [
+        {
+          "a": "再看包内结构，主袋是拉链开合，里面还有一个小口袋。",
+          "b": "先看包内结构，主袋是拉链开合，里面还带一个小口袋。",
+          "similarity": 0.92
+        },
+        {
+          "a": "然后是背法，这款包配的是长肩带，可以手提也可以单肩背。",
+          "b": "再看背法，这款包配的是长肩带，可以手提，也可以单肩背。",
+          "similarity": 0.889
+        },
+        {
+          "a": "平时在家不用的时候，也可以折叠收纳，对家里放置空间比较在意的人来说，这个方式就比较顺手。",
+          "b": "平常在家不用的时候，也可以折叠收好，对放置空间比较在意的人来说，这个方式就比较顺手。",
+          "similarity": 0.93
+        },
+        {
+          "a": "早高峰赶地铁的时候，你可以单肩背着空出手来看手机、拿交通卡。",
+          "b": "早高峰赶地铁的时候，你可以单肩背着，空出一只手来看手机、拿交通卡。",
+          "similarity": 0.952
+        },
+        {
+          "a": "出差或者短途出行前把它折起来收进行李箱，到了目的地需要装东西时再展开用，不用一直带着一个撑得鼓鼓的空包。",
+          "b": "短途出行前把它折好放进箱子，到了目的地需要装东西时再展开用，就不用一直拎着一个撑得鼓鼓的空包。",
+          "similarity": 0.848
+        }
+      ],
+      "opening_similarity": 0.507
+    }
+  ]
+}

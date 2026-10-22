@@ -1,0 +1,42 @@
+{
+  "run": "release11_repeat",
+  "versions": [
+    {
+      "version": 1,
+      "program": 39.71,
+      "semantic": 53.0,
+      "total": 92.71,
+      "hard_gate": true,
+      "rule_issues": [],
+      "serious_claims": 0,
+      "cross_version_copy_pass": true,
+      "pass": true,
+      "gaps": [
+        "价格部分未提及原价与活动价的对比细节，仅陈述价格。",
+        "颜色列举用‘等等’带过，可能遗漏部分颜色信息。",
+        "整体语速可能较快，部分场景切换稍显急促。"
+      ]
+    },
+    {
+      "version": 2,
+      "program": 40.0,
+      "semantic": 50.0,
+      "total": 90.0,
+      "hard_gate": true,
+      "rule_issues": [],
+      "serious_claims": 0,
+      "cross_version_copy_pass": true,
+      "pass": true,
+      "gaps": [
+        "部分卖点如‘轻便耐磨’在口播中一笔带过，未充分展开使用情境和收益。",
+        "颜色选择建议中遗漏了红色，虽不影响核心信息，但列举不全。",
+        "整体节奏在颜色和尺码部分略显拖沓，可更紧凑。"
+      ]
+    }
+  ],
+  "pair_diversity": {
+    "score": 4,
+    "reason": "两版卖点展开顺序和情境节奏明显不同：版1以旅行和颜色开场，后聚焦居家舒适；版2以姐妹对话和厨房痛点切入，再展开卖点。两版均自然完整，差异鲜明。"
+  },
+  "rubric": "20261007.4-uniform-coverage-content-and-near-copy-checks"
+}

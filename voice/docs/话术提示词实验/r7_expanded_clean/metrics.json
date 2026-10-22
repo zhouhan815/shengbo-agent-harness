@@ -1,0 +1,77 @@
+{
+  "versions": [
+    {
+      "han_characters": 883,
+      "sentences": 27,
+      "coverage_groups": {
+        "材质成型": true,
+        "足弓": true,
+        "厚底软弹": true,
+        "静音防滑": true,
+        "清洗快干防臭": true,
+        "轻便场景": true,
+        "规格": true,
+        "选码": true
+      },
+      "coverage_rate": 1.0,
+      "natural_sentence_ratio": 1.0,
+      "duplicate_sentences": [],
+      "reference_5gram_overlap": 0.062,
+      "program_scores": {
+        "selling_point_coverage": 12.0,
+        "flow": 8.0,
+        "speakability": 10.0,
+        "length_fit": 5,
+        "fact_references": 5.0
+      },
+      "program_total": 40.0,
+      "invalid_references": false,
+      "app_issues": []
+    },
+    {
+      "han_characters": 830,
+      "sentences": 28,
+      "coverage_groups": {
+        "材质成型": true,
+        "足弓": true,
+        "厚底软弹": true,
+        "静音防滑": true,
+        "清洗快干防臭": true,
+        "轻便场景": true,
+        "规格": true,
+        "选码": true
+      },
+      "coverage_rate": 1.0,
+      "natural_sentence_ratio": 1.0,
+      "duplicate_sentences": [],
+      "reference_5gram_overlap": 0.047,
+      "program_scores": {
+        "selling_point_coverage": 12.0,
+        "flow": 8.0,
+        "speakability": 10.0,
+        "length_fit": 4.88,
+        "fact_references": 5.0
+      },
+      "program_total": 39.88,
+      "invalid_references": false,
+      "app_issues": []
+    }
+  ],
+  "pair": [
+    {
+      "a": 1,
+      "b": 2,
+      "fivegram_jaccard": 0.173,
+      "shared_narrative_sentences": [],
+      "near_copy_ratio": 0.059,
+      "near_copies": [
+        {
+          "a": "它还强调一冲即净，如果你不想花太多时间刷拖鞋，用水冲一冲就省事很多。",
+          "b": "它还强调一冲即净，如果你不想花太多时间蹲着刷拖鞋，用水冲一冲就省事很多。",
+          "similarity": 0.971
+        }
+      ],
+      "opening_similarity": 0.527
+    }
+  ]
+}

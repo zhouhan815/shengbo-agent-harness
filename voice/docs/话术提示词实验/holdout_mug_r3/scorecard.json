@@ -1,0 +1,42 @@
+{
+  "run": "holdout_mug_r3",
+  "versions": [
+    {
+      "version": 1,
+      "program": 39.95,
+      "semantic": 49.0,
+      "total": 88.95,
+      "hard_gate": true,
+      "rule_issues": [],
+      "serious_claims": 0,
+      "cross_version_copy_pass": true,
+      "pass": false,
+      "gaps": [
+        "未说明杯子能否微波炉加热、洗碗机清洗或耐温范围，稿中未提示这些使用限制。",
+        "只提供米白色，稿中虽提到'目前提供的就是米白色这一种颜色'，但未说明容量是否唯一。",
+        "无促销信息，价格正确，但可补充邮费或优惠条件说明。"
+      ]
+    },
+    {
+      "version": 2,
+      "program": 39.02,
+      "semantic": 49.0,
+      "total": 88.02,
+      "hard_gate": true,
+      "rule_issues": [],
+      "serious_claims": 0,
+      "cross_version_copy_pass": true,
+      "pass": false,
+      "gaps": [
+        "未提供耐温范围、微波炉/洗碗机适用性和保温功能，但稿中未提及这些限制，可能让观众产生不明确预期。",
+        "仅提供米白色一种颜色，未说明是否有其他颜色可选，但稿中未重申颜色唯一性。",
+        "无促销活动，价格49元正确，但未提及邮费或优惠条件，属于可补充信息。"
+      ]
+    }
+  ],
+  "pair_diversity": {
+    "score": 2,
+    "reason": "两版开场问候不同（'欢迎来到直播间' vs '欢迎来到直播间，今天咱们聊'），但后续均按材质、把手、容量、颜色、价格逐点展开，卖点顺序和叙述结构高度相似，属于换开场但同样逐点模板。"
+  },
+  "rubric": "20261007.4-uniform-coverage-content-and-near-copy-checks"
+}

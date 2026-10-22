@@ -1,0 +1,25 @@
+{
+  "date": "2026-10-17",
+  "scope": "当前 Agent 工作台的前端流程审查及交付文档对照；未修改应用代码或正式数据",
+  "reference_document": "C:/Users/lizhe/Documents/ChatGPT/voice man/output/声播播前Agent交互设计调研与方案20261015.docx",
+  "test_origin": "http://127.0.0.1:8771",
+  "isolated_runtime": "runtime/ui-audit-20261017",
+  "paid_generation_exercised": false,
+  "real_platform_publish_exercised": false,
+  "flows_reviewed": ["共享商品编辑与草稿恢复", "直播间和本场选择", "本场配置和定向Agent对象", "模块话术", "播放清单和采用阻断", "播出监控", "平台来源输入校验", "评论测试草稿", "变更与后台任务的静态契约"],
+  "findings": [
+    {"id":"UX-01","priority":"P1","verification":"browser","problem":"测试评论草稿会禁用无关的开始播出按钮","evidence":{"before":{"start_disabled":false,"status":"已读取"},"after_entering_unsent_test_comment_and_returning_overview":{"start_disabled":true,"status":"有未保存修改"}},"code":["web/workbench-execution.js:16","web/agent-workbench.js:74"],"acceptance":"未发送测试评论或平台表单草稿不能阻断已准备本场播出；仅提示对应草稿"},
+    {"id":"UX-02","priority":"P1","verification":"browser-and-http","problem":"观众事件数组满120条后监控不继续刷新","evidence":{"injected_simulated_events":150,"last_backend_event":"audit-event-150","backend_retained_events":120,"ui_contains_event_120":true,"ui_contains_event_150":false,"playback_status":"stopped"},"code":["web/workbench-execution.js:143","app/server.py:test_event"],"acceptance":"用游标或最后事件ID更新；至少150条后仍及时显示最新事件"},
+    {"id":"UX-03","priority":"P1","verification":"code-and-pure-function","problem":"商品不适用字段没有从新版生成上下文排除","evidence":"fact_catalog 对 material 非空且 hidden_optional_fields 含 material 的样本仍产生材质DETAILS","code":["web/workspace-editors.js:157","app/prelive/module_generation.py:76"],"acceptance":"标记不适用后UI隐藏或明确停用，生成上下文不含该事实；重新添加行为可理解"},
+    {"id":"UX-04","priority":"P1","verification":"browser-layout","problem":"常驻声音设备区和多层导航挤占主要操作区","evidence":{"viewport_width":1280,"viewport_height":720,"monitor_editor_height_with_alert":44,"work_panel_height":508.703125,"horizontal_overflow":false},"screenshot":"docs/screenshots/ui-audit-20261017/monitor-layout.jpg","acceptance":"声音路由默认收成状态条；在1280x720时主操作区可查看至少一张完整话术或监控卡，设置按需展开"},
+    {"id":"UX-05","priority":"P2","verification":"browser-and-code","problem":"采用阻断显示AUDIO_NOT_READY和哈希列表，无商品版本句子定位与恢复动作","caveat":"隔离副本的路径/音频校验可能引发该阻断，不能据此认定正式音频损坏；此项只评价错误呈现","screenshot":"docs/screenshots/ui-audit-20261017/adoption-error.jpg","acceptance":"说明缺失商品/版本/句子与音色，提供补齐或重新检查入口，技术信息折叠"},
+    {"id":"UX-06","priority":"P2","verification":"browser-and-code","problem":"新版监控缺少采集开关/来源状态，观众消息呈现为JSON折叠详情","acceptance":"监控直接呈现采集开关、外部房间号、连接状态、最后接收时间和可读事件流"},
+    {"id":"UX-07","priority":"P2","verification":"code-review-not-dynamic-completion-test","problem":"任务完成与普通编辑页缓存缺少可靠同步；生成后可能仍展示旧快照","code":["web/workspace-editors.js:138","web/workspace-editors.js:314"],"acceptance":"任务完成后2秒内更新或提示新结果；已有未保存草稿保留，不能静默覆盖"},
+    {"id":"UX-08","priority":"P2","verification":"browser-and-code","problem":"商品与本场表单布局回退为通用控件；币种自由文本，时间要求ISO8601，单位含英文","acceptance":"币种在金额前且为选择框；图片固定预览方框；短值紧凑长描述独占行；日期时间选择器转换时区"},
+    {"id":"UX-09","priority":"P2","verification":"document-code-gap","problem":"商品来源/缺项/冲突和变更对照未成为面向运营的视图，主要提供表单和JSON","acceptance":"关键事实可定位出处；缺项冲突能直接处理；变更显示前后值和连带影响，支持安全撤销"},
+    {"id":"UX-10","priority":"P2","verification":"code-review","problem":"同一内部直播间切换外部抖音来源只合并事件，旧来源列表/游标未清空","code":["web/workbench-execution.js:156"],"acceptance":"默认实时列表仅新来源，旧来源进入有标识历史视图，计数与指标同口径"}
+  ],
+  "recommended_path": ["共享商品资料", "本场配置与选品", "模块话术", "顺序和语音准备", "采用此版本并播出"],
+  "design_constraints": ["保留全局商品库与本场修订引用", "保留真实生成进度、版本并发保护和本地持久化", "减少前端技术术语和重复审批，不删除必要后端校验", "循环播报显示真实音频的一轮时长，不照搬90分钟示意", "只读平台采集与声音推流状态分开表达"],
+  "research_evidence": "github-research-output/frontend-design-20261017/research.json"
+}

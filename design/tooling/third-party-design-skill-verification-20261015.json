@@ -1,0 +1,25 @@
+{
+  "date": "2026-10-15",
+  "source": "GitHub REST repository metadata; stars belong to repositories, not individual skills",
+  "items": [
+    {
+      "repo": "wshobson/agents",
+      "stars": 40824,
+      "url": "https://github.com/wshobson/agents",
+      "pushed_at": "2026-10-14T21:06:13Z"
+    },
+    {
+      "repo": "muratcankoylan/Agent-Skills-for-Context-Engineering",
+      "stars": 18142,
+      "url": "https://github.com/muratcankoylan/Agent-Skills-for-Context-Engineering",
+      "pushed_at": "2026-10-12T02:06:40Z"
+    },
+    {
+      "repo": "DenisSergeevitch/agents-best-practices",
+      "stars": 2383,
+      "url": "https://github.com/DenisSergeevitch/agents-best-practices",
+      "pushed_at": "2026-10-13T15:53:38Z"
+    }
+  ],
+  "history": "No explicit historical final-selection evidence found for these three candidates"
+}

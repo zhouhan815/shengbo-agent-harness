@@ -1,0 +1,76 @@
+{
+  "versions": [
+    {
+      "han_characters": 490,
+      "sentences": 18,
+      "coverage_groups": {
+        "材质": true,
+        "容量": true,
+        "把手": true,
+        "颜色": true,
+        "场景": true
+      },
+      "coverage_rate": 1.0,
+      "natural_sentence_ratio": 1.0,
+      "duplicate_sentences": [],
+      "reference_5gram_overlap": 0.0,
+      "program_scores": {
+        "selling_point_coverage": 12.0,
+        "flow": 8.0,
+        "speakability": 10.0,
+        "length_fit": 5,
+        "fact_references": 5.0
+      },
+      "program_total": 40.0,
+      "invalid_references": false,
+      "app_issues": []
+    },
+    {
+      "han_characters": 582,
+      "sentences": 22,
+      "coverage_groups": {
+        "材质": true,
+        "容量": true,
+        "把手": true,
+        "颜色": true,
+        "场景": true
+      },
+      "coverage_rate": 1.0,
+      "natural_sentence_ratio": 0.955,
+      "duplicate_sentences": [],
+      "reference_5gram_overlap": 0.0,
+      "program_scores": {
+        "selling_point_coverage": 12.0,
+        "flow": 8.0,
+        "speakability": 9.55,
+        "length_fit": 4.3,
+        "fact_references": 5.0
+      },
+      "program_total": 38.85,
+      "invalid_references": false,
+      "app_issues": []
+    }
+  ],
+  "pair": [
+    {
+      "a": 1,
+      "b": 2,
+      "fivegram_jaccard": 0.158,
+      "shared_narrative_sentences": [],
+      "near_copy_ratio": 0.133,
+      "near_copies": [
+        {
+          "a": "平时在家喝白水、喝茶，或者冲一杯麦片，这种材质用起来都挺日常的。",
+          "b": "平时在家喝白水、喝茶，或者冲一杯麦片，这种材质用起来比较踏实。",
+          "similarity": 0.857
+        },
+        {
+          "a": "欢迎来到直播间，今天咱们聊一只日常用的陶瓷马克杯。",
+          "b": "欢迎来到直播间，今天咱们看一只日常用的陶瓷马克杯。",
+          "similarity": 0.96
+        }
+      ],
+      "opening_similarity": 0.366
+    }
+  ]
+}

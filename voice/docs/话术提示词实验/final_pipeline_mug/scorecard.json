@@ -1,0 +1,42 @@
+{
+  "run": "final_pipeline_mug",
+  "versions": [
+    {
+      "version": 1,
+      "program": 38.43,
+      "semantic": 53.0,
+      "total": 91.43,
+      "hard_gate": true,
+      "rule_issues": [],
+      "serious_claims": 0,
+      "cross_version_copy_pass": true,
+      "pass": true,
+      "gaps": [
+        "对陶瓷材质的实际特性如易碎、清洗等未展开，仅停留于触感。",
+        "容量350ml的适用性描述较泛，未结合具体饮品种类细化。",
+        "米白色搭配场景重复提及桌面，缺乏更多生活场景变化。"
+      ]
+    },
+    {
+      "version": 2,
+      "program": 38.7,
+      "semantic": 47.0,
+      "total": 85.7,
+      "hard_gate": true,
+      "rule_issues": [],
+      "serious_claims": 0,
+      "cross_version_copy_pass": true,
+      "pass": true,
+      "gaps": [
+        "场景展开虽有四个卖点，但部分情境较为泛化，缺少更具体的生活画面。",
+        "部分口语表达偏说明书化，如“规格就是三百五十毫升带把手，没有其他容量可选”。",
+        "对“陶瓷材质”和“带把手”的展开略显单薄，未充分体现使用差异。"
+      ]
+    }
+  ],
+  "pair_diversity": {
+    "score": 3,
+    "reason": "两版开场不同，版2以握杯暖手提问开场，版1以喝水偏好开场；卖点展开顺序和情境略有差异，如版1先颜色后容量，版2先材质后把手，但整体结构仍相似，均按痛点、卖点、价格收口，因此评3分。"
+  },
+  "rubric": "20261007.4-uniform-coverage-content-and-near-copy-checks"
+}

@@ -1,0 +1,466 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:shengbo:live-score:design:0.1",
+  "title": "Proposed ScoreResult, not a registered business API",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "score_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "policy_version": {
+      "const": "LIVE-SCORE-0.1"
+    },
+    "score_basis": {
+      "enum": [
+        "target_completion",
+        "historical_higher",
+        "historical_lower",
+        "content_completion",
+        "data_coverage"
+      ]
+    },
+    "metric_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "archive_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "baseline_ref": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "minLength": 1
+    },
+    "goal_ref": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "minLength": 1
+    },
+    "status": {
+      "enum": [
+        "available",
+        "provisional",
+        "unavailable",
+        "not_applicable"
+      ]
+    },
+    "score": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "minimum": 0,
+      "maximum": 100
+    },
+    "raw_value": {
+      "type": [
+        "number",
+        "null"
+      ]
+    },
+    "unit": {
+      "type": "string",
+      "minLength": 1
+    },
+    "currency": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "minLength": 1
+    },
+    "minor_unit_exponent": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0,
+      "maximum": 9
+    },
+    "numerator": {
+      "type": [
+        "number",
+        "null"
+      ]
+    },
+    "denominator": {
+      "type": [
+        "number",
+        "null"
+      ]
+    },
+    "as_of": {
+      "type": "string",
+      "minLength": 1
+    },
+    "missing_reason": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "minLength": 1
+    },
+    "sample_notes": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "data_eligibility": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "limitations": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "evidence_refs": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "source_kinds": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "public_interaction",
+          "authorized_business_export",
+          "local_player",
+          "manual_note",
+          "synthetic"
+        ]
+      }
+    },
+    "synthetic": {
+      "type": "boolean"
+    },
+    "business_outcome": {
+      "enum": [
+        "goal_met",
+        "goal_not_met",
+        "undetermined"
+      ]
+    }
+  },
+  "required": [
+    "score_id",
+    "policy_version",
+    "score_basis",
+    "metric_ref",
+    "archive_ref",
+    "baseline_ref",
+    "goal_ref",
+    "status",
+    "score",
+    "raw_value",
+    "unit",
+    "currency",
+    "minor_unit_exponent",
+    "numerator",
+    "denominator",
+    "as_of",
+    "missing_reason",
+    "sample_notes",
+    "data_eligibility",
+    "limitations",
+    "evidence_refs",
+    "source_kinds",
+    "synthetic",
+    "business_outcome"
+  ],
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "enum": [
+              "unavailable",
+              "not_applicable"
+            ]
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "score": {
+            "type": "null"
+          },
+          "missing_reason": {
+            "type": "string",
+            "minLength": 1
+          },
+          "business_outcome": {
+            "const": "undetermined"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "enum": [
+              "available",
+              "provisional"
+            ]
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "score": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "missing_reason": {
+            "type": "null"
+          },
+          "evidence_refs": {
+            "minItems": 1
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "score_basis": {
+            "const": "target_completion"
+          },
+          "status": {
+            "enum": [
+              "available",
+              "provisional"
+            ]
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "goal_ref": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "score_basis": {
+            "enum": [
+              "historical_higher",
+              "historical_lower"
+            ]
+          },
+          "status": {
+            "enum": [
+              "available",
+              "provisional"
+            ]
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "baseline_ref": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "synthetic": {
+            "const": true
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "business_outcome": {
+            "const": "undetermined"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "source_kinds": {
+            "contains": {
+              "const": "synthetic"
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "synthetic": {
+            "const": true
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "score_basis": {
+            "enum": [
+              "historical_higher",
+              "historical_lower",
+              "content_completion",
+              "data_coverage"
+            ]
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "business_outcome": {
+            "const": "undetermined"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "business_outcome": {
+            "enum": [
+              "goal_met",
+              "goal_not_met"
+            ]
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "score_basis": {
+            "const": "target_completion"
+          },
+          "status": {
+            "enum": [
+              "available",
+              "provisional"
+            ]
+          },
+          "synthetic": {
+            "const": false
+          },
+          "source_kinds": {
+            "contains": {
+              "const": "authorized_business_export"
+            }
+          },
+          "goal_ref": {
+            "type": "string",
+            "minLength": 1
+          },
+          "numerator": {
+            "type": "number"
+          },
+          "denominator": {
+            "type": "number",
+            "exclusiveMinimum": 0
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "business_outcome": {
+            "const": "goal_met"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "score": {
+            "const": 100
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "business_outcome": {
+            "const": "goal_not_met"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "score": {
+            "type": "number",
+            "minimum": 0,
+            "exclusiveMaximum": 100
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "unit": {
+            "const": "currency_minor"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "currency": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minor_unit_exponent": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9
+          },
+          "raw_value": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "numerator": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "denominator": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          }
+        }
+      }
+    }
+  ]
+}

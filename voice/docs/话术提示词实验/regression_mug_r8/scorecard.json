@@ -1,0 +1,42 @@
+{
+  "run": "regression_mug_r8",
+  "versions": [
+    {
+      "version": 1,
+      "program": 38.8,
+      "semantic": 56.0,
+      "total": 94.8,
+      "hard_gate": true,
+      "rule_issues": [],
+      "serious_claims": 0,
+      "cross_version_copy_pass": false,
+      "pass": false,
+      "gaps": [
+        "陶瓷材质的描述仍加入“声音沉沉的”等资料未提供的主观感受。",
+        "容量展开较好，但未提及颜色只有米白色这一种规格限制对选择的影响。",
+        "把手部分对“不是隔热手套”的说明可能暗示商品可装热水且不隔热，需避免无依据性能暗示。"
+      ]
+    },
+    {
+      "version": 2,
+      "program": 39.18,
+      "semantic": 52.0,
+      "total": 91.18,
+      "hard_gate": true,
+      "rule_issues": [],
+      "serious_claims": 0,
+      "cross_version_copy_pass": false,
+      "pass": false,
+      "gaps": [
+        "米白色的场景展开部分偏重“酒店桌面”等资料未支持的场景，可更聚焦家庭餐桌和办公室。",
+        "陶瓷材质带来的温润扎实感描述较多，但资料没有提供手感、声音等实测依据。",
+        "购买引导只提了使用场景，缺少对350毫升容量与日常饮水习惯是否匹配的更具体选择提示。"
+      ]
+    }
+  ],
+  "pair_diversity": {
+    "score": 4,
+    "reason": "两版开场明显不同：版1从出门带杯子和换场景切入，版2从拿杯习惯和端热饮痛点切入。卖点展开顺序也不同：版1先米白色外观再容量、把手、材质，版2先把手、材质、容量、颜色。情境和节奏有有效差异，且均较完整自然。"
+  },
+  "rubric": "20261007.4-uniform-coverage-content-and-near-copy-checks"
+}

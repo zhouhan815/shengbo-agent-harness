@@ -1,0 +1,84 @@
+{
+  "versions": [
+    {
+      "index": 1,
+      "scores": {
+        "natural_live_speech": 14,
+        "benefit_scene_expansion": 13,
+        "coherent_flow": 7,
+        "non_repetition": 8,
+        "purchase_guidance": 4
+      },
+      "score_reasons": [
+        "口语自然，如‘咱们聊一本’、‘边听边看’，有生活化表达。",
+        "卖点展开侧重A5软封面携带、点阵灵活、80页阶段记录，但对‘简单手账’‘学习笔记’仅概括提及，未深入展开，有效展开不足4个。",
+        "流程完整但部分衔接机械，如‘再看封面和大小’、‘最后帮大家收一下重点’略显生硬。",
+        "基本无重复，但‘没有提供’式免责声明打断节奏，属于额外内容。",
+        "价格优惠表述正确，引导自然，但未强调选择依据。"
+      ],
+      "unsupported_claims": [
+        {
+          "quote": "它没有提供防水资料，日常使用还是注意避开大量水就好。",
+          "reason": "商品资料未提供防水信息，主播主观断言‘没有提供防水资料’并给出使用建议，暗示不防水，属于对未提供性能的擅自判断。",
+          "severity": "minor"
+        },
+        {
+          "quote": "当然，它没有提供纸张克重、钢笔适用性、环保认证和防水这些资料，选的时候按自己的使用习惯来判断就好。",
+          "reason": "直接播出knowledge中未提供的规格，虽为免责声明，但将knowledge专有内容作为口播依据。",
+          "severity": "minor"
+        }
+      ],
+      "price_and_terms_correct": true,
+      "knowledge_leaks": [
+        "它没有提供纸张克重、钢笔适用性、环保认证和防水这些资料，选的时候按自己的使用习惯来判断就好。",
+        "它没有提供防水资料，日常使用还是注意避开大量水就好。"
+      ],
+      "main_gaps": [
+        "卖点展开密度不足，80页使用场景较单薄，未呈现‘一段时间’的具体画面。",
+        "点阵格式的收益仅泛泛而谈，未像参考稿那样结合分栏、表格等具体用途。",
+        "颜色介绍简短，未与使用场景或情绪价值关联。"
+      ]
+    },
+    {
+      "index": 2,
+      "scores": {
+        "natural_live_speech": 14,
+        "benefit_scene_expansion": 16,
+        "coherent_flow": 8,
+        "non_repetition": 9,
+        "purchase_guidance": 4
+      },
+      "score_reasons": [
+        "自然口语，如‘欢迎来到直播间’、‘拿在手里有一点柔韧感’，非说明书式播报。",
+        "卖点展开有效：A5携带、软封面手感、点阵多用途、80页适用阶段记录、颜色选择，至少有4个卖点结合具体情境。",
+        "结构连贯，从痛点引入到规格、价格、购买引导，过渡自然。",
+        "没有空话凑字，不同卖点展开不重复，仅规格汇总处略有重复但可接受。",
+        "价格币种正确，优惠条件自然引导，未假设已挂购物车。"
+      ],
+      "unsupported_claims": [],
+      "price_and_terms_correct": true,
+      "knowledge_leaks": [],
+      "main_gaps": [
+        "对点阵格式的书写便利性描述较泛，未结合具体记录场景（如画表格）进一步展开。",
+        "封面颜色的视觉描述较为主观，缺少与使用场景的细腻关联。",
+        "购买引导仅停留在颜色和凑三本，未提及适合人群的差异化推荐。"
+      ]
+    }
+  ],
+  "pair_diversity": {
+    "score": 3,
+    "reason": "两版开场痛点不同（出门带本子 vs 手机记录），卖点展开顺序有差异（版本1规格穿插，版本2先点阵后尺寸），但核心结构均为痛点-规格-颜色-价格，且对点阵、软封面的诠释相似，差异不够鲜明。"
+  },
+  "judge_model": "deepseek-flash",
+  "judge_protocol": "v2-core-facts-only-no-unsupported-reference-priming",
+  "usage": {
+    "prompt_tokens": 2197,
+    "completion_tokens": 938,
+    "total_tokens": 3135,
+    "prompt_tokens_details": {
+      "cached_tokens": 768
+    },
+    "prompt_cache_hit_tokens": 768,
+    "prompt_cache_miss_tokens": 1429
+  }
+}

@@ -1,0 +1,185 @@
+[
+  {
+    "stage": "pain",
+    "version": "A-原参数",
+    "text": "你有没有过这种小烦恼：下楼散步、倒垃圾，穿运动鞋太麻烦，穿普通拖鞋又怕走久了脚累。",
+    "voice": "Wise_Woman",
+    "model": "speech-2.8-turbo",
+    "style": null,
+    "listening": {
+      "唱腔": "未试听",
+      "背景杂音": "未试听",
+      "感染力": "未试听"
+    },
+    "waveform": {
+      "duration": 12.109,
+      "sample_rate": 32000,
+      "channels": 1,
+      "peak": 0.68369,
+      "rms": 0.04655,
+      "clip_ratio": 0.0
+    },
+    "file": "b57209c095c9900790f55231bc4e47247df2faddbbfdf6430d72b7bf151ddeef.wav",
+    "status": "generated"
+  },
+  {
+    "stage": "pain",
+    "version": "B-分段参数",
+    "text": "你有没有过这种小烦恼：下楼散步、倒垃圾，穿运动鞋太麻烦，穿普通拖鞋又怕走久了脚累。",
+    "voice": "Wise_Woman",
+    "model": "speech-2.8-turbo",
+    "style": {
+      "profile_id": "pain",
+      "stage": "pain",
+      "style_revision": "ecommerce-stage-20261007.1",
+      "label": "场景引入",
+      "direction": "像聊一个生活小烦恼，带关切和提问感，留出理解空间，不刻意卖惨。",
+      "description": "像聊一个生活小烦恼，带关切和提问感，留出理解空间，不刻意卖惨。",
+      "goal": "场景引入",
+      "provider": "minimax",
+      "emotion": null,
+      "speed": 0.98,
+      "pitch": 0,
+      "vol": 1.0,
+      "emotion_supported": true,
+      "capability_note": "方向说明用于展示；模型接收情绪和语速等参数，效果需试听确认"
+    },
+    "listening": {
+      "唱腔": "未试听",
+      "背景杂音": "未试听",
+      "感染力": "未试听"
+    },
+    "waveform": {
+      "duration": 9.88,
+      "sample_rate": 32000,
+      "channels": 1,
+      "peak": 0.45267,
+      "rms": 0.05005,
+      "clip_ratio": 0.0
+    },
+    "file": "24d6346306f326a1df43b64683c395ca41f06b784fbc4a473bda35d43508f0ab.wav",
+    "status": "generated"
+  },
+  {
+    "stage": "benefit",
+    "version": "A-原参数",
+    "text": "这双拖鞋采用一体成型的EVA材质，搭配足弓支撑和软弹厚底。在家走动时，可以按自己的需要选择。",
+    "voice": "Wise_Woman",
+    "model": "speech-2.8-turbo",
+    "style": null,
+    "listening": {
+      "唱腔": "未试听",
+      "背景杂音": "未试听",
+      "感染力": "未试听"
+    },
+    "waveform": {
+      "duration": 10.066,
+      "sample_rate": 32000,
+      "channels": 1,
+      "peak": 0.66168,
+      "rms": 0.05766,
+      "clip_ratio": 0.0
+    },
+    "file": "8d1fcb2e41ff360186c11c4aa99f6985d38d90c6518729651d34c98ffad9889a.wav",
+    "status": "generated"
+  },
+  {
+    "stage": "benefit",
+    "version": "B-分段参数",
+    "text": "这双拖鞋采用一体成型的EVA材质，搭配足弓支撑和软弹厚底。在家走动时，可以按自己的需要选择。",
+    "voice": "Wise_Woman",
+    "model": "speech-2.8-turbo",
+    "style": {
+      "profile_id": "benefit",
+      "stage": "benefit",
+      "style_revision": "ecommerce-stage-20261007.1",
+      "label": "卖点讲解",
+      "direction": "亲切、有画面感，强调具体特点和使用感受，句子之间有轻重变化。",
+      "description": "亲切、有画面感，强调具体特点和使用感受，句子之间有轻重变化。",
+      "goal": "卖点讲解",
+      "provider": "minimax",
+      "emotion": null,
+      "speed": 1.0,
+      "pitch": 0,
+      "vol": 1.0,
+      "emotion_supported": true,
+      "capability_note": "方向说明用于展示；模型接收情绪和语速等参数，效果需试听确认"
+    },
+    "listening": {
+      "唱腔": "未试听",
+      "背景杂音": "未试听",
+      "感染力": "未试听"
+    },
+    "waveform": {
+      "duration": 10.101,
+      "sample_rate": 32000,
+      "channels": 1,
+      "peak": 0.55093,
+      "rms": 0.04712,
+      "clip_ratio": 0.0
+    },
+    "file": "d12f8bd58fb2c1ef206ff148592746ffe30601bf2ecb3b378123838a7a184c8f.wav",
+    "status": "generated"
+  },
+  {
+    "stage": "promotion",
+    "version": "A-原参数",
+    "text": "活动价是一百零七新台币。喜欢这款的朋友，先选好颜色和尺码，合适就下单。",
+    "voice": "Wise_Woman",
+    "model": "speech-2.8-turbo",
+    "style": null,
+    "listening": {
+      "唱腔": "未试听",
+      "背景杂音": "未试听",
+      "感染力": "未试听"
+    },
+    "waveform": {
+      "duration": 7.976,
+      "sample_rate": 32000,
+      "channels": 1,
+      "peak": 0.67923,
+      "rms": 0.05033,
+      "clip_ratio": 0.0
+    },
+    "file": "3acaabb8c74c508c441d56e20c92d63ca03665011838104ed648bd1d71f37985.wav",
+    "status": "generated"
+  },
+  {
+    "stage": "promotion",
+    "version": "B-分段参数",
+    "text": "活动价是一百零七新台币。喜欢这款的朋友，先选好颜色和尺码，合适就下单。",
+    "voice": "Wise_Woman",
+    "model": "speech-2.8-turbo",
+    "style": {
+      "profile_id": "promotion",
+      "stage": "promotion",
+      "style_revision": "ecommerce-stage-20261007.1",
+      "label": "优惠强调",
+      "direction": "有感染力地强调已知优惠，重点清楚、有节奏，兴奋但不喊叫，不制造未知紧迫感。",
+      "description": "有感染力地强调已知优惠，重点清楚、有节奏，兴奋但不喊叫，不制造未知紧迫感。",
+      "goal": "优惠强调",
+      "provider": "minimax",
+      "emotion": "happy",
+      "speed": 1.02,
+      "pitch": 0,
+      "vol": 1.0,
+      "emotion_supported": true,
+      "capability_note": "方向说明用于展示；模型接收情绪和语速等参数，效果需试听确认"
+    },
+    "listening": {
+      "唱腔": "未试听",
+      "背景杂音": "未试听",
+      "感染力": "未试听"
+    },
+    "waveform": {
+      "duration": 5.805,
+      "sample_rate": 32000,
+      "channels": 1,
+      "peak": 0.5531,
+      "rms": 0.0512,
+      "clip_ratio": 0.0
+    },
+    "file": "b9389cfc376ddf9344c69982b6b6f6bdb610f11d36456bfcfafb71b7fd8ea106.wav",
+    "status": "generated"
+  }
+]

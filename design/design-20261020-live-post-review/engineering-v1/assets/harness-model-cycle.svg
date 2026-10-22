@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1580" height="1010" viewBox="0 0 1580 1010" role="img"><title>一轮Agent模型工具循环的中间件与Skill位置</title>
+<defs><marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#66758b"/></marker></defs>
+<rect width="100%" height="100%" fill="#f7f8f4"/>
+<style>text{font-family:Segoe UI,Microsoft YaHei,sans-serif;fill:#25334a} .line{fill:none;stroke:#758399;stroke-width:2;marker-end:url(#arr)} .dash{stroke-dasharray:7 5}</style>
+<text x="30" y="44" font-size="28" font-weight="700">一轮模型／工具循环：谁自动触发，谁由模型选择</text>
+<text x="30" y="78" font-size="17" font-weight="400">四个业务中间件不会作为工具等待模型调用；Skill和工具由模型按需选择。</text>
+<rect x="30" y="125" width="460" height="145" rx="10" fill="#eef1ff" stroke="#aebad0" stroke-width="1.6"/>
+<text x="44" y="154" font-size="18" font-weight="650">1 Runtime进入</text>
+<text x="44" y="180" font-size="15" font-weight="400">绑定可信run／role／budget</text>
+<text x="44" y="205" font-size="15" font-weight="400">try/finally覆盖整个ainvoke</text>
+<rect x="560" y="125" width="460" height="145" rx="10" fill="#f0eaff" stroke="#aebad0" stroke-width="1.6"/>
+<text x="574" y="154" font-size="18" font-weight="650">2 Completion控制门</text>
+<text x="574" y="180" font-size="15" font-weight="400">查正式完成／等待回执</text>
+<text x="574" y="205" font-size="15" font-weight="400">可停止invocation，等待不等于完成</text>
+<rect x="1090" y="125" width="460" height="145" rx="10" fill="#f0eaff" stroke="#aebad0" stroke-width="1.6"/>
+<text x="1104" y="154" font-size="18" font-weight="650">3 EvidenceContext</text>
+<text x="1104" y="180" font-size="15" font-weight="400">固定Goal、成果、缺项与精确reader</text>
+<text x="1104" y="205" font-size="15" font-weight="400">按需工作集，历史过大才摘要</text>
+<rect x="1090" y="375" width="460" height="145" rx="10" fill="#f9e9df" stroke="#aebad0" stroke-width="1.6"/>
+<text x="1104" y="404" font-size="18" font-weight="650">4 SDK机制 + Provider发送边界</text>
+<text x="1104" y="430" font-size="15" font-weight="400">Skill按角色读取；仅一套Summary</text>
+<text x="1104" y="455" font-size="15" font-weight="400">最终wire核预算；所有模型共享账本</text>
+<rect x="560" y="375" width="460" height="145" rx="10" fill="#eef1ff" stroke="#aebad0" stroke-width="1.6"/>
+<text x="574" y="404" font-size="18" font-weight="650">5 模型自主选择</text>
+<text x="574" y="430" font-size="15" font-weight="400">原子工具／F组合工具／子任务</text>
+<text x="574" y="455" font-size="15" font-weight="400">补问／提交；可追加新调查路径</text>
+<rect x="30" y="375" width="460" height="145" rx="10" fill="#f0eaff" stroke="#aebad0" stroke-width="1.6"/>
+<text x="44" y="404" font-size="18" font-weight="650">6 工具边界：Scope + TraceBudget</text>
+<text x="44" y="430" font-size="15" font-weight="400">身份／ref／副作用／取消／额度</text>
+<text x="44" y="455" font-size="15" font-weight="400">记录安全参数、缓存、耗时与结果</text>
+<rect x="30" y="625" width="460" height="145" rx="10" fill="#e5f4ee" stroke="#aebad0" stroke-width="1.6"/>
+<text x="44" y="654" font-size="18" font-weight="650">7 typed服务执行</text>
+<text x="44" y="680" font-size="15" font-weight="400">机械步骤固定；资格、事务单一正本</text>
+<text x="44" y="705" font-size="15" font-weight="400">K10／K13保存四项审核并程序算分</text>
+<rect x="560" y="625" width="460" height="145" rx="10" fill="#e5f4ee" stroke="#aebad0" stroke-width="1.6"/>
+<text x="574" y="654" font-size="18" font-weight="650">8 持久结果 + ToolMessage</text>
+<text x="574" y="680" font-size="15" font-weight="400">正式refs／缺项／等待／错误可纠正</text>
+<text x="574" y="705" font-size="15" font-weight="400">Provider响应先落用量再验内容</text>
+<rect x="1090" y="625" width="460" height="145" rx="10" fill="#f0eaff" stroke="#aebad0" stroke-width="1.6"/>
+<text x="1104" y="654" font-size="18" font-weight="650">9 下次进入模型前再次检查</text>
+<text x="1104" y="680" font-size="15" font-weight="400">完成→结束并展示绑定交付</text>
+<text x="1104" y="705" font-size="15" font-weight="400">等待→停止并等待持久Inbox唤醒</text>
+<polyline class="line" points="490,195 560,195"/>
+<polyline class="line" points="1020,195 1090,195"/>
+<polyline class="line" points="1320,270 1320,375"/>
+<polyline class="line" points="1090,445 1020,445"/>
+<polyline class="line" points="560,445 490,445"/>
+<polyline class="line" points="260,520 260,625"/>
+<polyline class="line" points="490,695 560,695"/>
+<polyline class="line" points="1020,695 1090,695"/>
+<polyline class="line dash" points="1320,770 1320,825 530,825 530,195 560,195"/>
+<text x="550" y="812" font-size="14" font-weight="550">未结束则继续；不补一轮无用收尾</text>
+<text x="30" y="894" font-size="18" font-weight="400">输入／Job等待：保存WaitReceipt → 控制门停本次图 → 协调器原子消费Inbox → 同Goal同thread新invocation续办。</text>
+<text x="30" y="931" font-size="18" font-weight="400">成功：finish非return_direct工具保存DeliveryReceipt → before_model检查后结束；参数错仍留给模型纠正。</text>
+<text x="30" y="970" font-size="18" font-weight="650">Skill供选择方法；中间件自动守边界；确定性服务处理数据；模型保留业务规划和调查能力。</text>
+</svg>

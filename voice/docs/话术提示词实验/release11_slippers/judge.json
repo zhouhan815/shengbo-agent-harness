@@ -1,0 +1,102 @@
+{
+  "versions": [
+    {
+      "index": 1,
+      "scores": {
+        "natural_live_speech": 13,
+        "benefit_scene_expansion": 16,
+        "coherent_flow": 9,
+        "non_repetition": 7,
+        "purchase_guidance": 4
+      },
+      "score_reasons": [
+        "natural_live_speech: 口语自然，有'可以在心里扣个一''脚底板一直压在平底上，那种累是慢慢攒出来的'等生动表达，但'材质本身防臭快干'等句式偏说明书，扣2分。",
+        "benefit_scene_expansion: 卖点展开有：足弓支撑（厨房切菜煲汤）、厚底缓震（小蛮腰造型，软弹感）、静音（早起烧水、夜里倒水）、防滑（浴室湿地面）、防臭快干（洗完澡、冲水）、轻便（散步、倒垃圾、旅行）、耐磨（'不用太担心鞋底很快磨薄'）。有5-6个卖点展开，但部分展开如'脚底有支撑和没支撑，感受差别挺明显'较泛，给16分。",
+        "coherent_flow: 痛点（站久了脚底没有支撑）→身份（扣1）→规格（颜色、尺码）→价格→收口，结构清晰，连贯自然，给9分。",
+        "non_repetition: 卖点有不同情境，但'在厨房切菜、煲汤'与第一版类似，且整体长度略短，展开不够丰富，扣3分。",
+        "purchase_guidance: 有真实价格和优惠条件，引导'觉得合适再下单'，给4分。"
+      ],
+      "unsupported_claims": [
+        {
+          "quote": "鞋底有耐磨特性，日常在室内外走动，不用太担心鞋底很快磨薄。",
+          "reason": "资料提到'轻便耐磨'，但'不用太担心鞋底很快磨薄'是主观保证，无测试数据支持，属于对性能的夸张量级保证，判minor。",
+          "severity": "minor"
+        },
+        {
+          "quote": "脚底有支撑和没支撑，感受差别挺明显。",
+          "reason": "对比效果描述，资料未提供支撑强度的具体信息，可能被理解为性能保证，判minor。",
+          "severity": "minor"
+        }
+      ],
+      "price_and_terms_correct": true,
+      "knowledge_leaks": [],
+      "main_gaps": [
+        "部分展开较泛，如'脚底有支撑和没支撑，感受差别挺明显'，不够具体。",
+        "颜色列举时用'等等'，不如第一版完整，但资料有十色，不背诵全部不扣分，但直播中可能影响信息完整度。",
+        "整体卖点展开的生动性略弱于第一版，如厨房场景与第一版重复。"
+      ],
+      "natural_live_speech": 13,
+      "benefit_scene_expansion": 16,
+      "coherent_flow": 9,
+      "non_repetition": 7,
+      "purchase_guidance": 4
+    },
+    {
+      "index": 2,
+      "scores": {
+        "natural_live_speech": 13,
+        "benefit_scene_expansion": 17,
+        "coherent_flow": 9,
+        "non_repetition": 8,
+        "purchase_guidance": 4
+      },
+      "score_reasons": [
+        "natural_live_speech: 整体口语自然，有'姐妹，你平时在家穿拖鞋，最在意的是一双鞋的哪一点呢？'等互动问句，'啪嗒啪嗒响''蹲在那里刷半天'等表达生活化。但部分句子如'鞋底具备静音特性。'偏说明书式，扣2分。",
+        "benefit_scene_expansion: 核心卖点展开充分：静音（夜间倒水、关窗、看孩子踢被子）、防滑（浴室湿地面）、轻便（取快递、倒垃圾、散步、旅行）、防臭快干（洗完澡、冲水、海边沙子）、足弓支撑（厨房久站）、厚底缓震、一体成型、耐磨，至少6个卖点有效展开，给17分。",
+        "coherent_flow: 结构完整：痛点（夜间噪音、浴室湿滑）→身份（姐妹）→规格（颜色、尺码）→价格 →收口，过渡自然，不机械贴标签，给9分。",
+        "non_repetition: 无空话凑字，各卖点用不同情境展开，但'多一分'等表达略有重复，扣2分。",
+        "purchase_guidance: 有真实价格'原价一百七十八新台币，现在活动价一百零七新台币'和优惠条件'限时下杀'，引导自然'合适再下单'，不假设已挂购物车，给4分。"
+      ],
+      "unsupported_claims": [
+        {
+          "quote": "材质方面也考虑了耐磨，日常在室内和小区路面走动，鞋底经得起反复使用。",
+          "reason": "产品卖点提到'轻便耐磨'，但'经得起反复使用'是主观保证，无具体测试数据支持，属于对性能的夸张量级保证，判minor。",
+          "severity": "minor"
+        },
+        {
+          "quote": "脚掌内侧那条弧线能被托住一点。",
+          "reason": "'托住一点'是对足弓支撑效果的具象体验描述，但商品资料未提供实际支撑力度或体验细节，属于合理场景联想？但'托住一点'可能被消费者理解为性能保证，且资料未支持具体感受，判minor。",
+          "severity": "minor"
+        }
+      ],
+      "price_and_terms_correct": true,
+      "knowledge_leaks": [],
+      "main_gaps": [
+        "部分句子偏说明书式，如'鞋底具备静音特性。'，影响口语自然度。",
+        "对足弓支撑的描写'脚掌内侧那条弧线能被托住一点'缺乏资料支持，可能引发误解。",
+        "颜色列举了十个但未说明所有颜色是否有货，可能让消费者产生选择困惑（但非严重问题）。"
+      ],
+      "natural_live_speech": 13,
+      "benefit_scene_expansion": 17,
+      "coherent_flow": 9,
+      "non_repetition": 8,
+      "purchase_guidance": 4
+    }
+  ],
+  "pair_diversity": {
+    "score": 3,
+    "reason": "两版开场不同（第一版互动问句，第二版扣1互动），痛点引入不同（第一版夜间噪音，第二版久站劳累），卖点展开顺序不同（第一版先静音后足弓，第二版先足弓后静音），情境有差异但部分重叠（厨房场景），整体结构相似，差异不够鲜明，给3分。"
+  },
+  "judge_model": "deepseek-flash",
+  "judge_protocol": "v2-core-facts-only-no-unsupported-reference-priming",
+  "usage": {
+    "prompt_tokens": 2709,
+    "completion_tokens": 1572,
+    "total_tokens": 4281,
+    "prompt_tokens_details": {
+      "cached_tokens": 1024
+    },
+    "prompt_cache_hit_tokens": 1024,
+    "prompt_cache_miss_tokens": 1685
+  }
+}

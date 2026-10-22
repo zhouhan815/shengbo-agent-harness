@@ -1,0 +1,166 @@
+{
+  "version": "LIVE-REVIEW-ENG-1.0",
+  "scope": "design_only",
+  "files": [
+    {
+      "path": "00_总开发计划与架构.html",
+      "sha256": "3cea4bf3acb7b231cab3caddde3744d7477e2fa753ec6057a30a31f4e9a11b34",
+      "bytes": 27215
+    },
+    {
+      "path": "00_总开发计划与架构.md",
+      "sha256": "7b4b4de8e156e4d63b1b8aa0e284fd9e95999ef38932990d56b518c9a00ba692",
+      "bytes": 20562
+    },
+    {
+      "path": "01_数据契约与持久化.html",
+      "sha256": "7fd8cb0a62836eff0c1a3ef41d94dd2c2b2d29df4a52db4a5b5b0c851b8c08c1",
+      "bytes": 31960
+    },
+    {
+      "path": "01_数据契约与持久化.md",
+      "sha256": "2938f276730148d0065b96f7083e1bcb7d9cf17faa252f7a6312bad6019c276d",
+      "bytes": 25499
+    },
+    {
+      "path": "02_AgentHarness与上下文中间件.html",
+      "sha256": "aac64aaaca1a8c6fca1e18511898211183a94b80febb149aa0bffeb61f266109",
+      "bytes": 35274
+    },
+    {
+      "path": "02_AgentHarness与上下文中间件.md",
+      "sha256": "6b880816871b260080df617a44d55d95bcf301fb039cc4d5eb9aa29e82867268",
+      "bytes": 28244
+    },
+    {
+      "path": "03_工具与可调用工作流.html",
+      "sha256": "758c015ba8175f5748a373caa187d505fee12834975a42e58bd0075cef462186",
+      "bytes": 27711
+    },
+    {
+      "path": "03_工具与可调用工作流.md",
+      "sha256": "d2fcc2dd9427bfa53c6cbea4f108242dd96e6c082261fda94e948ff9a70228e9",
+      "bytes": 21577
+    },
+    {
+      "path": "04_API前端与播前交接.html",
+      "sha256": "b2f46035e9787d56ccf409f0058cd0f71af0d35072a6a3bb4ede1e29e05cfbf0",
+      "bytes": 22953
+    },
+    {
+      "path": "04_API前端与播前交接.md",
+      "sha256": "0243b1190a4cf8ff5b8851ce3412da57ea0fbd7003fbb7796748e9378d3110f4",
+      "bytes": 16998
+    },
+    {
+      "path": "05_验收与实施任务包.html",
+      "sha256": "f8c1eb96ed577f3c7282ffd24957e47b0fba6650a99a98f1a3110d10380c597e",
+      "bytes": 50942
+    },
+    {
+      "path": "05_验收与实施任务包.md",
+      "sha256": "0d12204e7dd478d2cf0d91b55c2a2f647e317f034df7712bf1124e223773cdc6",
+      "bytes": 41570
+    },
+    {
+      "path": "06_播前迭代教训预防矩阵.html",
+      "sha256": "40121148eb7de15a8c27fd06ad471dcff942020a634834085927eebaec598709",
+      "bytes": 35706
+    },
+    {
+      "path": "06_播前迭代教训预防矩阵.md",
+      "sha256": "5f1f8f07b1053c1424b1f932293022256ca2df8e768ccb240a4fd7375eb38036",
+      "bytes": 28033
+    },
+    {
+      "path": "07_评价体系执行配方.html",
+      "sha256": "b603c68da802640c66665e56834c114ae913c08aa4897cf8fe3f622585eeb1bd",
+      "bytes": 53788
+    },
+    {
+      "path": "07_评价体系执行配方.md",
+      "sha256": "c5590d87abeab17cd6a9e6faf744506be77bea52a4162d6930518610c7787620",
+      "bytes": 43107
+    },
+    {
+      "path": "assets/harness-architecture-preview.png",
+      "sha256": "4a4317d98b0077df54e3ad8169e138db165cdd4815f30633a3605d6300e5827a",
+      "bytes": 280511
+    },
+    {
+      "path": "assets/harness-architecture.svg",
+      "sha256": "7d3d2bf7aefa5deda6e39c6e0af916b6c9e64b764f13ecbe368c19258a031870",
+      "bytes": 13845
+    },
+    {
+      "path": "assets/harness-model-cycle.svg",
+      "sha256": "7976108e25a5b8f095d9603d6399e3a59ee2f0842dc0b1bdc9e86cffea89e51e",
+      "bytes": 5723
+    },
+    {
+      "path": "README.md",
+      "sha256": "cf7fdc9c14efd03318f8fa22043dfc0c17476ecbbf57d6ab0192dfbc61b63ca9",
+      "bytes": 3809
+    },
+    {
+      "path": "research/Harness工程计划复核.md",
+      "sha256": "01b9e18b5e360147a0953ec194518e4d881a0e9a9cc6e71da247e81263bef959",
+      "bytes": 10873
+    },
+    {
+      "path": "research/SDK与Harness实现核查.md",
+      "sha256": "cb5c8d893d7b407f95f9c341e5b7ba9be3ceddc3ff4f43abd53dc0ef74ba3d22",
+      "bytes": 45923
+    },
+    {
+      "path": "research/工程计划独立复核收口.md",
+      "sha256": "fc14e5b29c2007a034dca5c20b08ead976d606f6cd5107ea8a32feaeeaf3b96f",
+      "bytes": 4287
+    },
+    {
+      "path": "research/播前迭代教训与预防映射.md",
+      "sha256": "8c9cc2bf238e530eedacbbc340ff7c7df45a4afa44c4cceb48cd296af2c7aa06",
+      "bytes": 30234
+    },
+    {
+      "path": "research/数据工程计划复核.md",
+      "sha256": "65291cf080cc756de71078f9b60055a292237618fa88d31ebf60da1fe302b686",
+      "bytes": 11793
+    },
+    {
+      "path": "research/数据底座与评分工程审查.md",
+      "sha256": "ba8f0a7132c4e0aad6dc608d56c5826b74094585f18a7a7bc5b095c83883be8e",
+      "bytes": 47038
+    },
+    {
+      "path": "research/迭代预防工程计划复核.md",
+      "sha256": "797611bb9431bcdb4d8346c0a361d457660fcef676174eeb3b1133c982420571",
+      "bytes": 9427
+    },
+    {
+      "path": "tooling/build_engineering_reading.py",
+      "sha256": "d433d355a1a561fe9dd519ac8d5c9525e74b459b072fa34ec89b94f391d42862",
+      "bytes": 24437
+    },
+    {
+      "path": "工程接口索引.json",
+      "sha256": "5dd20f721a857ebf96d604bf8171c75a72e4649fa2e3b8bb2ae240fd47f78e6b",
+      "bytes": 10099
+    },
+    {
+      "path": "工程计划静态核对记录.json",
+      "sha256": "ff1471bd7828db62ff0f37b8b214b9507a13c8a16147464753d532bfc98e6338",
+      "bytes": 16319
+    },
+    {
+      "path": "播中播后综合Agent完整工程计划.html",
+      "sha256": "fb5bb237bebb13b7cf685a3d2588e530dcd68bd3993bac950e102f88925dddd4",
+      "bytes": 258244
+    },
+    {
+      "path": "源码核查基线.json",
+      "sha256": "6b717190f9ef1a733df147ab101ca2f6308f5201f31bf5908c92f1f0f2169c08",
+      "bytes": 1593
+    }
+  ]
+}

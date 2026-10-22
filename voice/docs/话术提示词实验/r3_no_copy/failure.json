@@ -1,0 +1,6 @@
+{
+  "version": 2,
+  "error_type": "RuntimeError",
+  "message": "DeepSeek返回0版，要求1版；未覆盖已有稿件，可重试生成",
+  "evidence": "当次实际命令退出记录；发生在启用原始响应留存之前。第1版成功稿保留。"
+}

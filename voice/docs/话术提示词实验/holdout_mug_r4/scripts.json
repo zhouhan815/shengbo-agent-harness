@@ -1,0 +1,704 @@
+[
+  {
+    "id": "script_8ad0e954238941dd",
+    "product_id": "lab_mug",
+    "product_snapshot": {
+      "id": "lab_mug",
+      "name": "日常陶瓷马克杯",
+      "currency": "CNY",
+      "price": 49,
+      "promo_price": null,
+      "selling_points": "陶瓷材质，容量350毫升。带把手，米白色。适合家庭餐桌和办公室使用。未提供耐温范围、微波炉/洗碗机适用性和保温功能。",
+      "promotion": "",
+      "knowledge": "只用于问答的测试暗号：蓝鹭专享，九块九包邮，七天无理由。"
+    },
+    "revision": 1,
+    "label": "1",
+    "angle": "从办公室端拿习惯切入讲把手与容量，再讲米白陶瓷材质和居家打理，最后收拢颜色与购买引导。",
+    "locale": "zh-CN",
+    "source": "DeepSeek",
+    "status": "draft",
+    "blocks": [
+      {
+        "id": "script_8ad0e954238941dd_b001",
+        "stage": "welcome",
+        "ordinal": 1
+      },
+      {
+        "id": "script_8ad0e954238941dd_b002",
+        "stage": "identity",
+        "ordinal": 2
+      },
+      {
+        "id": "script_8ad0e954238941dd_b003",
+        "stage": "benefit",
+        "ordinal": 3
+      },
+      {
+        "id": "script_8ad0e954238941dd_b004",
+        "stage": "scene",
+        "ordinal": 4
+      },
+      {
+        "id": "script_8ad0e954238941dd_b005",
+        "stage": "specification",
+        "ordinal": 5
+      },
+      {
+        "id": "script_8ad0e954238941dd_b006",
+        "stage": "price",
+        "ordinal": 6
+      },
+      {
+        "id": "script_8ad0e954238941dd_b007",
+        "stage": "cta",
+        "ordinal": 7
+      }
+    ],
+    "sentences": [
+      {
+        "id": "script_8ad0e954238941dd_s001",
+        "block_id": "script_8ad0e954238941dd_b001",
+        "block_ordinal": 1,
+        "stage": "welcome",
+        "ordinal": 1,
+        "text": "欢迎来到直播间，今天咱们来看一只日常用的陶瓷马克杯。",
+        "spoken_text": "欢迎来到直播间，今天咱们来看一只日常用的陶瓷马克杯。",
+        "kind": "engagement",
+        "fact_ids": []
+      },
+      {
+        "id": "script_8ad0e954238941dd_s002",
+        "block_id": "script_8ad0e954238941dd_b001",
+        "block_ordinal": 1,
+        "stage": "welcome",
+        "ordinal": 2,
+        "text": "如果你平时在办公桌前工作，手边总想放一只杯子。",
+        "spoken_text": "如果你平时在办公桌前工作，手边总想放一只杯子。",
+        "kind": "engagement",
+        "fact_ids": []
+      },
+      {
+        "id": "script_8ad0e954238941dd_s003",
+        "block_id": "script_8ad0e954238941dd_b001",
+        "block_ordinal": 1,
+        "stage": "welcome",
+        "ordinal": 3,
+        "text": "或者家里餐桌边，也需要一只随手端起来就能喝水的杯子。",
+        "spoken_text": "或者家里餐桌边，也需要一只随手端起来就能喝水的杯子。",
+        "kind": "engagement",
+        "fact_ids": []
+      },
+      {
+        "id": "script_8ad0e954238941dd_s004",
+        "block_id": "script_8ad0e954238941dd_b001",
+        "block_ordinal": 1,
+        "stage": "welcome",
+        "ordinal": 4,
+        "text": "挑这种杯子的时候，你会不会先看看它端着顺不顺手、拿起来稳不稳、日常好不好放。",
+        "spoken_text": "挑这种杯子的时候，你会不会先看看它端着顺不顺手、拿起来稳不稳、日常好不好放。",
+        "kind": "engagement",
+        "fact_ids": []
+      },
+      {
+        "id": "script_8ad0e954238941dd_s005",
+        "block_id": "script_8ad0e954238941dd_b002",
+        "block_ordinal": 2,
+        "stage": "identity",
+        "ordinal": 5,
+        "text": "今天说的这只日常陶瓷马克杯，就是给家庭餐桌和办公室使用准备的。",
+        "spoken_text": "今天说的这只日常陶瓷马克杯，就是给家庭餐桌和办公室使用准备的。",
+        "kind": "product_claim",
+        "fact_ids": [
+          "NAME",
+          "SELLING"
+        ]
+      },
+      {
+        "id": "script_8ad0e954238941dd_s006",
+        "block_id": "script_8ad0e954238941dd_b002",
+        "block_ordinal": 2,
+        "stage": "identity",
+        "ordinal": 6,
+        "text": "它的杯身带一个把手，你在桌前喝水、在餐桌边喝茶，都能多一个着力的位置。",
+        "spoken_text": "它的杯身带一个把手，你在桌前喝水、在餐桌边喝茶，都能多一个着力的位置。",
+        "kind": "product_claim",
+        "fact_ids": [
+          "SELLING"
+        ]
+      },
+      {
+        "id": "script_8ad0e954238941dd_s007",
+        "block_id": "script_8ad0e954238941dd_b002",
+        "block_ordinal": 2,
+        "stage": "identity",
+        "ordinal": 7,
+        "text": "有些人握杯习惯直接握住杯身，有些人在意手指有没有地方搭着，这只杯子就给了你一个手部放置的位置。",
+        "spoken_text": "有些人握杯习惯直接握住杯身，有些人在意手指有没有地方搭着，这只杯子就给了你一个手部放置的位置。",
+        "kind": "product_claim",
+        "fact_ids": [
+          "SELLING"
+        ]
+      },
+      {
+        "id": "script_8ad0e954238941dd_s008",
+        "block_id": "script_8ad0e954238941dd_b002",
+        "block_ordinal": 2,
+        "stage": "identity",
+        "ordinal": 8,
+        "text": "再看容量，它是三百五十毫升。",
+        "spoken_text": "再看容量，它是三百五十毫升。",
+        "kind": "product_claim",
+        "fact_ids": [
+          "SELLING"
+        ]
+      },
+      {
+        "id": "script_8ad0e954238941dd_s009",
+        "block_id": "script_8ad0e954238941dd_b002",
+        "block_ordinal": 2,
+        "stage": "identity",
+        "ordinal": 9,
+        "text": "这个容量放在办公桌上，你接一杯水、泡一杯茶，不用频繁来回续杯；放在家里餐边，给家人倒点喝的也够盛。",
+        "spoken_text": "这个容量放在办公桌上，你接一杯水、泡一杯茶，不用频繁来回续杯；放在家里餐边，给家人倒点喝的也够盛。",
+        "kind": "product_claim",
+        "fact_ids": [
+          "SELLING"
+        ]
+      },
+      {
+        "id": "script_8ad0e954238941dd_s010",
+        "block_id": "script_8ad0e954238941dd_b003",
+        "block_ordinal": 3,
+        "stage": "benefit",
+        "ordinal": 10,
+        "text": "杯子是陶瓷材质，杯身摸起来有陶瓷器物的质感。",
+        "spoken_text": "杯子是陶瓷材质，杯身摸起来有陶瓷器物的质感。",
+        "kind": "product_claim",
+        "fact_ids": [
+          "SELLING"
+        ]
+      },
+      {
+        "id": "script_8ad0e954238941dd_s011",
+        "block_id": "script_8ad0e954238941dd_b003",
+        "block_ordinal": 3,
+        "stage": "benefit",
+        "ordinal": 11,
+        "text": "你平时在家吃完饭，想把杯子收进橱柜，陶瓷这种材质放在日常餐具里比较常见，餐边柜里多一只它，不会显得很突兀。",
+        "spoken_text": "你平时在家吃完饭，想把杯子收进橱柜，陶瓷这种材质放在日常餐具里比较常见，餐边柜里多一只它，不会显得很突兀。",
+        "kind": "product_claim",
+        "fact_ids": [
+          "SELLING"
+        ]
+      },
+      {
+        "id": "script_8ad0e954238941dd_s012",
+        "block_id": "script_8ad0e954238941dd_b003",
+        "block_ordinal": 3,
+        "stage": "benefit",
+        "ordinal": 12,
+        "text": "如果把它放在办公室，开会前端着走一段路，有把手可以让你整个手掌有更自然的握持方式。",
+        "spoken_text": "如果把它放在办公室，开会前端着走一段路，有把手可以让你整个手掌有更自然的握持方式。",
+        "kind": "product_claim",
+        "fact_ids": [
+          "SELLING"
+        ]
+      },
+      {
+        "id": "script_8ad0e954238941dd_s013",
+        "block_id": "script_8ad0e954238941dd_b004",
+        "block_ordinal": 4,
+        "stage": "scene",
+        "ordinal": 13,
+        "text": "米白色这个颜色，放在浅色桌面、木质餐桌或者办公桌上，视觉上比较安静。",
+        "spoken_text": "米白色这个颜色，放在浅色桌面、木质餐桌或者办公桌上，视觉上比较安静。",
+        "kind": "product_claim",
+        "fact_ids": [
+          "SELLING"
+        ]
+      },
+      {
+        "id": "script_8ad0e954238941dd_s014",
+        "block_id": "script_8ad0e954238941dd_b004",
+        "block_ordinal": 4,
+        "stage": "scene",
+        "ordinal": 14,
+        "text": "你早上到办公室，把杯子放在键盘旁边，米白调子不抢眼，也不容易和屏幕、文件混成一片。",
+        "spoken_text": "你早上到办公室，把杯子放在键盘旁边，米白调子不抢眼，也不容易和屏幕、文件混成一片。",
+        "kind": "product_claim",
+        "fact_ids": [
+          "SELLING"
+        ]
+      },
+      {
+        "id": "script_8ad0e954238941dd_s015",
+        "block_id": "script_8ad0e954238941dd_b004",
+        "block_ordinal": 4,
+        "stage": "scene",
+        "ordinal": 15,
+        "text": "在家里用，放在餐桌上招待朋友，或者自己泡点热饮，这个颜色都比较好搭配桌面上的东西。",
+        "spoken_text": "在家里用，放在餐桌上招待朋友，或者自己泡点热饮，这个颜色都比较好搭配桌面上的东西。",
+        "kind": "product_claim",
+        "fact_ids": [
+          "SELLING"
+        ]
+      },
+      {
+        "id": "script_8ad0e954238941dd_s016",
+        "block_id": "script_8ad0e954238941dd_b005",
+        "block_ordinal": 5,
+        "stage": "specification",
+        "ordinal": 16,
+        "text": "它是米白色，杯型带把手，容量三百五十毫升，这些是固定的。",
+        "spoken_text": "它是米白色，杯型带把手，容量三百五十毫升，这些是固定的。",
+        "kind": "product_claim",
+        "fact_ids": [
+          "SELLING"
+        ]
+      },
+      {
+        "id": "script_8ad0e954238941dd_s017",
+        "block_id": "script_8ad0e954238941dd_b005",
+        "block_ordinal": 5,
+        "stage": "specification",
+        "ordinal": 17,
+        "text": "你在选择的时候，先想好放在哪里用——办公室还是家里餐桌，再按自己的桌面颜色和使用习惯来选就行。",
+        "spoken_text": "你在选择的时候，先想好放在哪里用——办公室还是家里餐桌，再按自己的桌面颜色和使用习惯来选就行。",
+        "kind": "engagement",
+        "fact_ids": []
+      },
+      {
+        "id": "script_8ad0e954238941dd_s018",
+        "block_id": "script_8ad0e954238941dd_b006",
+        "block_ordinal": 6,
+        "stage": "price",
+        "ordinal": 18,
+        "text": "这只日常陶瓷马克杯，售价是四十九元。",
+        "spoken_text": "这只日常陶瓷马克杯，售价是四十九元。",
+        "kind": "product_claim",
+        "fact_ids": [
+          "PRICE"
+        ]
+      },
+      {
+        "id": "script_8ad0e954238941dd_s019",
+        "block_id": "script_8ad0e954238941dd_b007",
+        "block_ordinal": 7,
+        "stage": "cta",
+        "ordinal": 19,
+        "text": "如果你需要一只带把手、容量三百五十毫升的陶瓷杯，放在办公室或家里餐桌用，这只米白马克杯就挺合适。",
+        "spoken_text": "如果你需要一只带把手、容量三百五十毫升的陶瓷杯，放在办公室或家里餐桌用，这只米白马克杯就挺合适。",
+        "kind": "product_claim",
+        "fact_ids": [
+          "NAME",
+          "SELLING"
+        ]
+      },
+      {
+        "id": "script_8ad0e954238941dd_s020",
+        "block_id": "script_8ad0e954238941dd_b007",
+        "block_ordinal": 7,
+        "stage": "cta",
+        "ordinal": 20,
+        "text": "先想着自己平时在哪儿喝水多，再按需要选择就好。",
+        "spoken_text": "先想着自己平时在哪儿喝水多，再按需要选择就好。",
+        "kind": "engagement",
+        "fact_ids": []
+      }
+    ],
+    "facts": [
+      {
+        "id": "NAME",
+        "text": "日常陶瓷马克杯"
+      },
+      {
+        "id": "PRICE",
+        "text": "售价 49 CNY；没有另设活动价"
+      },
+      {
+        "id": "SELLING",
+        "text": "陶瓷材质，容量350毫升。带把手，米白色。适合家庭餐桌和办公室使用。未提供耐温范围、微波炉/洗碗机适用性和保温功能。"
+      },
+      {
+        "id": "PROMOTION",
+        "text": ""
+      }
+    ],
+    "issues": [],
+    "missing_information": [
+      "未提供耐温范围、微波炉/洗碗机适用性和保温功能。",
+      "未提供购物车位置或链接。",
+      "没有另设活动价或促销规则。"
+    ],
+    "created_at": "2026-10-07T17:11:34+08:00",
+    "usage": {
+      "prompt_tokens": 2067,
+      "completion_tokens": 1881,
+      "total_tokens": 3948,
+      "prompt_tokens_details": {
+        "cached_tokens": 1664
+      },
+      "prompt_cache_hit_tokens": 1664,
+      "prompt_cache_miss_tokens": 403
+    },
+    "model": "deepseek-flash",
+    "prompt_revision": "81a4e47ce8ed",
+    "lab_elapsed_seconds": 7.55
+  },
+  {
+    "id": "script_08e52a7406cc440c",
+    "product_id": "lab_mug",
+    "product_snapshot": {
+      "id": "lab_mug",
+      "name": "日常陶瓷马克杯",
+      "currency": "CNY",
+      "price": 49,
+      "promo_price": null,
+      "selling_points": "陶瓷材质，容量350毫升。带把手，米白色。适合家庭餐桌和办公室使用。未提供耐温范围、微波炉/洗碗机适用性和保温功能。",
+      "promotion": "",
+      "knowledge": "只用于问答的测试暗号：蓝鹭专享，九块九包邮，七天无理由。"
+    },
+    "revision": 1,
+    "label": "1",
+    "angle": "从日常清洁收纳和外观选择切入，先讲米白陶瓷在餐桌办公桌的搭配与收拾，再讲350毫升容量和带把手端拿，最后报价格并收拢选择。",
+    "locale": "zh-CN",
+    "source": "DeepSeek",
+    "status": "draft",
+    "blocks": [
+      {
+        "id": "script_08e52a7406cc440c_b001",
+        "stage": "welcome",
+        "ordinal": 1
+      },
+      {
+        "id": "script_08e52a7406cc440c_b002",
+        "stage": "identity",
+        "ordinal": 2
+      },
+      {
+        "id": "script_08e52a7406cc440c_b003",
+        "stage": "benefit",
+        "ordinal": 3
+      },
+      {
+        "id": "script_08e52a7406cc440c_b004",
+        "stage": "scene",
+        "ordinal": 4
+      },
+      {
+        "id": "script_08e52a7406cc440c_b005",
+        "stage": "benefit",
+        "ordinal": 5
+      },
+      {
+        "id": "script_08e52a7406cc440c_b006",
+        "stage": "specification",
+        "ordinal": 6
+      },
+      {
+        "id": "script_08e52a7406cc440c_b007",
+        "stage": "price",
+        "ordinal": 7
+      },
+      {
+        "id": "script_08e52a7406cc440c_b008",
+        "stage": "cta",
+        "ordinal": 8
+      }
+    ],
+    "sentences": [
+      {
+        "id": "script_08e52a7406cc440c_s001",
+        "block_id": "script_08e52a7406cc440c_b001",
+        "block_ordinal": 1,
+        "stage": "welcome",
+        "ordinal": 1,
+        "text": "欢迎来到直播间，今天咱们看一只日常用的陶瓷马克杯。",
+        "spoken_text": "欢迎来到直播间，今天咱们看一只日常用的陶瓷马克杯。",
+        "kind": "engagement",
+        "fact_ids": []
+      },
+      {
+        "id": "script_08e52a7406cc440c_s002",
+        "block_id": "script_08e52a7406cc440c_b001",
+        "block_ordinal": 1,
+        "stage": "welcome",
+        "ordinal": 2,
+        "text": "如果你平时在家喝完东西，会顺手把杯子收进餐边柜或者厨房架子上，那你挑杯子时可能就会多看它和餐具搭不搭。",
+        "spoken_text": "如果你平时在家喝完东西，会顺手把杯子收进餐边柜或者厨房架子上，那你挑杯子时可能就会多看它和餐具搭不搭。",
+        "kind": "engagement",
+        "fact_ids": []
+      },
+      {
+        "id": "script_08e52a7406cc440c_s003",
+        "block_id": "script_08e52a7406cc440c_b001",
+        "block_ordinal": 1,
+        "stage": "welcome",
+        "ordinal": 3,
+        "text": "要是放在办公室，桌面上的东西本来就多，一只杯子的颜色和体积也会影响你看它顺不顺眼。",
+        "spoken_text": "要是放在办公室，桌面上的东西本来就多，一只杯子的颜色和体积也会影响你看它顺不顺眼。",
+        "kind": "engagement",
+        "fact_ids": []
+      },
+      {
+        "id": "script_08e52a7406cc440c_s004",
+        "block_id": "script_08e52a7406cc440c_b002",
+        "block_ordinal": 2,
+        "stage": "identity",
+        "ordinal": 4,
+        "text": "这只马克杯走的是日常路线，陶瓷材质，米白色，容量三百五十毫升。",
+        "spoken_text": "这只马克杯走的是日常路线，陶瓷材质，米白色，容量三百五十毫升。",
+        "kind": "product_claim",
+        "fact_ids": [
+          "NAME",
+          "SELLING"
+        ]
+      },
+      {
+        "id": "script_08e52a7406cc440c_s005",
+        "block_id": "script_08e52a7406cc440c_b002",
+        "block_ordinal": 2,
+        "stage": "identity",
+        "ordinal": 5,
+        "text": "适合放在家庭餐桌，也适合办公室桌面，属于不需要多想就能拿来用的那一类杯子。",
+        "spoken_text": "适合放在家庭餐桌，也适合办公室桌面，属于不需要多想就能拿来用的那一类杯子。",
+        "kind": "product_claim",
+        "fact_ids": [
+          "SELLING"
+        ]
+      },
+      {
+        "id": "script_08e52a7406cc440c_s006",
+        "block_id": "script_08e52a7406cc440c_b003",
+        "block_ordinal": 3,
+        "stage": "benefit",
+        "ordinal": 6,
+        "text": "再看它的外观，米白色这个调子本身就比较安静。",
+        "spoken_text": "再看它的外观，米白色这个调子本身就比较安静。",
+        "kind": "product_claim",
+        "fact_ids": [
+          "SELLING"
+        ]
+      },
+      {
+        "id": "script_08e52a7406cc440c_s007",
+        "block_id": "script_08e52a7406cc440c_b003",
+        "block_ordinal": 3,
+        "stage": "benefit",
+        "ordinal": 7,
+        "text": "你把它放在木质餐桌、浅色桌布或者办公桌上，它不会抢旁边餐盘和文件的视觉位置。",
+        "spoken_text": "你把它放在木质餐桌、浅色桌布或者办公桌上，它不会抢旁边餐盘和文件的视觉位置。",
+        "kind": "engagement",
+        "fact_ids": []
+      },
+      {
+        "id": "script_08e52a7406cc440c_s008",
+        "block_id": "script_08e52a7406cc440c_b003",
+        "block_ordinal": 3,
+        "stage": "benefit",
+        "ordinal": 8,
+        "text": "这种颜色对桌面搭配来说省心的地方在于，不需要为了它专门调整周围的东西。",
+        "spoken_text": "这种颜色对桌面搭配来说省心的地方在于，不需要为了它专门调整周围的东西。",
+        "kind": "product_claim",
+        "fact_ids": [
+          "SELLING"
+        ]
+      },
+      {
+        "id": "script_08e52a7406cc440c_s009",
+        "block_id": "script_08e52a7406cc440c_b004",
+        "block_ordinal": 4,
+        "stage": "scene",
+        "ordinal": 9,
+        "text": "比如家里吃完饭，杯子要收回橱柜，米白陶瓷放在一摞餐具旁边看起来比较自然。",
+        "spoken_text": "比如家里吃完饭，杯子要收回橱柜，米白陶瓷放在一摞餐具旁边看起来比较自然。",
+        "kind": "product_claim",
+        "fact_ids": [
+          "SELLING"
+        ]
+      },
+      {
+        "id": "script_08e52a7406cc440c_s010",
+        "block_id": "script_08e52a7406cc440c_b004",
+        "block_ordinal": 4,
+        "stage": "scene",
+        "ordinal": 10,
+        "text": "在办公室，早上把杯子搁在键盘旁边，三百五十毫升这个容量装水、泡点东西都比较适中。",
+        "spoken_text": "在办公室，早上把杯子搁在键盘旁边，三百五十毫升这个容量装水、泡点东西都比较适中。",
+        "kind": "product_claim",
+        "fact_ids": [
+          "SELLING"
+        ]
+      },
+      {
+        "id": "script_08e52a7406cc440c_s011",
+        "block_id": "script_08e52a7406cc440c_b004",
+        "block_ordinal": 4,
+        "stage": "scene",
+        "ordinal": 11,
+        "text": "你忙起来不用频繁起身去接水，桌面也不会被一个特别大的杯子占掉太多地方。",
+        "spoken_text": "你忙起来不用频繁起身去接水，桌面也不会被一个特别大的杯子占掉太多地方。",
+        "kind": "engagement",
+        "fact_ids": []
+      },
+      {
+        "id": "script_08e52a7406cc440c_s012",
+        "block_id": "script_08e52a7406cc440c_b005",
+        "block_ordinal": 5,
+        "stage": "benefit",
+        "ordinal": 12,
+        "text": "说到端起杯子这个动作，它带把手。",
+        "spoken_text": "说到端起杯子这个动作，它带把手。",
+        "kind": "product_claim",
+        "fact_ids": [
+          "SELLING"
+        ]
+      },
+      {
+        "id": "script_08e52a7406cc440c_s013",
+        "block_id": "script_08e52a7406cc440c_b005",
+        "block_ordinal": 5,
+        "stage": "benefit",
+        "ordinal": 13,
+        "text": "你在餐桌边喝水、在办公桌前喝东西，可以用手指穿过把手来端，比直接捧着杯身多一个固定的着力点。",
+        "spoken_text": "你在餐桌边喝水、在办公桌前喝东西，可以用手指穿过把手来端，比直接捧着杯身多一个固定的着力点。",
+        "kind": "product_claim",
+        "fact_ids": [
+          "SELLING"
+        ]
+      },
+      {
+        "id": "script_08e52a7406cc440c_s014",
+        "block_id": "script_08e52a7406cc440c_b005",
+        "block_ordinal": 5,
+        "stage": "benefit",
+        "ordinal": 14,
+        "text": "对习惯一只手拿杯、另一只手还在翻文件或者夹菜的人来说，这个把手让端拿动作更顺手。",
+        "spoken_text": "对习惯一只手拿杯、另一只手还在翻文件或者夹菜的人来说，这个把手让端拿动作更顺手。",
+        "kind": "engagement",
+        "fact_ids": []
+      },
+      {
+        "id": "script_08e52a7406cc440c_s015",
+        "block_id": "script_08e52a7406cc440c_b006",
+        "block_ordinal": 6,
+        "stage": "specification",
+        "ordinal": 15,
+        "text": "颜色方面，这只杯子是米白色，你按自己桌面和餐具的颜色来选就行。",
+        "spoken_text": "颜色方面，这只杯子是米白色，你按自己桌面和餐具的颜色来选就行。",
+        "kind": "product_claim",
+        "fact_ids": [
+          "SELLING"
+        ]
+      },
+      {
+        "id": "script_08e52a7406cc440c_s016",
+        "block_id": "script_08e52a7406cc440c_b006",
+        "block_ordinal": 6,
+        "stage": "specification",
+        "ordinal": 16,
+        "text": "容量是三百五十毫升，喝水、喝茶或者冲点日常饮品，都可以按自己的习惯来用。",
+        "spoken_text": "容量是三百五十毫升，喝水、喝茶或者冲点日常饮品，都可以按自己的习惯来用。",
+        "kind": "product_claim",
+        "fact_ids": [
+          "SELLING"
+        ]
+      },
+      {
+        "id": "script_08e52a7406cc440c_s017",
+        "block_id": "script_08e52a7406cc440c_b007",
+        "block_ordinal": 7,
+        "stage": "price",
+        "ordinal": 17,
+        "text": "价格这边，它的售价是四十九元。",
+        "spoken_text": "价格这边，它的售价是四十九元。",
+        "kind": "product_claim",
+        "fact_ids": [
+          "PRICE"
+        ]
+      },
+      {
+        "id": "script_08e52a7406cc440c_s018",
+        "block_id": "script_08e52a7406cc440c_b007",
+        "block_ordinal": 7,
+        "stage": "price",
+        "ordinal": 18,
+        "text": "没有另外设活动价，就按这个价格来看。",
+        "spoken_text": "没有另外设活动价，就按这个价格来看。",
+        "kind": "product_claim",
+        "fact_ids": [
+          "PRICE"
+        ]
+      },
+      {
+        "id": "script_08e52a7406cc440c_s019",
+        "block_id": "script_08e52a7406cc440c_b008",
+        "block_ordinal": 8,
+        "stage": "cta",
+        "ordinal": 19,
+        "text": "如果你需要一只带把手、三百五十毫升的米白陶瓷杯，放在家里餐桌或者办公室桌面，这只就比较合适。",
+        "spoken_text": "如果你需要一只带把手、三百五十毫升的米白陶瓷杯，放在家里餐桌或者办公室桌面，这只就比较合适。",
+        "kind": "product_claim",
+        "fact_ids": [
+          "NAME",
+          "SELLING"
+        ]
+      },
+      {
+        "id": "script_08e52a7406cc440c_s020",
+        "block_id": "script_08e52a7406cc440c_b008",
+        "block_ordinal": 8,
+        "stage": "cta",
+        "ordinal": 20,
+        "text": "先想好自己平时在哪儿喝水多，选好颜色和尺码，合适再下单。",
+        "spoken_text": "先想好自己平时在哪儿喝水多，选好颜色和尺码，合适再下单。",
+        "kind": "engagement",
+        "fact_ids": []
+      }
+    ],
+    "facts": [
+      {
+        "id": "NAME",
+        "text": "日常陶瓷马克杯"
+      },
+      {
+        "id": "PRICE",
+        "text": "售价 49 CNY；没有另设活动价"
+      },
+      {
+        "id": "SELLING",
+        "text": "陶瓷材质，容量350毫升。带把手，米白色。适合家庭餐桌和办公室使用。未提供耐温范围、微波炉/洗碗机适用性和保温功能。"
+      },
+      {
+        "id": "PROMOTION",
+        "text": ""
+      }
+    ],
+    "issues": [],
+    "missing_information": [
+      "未提供耐温范围",
+      "未提供微波炉适用性",
+      "未提供洗碗机适用性",
+      "未提供保温功能",
+      "未提供尺码信息",
+      "未提供颜色选择数量",
+      "未提供购物车位置",
+      "未提供活动截止时间或优惠条件"
+    ],
+    "created_at": "2026-10-07T17:11:41+08:00",
+    "usage": {
+      "prompt_tokens": 2710,
+      "completion_tokens": 1837,
+      "total_tokens": 4547,
+      "prompt_tokens_details": {
+        "cached_tokens": 1792
+      },
+      "prompt_cache_hit_tokens": 1792,
+      "prompt_cache_miss_tokens": 918
+    },
+    "model": "deepseek-flash",
+    "prompt_revision": "81a4e47ce8ed",
+    "lab_elapsed_seconds": 6.73
+  }
+]

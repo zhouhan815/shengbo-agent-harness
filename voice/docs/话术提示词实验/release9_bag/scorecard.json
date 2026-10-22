@@ -1,0 +1,42 @@
+{
+  "run": "release9_bag",
+  "versions": [
+    {
+      "version": 1,
+      "program": 40.0,
+      "semantic": 50.0,
+      "total": 90.0,
+      "hard_gate": true,
+      "rule_issues": [],
+      "serious_claims": 0,
+      "cross_version_copy_pass": true,
+      "pass": true,
+      "gaps": [
+        "'长肩带设计，让手提和单肩背都行得通'前后几乎原句重复。",
+        "尺寸描述'比较从容'过于模糊，未像版本1那样连接到具体日常物品。",
+        "颜色部分两色描述较泛，缺少与常见穿搭场景的进一步联系。"
+      ]
+    },
+    {
+      "version": 2,
+      "program": 40.0,
+      "semantic": 53.0,
+      "total": 93.0,
+      "hard_gate": true,
+      "rule_issues": [],
+      "serious_claims": 0,
+      "cross_version_copy_pass": true,
+      "pass": true,
+      "gaps": [
+        "部分句子偏说明书式，如直接念尺寸数字，缺少口语化转译。",
+        "结尾收口稍长，把前面卖点又罗列一遍，可更简洁。",
+        "颜色选择只停留在搭配建议，未进一步联系场景帮助决策。"
+      ]
+    }
+  ],
+  "pair_diversity": {
+    "score": 3,
+    "reason": "两版开场痛点不同，版本1从周末/出差临时用包切入，版本2从换包麻烦切入；卖点展开顺序有差异（版本1先可折叠再面料，版本2先拉链再折叠），且两版均完整覆盖核心事实。但整体逐点结构和收口方式仍较相似，未达到'卖点展开顺序/情境/节奏至少两项明显不同且均完整'的4分标准。"
+  },
+  "rubric": "20261007.4-uniform-coverage-content-and-near-copy-checks"
+}

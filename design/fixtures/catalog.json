@@ -1,0 +1,99 @@
+{
+  "schema_version": "shengbo.ops.v2",
+  "kind": "CatalogFixture",
+  "id": "catalog_demo",
+  "revision": 1,
+  "created_at": "2026-10-07T10:00:00+08:00",
+  "data_origin": "simulated",
+  "products": [
+    {
+      "product_id": "product_slippers",
+      "product_revision": "fixture-sha256:1ea774084031f4d1904755a5b61e011c926d814c98d5c44f9685d95ba639ca73",
+      "fields": {
+        "name": "足弓支撑静音防滑厚底凉拖鞋",
+        "price": "178",
+        "promo_price": null,
+        "currency": "TWD",
+        "selling_points": "EVA材质，足弓支撑，厚底；地面有水时仍须小心行走。",
+        "promotion": "历史活动价未核实有效期，本轮演示不启用优惠承诺。",
+        "knowledge": "尺码36-37至44-45；脚背宽或脚型偏肉可斟酌大一码。\n历史样例配送9月21日至9月30日，当前日期不可直接沿用。"
+      },
+      "facts": [
+        {
+          "id": "NAME",
+          "text": "足弓支撑静音防滑厚底凉拖鞋"
+        },
+        {
+          "id": "PRICE",
+          "text": "标价178 TWD。"
+        },
+        {
+          "id": "SELLING",
+          "text": "EVA材质、足弓支撑和厚底设计。"
+        },
+        {
+          "id": "SIZE",
+          "text": "尺码36-37、38-39、40-41、42-43、44-45；脚背宽可斟酌大一码。"
+        },
+        {
+          "id": "CARE",
+          "text": "浴室地面遇水仍请小心行走。"
+        },
+        {
+          "id": "PROMOTION",
+          "text": "历史样例活动价107 TWD，当前有效期未核实，不作现行优惠承诺。"
+        },
+        {
+          "id": "DELIVERY",
+          "text": "历史资料含9月21日至9月30日，不能当成当前配送承诺。"
+        }
+      ],
+      "source": "design_fixture_not_current_offer",
+      "data_origin": "simulated",
+      "verified_at": null,
+      "valid_until": null,
+      "missing_fields": [
+        "inventory",
+        "promotion_valid_until",
+        "current_delivery_date"
+      ]
+    },
+    {
+      "product_id": "product_bag",
+      "product_revision": "fixture-sha256:11c3842d1b96627ef3fba63ac132dafee0399243a63b175c3755d69233d1e1d3",
+      "fields": {
+        "name": "演示收纳袋",
+        "price": "59",
+        "promo_price": null,
+        "currency": "TWD",
+        "selling_points": "仅用于测试的聚酯材质收纳袋。",
+        "promotion": "历史活动价未核实有效期，本轮演示不启用优惠承诺。",
+        "knowledge": "本商品完全为构造样例，不表示真实在售商品。"
+      },
+      "facts": [
+        {
+          "id": "NAME",
+          "text": "演示收纳袋"
+        },
+        {
+          "id": "PRICE",
+          "text": "构造标价59 TWD。"
+        },
+        {
+          "id": "MATERIAL",
+          "text": "构造资料标明聚酯材质。"
+        }
+      ],
+      "source": "design_fixture_not_current_offer",
+      "data_origin": "simulated",
+      "verified_at": null,
+      "valid_until": null,
+      "missing_fields": [
+        "inventory",
+        "promotion_valid_until",
+        "current_delivery_date"
+      ]
+    }
+  ],
+  "notice": "全部为设计测试数据；拖鞋部分参考用户历史样例并做演示处理，不能导入实际销售承诺。"
+}

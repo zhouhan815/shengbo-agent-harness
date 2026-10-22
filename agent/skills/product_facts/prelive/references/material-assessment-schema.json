@@ -1,0 +1,932 @@
+{
+  "$defs": {
+    "ArtifactRef": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "title": "Kind",
+          "type": "string"
+        },
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "revision": {
+          "minimum": 1,
+          "title": "Revision",
+          "type": "integer"
+        },
+        "content_hash": {
+          "title": "Content Hash",
+          "type": "string"
+        },
+        "schema_version": {
+          "default": "PRELIVE-2.3",
+          "title": "Schema Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "id",
+        "revision",
+        "content_hash"
+      ],
+      "title": "ArtifactRef",
+      "type": "object"
+    },
+    "BenefitMapping": {
+      "additionalProperties": false,
+      "properties": {
+        "mapping_id": {
+          "maxLength": 160,
+          "minLength": 1,
+          "title": "Mapping Id",
+          "type": "string"
+        },
+        "product_candidate_id": {
+          "maxLength": 160,
+          "minLength": 1,
+          "title": "Product Candidate Id",
+          "type": "string"
+        },
+        "audience_need": {
+          "maxLength": 2000,
+          "minLength": 1,
+          "title": "Audience Need",
+          "type": "string"
+        },
+        "use_scene": {
+          "maxLength": 2000,
+          "minLength": 1,
+          "title": "Use Scene",
+          "type": "string"
+        },
+        "supported_observation_ids": {
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 100,
+          "minItems": 1,
+          "title": "Supported Observation Ids",
+          "type": "array"
+        },
+        "selling_point": {
+          "maxLength": 2000,
+          "minLength": 1,
+          "title": "Selling Point",
+          "type": "string"
+        },
+        "talking_focus": {
+          "maxLength": 3000,
+          "minLength": 1,
+          "title": "Talking Focus",
+          "type": "string"
+        },
+        "priority": {
+          "default": 1,
+          "maximum": 100,
+          "minimum": 1,
+          "title": "Priority",
+          "type": "integer"
+        },
+        "research_status": {
+          "default": "hypothesis",
+          "enum": [
+            "provided",
+            "reused",
+            "researched",
+            "hypothesis"
+          ],
+          "title": "Research Status",
+          "type": "string"
+        },
+        "evidence_ids": {
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 100,
+          "title": "Evidence Ids",
+          "type": "array"
+        },
+        "limitations": {
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 20,
+          "title": "Limitations",
+          "type": "array"
+        }
+      },
+      "required": [
+        "mapping_id",
+        "product_candidate_id",
+        "audience_need",
+        "use_scene",
+        "supported_observation_ids",
+        "selling_point",
+        "talking_focus"
+      ],
+      "title": "BenefitMapping",
+      "type": "object"
+    },
+    "ContentGroup": {
+      "additionalProperties": false,
+      "description": "A classified material region, not an authorized script-import command.",
+      "properties": {
+        "group_id": {
+          "maxLength": 160,
+          "minLength": 1,
+          "title": "Group Id",
+          "type": "string"
+        },
+        "role": {
+          "enum": [
+            "product_facts",
+            "existing_script",
+            "campaign",
+            "faq",
+            "presentation_instruction",
+            "audience_research",
+            "mixed",
+            "unknown"
+          ],
+          "title": "Role",
+          "type": "string"
+        },
+        "product_candidate_ids": {
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 200,
+          "title": "Product Candidate Ids",
+          "type": "array"
+        },
+        "language": {
+          "anyOf": [
+            {
+              "maxLength": 100,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Language"
+        },
+        "script_variant_label": {
+          "anyOf": [
+            {
+              "maxLength": 200,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Script Variant Label"
+        },
+        "evidence_ids": {
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 200,
+          "title": "Evidence Ids",
+          "type": "array"
+        },
+        "note": {
+          "default": "",
+          "maxLength": 2000,
+          "title": "Note",
+          "type": "string"
+        }
+      },
+      "required": [
+        "group_id",
+        "role"
+      ],
+      "title": "ContentGroup",
+      "type": "object"
+    },
+    "FieldObservation": {
+      "additionalProperties": false,
+      "properties": {
+        "observation_id": {
+          "maxLength": 160,
+          "minLength": 1,
+          "title": "Observation Id",
+          "type": "string"
+        },
+        "product_candidate_id": {
+          "maxLength": 160,
+          "minLength": 1,
+          "title": "Product Candidate Id",
+          "type": "string"
+        },
+        "sku_key": {
+          "anyOf": [
+            {
+              "maxLength": 200,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Sku Key"
+        },
+        "field_path": {
+          "maxLength": 300,
+          "minLength": 1,
+          "title": "Field Path",
+          "type": "string"
+        },
+        "value": {
+          "$ref": "#/$defs/JsonValue",
+          "default": null
+        },
+        "unit": {
+          "anyOf": [
+            {
+              "maxLength": 100,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Unit"
+        },
+        "measurement_basis": {
+          "anyOf": [
+            {
+              "maxLength": 300,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Measurement Basis"
+        },
+        "parameter_role": {
+          "anyOf": [
+            {
+              "maxLength": 200,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Parameter Role"
+        },
+        "scope": {
+          "default": "unknown",
+          "enum": [
+            "catalog",
+            "session",
+            "unknown"
+          ],
+          "title": "Scope",
+          "type": "string"
+        },
+        "scope_id": {
+          "anyOf": [
+            {
+              "maxLength": 200,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Scope Id"
+        },
+        "claim_kind": {
+          "default": "merchant_claim",
+          "enum": [
+            "fact",
+            "merchant_claim",
+            "script_claim",
+            "research_hypothesis"
+          ],
+          "title": "Claim Kind",
+          "type": "string"
+        },
+        "knowledge": {
+          "default": "known",
+          "enum": [
+            "known",
+            "unknown",
+            "not_applicable"
+          ],
+          "title": "Knowledge",
+          "type": "string"
+        },
+        "evidence_ids": {
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 100,
+          "title": "Evidence Ids",
+          "type": "array"
+        },
+        "comparison_eligible": {
+          "default": false,
+          "title": "Comparison Eligible",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "observation_id",
+        "product_candidate_id",
+        "field_path"
+      ],
+      "title": "FieldObservation",
+      "type": "object"
+    },
+    "JsonValue": {},
+    "MaterialConflict": {
+      "additionalProperties": false,
+      "properties": {
+        "conflict_id": {
+          "maxLength": 160,
+          "minLength": 1,
+          "title": "Conflict Id",
+          "type": "string"
+        },
+        "product_candidate_id": {
+          "anyOf": [
+            {
+              "maxLength": 160,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Product Candidate Id"
+        },
+        "field_path": {
+          "maxLength": 300,
+          "minLength": 1,
+          "title": "Field Path",
+          "type": "string"
+        },
+        "observation_ids": {
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 100,
+          "title": "Observation Ids",
+          "type": "array"
+        },
+        "evidence_ids": {
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 100,
+          "title": "Evidence Ids",
+          "type": "array"
+        },
+        "explanation": {
+          "maxLength": 3000,
+          "minLength": 1,
+          "title": "Explanation",
+          "type": "string"
+        },
+        "status": {
+          "default": "unresolved",
+          "enum": [
+            "unresolved",
+            "resolved",
+            "different_scope",
+            "nonblocking"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "blocked_actions": {
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 30,
+          "title": "Blocked Actions",
+          "type": "array"
+        },
+        "applicable_purposes": {
+          "items": {
+            "enum": [
+              "audience_research",
+              "audio_prepare",
+              "catalog_update",
+              "facts_analysis",
+              "playlist_reorder",
+              "prepare_session",
+              "read_explain",
+              "script_change",
+              "script_generation",
+              "session_config"
+            ],
+            "type": "string"
+          },
+          "maxItems": 30,
+          "title": "Applicable Purposes",
+          "type": "array"
+        },
+        "resolution": {
+          "anyOf": [
+            {
+              "maxLength": 3000,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Resolution"
+        },
+        "question": {
+          "anyOf": [
+            {
+              "maxLength": 3000,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Question"
+        }
+      },
+      "required": [
+        "conflict_id",
+        "field_path",
+        "explanation"
+      ],
+      "title": "MaterialConflict",
+      "type": "object"
+    },
+    "MissingInfoItem": {
+      "additionalProperties": false,
+      "properties": {
+        "item_id": {
+          "maxLength": 160,
+          "minLength": 1,
+          "title": "Item Id",
+          "type": "string"
+        },
+        "product_candidate_id": {
+          "anyOf": [
+            {
+              "maxLength": 160,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Product Candidate Id"
+        },
+        "field_path": {
+          "maxLength": 300,
+          "minLength": 1,
+          "title": "Field Path",
+          "type": "string"
+        },
+        "level": {
+          "enum": [
+            "block_required",
+            "conditional",
+            "recommended",
+            "optional"
+          ],
+          "title": "Level",
+          "type": "string"
+        },
+        "why": {
+          "maxLength": 3000,
+          "minLength": 1,
+          "title": "Why",
+          "type": "string"
+        },
+        "question": {
+          "maxLength": 3000,
+          "minLength": 1,
+          "title": "Question",
+          "type": "string"
+        },
+        "applicable_purposes": {
+          "items": {
+            "enum": [
+              "audience_research",
+              "audio_prepare",
+              "catalog_update",
+              "facts_analysis",
+              "playlist_reorder",
+              "prepare_session",
+              "read_explain",
+              "script_change",
+              "script_generation",
+              "session_config"
+            ],
+            "type": "string"
+          },
+          "maxItems": 30,
+          "title": "Applicable Purposes",
+          "type": "array"
+        },
+        "blocked_actions": {
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 30,
+          "title": "Blocked Actions",
+          "type": "array"
+        },
+        "condition": {
+          "anyOf": [
+            {
+              "maxLength": 2000,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Condition"
+        },
+        "condition_active": {
+          "default": false,
+          "title": "Condition Active",
+          "type": "boolean"
+        },
+        "can_skip": {
+          "default": true,
+          "title": "Can Skip",
+          "type": "boolean"
+        },
+        "alternatives": {
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 20,
+          "title": "Alternatives",
+          "type": "array"
+        },
+        "evidence_ids": {
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 100,
+          "title": "Evidence Ids",
+          "type": "array"
+        },
+        "status": {
+          "default": "unresolved",
+          "enum": [
+            "unresolved",
+            "answered",
+            "omitted_from_task",
+            "not_applicable"
+          ],
+          "title": "Status",
+          "type": "string"
+        }
+      },
+      "required": [
+        "item_id",
+        "field_path",
+        "level",
+        "why",
+        "question"
+      ],
+      "title": "MissingInfoItem",
+      "type": "object"
+    },
+    "ProductCandidate": {
+      "additionalProperties": false,
+      "properties": {
+        "candidate_id": {
+          "maxLength": 160,
+          "minLength": 1,
+          "title": "Candidate Id",
+          "type": "string"
+        },
+        "name": {
+          "maxLength": 500,
+          "minLength": 1,
+          "title": "Name",
+          "type": "string"
+        },
+        "product_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Product Id"
+        },
+        "product_ref": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ArtifactRef"
+            },
+            {
+              "$ref": "#/$defs/RecordRef"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Product Ref"
+        },
+        "identity_status": {
+          "default": "ambiguous",
+          "enum": [
+            "new",
+            "existing",
+            "ambiguous"
+          ],
+          "title": "Identity Status",
+          "type": "string"
+        },
+        "sku_keys": {
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 200,
+          "title": "Sku Keys",
+          "type": "array"
+        },
+        "evidence_ids": {
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 200,
+          "title": "Evidence Ids",
+          "type": "array"
+        },
+        "identity_note": {
+          "default": "",
+          "maxLength": 2000,
+          "title": "Identity Note",
+          "type": "string"
+        }
+      },
+      "required": [
+        "candidate_id",
+        "name"
+      ],
+      "title": "ProductCandidate",
+      "type": "object"
+    },
+    "RecordRef": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "title": "Kind",
+          "type": "string"
+        },
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "revision": {
+          "minimum": 1,
+          "title": "Revision",
+          "type": "integer"
+        },
+        "content_hash": {
+          "title": "Content Hash",
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "id",
+        "revision",
+        "content_hash"
+      ],
+      "title": "RecordRef",
+      "type": "object"
+    },
+    "VisualReview": {
+      "additionalProperties": false,
+      "description": "An Agent judgement about one real visual region, separate from delivery.\n\nReceipt/locator validation proves access and coordinates, never the meaning\nof the image or the truth of the Agent's summary.",
+      "properties": {
+        "review_id": {
+          "maxLength": 160,
+          "minLength": 1,
+          "title": "Review Id",
+          "type": "string"
+        },
+        "source_ref": {
+          "$ref": "#/$defs/ArtifactRef"
+        },
+        "locator": {
+          "maxLength": 100,
+          "pattern": "^(image|page):[1-9][0-9]*$",
+          "title": "Locator",
+          "type": "string"
+        },
+        "product_candidate_ids": {
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 200,
+          "title": "Product Candidate Ids",
+          "type": "array"
+        },
+        "status": {
+          "enum": [
+            "reviewed",
+            "unread",
+            "unreadable"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "relevance": {
+          "default": "unknown",
+          "enum": [
+            "relevant",
+            "irrelevant",
+            "unknown"
+          ],
+          "title": "Relevance",
+          "type": "string"
+        },
+        "summary": {
+          "maxLength": 3000,
+          "minLength": 1,
+          "title": "Summary",
+          "type": "string"
+        },
+        "evidence_ids": {
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 100,
+          "title": "Evidence Ids",
+          "type": "array"
+        },
+        "read_receipt_ids": {
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 30,
+          "title": "Read Receipt Ids",
+          "type": "array"
+        },
+        "reuse_note": {
+          "default": "",
+          "maxLength": 2000,
+          "title": "Reuse Note",
+          "type": "string"
+        },
+        "critical_for_actions": {
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 30,
+          "title": "Critical For Actions",
+          "type": "array"
+        },
+        "missing_info_ids": {
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 100,
+          "title": "Missing Info Ids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "review_id",
+        "source_ref",
+        "locator",
+        "status",
+        "summary"
+      ],
+      "title": "VisualReview",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "material-assessment.v1",
+      "default": "material-assessment.v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "product_candidates": {
+      "items": {
+        "$ref": "#/$defs/ProductCandidate"
+      },
+      "maxItems": 200,
+      "title": "Product Candidates",
+      "type": "array"
+    },
+    "content_groups": {
+      "items": {
+        "$ref": "#/$defs/ContentGroup"
+      },
+      "maxItems": 1000,
+      "title": "Content Groups",
+      "type": "array"
+    },
+    "field_observations": {
+      "items": {
+        "$ref": "#/$defs/FieldObservation"
+      },
+      "maxItems": 3000,
+      "title": "Field Observations",
+      "type": "array"
+    },
+    "missing_info": {
+      "items": {
+        "$ref": "#/$defs/MissingInfoItem"
+      },
+      "maxItems": 500,
+      "title": "Missing Info",
+      "type": "array"
+    },
+    "conflicts": {
+      "items": {
+        "$ref": "#/$defs/MaterialConflict"
+      },
+      "maxItems": 500,
+      "title": "Conflicts",
+      "type": "array"
+    },
+    "benefit_mappings": {
+      "items": {
+        "$ref": "#/$defs/BenefitMapping"
+      },
+      "maxItems": 1000,
+      "title": "Benefit Mappings",
+      "type": "array"
+    },
+    "reused_research_refs": {
+      "items": {
+        "anyOf": [
+          {
+            "$ref": "#/$defs/ArtifactRef"
+          },
+          {
+            "$ref": "#/$defs/RecordRef"
+          }
+        ]
+      },
+      "maxItems": 100,
+      "title": "Reused Research Refs",
+      "type": "array"
+    },
+    "notes": {
+      "items": {
+        "type": "string"
+      },
+      "maxItems": 100,
+      "title": "Notes",
+      "type": "array"
+    },
+    "visual_reviews": {
+      "anyOf": [
+        {
+          "items": {
+            "$ref": "#/$defs/VisualReview"
+          },
+          "maxItems": 3000,
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Visual Reviews"
+    }
+  },
+  "title": "MaterialAssessment",
+  "type": "object"
+}

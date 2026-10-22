@@ -1,0 +1,83 @@
+{
+  "provenance": "RC10 round-01 rejected public response only; no private provider envelope or credentials",
+  "original_provider_response_ref": {
+    "content_hash": "sha256:07141008199587324b619e3f1f36b65120550625249d1846026527f8be177ae6",
+    "id": "provider_response_07141008199587324b619e3f1f36b65120550625249d1846026527f8be177ae6",
+    "kind": "provider_response",
+    "revision": 1
+  },
+  "public_content_sha256": "e2d4f5e1bc48af1911155871b460f611df578ae82c18205530cc75add81b6c03",
+  "receipt": {
+    "module_key": "selling_points",
+    "content": "{\"module_key\":\"selling_points\",\"sentences\":[{\"display_text\":\"先看妆效，这支是柔雾质感，上唇不是亮面水光那种反光感。\",\"spoken_text\":\"先看妆效，这支是柔雾质感，上唇不是亮面水光那种反光感。\",\"kind\":\"product_claim\",\"fact_ids\":[\"SELLING\",\"DETAILS\"]},{\"display_text\":\"如果你平时通勤偏好薄涂，清洁唇部后少量上一层就可以，先薄后叠更好控制浓淡。\",\"spoken_text\":\"如果你平时通勤偏好薄涂，清洁唇部后少量上一层就可以，先薄后叠更好控制浓淡。\",\"kind\":\"product_claim\",\"fact_ids\":[\"DETAILS\",\"SELLING\"]},{\"display_text\":\"想要妆效更明显一些，可以按自己的习惯在原基础上叠涂，不用一次就厚厚压上去。\",\"spoken_text\":\"想要妆效更明显一些，可以按自己的习惯在原基础上叠涂，不用一次就厚厚压上去。\",\"kind\":\"product_claim\",\"fact_ids\":[\"SELLING\",\"DETAILS\"]},{\"display_text\":\"管身是旋转结构，单支3.2克，出门放进随身小包不占太大地方，补涂时直接旋出来用。\",\"spoken_text\":\"管身是旋转结构，单支三点二克，出门放进随身小包不占太大地方，补涂时直接旋出来用。\",\"kind\":\"product_claim\",\"fact_ids\":[\"SELLING\",\"DETAILS\"]},{\"display_text\":\"但颜色这件事要如实说，02玫瑰豆沙色会受自身唇色、光线和屏幕影响，别只看滤镜下判断，以真实试色为准。\",\"spoken_text\":\"但颜色这件事要如实说，零二玫瑰豆沙色会受自身唇色、光线和屏幕影响，别只看滤镜下判断，以真实试色为准。\",\"kind\":\"product_claim\",\"fact_ids\":[\"DETAILS\"]}],\"fact_ids\":[]}",
+    "usage": {
+      "completion_tokens": 424,
+      "prompt_cache_hit_tokens": 896,
+      "prompt_cache_miss_tokens": 53118,
+      "prompt_tokens": 54014,
+      "prompt_tokens_details": {
+        "cached_tokens": 896
+      },
+      "total_tokens": 54438
+    },
+    "usage_state": "known",
+    "finish_reason": "stop",
+    "unsupported_response": false
+  },
+  "product": {
+    "archived": false,
+    "core_selling_points": [
+      "柔雾妆效",
+      "可少量薄涂，也可按妆效叠涂",
+      "旋转管身，便携"
+    ],
+    "currency": "CNY",
+    "display_number": 2,
+    "faq": "色彩受自身唇色、光线、屏幕影响，以真实试色为准。运费看结算页，不承诺包邮。没有持妆、防水、不沾杯、保湿时长或医学效果证据；不得承诺无刺激、孕妇适用或敏感肌必可用。",
+    "hidden_optional_fields": [],
+    "id": "product_7eaa849580ca464ca6412cd5979f3df2",
+    "image": "",
+    "ingredients": "已提供部分配方信息：蓖麻籽油、合成蜡、生育酚。不是完整成分表，不可作为完整INCI。",
+    "knowledge": "生产日期看包装，保质期36个月。仅已提供部分配方信息，不是完整INCI。无持妆、防水、不沾杯、保湿时长及医学效果证据；不能承诺无刺激、孕妇适用或敏感肌必可用。没有真实销量、评价或访谈数据，不得虚构本人使用经历、库存稀缺、包邮或购买入口位置。",
+    "knowledge_documents": [],
+    "material": "",
+    "name": "绯笺柔雾唇膏02玫瑰豆沙色",
+    "price": 129.0,
+    "promo_price": null,
+    "promotion": "",
+    "return_policy": "未拆封且不影响二次销售可按明确商家规则申请售后；拆封彩妆不支持无理由退货；质量问题联系商家核实。",
+    "sale_status": "available",
+    "selling_points": "柔雾妆效，可薄涂或叠涂；旋转管身，便携。",
+    "shelf_life_unit": "month",
+    "shelf_life_value": 36.0,
+    "shipping_origin": "上海",
+    "shipping_time": "付款后48小时安排发货；运费以结算页为准，没有包邮承诺。",
+    "sku_id": "VAL-ROSE02-32G",
+    "specifications": [
+      {
+        "name": "商品类别",
+        "value": "普通彩妆／唇膏"
+      },
+      {
+        "name": "净含量",
+        "value": "单支3.2克"
+      },
+      {
+        "name": "色号",
+        "value": "02玫瑰豆沙色；仅此一个色号"
+      },
+      {
+        "name": "包装结构",
+        "value": "旋转管身"
+      },
+      {
+        "name": "妆效",
+        "value": "柔雾妆效"
+      }
+    ],
+    "storage_conditions": "避免高温与阳光直射，盖紧。",
+    "target_audience": "",
+    "updated_at": "2026-10-17T18:38:50.043+00:00",
+    "usage_instructions": "清洁唇部后少量薄涂，可按妆效叠涂；出现不适停止使用。"
+  }
+}

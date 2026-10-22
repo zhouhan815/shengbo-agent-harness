@@ -1,0 +1,92 @@
+{
+  "versions": [
+    {
+      "han_characters": 845,
+      "sentences": 31,
+      "coverage_groups": {
+        "材质成型": true,
+        "足弓": true,
+        "厚底软弹": true,
+        "静音防滑": true,
+        "清洗快干防臭": true,
+        "轻便场景": true,
+        "规格": true,
+        "选码": true
+      },
+      "coverage_rate": 1.0,
+      "natural_sentence_ratio": 1.0,
+      "duplicate_sentences": [],
+      "reference_5gram_overlap": 0.052,
+      "program_scores": {
+        "selling_point_coverage": 12.0,
+        "flow": 8.0,
+        "speakability": 10.0,
+        "length_fit": 4.97,
+        "fact_references": 5.0
+      },
+      "program_total": 39.97,
+      "invalid_references": false,
+      "app_issues": []
+    },
+    {
+      "han_characters": 1012,
+      "sentences": 31,
+      "coverage_groups": {
+        "材质成型": true,
+        "足弓": true,
+        "厚底软弹": true,
+        "静音防滑": true,
+        "清洗快干防臭": true,
+        "轻便场景": true,
+        "规格": true,
+        "选码": true
+      },
+      "coverage_rate": 1.0,
+      "natural_sentence_ratio": 1.0,
+      "duplicate_sentences": [],
+      "reference_5gram_overlap": 0.046,
+      "program_scores": {
+        "selling_point_coverage": 12.0,
+        "flow": 8.0,
+        "speakability": 10.0,
+        "length_fit": 5,
+        "fact_references": 5.0
+      },
+      "program_total": 40.0,
+      "invalid_references": false,
+      "app_issues": []
+    }
+  ],
+  "pair": [
+    {
+      "a": 1,
+      "b": 2,
+      "fivegram_jaccard": 0.145,
+      "shared_narrative_sentences": [],
+      "near_copy_ratio": 0.19,
+      "near_copies": [
+        {
+          "a": "大家可以根据自己喜欢的颜色和合适的尺码来选，觉得合适再下单。",
+          "b": "你可以根据自己喜欢的颜色和合适的尺码去选，合适再下单。",
+          "similarity": 0.877
+        },
+        {
+          "a": "平时在家做家务、站着叠衣服，脚底如果一直是平的，站久了会感觉压力集中。",
+          "b": "平时在家做家务、站着叠衣服，脚底如果一直是平的，站久了容易觉得累。",
+          "similarity": 0.853
+        },
+        {
+          "a": "晚上家人都休息了，你去浴室洗漱或者到厨房倒水，鞋底声音小一点，对家人的打扰也会少一些。",
+          "b": "晚上家人都休息了，你去浴室洗漱或者到厨房倒水，鞋底静音一点，走动时对家人的打扰就少一些。",
+          "similarity": 0.897
+        },
+        {
+          "a": "防滑这一点在浴室和室内走动时比较实用，但浴室地面有水，走动时还是要留意脚下。",
+          "b": "防滑这一点在浴室和室内走动时比较实用，当然浴室地面有水，走动还是要留意脚下。",
+          "similarity": 0.947
+        }
+      ],
+      "opening_similarity": 0.283
+    }
+  ]
+}

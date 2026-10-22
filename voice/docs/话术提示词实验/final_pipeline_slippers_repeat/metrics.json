@@ -1,0 +1,82 @@
+{
+  "versions": [
+    {
+      "han_characters": 642,
+      "sentences": 24,
+      "coverage_groups": {
+        "材质成型": true,
+        "足弓": true,
+        "厚底软弹": true,
+        "静音防滑": true,
+        "清洗快干防臭": true,
+        "轻便场景": true,
+        "规格": true,
+        "选码": true
+      },
+      "coverage_rate": 1.0,
+      "natural_sentence_ratio": 1.0,
+      "duplicate_sentences": [],
+      "reference_5gram_overlap": 0.065,
+      "program_scores": {
+        "selling_point_coverage": 12.0,
+        "flow": 8.0,
+        "speakability": 10.0,
+        "length_fit": 3.78,
+        "fact_references": 5.0
+      },
+      "program_total": 38.78,
+      "invalid_references": false,
+      "app_issues": []
+    },
+    {
+      "han_characters": 635,
+      "sentences": 28,
+      "coverage_groups": {
+        "材质成型": true,
+        "足弓": true,
+        "厚底软弹": true,
+        "静音防滑": true,
+        "清洗快干防臭": true,
+        "轻便场景": true,
+        "规格": true,
+        "选码": true
+      },
+      "coverage_rate": 1.0,
+      "natural_sentence_ratio": 1.0,
+      "duplicate_sentences": [],
+      "reference_5gram_overlap": 0.054,
+      "program_scores": {
+        "selling_point_coverage": 12.0,
+        "flow": 8.0,
+        "speakability": 10.0,
+        "length_fit": 3.74,
+        "fact_references": 5.0
+      },
+      "program_total": 38.74,
+      "invalid_references": false,
+      "app_issues": []
+    }
+  ],
+  "pair": [
+    {
+      "a": 1,
+      "b": 2,
+      "fivegram_jaccard": 0.156,
+      "shared_narrative_sentences": [],
+      "near_copy_ratio": 0.125,
+      "near_copies": [
+        {
+          "a": "先看脚底这一块，它有足弓支撑，不是完全平塌塌的鞋床。",
+          "b": "再看脚底这一块，它做了足弓支撑，不是完全平塌塌的鞋底。",
+          "similarity": 0.868
+        },
+        {
+          "a": "材质本身防臭快干，洗澡沾了水，冲一冲就干净，晾着也干得快。",
+          "b": "材质防臭快干，洗澡沾了水，冲一冲就干净，晾着也干得快。",
+          "similarity": 0.964
+        }
+      ],
+      "opening_similarity": 0.161
+    }
+  ]
+}

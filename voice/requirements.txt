@@ -1,0 +1,8 @@
+fastapi==0.142.2
+uvicorn==0.54.0
+websockets>=13,<17
+realtimetts[system]==0.8.10
+opencc-python-reimplemented==0.1.7
+httpx==0.28.1
+pycaw==20260927; sys_platform == 'win32'
+# The sibling shared-contract project is installed editable by setup instructions.

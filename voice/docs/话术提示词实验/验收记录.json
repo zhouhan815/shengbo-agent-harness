@@ -1,0 +1,43 @@
+{
+  "python_tests": 78,
+  "audio_player_checks": 5,
+  "js_syntax": [
+    "preparation.js",
+    "control.js"
+  ],
+  "qa_room": "room_8ae0a05687b24823",
+  "qa_job_status": "completed",
+  "qa_versions": 2,
+  "qa_sentences": 59,
+  "room_script_numbers": [
+    1,
+    2
+  ],
+  "outside_script_import_button": false,
+  "generated_fact_ids": [
+    "NAME",
+    "PRICE",
+    "SELLING",
+    "PROMOTION"
+  ],
+  "prompt_revision": "29d1aa48d10b",
+  "screenshot": "网页验收.png",
+  "prior_failed_job_preserved": true,
+  "existing_live_data_modified": false,
+  "tts_synthesis_this_turn": false,
+  "desktop_service": "8765 restarted and healthy",
+  "existing_counts_before": {
+    "products": 1,
+    "scripts": 14,
+    "rooms": 2
+  },
+  "existing_counts_after": {
+    "products": 1,
+    "scripts": 14,
+    "rooms": 2
+  },
+  "backup": "runtime/backups/20261007-prompt-upgrade/library.sqlite3",
+  "traditional_input_validation": true,
+  "qa_service": "8766 stopped after successful checks",
+  "production_ui_screenshot": "选品入口修复.png"
+}

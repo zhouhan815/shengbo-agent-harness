@@ -1,0 +1,71 @@
+{
+  "versions": [
+    {
+      "han_characters": 1005,
+      "sentences": 39,
+      "coverage_groups": {
+        "材质成型": true,
+        "足弓": true,
+        "厚底软弹": true,
+        "静音防滑": true,
+        "清洗快干防臭": true,
+        "轻便场景": true,
+        "规格": true,
+        "选码": true
+      },
+      "coverage_rate": 1.0,
+      "natural_sentence_ratio": 0.974,
+      "duplicate_sentences": [],
+      "reference_5gram_overlap": 0.047,
+      "program_scores": {
+        "selling_point_coverage": 12.0,
+        "flow": 8.0,
+        "speakability": 9.74,
+        "length_fit": 5,
+        "fact_references": 5.0
+      },
+      "program_total": 39.74,
+      "invalid_references": false,
+      "app_issues": []
+    },
+    {
+      "han_characters": 919,
+      "sentences": 28,
+      "coverage_groups": {
+        "材质成型": true,
+        "足弓": true,
+        "厚底软弹": true,
+        "静音防滑": true,
+        "清洗快干防臭": true,
+        "轻便场景": true,
+        "规格": true,
+        "选码": true
+      },
+      "coverage_rate": 1.0,
+      "natural_sentence_ratio": 1.0,
+      "duplicate_sentences": [],
+      "reference_5gram_overlap": 0.031,
+      "program_scores": {
+        "selling_point_coverage": 12.0,
+        "flow": 8.0,
+        "speakability": 10.0,
+        "length_fit": 5,
+        "fact_references": 5.0
+      },
+      "program_total": 40.0,
+      "invalid_references": false,
+      "app_issues": []
+    }
+  ],
+  "pair": [
+    {
+      "a": 1,
+      "b": 2,
+      "fivegram_jaccard": 0.108,
+      "shared_narrative_sentences": [],
+      "near_copy_ratio": 0.0,
+      "near_copies": [],
+      "opening_similarity": 0.268
+    }
+  ]
+}

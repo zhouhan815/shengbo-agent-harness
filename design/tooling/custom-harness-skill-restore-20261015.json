@@ -1,0 +1,83 @@
+{
+  "date": "2026-10-15",
+  "source": "D:\\Codex project\\agent-harness-design-research\\skill\\agent-harness-design",
+  "installed": "C:\\Users\\lizhe\\.codex\\skills\\agent-harness-design",
+  "files": [
+    {
+      "path": "agents/openai.yaml",
+      "sha256": "3a41f94ace61a11808f126c1c3d3628a5106cc20f1a9d53997b2b030006958ca",
+      "matches_source": true
+    },
+    {
+      "path": "assets/agent-design-template.md",
+      "sha256": "0dfdf1e9505b59b0297b2bd38e01ec2c114619aa998691af329979e01cfd94f4",
+      "matches_source": true
+    },
+    {
+      "path": "assets/evaluation-case-template.json",
+      "sha256": "50a63c40a7bd72d01d3582e0987efaf68073f3af1138c5ea29a0290f0bc85e0d",
+      "matches_source": true
+    },
+    {
+      "path": "assets/implementation-handoff-template.md",
+      "sha256": "a6a641096b603c919e665e2edf78e791529cc82663efb34b96f07e57b96f13b2",
+      "matches_source": true
+    },
+    {
+      "path": "references/01-intake-and-task-design.md",
+      "sha256": "f0d35d1708b78daf67f241c29c7cfdf262d9b3695f31d7aac9c6a786d290231e",
+      "matches_source": true
+    },
+    {
+      "path": "references/02-harness-architecture.md",
+      "sha256": "5dfe44774d92827e5ad13aaab40396be3b7611e8fd4e266f25f82620b270da3e",
+      "matches_source": true
+    },
+    {
+      "path": "references/03-tools-and-state-contracts.md",
+      "sha256": "0e7ab05e5e24672f066084b9b742fcac7aee1b8f654b0e50a27853973035bf4d",
+      "matches_source": true
+    },
+    {
+      "path": "references/04-context-skills-memory.md",
+      "sha256": "2e5d2d2262cd492b3558eb091c13a662834b7a8537fe9c4742669b13d3ea4adb",
+      "matches_source": true
+    },
+    {
+      "path": "references/05-multi-agent-coordination.md",
+      "sha256": "9c099df9eb126363b70cd1b614cc541de886cc171f2b12b72c0976693c6324da",
+      "matches_source": true
+    },
+    {
+      "path": "references/06-reliability-and-boundaries.md",
+      "sha256": "ba2749e8052e9e53857d2ccac799ee8e81db0bd67faddaeaa4406daa6caf7773",
+      "matches_source": true
+    },
+    {
+      "path": "references/07-evaluation-and-delivery.md",
+      "sha256": "bc9c6b6fbd4bfaea620103de1aac09b0306883680709842409342bf2df89e2e7",
+      "matches_source": true
+    },
+    {
+      "path": "references/08-framework-selection.md",
+      "sha256": "d59c57546413e17e02141b830c33e8efefe375c781e2b9e039ad7f39115e6f2b",
+      "matches_source": true
+    },
+    {
+      "path": "references/09-source-map.md",
+      "sha256": "2e8696049ad933e21687cd553dc2050cc7fdc83447139cdc383565847a0cab88",
+      "matches_source": true
+    },
+    {
+      "path": "references/10-worked-examples.md",
+      "sha256": "a96ba7c31aba67f481c428fcac731df32c247b6eda41df7c35069f631209b422",
+      "matches_source": true
+    },
+    {
+      "path": "SKILL.md",
+      "sha256": "68fa774e37f5d577d367da2ef2e47dae842a498cda4d9aed26f2ba0bafb7042b",
+      "matches_source": true
+    }
+  ],
+  "all_match": true
+}

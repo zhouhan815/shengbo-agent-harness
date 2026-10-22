@@ -1,0 +1,69 @@
+{
+  "versions": [
+    {
+      "index": 1,
+      "scores": {
+        "natural_live_speech": 13,
+        "benefit_scene_expansion": 18,
+        "coherent_flow": 10,
+        "non_repetition": 9,
+        "purchase_guidance": 5
+      },
+      "score_reasons": [
+        "整体口语自然，如“你平时在家走动的时候，会留意脚下这双鞋舒不舒服吗？”、“不用特地换鞋”，但“它轻便又耐磨”稍偏资料罗列。",
+        "核心卖点足弓支撑、小蛮腰厚底、静音防滑、快干易清洗均有情境和收益展开，如做饭打扫久站、夜间倒水、浴室出来换上，达标18分。",
+        "从居家痛点身份展开，到脚感、材质、场景、规格价格，再到选码收口，连贯不机械。",
+        "重复语较少，颜色尺码信息和选码建议自然带出。",
+        "明确说“记得先选好颜色和尺码，……合适就可以带回家”，选择引导自然，给5分。"
+      ],
+      "unsupported_claims": [],
+      "price_and_terms_correct": true,
+      "knowledge_leaks": [],
+      "main_gaps": [
+        "防滑和静音的表达稍偏绝对，但已补“湿地面还是要自己多留神”，仍可再弱化。",
+        "对颜色没有给出选择建议，只做罗列，信息展示不如版本1分组清晰。",
+        "价格段结束后没有进一步提醒活动条件，购买紧迫感较弱。"
+      ]
+    },
+    {
+      "index": 2,
+      "scores": {
+        "natural_live_speech": 14,
+        "benefit_scene_expansion": 17,
+        "coherent_flow": 10,
+        "non_repetition": 9,
+        "purchase_guidance": 4
+      },
+      "score_reasons": [
+        "口播自然，如“你平时收拾行李的时候，会不会纠结要不要多塞一双拖鞋？”、“顺手冲一冲放起来，下一次穿的时候心里更舒服”，没有说明书腔。",
+        "4个核心卖点均有情境收益展开：轻便→旅行打包、清洗→沙滩/浴室冲洗、静音防滑→夜间走动，足弓/厚底→厨房打扫久站，达到17分标准。",
+        "从旅行场景痛点切入，依次展开材质、鞋底、脚感、规格、价格，收口在活动价和选码建议，结构连贯。",
+        "只有颜色分组推荐、选码提醒等轻量重复，没有空话凑字。",
+        "播报了原价178、活动价107，并说“活动状态和条件以页面标示为准”，但缺少直接的下单选择引导，只给4分。"
+      ],
+      "unsupported_claims": [],
+      "price_and_terms_correct": true,
+      "knowledge_leaks": [],
+      "main_gaps": [
+        "没有明确引导点击购物车或下单动作，购买引导偏弱。",
+        "颜色只给了部分分组推荐，颜色信息展示可再完整一点。",
+        "缺少对促销条件（如限时范围、券规则）的更多说明，只以页面标示为准。"
+      ]
+    }
+  ],
+  "pair_diversity": {
+    "score": 4,
+    "reason": "两版开场分别用旅行打包和居家久站切入，卖点展开顺序不同，情境素材（打包/沙滩 vs 做饭/打扫/夜间）和节奏均有明显差异，且核心事实完整，因此给4分。"
+  },
+  "judge_model": "deepseek-flash",
+  "usage": {
+    "prompt_tokens": 4310,
+    "completion_tokens": 685,
+    "total_tokens": 4995,
+    "prompt_tokens_details": {
+      "cached_tokens": 2560
+    },
+    "prompt_cache_hit_tokens": 2560,
+    "prompt_cache_miss_tokens": 1750
+  }
+}

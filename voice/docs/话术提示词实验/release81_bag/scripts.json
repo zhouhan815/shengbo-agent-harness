@@ -1,0 +1,829 @@
+[
+  {
+    "id": "script_6b514114e090453a",
+    "product_id": "lab_bag",
+    "product_snapshot": {
+      "id": "lab_bag",
+      "name": "轻行可折叠通勤托特包",
+      "currency": "CNY",
+      "price": 99,
+      "promo_price": 79,
+      "selling_points": "涤纶面料，包身可折叠。尺寸38×30×12厘米。主袋拉链开合，内部一个小口袋，适合放置日常小物。长肩带，可手提或单肩。黑色、米色两种颜色。适合通勤、购物、短途出行。仅描述日常携带用途，未提供电脑适配尺寸、承重、防水和防盗性能。",
+      "promotion": "活动价79元；活动截至时间未提供。",
+      "knowledge": "仅供问答的测试暗号：紫鲸售后，买一送一，终身保修。"
+    },
+    "revision": 1,
+    "label": "1",
+    "angle": "先讲核心设计和使用体验，再讲打理、携带和选择",
+    "locale": "zh-CN",
+    "source": "DeepSeek",
+    "status": "draft",
+    "blocks": [
+      {
+        "id": "script_6b514114e090453a_b001",
+        "stage": "welcome",
+        "focus": "开场问候",
+        "ordinal": 1
+      },
+      {
+        "id": "script_6b514114e090453a_b002",
+        "stage": "pain",
+        "focus": "通勤包不好选的问题",
+        "ordinal": 2
+      },
+      {
+        "id": "script_6b514114e090453a_b003",
+        "stage": "identity",
+        "focus": "商品身份",
+        "ordinal": 3
+      },
+      {
+        "id": "script_6b514114e090453a_b004",
+        "stage": "benefit",
+        "focus": "拉链主袋与内部小口袋",
+        "ordinal": 4
+      },
+      {
+        "id": "script_6b514114e090453a_b005",
+        "stage": "benefit",
+        "focus": "长肩带与手提单肩",
+        "ordinal": 5
+      },
+      {
+        "id": "script_6b514114e090453a_b006",
+        "stage": "benefit",
+        "focus": "可折叠与收纳携带",
+        "ordinal": 6
+      },
+      {
+        "id": "script_6b514114e090453a_b007",
+        "stage": "benefit",
+        "focus": "尺寸与日常容量参考",
+        "ordinal": 7
+      },
+      {
+        "id": "script_6b514114e090453a_b008",
+        "stage": "specification",
+        "focus": "颜色选择建议",
+        "ordinal": 8
+      },
+      {
+        "id": "script_6b514114e090453a_b009",
+        "stage": "price",
+        "focus": "价格",
+        "ordinal": 9
+      },
+      {
+        "id": "script_6b514114e090453a_b010",
+        "stage": "cta",
+        "focus": "购买引导",
+        "ordinal": 10
+      }
+    ],
+    "sentences": [
+      {
+        "id": "script_6b514114e090453a_s001",
+        "block_id": "script_6b514114e090453a_b001",
+        "block_ordinal": 1,
+        "stage": "welcome",
+        "ordinal": 1,
+        "text": "欢迎来到直播间，今天咱们来看一款日常好搭的包。",
+        "spoken_text": "欢迎来到直播间，今天咱们来看一款日常好搭的包。",
+        "kind": "engagement",
+        "fact_ids": []
+      },
+      {
+        "id": "script_6b514114e090453a_s002",
+        "block_id": "script_6b514114e090453a_b002",
+        "block_ordinal": 2,
+        "stage": "pain",
+        "ordinal": 2,
+        "text": "每天出门前，是不是总在纠结背哪个包？",
+        "spoken_text": "每天出门前，是不是总在纠结背哪个包？",
+        "kind": "engagement",
+        "fact_ids": []
+      },
+      {
+        "id": "script_6b514114e090453a_s003",
+        "block_id": "script_6b514114e090453a_b002",
+        "block_ordinal": 2,
+        "stage": "pain",
+        "ordinal": 3,
+        "text": "大包装不满，小包又怕东西没处放，想找个顺手的通勤包不容易。",
+        "spoken_text": "大包装不满，小包又怕东西没处放，想找个顺手的通勤包不容易。",
+        "kind": "engagement",
+        "fact_ids": []
+      },
+      {
+        "id": "script_6b514114e090453a_s004",
+        "block_id": "script_6b514114e090453a_b003",
+        "block_ordinal": 3,
+        "stage": "identity",
+        "ordinal": 4,
+        "text": "这款是轻行可折叠通勤托特包。",
+        "spoken_text": "这款是轻行可折叠通勤托特包。",
+        "kind": "product_claim",
+        "fact_ids": [
+          "NAME"
+        ]
+      },
+      {
+        "id": "script_6b514114e090453a_s005",
+        "block_id": "script_6b514114e090453a_b003",
+        "block_ordinal": 3,
+        "stage": "identity",
+        "ordinal": 5,
+        "text": "它用的是涤纶面料，包身可以折叠，日常通勤、购物、短途出行都能用上。",
+        "spoken_text": "它用的是涤纶面料，包身可以折叠，日常通勤、购物、短途出行都能用上。",
+        "kind": "product_claim",
+        "fact_ids": [
+          "SELLING"
+        ]
+      },
+      {
+        "id": "script_6b514114e090453a_s006",
+        "block_id": "script_6b514114e090453a_b004",
+        "block_ordinal": 4,
+        "stage": "benefit",
+        "ordinal": 6,
+        "text": "主袋是拉链开合，早晚高峰挤地铁或公交时，东西放在里面会更安心。",
+        "spoken_text": "主袋是拉链开合，早晚高峰挤地铁或公交时，东西放在里面会更安心。",
+        "kind": "product_claim",
+        "fact_ids": [
+          "SELLING"
+        ]
+      },
+      {
+        "id": "script_6b514114e090453a_s007",
+        "block_id": "script_6b514114e090453a_b004",
+        "block_ordinal": 4,
+        "stage": "benefit",
+        "ordinal": 7,
+        "text": "内部还有一个小口袋，钥匙、门禁卡、耳机这些小东西可以单独放。",
+        "spoken_text": "内部还有一个小口袋，钥匙、门禁卡、耳机这些小东西可以单独放。",
+        "kind": "product_claim",
+        "fact_ids": [
+          "SELLING"
+        ]
+      },
+      {
+        "id": "script_6b514114e090453a_s008",
+        "block_id": "script_6b514114e090453a_b004",
+        "block_ordinal": 4,
+        "stage": "benefit",
+        "ordinal": 8,
+        "text": "到公司或者回家开门时，不用在包里翻半天，随手就能摸到。",
+        "spoken_text": "到公司或者回家开门时，不用在包里翻半天，随手就能摸到。",
+        "kind": "product_claim",
+        "fact_ids": [
+          "SELLING"
+        ]
+      },
+      {
+        "id": "script_6b514114e090453a_s009",
+        "block_id": "script_6b514114e090453a_b005",
+        "block_ordinal": 5,
+        "stage": "benefit",
+        "ordinal": 9,
+        "text": "它配的是长肩带，可以手提，也能单肩背着。",
+        "spoken_text": "它配的是长肩带，可以手提，也能单肩背着。",
+        "kind": "product_claim",
+        "fact_ids": [
+          "SELLING"
+        ]
+      },
+      {
+        "id": "script_6b514114e090453a_s010",
+        "block_id": "script_6b514114e090453a_b005",
+        "block_ordinal": 5,
+        "stage": "benefit",
+        "ordinal": 10,
+        "text": "比如早上赶时间，拎起来就能走；路上想腾出手回消息，往肩上一挂就方便多了。",
+        "spoken_text": "比如早上赶时间，拎起来就能走；路上想腾出手回消息，往肩上一挂就方便多了。",
+        "kind": "product_claim",
+        "fact_ids": [
+          "SELLING"
+        ]
+      },
+      {
+        "id": "script_6b514114e090453a_s011",
+        "block_id": "script_6b514114e090453a_b005",
+        "block_ordinal": 5,
+        "stage": "benefit",
+        "ordinal": 11,
+        "text": "不同场景换着背，不用特意换包。",
+        "spoken_text": "不同场景换着背，不用特意换包。",
+        "kind": "engagement",
+        "fact_ids": []
+      },
+      {
+        "id": "script_6b514114e090453a_s012",
+        "block_id": "script_6b514114e090453a_b006",
+        "block_ordinal": 6,
+        "stage": "benefit",
+        "ordinal": 12,
+        "text": "包身可以折叠，这一点在临时出门时挺实在。",
+        "spoken_text": "包身可以折叠，这一点在临时出门时挺实在。",
+        "kind": "product_claim",
+        "fact_ids": [
+          "SELLING"
+        ]
+      },
+      {
+        "id": "script_6b514114e090453a_s013",
+        "block_id": "script_6b514114e090453a_b006",
+        "block_ordinal": 6,
+        "stage": "benefit",
+        "ordinal": 13,
+        "text": "比如下楼买东西、周末短途出行，不想背大包，把它折起来收进行李箱或者大包里，需要装东西时再展开。",
+        "spoken_text": "比如下楼买东西、周末短途出行，不想背大包，把它折起来收进行李箱或者大包里，需要装东西时再展开。",
+        "kind": "product_claim",
+        "fact_ids": [
+          "SELLING"
+        ]
+      },
+      {
+        "id": "script_6b514114e090453a_s014",
+        "block_id": "script_6b514114e090453a_b006",
+        "block_ordinal": 6,
+        "stage": "benefit",
+        "ordinal": 14,
+        "text": "收着带着比较顺手，不会占太多地方。",
+        "spoken_text": "收着带着比较顺手，不会占太多地方。",
+        "kind": "product_claim",
+        "fact_ids": [
+          "SELLING"
+        ]
+      },
+      {
+        "id": "script_6b514114e090453a_s015",
+        "block_id": "script_6b514114e090453a_b007",
+        "block_ordinal": 7,
+        "stage": "benefit",
+        "ordinal": 15,
+        "text": "尺寸是三十八乘三十乘十二厘米。",
+        "spoken_text": "尺寸是三十八乘三十乘十二厘米。",
+        "kind": "product_claim",
+        "fact_ids": [
+          "SELLING"
+        ]
+      },
+      {
+        "id": "script_6b514114e090453a_s016",
+        "block_id": "script_6b514114e090453a_b007",
+        "block_ordinal": 7,
+        "stage": "benefit",
+        "ordinal": 16,
+        "text": "这个大小用来装日常通勤要带的东西、购物买的小件，或者短途出行的随身物品，都比较合适。",
+        "spoken_text": "这个大小用来装日常通勤要带的东西、购物买的小件，或者短途出行的随身物品，都比较合适。",
+        "kind": "product_claim",
+        "fact_ids": [
+          "SELLING"
+        ]
+      },
+      {
+        "id": "script_6b514114e090453a_s017",
+        "block_id": "script_6b514114e090453a_b008",
+        "block_ordinal": 8,
+        "stage": "specification",
+        "ordinal": 17,
+        "text": "颜色有黑色和米色两种。",
+        "spoken_text": "颜色有黑色和米色两种。",
+        "kind": "product_claim",
+        "fact_ids": [
+          "SELLING"
+        ]
+      },
+      {
+        "id": "script_6b514114e090453a_s018",
+        "block_id": "script_6b514114e090453a_b008",
+        "block_ordinal": 8,
+        "stage": "specification",
+        "ordinal": 18,
+        "text": "黑色比较利落，搭深色外套或者通勤装都好配；米色更柔和，配浅色衣服或者休闲装会显得轻松一些。",
+        "spoken_text": "黑色比较利落，搭深色外套或者通勤装都好配；米色更柔和，配浅色衣服或者休闲装会显得轻松一些。",
+        "kind": "product_claim",
+        "fact_ids": [
+          "SELLING"
+        ]
+      },
+      {
+        "id": "script_6b514114e090453a_s019",
+        "block_id": "script_6b514114e090453a_b008",
+        "block_ordinal": 8,
+        "stage": "specification",
+        "ordinal": 19,
+        "text": "大家按自己平时穿衣服的颜色来选就行。",
+        "spoken_text": "大家按自己平时穿衣服的颜色来选就行。",
+        "kind": "engagement",
+        "fact_ids": []
+      },
+      {
+        "id": "script_6b514114e090453a_s020",
+        "block_id": "script_6b514114e090453a_b009",
+        "block_ordinal": 9,
+        "stage": "price",
+        "ordinal": 20,
+        "text": "这款包原价九十九元，现在活动价七十九元。",
+        "spoken_text": "这款包原价九十九元，现在活动价七十九元。",
+        "kind": "product_claim",
+        "fact_ids": [
+          "PRICE",
+          "PROMOTION"
+        ]
+      },
+      {
+        "id": "script_6b514114e090453a_s021",
+        "block_id": "script_6b514114e090453a_b010",
+        "block_ordinal": 10,
+        "stage": "cta",
+        "ordinal": 21,
+        "text": "选好颜色和规格，觉得合适再下单。",
+        "spoken_text": "选好颜色和规格，觉得合适再下单。",
+        "kind": "engagement",
+        "fact_ids": []
+      },
+      {
+        "id": "script_6b514114e090453a_s022",
+        "block_id": "script_6b514114e090453a_b010",
+        "block_ordinal": 10,
+        "stage": "cta",
+        "ordinal": 22,
+        "text": "日常通勤、购物、短途出行都能用，关键是可折叠、带拉链、有长肩带这几个点，大家按需入手。",
+        "spoken_text": "日常通勤、购物、短途出行都能用，关键是可折叠、带拉链、有长肩带这几个点，大家按需入手。",
+        "kind": "engagement",
+        "fact_ids": []
+      }
+    ],
+    "facts": [
+      {
+        "id": "NAME",
+        "text": "轻行可折叠通勤托特包"
+      },
+      {
+        "id": "PRICE",
+        "text": "原价 99 CNY；活动价 79 CNY"
+      },
+      {
+        "id": "SELLING",
+        "text": "涤纶面料，包身可折叠。尺寸38×30×12厘米。主袋拉链开合，内部一个小口袋，适合放置日常小物。长肩带，可手提或单肩。黑色、米色两种颜色。适合通勤、购物、短途出行。仅描述日常携带用途，未提供电脑适配尺寸、承重、防水和防盗性能。"
+      },
+      {
+        "id": "PROMOTION",
+        "text": "活动价79元；活动截至时间未提供。"
+      }
+    ],
+    "issues": [],
+    "missing_information": [
+      "电脑适配尺寸未提供",
+      "承重性能未提供",
+      "防水性能未提供",
+      "防盗性能未提供",
+      "活动截至时间未提供"
+    ],
+    "created_at": "2026-10-07T17:35:41+08:00",
+    "usage": {
+      "prompt_tokens": 1662,
+      "completion_tokens": 2020,
+      "total_tokens": 3682,
+      "prompt_tokens_details": {
+        "cached_tokens": 1280
+      },
+      "prompt_cache_hit_tokens": 1280,
+      "prompt_cache_miss_tokens": 382
+    },
+    "model": "deepseek-flash",
+    "prompt_revision": "9b51f128ace0",
+    "quality_rewrite_attempts": 0,
+    "lab_elapsed_seconds": 7.06
+  },
+  {
+    "id": "script_6cc68eb063d84ec1",
+    "product_id": "lab_bag",
+    "product_snapshot": {
+      "id": "lab_bag",
+      "name": "轻行可折叠通勤托特包",
+      "currency": "CNY",
+      "price": 99,
+      "promo_price": 79,
+      "selling_points": "涤纶面料，包身可折叠。尺寸38×30×12厘米。主袋拉链开合，内部一个小口袋，适合放置日常小物。长肩带，可手提或单肩。黑色、米色两种颜色。适合通勤、购物、短途出行。仅描述日常携带用途，未提供电脑适配尺寸、承重、防水和防盗性能。",
+      "promotion": "活动价79元；活动截至时间未提供。",
+      "knowledge": "仅供问答的测试暗号：紫鲸售后，买一送一，终身保修。"
+    },
+    "revision": 1,
+    "label": "1",
+    "angle": "先讲携带与折叠，再讲外观容量，最后回到材质与内部结构",
+    "locale": "zh-CN",
+    "source": "DeepSeek",
+    "status": "draft",
+    "blocks": [
+      {
+        "id": "script_6cc68eb063d84ec1_b001",
+        "stage": "welcome",
+        "focus": "开场互动",
+        "ordinal": 1
+      },
+      {
+        "id": "script_6cc68eb063d84ec1_b002",
+        "stage": "pain",
+        "focus": "临时出门不想背大包",
+        "ordinal": 2
+      },
+      {
+        "id": "script_6cc68eb063d84ec1_b003",
+        "stage": "identity",
+        "focus": "商品身份和两种颜色",
+        "ordinal": 3
+      },
+      {
+        "id": "script_6cc68eb063d84ec1_b004",
+        "stage": "benefit",
+        "focus": "包身可折叠，旅行收纳方便",
+        "ordinal": 4
+      },
+      {
+        "id": "script_6cc68eb063d84ec1_b005",
+        "stage": "benefit",
+        "focus": "长肩带，手提单肩两用",
+        "ordinal": 5
+      },
+      {
+        "id": "script_6cc68eb063d84ec1_b006",
+        "stage": "benefit",
+        "focus": "涤纶面料，日常携带轻便",
+        "ordinal": 6
+      },
+      {
+        "id": "script_6cc68eb063d84ec1_b007",
+        "stage": "benefit",
+        "focus": "拉链主袋与小口袋收纳",
+        "ordinal": 7
+      },
+      {
+        "id": "script_6cc68eb063d84ec1_b008",
+        "stage": "specification",
+        "focus": "颜色与使用场景建议",
+        "ordinal": 8
+      },
+      {
+        "id": "script_6cc68eb063d84ec1_b009",
+        "stage": "price",
+        "focus": "价格说明",
+        "ordinal": 9
+      },
+      {
+        "id": "script_6cc68eb063d84ec1_b010",
+        "stage": "cta",
+        "focus": "引导选择",
+        "ordinal": 10
+      }
+    ],
+    "sentences": [
+      {
+        "id": "script_6cc68eb063d84ec1_s001",
+        "block_id": "script_6cc68eb063d84ec1_b001",
+        "block_ordinal": 1,
+        "stage": "welcome",
+        "ordinal": 1,
+        "text": "欢迎刚进来的朋友，今天咱们不赶时间，慢慢看一款日常背的包。",
+        "spoken_text": "欢迎刚进来的朋友，今天咱们不赶时间，慢慢看一款日常背的包。",
+        "kind": "engagement",
+        "fact_ids": []
+      },
+      {
+        "id": "script_6cc68eb063d84ec1_s002",
+        "block_id": "script_6cc68eb063d84ec1_b001",
+        "block_ordinal": 1,
+        "stage": "welcome",
+        "ordinal": 2,
+        "text": "如果你最近正想找一只轻便、能折起来收着的包，可以在直播间多留一会儿。",
+        "spoken_text": "如果你最近正想找一只轻便、能折起来收着的包，可以在直播间多留一会儿。",
+        "kind": "engagement",
+        "fact_ids": []
+      },
+      {
+        "id": "script_6cc68eb063d84ec1_s003",
+        "block_id": "script_6cc68eb063d84ec1_b002",
+        "block_ordinal": 2,
+        "stage": "pain",
+        "ordinal": 3,
+        "text": "有时候下楼买点东西、去附近办个事，空手拿袋子有点随意，背个大包又觉得累赘。",
+        "spoken_text": "有时候下楼买点东西、去附近办个事，空手拿袋子有点随意，背个大包又觉得累赘。",
+        "kind": "engagement",
+        "fact_ids": []
+      },
+      {
+        "id": "script_6cc68eb063d84ec1_s004",
+        "block_id": "script_6cc68eb063d84ec1_b002",
+        "block_ordinal": 2,
+        "stage": "pain",
+        "ordinal": 4,
+        "text": "这种短途出门，其实就想要一个随手拎、能装下随身小物、不用时又收得起来的选择。",
+        "spoken_text": "这种短途出门，其实就想要一个随手拎、能装下随身小物、不用时又收得起来的选择。",
+        "kind": "engagement",
+        "fact_ids": []
+      },
+      {
+        "id": "script_6cc68eb063d84ec1_s005",
+        "block_id": "script_6cc68eb063d84ec1_b003",
+        "block_ordinal": 3,
+        "stage": "identity",
+        "ordinal": 5,
+        "text": "今天要讲的就是这款轻行可折叠通勤托特包。",
+        "spoken_text": "今天要讲的就是这款轻行可折叠通勤托特包。",
+        "kind": "product_claim",
+        "fact_ids": [
+          "NAME"
+        ]
+      },
+      {
+        "id": "script_6cc68eb063d84ec1_s006",
+        "block_id": "script_6cc68eb063d84ec1_b003",
+        "block_ordinal": 3,
+        "stage": "identity",
+        "ordinal": 6,
+        "text": "它有黑色和米色两种颜色，尺寸是三十八乘三十乘十二厘米。",
+        "spoken_text": "它有黑色和米色两种颜色，尺寸是三十八乘三十乘十二厘米。",
+        "kind": "product_claim",
+        "fact_ids": [
+          "SELLING"
+        ]
+      },
+      {
+        "id": "script_6cc68eb063d84ec1_s007",
+        "block_id": "script_6cc68eb063d84ec1_b004",
+        "block_ordinal": 4,
+        "stage": "benefit",
+        "ordinal": 7,
+        "text": "先看它很方便的一点，包身可以折叠。",
+        "spoken_text": "先看它很方便的一点，包身可以折叠。",
+        "kind": "product_claim",
+        "fact_ids": [
+          "SELLING"
+        ]
+      },
+      {
+        "id": "script_6cc68eb063d84ec1_s008",
+        "block_id": "script_6cc68eb063d84ec1_b004",
+        "block_ordinal": 4,
+        "stage": "benefit",
+        "ordinal": 8,
+        "text": "比如周末短途出行，或者出差住酒店时想换上自己的拖鞋，不想再拖一个占地方的大包，就可以把它折起来放在行李里。",
+        "spoken_text": "比如周末短途出行，或者出差住酒店时想换上自己的拖鞋，不想再拖一个占地方的大包，就可以把它折起来放在行李里。",
+        "kind": "product_claim",
+        "fact_ids": [
+          "SELLING"
+        ]
+      },
+      {
+        "id": "script_6cc68eb063d84ec1_s009",
+        "block_id": "script_6cc68eb063d84ec1_b004",
+        "block_ordinal": 4,
+        "stage": "benefit",
+        "ordinal": 9,
+        "text": "到了目的地需要装东西再展开，收着带着比较顺手，不会一直占着箱子空间。",
+        "spoken_text": "到了目的地需要装东西再展开，收着带着比较顺手，不会一直占着箱子空间。",
+        "kind": "product_claim",
+        "fact_ids": [
+          "SELLING"
+        ]
+      },
+      {
+        "id": "script_6cc68eb063d84ec1_s010",
+        "block_id": "script_6cc68eb063d84ec1_b005",
+        "block_ordinal": 5,
+        "stage": "benefit",
+        "ordinal": 10,
+        "text": "它配的是长肩带，可以手提，也可以单肩背着。",
+        "spoken_text": "它配的是长肩带，可以手提，也可以单肩背着。",
+        "kind": "product_claim",
+        "fact_ids": [
+          "SELLING"
+        ]
+      },
+      {
+        "id": "script_6cc68eb063d84ec1_s011",
+        "block_id": "script_6cc68eb063d84ec1_b005",
+        "block_ordinal": 5,
+        "stage": "benefit",
+        "ordinal": 11,
+        "text": "早上通勤赶时间，拎起来就走；路上想腾出手回消息或者拿杯咖啡，往肩上一挂也行。",
+        "spoken_text": "早上通勤赶时间，拎起来就走；路上想腾出手回消息或者拿杯咖啡，往肩上一挂也行。",
+        "kind": "product_claim",
+        "fact_ids": [
+          "SELLING"
+        ]
+      },
+      {
+        "id": "script_6cc68eb063d84ec1_s012",
+        "block_id": "script_6cc68eb063d84ec1_b005",
+        "block_ordinal": 5,
+        "stage": "benefit",
+        "ordinal": 12,
+        "text": "手提和单肩两种方式换着用，日常出门就不用特意为了搭配再换一只包。",
+        "spoken_text": "手提和单肩两种方式换着用，日常出门就不用特意为了搭配再换一只包。",
+        "kind": "product_claim",
+        "fact_ids": [
+          "SELLING"
+        ]
+      },
+      {
+        "id": "script_6cc68eb063d84ec1_s013",
+        "block_id": "script_6cc68eb063d84ec1_b006",
+        "block_ordinal": 6,
+        "stage": "benefit",
+        "ordinal": 13,
+        "text": "包身用的是涤纶面料。",
+        "spoken_text": "包身用的是涤纶面料。",
+        "kind": "product_claim",
+        "fact_ids": [
+          "SELLING"
+        ]
+      },
+      {
+        "id": "script_6cc68eb063d84ec1_s014",
+        "block_id": "script_6cc68eb063d84ec1_b006",
+        "block_ordinal": 6,
+        "stage": "benefit",
+        "ordinal": 14,
+        "text": "日常通勤、购物或者短途出行拎着，这种材质做成的包身没有那种硬挺厚重感，拿在手里比较轻便。",
+        "spoken_text": "日常通勤、购物或者短途出行拎着，这种材质做成的包身没有那种硬挺厚重感，拿在手里比较轻便。",
+        "kind": "product_claim",
+        "fact_ids": [
+          "SELLING"
+        ]
+      },
+      {
+        "id": "script_6cc68eb063d84ec1_s015",
+        "block_id": "script_6cc68eb063d84ec1_b006",
+        "block_ordinal": 6,
+        "stage": "benefit",
+        "ordinal": 15,
+        "text": "和可折叠的特点放在一起，平时收在柜子里也不占太多地方，想用的时候拿出来展开就行。",
+        "spoken_text": "和可折叠的特点放在一起，平时收在柜子里也不占太多地方，想用的时候拿出来展开就行。",
+        "kind": "product_claim",
+        "fact_ids": [
+          "SELLING"
+        ]
+      },
+      {
+        "id": "script_6cc68eb063d84ec1_s016",
+        "block_id": "script_6cc68eb063d84ec1_b007",
+        "block_ordinal": 7,
+        "stage": "benefit",
+        "ordinal": 16,
+        "text": "再看内部，主袋是拉链开合，里面有一个小口袋，适合放日常小物。",
+        "spoken_text": "再看内部，主袋是拉链开合，里面有一个小口袋，适合放日常小物。",
+        "kind": "product_claim",
+        "fact_ids": [
+          "SELLING"
+        ]
+      },
+      {
+        "id": "script_6cc68eb063d84ec1_s017",
+        "block_id": "script_6cc68eb063d84ec1_b007",
+        "block_ordinal": 7,
+        "stage": "benefit",
+        "ordinal": 17,
+        "text": "早晚高峰挤地铁或公交时，东西放在拉链主袋里，不用一路用手按着包口。",
+        "spoken_text": "早晚高峰挤地铁或公交时，东西放在拉链主袋里，不用一路用手按着包口。",
+        "kind": "product_claim",
+        "fact_ids": [
+          "SELLING"
+        ]
+      },
+      {
+        "id": "script_6cc68eb063d84ec1_s018",
+        "block_id": "script_6cc68eb063d84ec1_b007",
+        "block_ordinal": 7,
+        "stage": "benefit",
+        "ordinal": 18,
+        "text": "小口袋可以把钥匙、门禁卡、耳机这些零碎东西单独放，到公司或回家开门时不用在包里翻半天。",
+        "spoken_text": "小口袋可以把钥匙、门禁卡、耳机这些零碎东西单独放，到公司或回家开门时不用在包里翻半天。",
+        "kind": "product_claim",
+        "fact_ids": [
+          "SELLING"
+        ]
+      },
+      {
+        "id": "script_6cc68eb063d84ec1_s019",
+        "block_id": "script_6cc68eb063d84ec1_b008",
+        "block_ordinal": 8,
+        "stage": "specification",
+        "ordinal": 19,
+        "text": "颜色有黑色和米色两种。",
+        "spoken_text": "颜色有黑色和米色两种。",
+        "kind": "product_claim",
+        "fact_ids": [
+          "SELLING"
+        ]
+      },
+      {
+        "id": "script_6cc68eb063d84ec1_s020",
+        "block_id": "script_6cc68eb063d84ec1_b008",
+        "block_ordinal": 8,
+        "stage": "specification",
+        "ordinal": 20,
+        "text": "黑色比较利落，配深色外套或通勤装都好搭；米色看起来柔和，和浅色衣服放一起很舒服。",
+        "spoken_text": "黑色比较利落，配深色外套或通勤装都好搭；米色看起来柔和，和浅色衣服放一起很舒服。",
+        "kind": "product_claim",
+        "fact_ids": [
+          "SELLING"
+        ]
+      },
+      {
+        "id": "script_6cc68eb063d84ec1_s021",
+        "block_id": "script_6cc68eb063d84ec1_b008",
+        "block_ordinal": 8,
+        "stage": "specification",
+        "ordinal": 21,
+        "text": "尺寸三十八乘三十乘十二厘米，平时上班、购物、短途出行都能用，你可以按自己常穿的颜色来选。",
+        "spoken_text": "尺寸三十八乘三十乘十二厘米，平时上班、购物、短途出行都能用，你可以按自己常穿的颜色来选。",
+        "kind": "product_claim",
+        "fact_ids": [
+          "SELLING"
+        ]
+      },
+      {
+        "id": "script_6cc68eb063d84ec1_s022",
+        "block_id": "script_6cc68eb063d84ec1_b009",
+        "block_ordinal": 9,
+        "stage": "price",
+        "ordinal": 22,
+        "text": "价格方面，这款包原价九十九元，现在活动价七十九元。",
+        "spoken_text": "价格方面，这款包原价九十九元，现在活动价七十九元。",
+        "kind": "product_claim",
+        "fact_ids": [
+          "PRICE",
+          "PROMOTION"
+        ]
+      },
+      {
+        "id": "script_6cc68eb063d84ec1_s023",
+        "block_id": "script_6cc68eb063d84ec1_b010",
+        "block_ordinal": 10,
+        "stage": "cta",
+        "ordinal": 23,
+        "text": "今天最值得留意的，就是它能折叠收着、长肩带手提单肩都行，还有拉链主袋加小口袋的收纳。",
+        "spoken_text": "今天最值得留意的，就是它能折叠收着、长肩带手提单肩都行，还有拉链主袋加小口袋的收纳。",
+        "kind": "product_claim",
+        "fact_ids": [
+          "SELLING"
+        ]
+      },
+      {
+        "id": "script_6cc68eb063d84ec1_s024",
+        "block_id": "script_6cc68eb063d84ec1_b010",
+        "block_ordinal": 10,
+        "stage": "cta",
+        "ordinal": 24,
+        "text": "你可以看看黑色还是米色更合自己的日常搭配，觉得合适再下单。",
+        "spoken_text": "你可以看看黑色还是米色更合自己的日常搭配，觉得合适再下单。",
+        "kind": "engagement",
+        "fact_ids": []
+      }
+    ],
+    "facts": [
+      {
+        "id": "NAME",
+        "text": "轻行可折叠通勤托特包"
+      },
+      {
+        "id": "PRICE",
+        "text": "原价 99 CNY；活动价 79 CNY"
+      },
+      {
+        "id": "SELLING",
+        "text": "涤纶面料，包身可折叠。尺寸38×30×12厘米。主袋拉链开合，内部一个小口袋，适合放置日常小物。长肩带，可手提或单肩。黑色、米色两种颜色。适合通勤、购物、短途出行。仅描述日常携带用途，未提供电脑适配尺寸、承重、防水和防盗性能。"
+      },
+      {
+        "id": "PROMOTION",
+        "text": "活动价79元；活动截至时间未提供。"
+      }
+    ],
+    "issues": [],
+    "missing_information": [
+      "活动截至时间未提供",
+      "未提供电脑适配尺寸",
+      "未提供承重信息",
+      "未提供防水性能",
+      "未提供防盗性能",
+      "未提供包邮、退换售后等履约条件"
+    ],
+    "created_at": "2026-10-07T17:35:56+08:00",
+    "usage": {
+      "prompt_tokens": 1976,
+      "completion_tokens": 2339,
+      "total_tokens": 4315,
+      "prompt_tokens_details": {
+        "cached_tokens": 1664
+      },
+      "prompt_cache_hit_tokens": 1664,
+      "prompt_cache_miss_tokens": 312
+    },
+    "model": "deepseek-flash",
+    "prompt_revision": "9b51f128ace0",
+    "quality_rewrite_attempts": 1,
+    "lab_elapsed_seconds": 15.09
+  }
+]

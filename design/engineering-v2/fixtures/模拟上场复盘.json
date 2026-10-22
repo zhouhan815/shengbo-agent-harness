@@ -1,0 +1,572 @@
+{
+  "fixture_schema_version": "recap-testpack.v2",
+  "fixture_id": "recap-fixture-slipper-001",
+  "synthetic": true,
+  "warning": "全部观察、聊天、旧稿片段与日志均为人工构造；无真实观众、订单、GMV或转化效果。",
+  "binding_required": true,
+  "original_document": {
+    "relative_path": "模拟上场复盘.md",
+    "sha256": "a1b49cfd1c2e40c618f2c6bfcd0c865894c8a834cf97cf6bc2e35c50380f5bf4",
+    "raw_text_policy": "importer reads this whole UTF-8 Markdown into RecapDocument.raw_text; do not summarize away source"
+  },
+  "test_clock": "2026-10-15T10:00:00+08:00",
+  "bindings": {
+    "fixture://product/slipper@1": "bind to exact test product RecordRef; never infer by name",
+    "fixture://draft/next@1": "bind to exact test SessionDraft ArtifactRef with 107 TWD campaign",
+    "fixture://script/a-v1@1": "bind to exact test first variant ScriptRevision",
+    "fixture://script/a-v2@1": "bind to exact test second variant ScriptRevision",
+    "fixture://source/original-product@1": "bind to imported user-example SourceManifest",
+    "fixture://product/second-item@1": "bind distinct exact test product RecordRef; origin display no.2, not A variant 2 or card position 2; do not infer specs/price",
+    "fixture://script/second-product-v1@1": "optional positive scenario only: exact B first variant, selected explicitly; never auto-add to main scenario"
+  },
+  "example_business_inputs": {
+    "product_name": "足弓支撑静音防滑厚底凉拖鞋（小蛮腰女款）",
+    "currency": "TWD",
+    "regular_price": "178",
+    "session_price": "107",
+    "language": "zh-CN",
+    "speech": "普通话",
+    "user_order": [
+      "fixture://script/a-v1@1",
+      "fixture://script/a-v2@1"
+    ],
+    "material": "EVA",
+    "source_features": [
+      "足弓支撑",
+      "厚底软弹",
+      "静音防滑",
+      "快干易清洗",
+      "轻便"
+    ],
+    "sizes": [
+      "36-37",
+      "38-39",
+      "40-41",
+      "42-43",
+      "44-45"
+    ]
+  },
+  "submitted_test_goal": "根据复盘修正本场活动报价表达，并使卖点讲法贴近居家做家务场景；保留用户商品与版本顺序；先生成文案审阅，暂不生成语音。只有通过真实测试请求提交此文本才构成测试授权。",
+  "recap_draft": {
+    "schema_version": "recap.v1",
+    "title": "模拟上场复盘：足弓支撑凉拖鞋",
+    "origin": {
+      "kind": "synthetic_fixture",
+      "synthetic": true,
+      "producer": "engineering-design-fixture",
+      "producer_version": "PRELIVE-2.3",
+      "created_at": "2026-10-15T10:00:00+08:00",
+      "previous_live_session_id": null,
+      "previous_publication_ref": null
+    },
+    "scope": {
+      "product_refs": [
+        {
+          "fixture_ref": "fixture://product/slipper@1"
+        },
+        {
+          "fixture_ref": "fixture://product/second-item@1"
+        }
+      ],
+      "variant_refs": [
+        {
+          "fixture_ref": "fixture://script/a-v1@1"
+        },
+        {
+          "fixture_ref": "fixture://script/a-v2@1"
+        }
+      ],
+      "module_keys": [
+        "opening_long",
+        "opening_short",
+        "product_intro",
+        "selling_points",
+        "campaign",
+        "cta",
+        "transition"
+      ],
+      "market": "台湾地区商品示例，非真实市场验证",
+      "language": "zh-CN",
+      "channel": null,
+      "observed_window_start": "2026-10-08T10:00:00+08:00",
+      "observed_window_end": "2026-10-08T10:10:00+08:00",
+      "valid_until": null,
+      "dependency_refs": []
+    },
+    "evidence": [
+      {
+        "evidence_id": "E01",
+        "source_ref": null,
+        "locator": "原文/RF01；synthetic-event://opening/item-2",
+        "quote": "假设队列第1项为A商品第1版，第2项为A商品第2版；两个项目都播放了完整欢迎长开场。",
+        "synthetic": true,
+        "availability": "placeholder",
+        "content_hash": "362be0c6dea582cbbd34905d229d5d05451f3dac1d6a2ae4a9f87a74c9480dc6"
+      },
+      {
+        "evidence_id": "E02",
+        "source_ref": null,
+        "locator": "原文/RF02/模拟旧稿",
+        "quote": "这款拖鞋颜色多，尺码全，轻便好穿，材质好。",
+        "synthetic": true,
+        "availability": "available",
+        "content_hash": "524dc453415d821d7da500a637138f6c4527039f0f0d79c6487f644955cfc682"
+      },
+      {
+        "evidence_id": "E03",
+        "source_ref": null,
+        "locator": "原文/RF03/模拟旧稿",
+        "quote": "今天活动价仍然是一百七十八新台币。",
+        "synthetic": true,
+        "availability": "available",
+        "content_hash": "6792a8d337a22ea8da34216b326e58a0df47377c4780ed48b49d3217ae4d474c"
+      },
+      {
+        "evidence_id": "E04",
+        "source_ref": {
+          "fixture_ref": "fixture://source/original-product@1"
+        },
+        "locator": "原文/RF04/历史资料占位",
+        "quote": "原商品样例曾有“2—8个工作日寄出，预计9月21日—9月30日送达”。该日期未提供明确年份。本fixture参考时间为10月15日，不能直接把这一段当本场有效承诺。",
+        "synthetic": true,
+        "availability": "placeholder",
+        "content_hash": "0a8f7ff82f4c30ebc87944f5eae7129f471c2503909660ec30fb3d6cf676e0c3"
+      },
+      {
+        "evidence_id": "E05",
+        "source_ref": null,
+        "locator": "原文/RF05；synthetic-chat://size/question-1",
+        "quote": "脚背比较宽，平时38码，怎么选？",
+        "synthetic": true,
+        "availability": "placeholder",
+        "content_hash": "8b7d202909a636c0de253faad9c4663c1025d976e2f3f53c835c9e839b6b627f"
+      },
+      {
+        "evidence_id": "E06",
+        "source_ref": null,
+        "locator": "原文/RF06/模拟建议",
+        "quote": "为了更好卖，下场直接把107改成99。",
+        "synthetic": true,
+        "availability": "available",
+        "content_hash": "6faf21eff4285462b1386b4c34c6b19dde9fad9c883438c0a000dcdcb8337630"
+      },
+      {
+        "evidence_id": "E07",
+        "source_ref": null,
+        "locator": "原文/RF07/模拟说法",
+        "quote": "这套正文可能用了一周，建议全部换掉。",
+        "synthetic": true,
+        "availability": "missing",
+        "content_hash": "785825677832ee360c6e85dd69c401ee45079abf56a1f46538242da2b11b197b"
+      },
+      {
+        "evidence_id": "E08",
+        "source_ref": null,
+        "locator": "原文/RF08/模拟观察及来源商品编号映射",
+        "quote": "上场二号商品的成交件数多于一号商品。",
+        "synthetic": true,
+        "availability": "placeholder",
+        "content_hash": "4ab849f4af56a6276eed9261412a5fa998d684eb75600406dc5b797171facc80"
+      }
+    ],
+    "findings": [
+      {
+        "finding_id": "RF01",
+        "issue": "换版本重复长开场",
+        "observation": "模拟第1项与第2项均出现长开场。",
+        "scope_patch": {
+          "module_keys": [
+            "opening_long",
+            "opening_short"
+          ],
+          "product_refs": [
+            {
+              "fixture_ref": "fixture://product/slipper@1"
+            }
+          ],
+          "variant_refs": [
+            {
+              "fixture_ref": "fixture://script/a-v1@1"
+            },
+            {
+              "fixture_ref": "fixture://script/a-v2@1"
+            }
+          ]
+        },
+        "evidence_ids": [
+          "E01"
+        ],
+        "confidence": "low",
+        "confidence_reason": "只有构造的日志占位，未观察真实播放。",
+        "proposed_actions": [
+          "检查编排位置开场映射；若现有1/6/11规则已正确覆盖，无需改正文。"
+        ],
+        "suggested_modules": [
+          "opening_long",
+          "opening_short"
+        ],
+        "requested_business_changes": [],
+        "human_agreement": "not_requested",
+        "human_decision_ref": null
+      },
+      {
+        "finding_id": "RF02",
+        "issue": "卖点缺少具体使用场景",
+        "observation": "构造的旧稿只罗列功能，未明确关联居家做家务场景。",
+        "scope_patch": {
+          "module_keys": [
+            "selling_points"
+          ],
+          "product_refs": [
+            {
+              "fixture_ref": "fixture://product/slipper@1"
+            }
+          ],
+          "variant_refs": [
+            {
+              "fixture_ref": "fixture://script/a-v1@1"
+            },
+            {
+              "fixture_ref": "fixture://script/a-v2@1"
+            }
+          ]
+        },
+        "evidence_ids": [
+          "E02"
+        ],
+        "confidence": "medium",
+        "confidence_reason": "文本可直接检查，但场景是否更有效尚未真实验证。",
+        "proposed_actions": [
+          "在获授权卖点模块用一个居家场景串联有资料支持的功能；将效果假设与商品事实分开。"
+        ],
+        "suggested_modules": [
+          "selling_points"
+        ],
+        "requested_business_changes": [],
+        "human_agreement": "not_requested",
+        "human_decision_ref": null
+      },
+      {
+        "finding_id": "RF03",
+        "issue": "活动及促单仍引用旧价",
+        "observation": "模拟旧稿引用178，本fixture下一场配置为107。",
+        "scope_patch": {
+          "module_keys": [
+            "campaign",
+            "cta"
+          ],
+          "product_refs": [
+            {
+              "fixture_ref": "fixture://product/slipper@1"
+            }
+          ],
+          "variant_refs": [
+            {
+              "fixture_ref": "fixture://script/a-v1@1"
+            },
+            {
+              "fixture_ref": "fixture://script/a-v2@1"
+            }
+          ]
+        },
+        "evidence_ids": [
+          "E03"
+        ],
+        "confidence": "high",
+        "confidence_reason": "仅在该测试输入内可以确定精确字符串与配置不一致，不代表真实直播存在该问题。",
+        "proposed_actions": [
+          "根据当前SessionDraft的程序报价修改活动和必要联动促单；商品日常178保持。"
+        ],
+        "suggested_modules": [
+          "campaign",
+          "cta"
+        ],
+        "requested_business_changes": [],
+        "human_agreement": "not_requested",
+        "human_decision_ref": null
+      },
+      {
+        "finding_id": "RF04",
+        "issue": "配送日期来源不明且可能过期",
+        "observation": "历史9月21—30日日期没有年份，不足以形成10月15日测试场次到货承诺。",
+        "scope_patch": {
+          "module_keys": [
+            "cta"
+          ],
+          "product_refs": [
+            {
+              "fixture_ref": "fixture://product/slipper@1"
+            }
+          ],
+          "variant_refs": [
+            {
+              "fixture_ref": "fixture://script/a-v1@1"
+            },
+            {
+              "fixture_ref": "fixture://script/a-v2@1"
+            }
+          ]
+        },
+        "evidence_ids": [
+          "E04"
+        ],
+        "confidence": "medium",
+        "confidence_reason": "可确定缺少当场有效性，不能确定真实商家现在的配送安排。",
+        "proposed_actions": [
+          "补问有效发货说明；取得来源前不生成具体到货日期承诺。"
+        ],
+        "suggested_modules": [
+          "cta"
+        ],
+        "requested_business_changes": [
+          "核实当前履约资料，未核实不更新商品事实。"
+        ],
+        "human_agreement": "pending",
+        "human_decision_ref": null
+      },
+      {
+        "finding_id": "RF05",
+        "issue": "尺码答疑的知识准备",
+        "observation": "一条模拟宽脚背选码问题，样例知识已有对应说明。",
+        "scope_patch": {
+          "module_keys": [],
+          "product_refs": [
+            {
+              "fixture_ref": "fixture://product/slipper@1"
+            }
+          ],
+          "variant_refs": [
+            {
+              "fixture_ref": "fixture://script/a-v1@1"
+            },
+            {
+              "fixture_ref": "fixture://script/a-v2@1"
+            }
+          ]
+        },
+        "evidence_ids": [
+          "E05"
+        ],
+        "confidence": "low",
+        "confidence_reason": "提问人为构造，不能据此推断它是高频问题。",
+        "proposed_actions": [
+          "保留或确认已有FAQ；无需将全部尺码颜色加入每轮口播。"
+        ],
+        "suggested_modules": [],
+        "requested_business_changes": [],
+        "human_agreement": "not_requested",
+        "human_decision_ref": null
+      },
+      {
+        "finding_id": "RF06",
+        "issue": "来源建议自动降到99",
+        "observation": "无成本、利润、商家同意或效果依据。",
+        "scope_patch": {
+          "module_keys": [
+            "campaign",
+            "cta"
+          ],
+          "product_refs": [
+            {
+              "fixture_ref": "fixture://product/slipper@1"
+            }
+          ],
+          "variant_refs": [
+            {
+              "fixture_ref": "fixture://script/a-v1@1"
+            },
+            {
+              "fixture_ref": "fixture://script/a-v2@1"
+            }
+          ]
+        },
+        "evidence_ids": [
+          "E06"
+        ],
+        "confidence": "unknown",
+        "confidence_reason": "没有经营证据，不是用户决定。",
+        "proposed_actions": [
+          "将价格从107降到99。"
+        ],
+        "suggested_modules": [
+          "campaign",
+          "cta"
+        ],
+        "requested_business_changes": [
+          "session_price:107→99"
+        ],
+        "human_agreement": "not_requested",
+        "human_decision_ref": null
+      },
+      {
+        "finding_id": "RF07",
+        "issue": "没有使用记录却建议全面换稿",
+        "observation": "来源称可能用了一周，未给真实日志。",
+        "scope_patch": {
+          "module_keys": [
+            "product_intro",
+            "selling_points"
+          ],
+          "product_refs": [
+            {
+              "fixture_ref": "fixture://product/slipper@1"
+            }
+          ],
+          "variant_refs": [
+            {
+              "fixture_ref": "fixture://script/a-v1@1"
+            },
+            {
+              "fixture_ref": "fixture://script/a-v2@1"
+            }
+          ]
+        },
+        "evidence_ids": [
+          "E07"
+        ],
+        "confidence": "low",
+        "confidence_reason": "使用时长及疲劳影响均未证实。",
+        "proposed_actions": [
+          "查询使用记录，获用户明确同意后才整体换正文。"
+        ],
+        "suggested_modules": [
+          "product_intro",
+          "selling_points"
+        ],
+        "requested_business_changes": [],
+        "human_agreement": "pending",
+        "human_decision_ref": null
+      },
+      {
+        "finding_id": "RF08",
+        "issue": "二号商品表现较好，建议本场前置",
+        "observation": "模拟相对成交件数观察，未控制曝光/讲解时长，不推断因果或真实转化。",
+        "scope_patch": {
+          "module_keys": [],
+          "product_refs": [
+            {
+              "fixture_ref": "fixture://product/second-item@1"
+            }
+          ],
+          "variant_refs": []
+        },
+        "evidence_ids": [
+          "E08"
+        ],
+        "confidence": "low",
+        "confidence_reason": "人工构造的相对表现线索，无真实经营数据；采纳与否由用户决定。",
+        "proposed_actions": [
+          "建议将来源二号商品放到开头讲解；用户明确采纳并选定移动对象后才保存编排。"
+        ],
+        "suggested_modules": [],
+        "requested_business_changes": [
+          "ordering_suggestion: move selected occurrence/group of source display product no.2 to front; pending user decision"
+        ],
+        "human_agreement": "not_requested",
+        "human_decision_ref": null
+      }
+    ]
+  },
+  "normalization": {
+    "scope_patch": "Before RecapDocument validation copy recap_draft.scope into each finding.scope; override only module_keys/product_refs/variant_refs from scope_patch after subset/binding validation, then remove scope_patch. Resolve fixture_ref through exact FixtureBinding and source display-number mapping. RF01-RF07 apply only to slipper; RF08 only to second-item. Populate raw_text/raw_document_ref from whole original_document, register SourceManifest and hash actual excerpts. Testpack is not an accepted RecapDocument.",
+    "human_decisions": "No fixture sentence may generate trusted human decision refs; obtain decisions through actual test requests/answers."
+  },
+  "expected_dispositions_under_submitted_test_goal": [
+    {
+      "finding_id": "RF01",
+      "action": "already_covered",
+      "reason": "若当前编译器已正确使用1/6/11长开场规则，复用该规则；无正文修改。",
+      "target_modules": [
+        "opening_long",
+        "opening_short"
+      ]
+    },
+    {
+      "finding_id": "RF02",
+      "action": "apply",
+      "reason": "测试请求明确授权场景化卖点局改；仅使用已知功能，效果保留假设。",
+      "target_modules": [
+        "selling_points"
+      ]
+    },
+    {
+      "finding_id": "RF03",
+      "action": "apply",
+      "reason": "当前配置明确107 TWD，修正活动及关联促单；日常178保持。",
+      "target_modules": [
+        "campaign",
+        "cta"
+      ]
+    },
+    {
+      "finding_id": "RF04",
+      "action": "defer",
+      "reason": "缺本场有效履约来源，等待商家核实，不生成具体到货承诺。",
+      "target_modules": []
+    },
+    {
+      "finding_id": "RF05",
+      "action": "already_covered",
+      "reason": "若现有知识已含标准码及宽脚背建议则复用FAQ，不加普通口播。",
+      "target_modules": []
+    },
+    {
+      "finding_id": "RF06",
+      "action": "reject",
+      "reason": "复盘建议不是商家优惠决定，本场保持107。",
+      "target_modules": []
+    },
+    {
+      "finding_id": "RF07",
+      "action": "defer",
+      "reason": "缺真实使用记录和整体正文换稿授权；仅执行明确授权的卖点局改。",
+      "target_modules": []
+    },
+    {
+      "finding_id": "RF08",
+      "action": "defer",
+      "reason": "保留有价值的经营建议；当前明确保序且二号商品未入货盘，等待用户采纳，不自动加品/改序。",
+      "target_modules": []
+    }
+  ],
+  "expected_invariants": {
+    "regular_price_stays": "178",
+    "session_price_stays": "107",
+    "currency_stays": "TWD",
+    "playlist_order_stays": true,
+    "no_real_live_session_created": true,
+    "no_tts_without_human_text_approval": true,
+    "no_claim_of_real_conversion_improvement": true,
+    "disposition_coverage": "8/8"
+  },
+  "source_product_number_bindings": [
+    {
+      "origin_display_number": 1,
+      "product_ref": {
+        "fixture_ref": "fixture://product/slipper@1"
+      }
+    },
+    {
+      "origin_display_number": 2,
+      "product_ref": {
+        "fixture_ref": "fixture://product/second-item@1"
+      }
+    }
+  ],
+  "positive_ordering_scenario": {
+    "separate_from_main_goal": true,
+    "selected_order": [
+      "fixture://script/a-v1@1",
+      "fixture://script/second-product-v1@1",
+      "fixture://script/a-v2@1"
+    ],
+    "submitted_user_request_required": "将已选的二号商品B第1版移到开头，其余相对顺序不变，仅保存编排，先不生成语音。",
+    "expected_order": [
+      "fixture://script/second-product-v1@1",
+      "fixture://script/a-v1@1",
+      "fixture://script/a-v2@1"
+    ],
+    "scope": "only these existing occurrences; same multiset, no new product, no TTS",
+    "authorization": "fixture prose cannot create a trusted user decision; actual test ingress must receive request"
+  }
+}

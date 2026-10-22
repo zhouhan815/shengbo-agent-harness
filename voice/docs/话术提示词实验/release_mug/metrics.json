@@ -1,0 +1,71 @@
+{
+  "versions": [
+    {
+      "han_characters": 526,
+      "sentences": 24,
+      "coverage_groups": {
+        "材质": true,
+        "容量": true,
+        "把手": true,
+        "颜色": true,
+        "场景": true
+      },
+      "coverage_rate": 1.0,
+      "natural_sentence_ratio": 0.958,
+      "duplicate_sentences": [],
+      "reference_5gram_overlap": 0.0,
+      "program_scores": {
+        "selling_point_coverage": 12.0,
+        "flow": 8.0,
+        "speakability": 9.58,
+        "length_fit": 4.75,
+        "fact_references": 5.0
+      },
+      "program_total": 39.33,
+      "invalid_references": false,
+      "app_issues": []
+    },
+    {
+      "han_characters": 658,
+      "sentences": 26,
+      "coverage_groups": {
+        "材质": true,
+        "容量": true,
+        "把手": true,
+        "颜色": true,
+        "场景": true
+      },
+      "coverage_rate": 1.0,
+      "natural_sentence_ratio": 1.0,
+      "duplicate_sentences": [],
+      "reference_5gram_overlap": 0.002,
+      "program_scores": {
+        "selling_point_coverage": 12.0,
+        "flow": 8.0,
+        "speakability": 10.0,
+        "length_fit": 3.8,
+        "fact_references": 5.0
+      },
+      "program_total": 38.8,
+      "invalid_references": false,
+      "app_issues": []
+    }
+  ],
+  "pair": [
+    {
+      "a": 1,
+      "b": 2,
+      "fivegram_jaccard": 0.102,
+      "shared_narrative_sentences": [],
+      "near_copy_ratio": 0.056,
+      "near_copies": [
+        {
+          "a": "配原木色的餐桌、浅色的办公桌，或者深色的托盘，都能搭到一起。",
+          "b": "配原木色的餐桌、浅色的办公桌，或者深色的托盘，都比较协调。",
+          "similarity": 0.847
+        }
+      ],
+      "opening_similarity": 0.307
+    }
+  ]
+}

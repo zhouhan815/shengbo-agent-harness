@@ -1,0 +1,1288 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>播中播后综合Agent完整工程计划</title><style>
+:root{--ink:#24304a;--muted:#626e80;--line:#dbe0e7;--blue:#475ed7;--paper:#fff;--bg:#f5f5f1}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.85 'Segoe UI','Microsoft YaHei',sans-serif}
+nav{position:fixed;left:0;top:0;bottom:0;width:266px;padding:28px 20px;background:#eeefe9;border-right:1px solid var(--line);overflow:auto}
+nav b{display:block;font-size:21px;margin-bottom:12px}nav small{display:block;color:var(--muted);line-height:1.65;margin-bottom:20px}
+nav a{display:block;color:#35426b;text-decoration:none;padding:10px 8px;border-radius:8px;font-size:14px;line-height:1.6}nav a:hover{background:#fff}
+main{margin:28px 28px 80px 294px;max-width:1600px}.hero,article{background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:28px 32px;margin-bottom:26px}
+.hero{border-top:5px solid var(--blue)}.badge{color:#52609c;font-size:13px;letter-spacing:.08em}.note{padding:14px 18px;background:#f1f4ff;border-left:4px solid #6b7ae0;border-radius:6px}
+h1{font-size:30px;line-height:1.45;margin:8px 0 22px}h2{font-size:23px;line-height:1.5;margin:34px 0 16px;border-bottom:1px solid #e6e9ee;padding-bottom:10px}h3{font-size:19px;line-height:1.6;margin:26px 0 12px}p{margin:13px 0}a{color:#425dc7;text-decoration:none}a:hover{text-decoration:underline}
+.table{overflow-x:auto;border:1px solid var(--line);border-radius:10px;margin:18px 0}table{width:100%;border-collapse:collapse;min-width:850px;font-size:14px;line-height:1.8}th,td{padding:13px 15px;text-align:left;vertical-align:top;border-bottom:1px solid #e1e6ed;border-right:1px solid #e1e6ed}th{background:#eef1f7;font-weight:650;position:sticky;top:0}tr:nth-child(even) td{background:#fafbf9}td:first-child{min-width:100px;font-weight:550}tr:last-child td{border-bottom:0}
+code{background:#eef1f7;padding:2px 5px;border-radius:4px;font:13px/1.7 Consolas,'Microsoft YaHei',monospace;overflow-wrap:anywhere}pre{background:#20283a;color:#f0f3f8;padding:20px;border-radius:10px;overflow:auto;font:13px/1.75 Consolas,'Microsoft YaHei',monospace}pre code{background:none;color:inherit;padding:0;white-space:pre}
+.figure{overflow:auto;background:#fafbf8;border:1px solid var(--line);border-radius:12px;padding:8px;margin:20px 0}.figure img{display:block;width:100%;min-width:1080px;height:auto}.caption{font-size:13px;color:var(--muted)}details{margin:12px 0;color:var(--muted)}summary{cursor:pointer}li{margin:7px 0}blockquote{margin:15px 0;padding:10px 18px;border-left:4px solid #adb8ce;background:#f8f9fb}
+@media(max-width:960px){nav{position:static;width:auto}nav a{display:inline-block}main{margin:15px}.hero,article{padding:20px}h1{font-size:25px}}
+@media print{nav{display:none}main{margin:0}.hero,article{border:0;padding:0}.table{overflow:visible}table{min-width:0;font-size:10px}h2{break-after:avoid}tr{break-inside:avoid}.figure img{min-width:0}article{break-before:page}}
+</style></head><body><nav><b>综合复盘 Agent</b><small>Harness工程计划<br>LIVE-REVIEW-ENG-1.0<br>设计完成 · 业务尚未实现</small><a href="#section-0">总开发计划与架构</a><a href="#section-1">数据契约与持久化</a><a href="#section-2">AgentHarness与上下文中间件</a><a href="#section-3">工具与可调用工作流</a><a href="#section-4">API前端与播前交接</a><a href="#section-5">验收与实施任务包</a><a href="#section-6">播前迭代教训预防矩阵</a><a href="#section-7">评价体系执行配方</a></nav><main><section class="hero"><div class="badge">2026-10-20 · LIVE-REVIEW-ENG-1.0</div><h1>播中播后综合 Agent<br>完整 Harness 工程计划</h1><p>从数据归档、数值评价到Agent自主复盘、人工采纳和下一场交接。</p><div class="note">一主、两个可选专题；四个业务中间件、四份Skill、十四个原子工具、五个可调用工具流。<br>本次交付工程设计，未修改业务代码；W／R／PL为后续实施和验收要求。</div></section><article id="section-0"><h1>播中播后综合Agent：Harness工程开发计划</h1>
+<p>版本：LIVE-REVIEW-ENG-1.0。日期：2026-10-20（Asia/Shanghai）。状态：可评审工程设计，尚未业务实现。</p>
+<p>本计划把LIVE-REVIEW-1.1总体方案、LIVE-SCORE-0.1数值评价和播前Agent三轮迭代后的实际教训合成一套实施合同。评分政策保留，不为工程化改变经营目标。旧播中实时干预方案、旧播后方案和本目录上级研究稿均保留。</p>
+<h2>1 首期交付边界</h2>
+<div class="table"><table>
+<tr><th>范围</th><th>本期实现目标</th><th>本期不执行的动作</th></tr>
+<tr><td>播中</td><td>按本场采集抖音公开事件、媒体播放时间线、连接／缺口和人工场记，形成可恢复归档</td><td>AI不自动插播、切品、重排、改稿、改价、发券或停止直播</td></tr>
+<tr><td>播后</td><td>导入用户授权经营报表，计算指标与评分；Agent按需取证，解释商品、稿件、模块、顾虑和经营瓶颈</td><td>不将评论当订单，不给没有数据的模块编造转化，不承诺单句带来多少GMV</td></tr>
+<tr><td>下一场</td><td>形成版本明确的建议候选；用户选中后交给播前，保留采用／暂缓／不适用的处置</td><td>复盘Agent本身不生成新话术或TTS，不直接更新商品和正式直播编排</td></tr>
+<tr><td>本次工作</td><td>写清架构、文件／函数、数据、工具流、中间件、Skill、权限、上下文、恢复、验收和实施分工</td><td>不修改业务程序，不启动采集／付费模型／TTS，不安装或升级生产依赖</td></tr>
+</table></div>
+<p>完成的业务判据：一场数据能从接入、封存、报表、指标、Agent结论一路追溯；没有经营数据也能诚实完成互动限定复盘；采纳建议能安全交到指定下一场。模块细粒度结论按数据资格启用，不以“每个格子都有分数”作为完成条件。</p>
+<h2>2 现有基线与复用决定</h2>
+<div class="table"><table>
+<tr><th>项目</th><th>本地已核实</th><th>工程决定</th></tr>
+<tr><td>运行时</td><td>Deep Agents 0.7.25、LangChain 1.4.6、Core 1.6.10、LangGraph 1.2.15、SQLite checkpointer 3.1.2</td><td>保持现有锁定版本，先核兼容；不套最新网页中本地没有的参数</td></tr>
+<tr><td>模型</td><td>既有chatgpt_plan／gpt-6.1-sol提供方适配器和本机安全凭据路径</td><td>复用provider入口、续期和工具往返；不复制令牌、不静默换计费来源；自动自然过期场景仍需实施验收</td></tr>
+<tr><td>部署</td><td>声播8765、播前Agent8791，由既有桌面启动器启动</td><td>在8791增加独立Review router和Runtime，经8765同源桥访问；不再增加第三个端口／启动器</td></tr>
+<tr><td>公开采集</td><td>douyinLive v2.3.1与voice/app/live_source.py；现有唯一采集连接、归一化和事件DB</td><td>在原持久化边界补outbox、未知／健康原件；Review消费者不另开第二个同房间采集器</td></tr>
+<tr><td>播放</td><td>server.py中Room状态与ack，编译稿有句／模块来源；日志尚不够完整</td><td>增加本地journal与缺口，不把role=monitor的瞬时WS快照当完整事件历史</td></tr>
+<tr><td>报表读取</td><td>现环境已有openpyxl 3.1.5、numpy；pandas／statsmodels尚未安装</td><td>CSV用标准csv，XLSX用openpyxl；首期评分／Wilson用小型版本化纯函数与参考值核验，必要时评审固定统计库依赖。研究推荐不等于已经接入</td></tr>
+<tr><td>最新播前证据</td><td>本地v8已做定向离线验证／旧产物回放，无新的完整付费链路耗时</td><td>将已知故障固化为新模块的负例，不能把v8预期减少往返写成已实测提速</td></tr>
+<tr><td>复盘交接</td><td>voice已有import_recap、link_recap_to_preparation和expected_revision</td><td>做显式ReviewBundle→Recap投影及幂等／对账，不假设当前dict接口已经覆盖完整语义</td></tr>
+</table></div>
+<p>播前经验的核心不是复制旧RuntimeEngine。新包只借用小型稳定组件：安全模型adapter、严格引用／规范JSON工具、只读文件读取器、安全日志投影原则。直播复盘的目标、权限、状态和完成判断另有单一实现，避免把旧的生成、批准、音频、发布逻辑带进来。</p>
+<h2>3 总体Harness结构</h2>
+<div class="figure"><img src="assets/harness-architecture.svg" alt="Harness结构图"></div>
+<p class="caption"><a href="assets/harness-architecture.svg">单独打开矢量图，可放大查看</a> · 图中组件是待实施设计。</p>
+<details><summary>查看可编辑Mermaid源图</summary><pre>flowchart TB
+  UI[Agent工作台：右侧对话，左侧数据／报告／微调] --&gt; G[8765同源桥：身份与Origin检查]
+  G --&gt; API[8791 Review API：任务、查询、采纳、SSE]
+  COL[现有唯一抖音采集源] --&gt; VO[voice本地事件与outbox]
+  PLAY[既有播放器ack／控制事件] --&gt; J[voice本地播放journal]
+  VO --&gt; IN[Review可靠消费者：归属、去重、游标]
+  J --&gt; IN
+  API --&gt; IMP[报表预览／映射／确认导入]
+  IN --&gt; DATA[review.sqlite：本场事实与不可变归档修订]
+  IMP --&gt; DATA
+  DATA --&gt; CALC[指标／资格／基线／评分：确定性工具服务]
+  API --&gt; RUN[ReviewRuntime：任务租约、恢复、取消、预算]
+  RUN --&gt; MAIN[Deep Agents主复盘Agent]
+  MAIN --&gt; TOOLS[只读证据工具＋可调用工具流]
+  TOOLS --&gt; CALC
+  TOOLS --&gt; DATA
+  MAIN -.按需并行.-&gt; C[内容专题子Agent]
+  MAIN -.按需并行.-&gt; B[经营专题子Agent]
+  C --&gt; DRAFT[专题草稿与引用：独立子任务产物]
+  B --&gt; DRAFT
+  DRAFT --&gt; MAIN
+  MAIN --&gt; FIN[submit_review_draft／finish_review：一次业务终态核验]
+  FIN --&gt; REPORT[正式ReviewBundle与四类评分卡]
+  REPORT --&gt; USER[用户选建议并确认具体下一场]
+  USER --&gt; HAND[采纳账本与Recap适配／CAS关联]
+  HAND --&gt; PRE[既有播前Agent：核差异后自行规划]
+  RUN --&gt; TRACE[安全事件／用量／耗时／进度记录]
+  TRACE --&gt; API</pre></details>
+<p>Harness分两层：业务后端提供“事实、指标和操作的真实语义”；模型Harness提供“自主调查、工具执行边界、上下文、任务生命周期和交付核验”。采集器、计算函数和报表解析器是普通程序，不为它们各建一个Agent。</p>
+<h2>4 目录与职责所有权</h2>
+<p>以下路径均是未来拟新增或改动的位置，不表示本轮已经生成实现。</p>
+<pre><code>D:/Codex project/shengbo-ops-agent/
+  src/shengbo_contracts/live_review.py       # 全部Review DTO／错误码／schema导出
+  src/shengbo_live_review/
+    bootstrap.py                           # 资源创建／关闭／现有app挂载
+    api.py                                 # /review/v1内网API
+    runtime.py                             # 主循环协调；不放指标或SQL
+    control.py                             # Goal解释冻结、等待回执／Inbox及完成查询适配
+    reports.py                             # 草稿、证据依赖校验、正式报告／交付回执唯一服务
+    jobs.py                                # 持久作业、去重／租约、完成唤醒
+    agent_factory.py                       # 主／子Deep Agent与SDK中间件配置
+    context.py                             # 当前目标、证据索引、压缩与精确回读
+    middleware.py                          # 四个定制业务中间件
+    policy.py                              # 唯一角色／工具／副作用权限注册
+    tools.py                               # DTO到普通服务的薄封装
+    flows.py                               # 可选机械组合工具，不是全局固定DAG
+    repository.py                          # SQLite事务／CAS／唯一键
+    artifacts.py                           # 规范JSON、原件、安全证据和引用校验
+    ingest.py                              # voice outbox／journal消费者
+    sessions.py                            # 绑定、租约、封存、迟到修订
+    playback.py                            # attempt／segment区间与时钟
+    report_imports.py                       # CSV／XLSX预览、映射、确认、拒绝行
+    metric_definitions.py                  # 指标定义唯一注册
+    metrics.py                             # 分子、分母、cohort、时间聚合
+    scoring.py                             # 四类分数、基线、样本资格
+    feedback.py                            # Review→Recap适配及采纳对账
+    observability.py                       # trace、账本、进度和时间报告
+  skills/review/&lt;skill_name&gt;/SKILL.md        # 四份唯一Skill原件，按角色投影可见目录
+  tests/live_review/                        # 纯函数／契约／SDK假模型／集成
+  verification/live_review/                 # 显式运行的授权真实验收
+  .runtime/live_review/
+    review.sqlite3                         # 事实／任务／指标／报告／trace正本
+    checkpoints.sqlite3                    # 图计算检查点，独立连接
+    artifacts/                             # 内容寻址不可变原件和产物</code></pre>
+<p>voice项目拟新增app/live_review_ingress.py、app/live_review_bridge.py；现有app/live_source.py和server.py只在已经确认的事件产生边界加入旁路，不复制第二套Room／normalize。UI新增Review工作区组件并复用既有对话布局机制；不在本计划重画整套前端视觉。</p>
+<p>同一规则只放一个正本：工具权限在policy；数据模型在contracts；计分在scoring；报告完成语义在报告服务；中间件调用这些服务，不各写一套“似乎完成”的判断。所有read工具使用repository查询，不从提示词里猜路径。</p>
+<h2>5 主Agent、子Agent与程序怎样分工</h2>
+<div class="table"><table>
+<tr><th>执行者</th><th>输入</th><th>自主选择</th><th>可以产生的结果</th><th>实际权限</th></tr>
+<tr><td>主复盘Agent</td><td>用户目标、固定归档修订、能力与指标索引、历史／政策引用</td><td>查哪个商品／模块、是否追加证据、何时委派、是否需要对比或小实验建议</td><td>Findings、报告草稿、建议候选、待补数据问题</td><td>只读业务事实；写本次草稿／待确认问题；可完成本次Review，不可改直播</td></tr>
+<tr><td>内容专题</td><td>指定问题、同归档、精确稿件／事实／评论引用、子预算</td><td>查原句、主题、反例、表达与内容四项评分</td><td>结构化子报告、证据引用、未知项</td><td>不可交付主报告、不可采纳或改稿；只读指定范围</td></tr>
+<tr><td>经营专题</td><td>指定经营问题、同归档、指标／基线／报表口径、子预算</td><td>分解漏斗、核退款龄期、选择可比对照</td><td>经营发现与替代解释</td><td>不可自行改计分公式、目标、原单或优惠</td></tr>
+<tr><td>确定性服务</td><td>版本化参数与可信scope</td><td>无业务语义自我规划</td><td>可靠数据、计算、资格、可恢复作业、正式回执</td><td>通过明确API执行；不调用模型来判断加减乘除</td></tr>
+<tr><td>人工控制器</td><td>登录身份、显示过的确认卡与选项</td><td>选择补数据、处理歧义、采纳建议、选择下一场</td><td>已确认映射／采用决定</td><td>人工授权业务动作入口，不通过模型自报身份取得权限</td></tr>
+</table></div>
+<p>主Agent可以一次调用两个task并行调查内容与经营；共同读取同一不可变归档，子结果各自落独立草稿。主Agent合并冲突，不让两个子Agent同时写同一报告正文。简单目标如“看本场净额达标没有”不固定委派，也不强制做评论分类。</p>
+<h2>6 固定的是哪一部分，灵活的是哪一部分</h2>
+<div class="table"><table>
+<tr><th>环节</th><th>程序必须保证的内部顺序</th><th>Agent保留的选择</th></tr>
+<tr><td>采集与封存</td><td>原件／事件保存→同事务outbox或可靠journal→消费去重→游标提交；封存固定截止与缺口</td><td>播中不运行运营模型；人工选择哪场要监控</td></tr>
+<tr><td>报表导入</td><td>类型读取→字段／单位预览→必要歧义确认→确定性规范化→正式导入</td><td>需要哪种表、数据缺什么、是否先出有限复盘</td></tr>
+<tr><td>指标评分</td><td>资格→同口径统计→固定基线／目标→评分→持久结果</td><td>只算某个指标／商品，追加别的分析，选择按需工具流</td></tr>
+<tr><td>内容理解</td><td>精确读取→结构化判断→保存引用；格式错误有限纠正</td><td>研究哪句话、哪些顾虑、是否需要专题、保留不同解释</td></tr>
+<tr><td>报告交付</td><td>草稿保存→同一服务检查引用／数值／原目标→正式回执→结束</td><td>如何组织报告、哪些建议优先、证据不足时怎样交付部分结果</td></tr>
+<tr><td>采纳交接</td><td>确认快照→稳定操作ID→导入Recap→CAS关联下一场→回读</td><td>用户采纳什么；播前如何评估修改范围</td></tr>
+</table></div>
+<p>提供五个可调用组合入口：prepare_review_context、build_product_panel、build_module_panel、compare_compatible_history、package_review_delivery。每个内部步骤确定，但没有强迫主Agent从第一个按顺序调用到第五个的总工作流。底层只读工具保留，模型可自行增补调查。</p>
+<h2>7 评分怎样融合进开发，而不是作为附录</h2>
+<div class="table"><table>
+<tr><th>评分要求</th><th>必须进入的工程部件</th><th>完成证据</th></tr>
+<tr><td>目标分、历史相对分、内容分、覆盖分分开</td><td>ScoreResult.score_basis、scoring.py、报告投影／UI四类卡</td><td>丢掉低分指标不会让别的分变高；内容87.5不写成经营成功</td></tr>
+<tr><td>净额目标900／1000得90</td><td>同龄支付退款cohort、整数金额、冻结GoalDefinition、score_target</td><td>原值90000分／100000分，可回算并显示900元／1000元</td></tr>
+<tr><td>历史持平60，1.25倍80，1.5倍100</td><td>BaselineSnapshot与score_relative；比例上限另处理</td><td>B=0返回null；比例B=.8、X=.9对应80，B=1不制造150%目标</td></tr>
+<tr><td>内容四项0／12.5／25</td><td>ContentAssessment引用原句及实际事实，程序求和</td><td>未知项不重标其余权重；错价单列严重问题</td></tr>
+<tr><td>模块／句子时间证据</td><td>publication映射、attempt／segment、时钟／延迟、mixed状态</td><td>播放不是发声保证；暂停不算播出；跨分钟UV不相加</td></tr>
+<tr><td>公共评论仅为代理</td><td>评论分类结果与覆盖、主题组／观测用户分开、已核人分钟</td><td>“买了”不变订单；少问题不自动高分；未核在线不算密度</td></tr>
+<tr><td>样本与成熟度</td><td>MetricResult、ScoreResult、Report.as_of与limitations</td><td>3／50和30／500均6%，区间不同；退款D+1不比D+14</td></tr>
+<tr><td>调试可解释</td><td>每次工具／模型／计算span、用量attempt、UI按块展开</td><td>点48分能查16／100、基线20%、来源、限制和原稿</td></tr>
+</table></div>
+<p>上级23项基础指标以及评分细则新增的C／Q／T指标应在同一指标注册器合并，不建两个互不兼容的“旧指标／评分专用指标”实现。具体收口映射见01与03。</p>
+<p>评价的可执行配方见07：逐项列数据字段、粒度、计算函数、数值映射、null出口及反例，供W2开发和W5验收直接使用。四项内容审核由K10主Agent或K13内容子提交同一typed ContentAssessment，程序评分；不是由评论分类工具K09代算。用户明确要重算时，Goal.refresh_mode和CalculationReceipt证明实际做过哪些计算，避免拿旧报告充新结果。</p>
+<h2>8 为避免重复三轮修补，开发前置的质量门</h2>
+<div class="table"><table>
+<tr><th>门</th><th>首次实现必须先做的事情</th><th>通过才允许做什么</th></tr>
+<tr><td>G0 契约收口</td><td>明确ReviewRef、SourceKind、错误码、状态、金额、分页与时区；把旧设计草案的字符串ref／来源拼写做一次显式适配</td><td>并行开发消费方，避免各窗口各写DTO</td></tr>
+<tr><td>G1 事实完整</td><td>两场同房、300条补档、掉线、循环／暂停、迟到、未知方法夹具；归档可复算</td><td>给模型开放资料和时间结论</td></tr>
+<tr><td>G2 数值可回算</td><td>目标／比例／退款／UV／覆盖和缺失反例；固定输入输出；正式指标单一注册</td><td>开放评分卡和报告数字</td></tr>
+<tr><td>G3 原生工具往返</td><td>假模型真实走Deep Agents工具调用、结构化返回、子Agent／错误反馈、压缩与恢复，不只单测函数</td><td>使用少量授权真实模型验证</td></tr>
+<tr><td>G4 完成与恢复</td><td>任务正本、图检查点、产物、待确认／未知动作分开；finish可核真实报告并直接结束</td><td>端到端声称“完成复盘”</td></tr>
+<tr><td>G5 同版交付</td><td>同一次冻结构建核代码、契约、Skill、迁移、测试和桌面加载版本</td><td>更新用户正在使用的服务</td></tr>
+</table></div>
+<p>每批合并同根因改动和相关回归；先检查真实失败入口，再补针对反例。没有新的修改／疑点，不反复全链调用模型。结构复查要求见05，不以“通过几百个测试”替代数据链路正确。</p>
+<h2>9 开发顺序与并行边界</h2>
+<div class="table"><table>
+<tr><th>工作包</th><th>先做的具体结果</th><th>可并行的工作</th><th>依赖与负责人边界</th></tr>
+<tr><td>W0 契约／夹具／接点冻结</td><td>统一DTO、schema、API目录、迁移编号、能力与完整场景夹具</td><td>提前整理现有报告样例和旧问题映射</td><td>集成者独占common contract；其余模块引用</td></tr>
+<tr><td>W1 归档／播放／生命周期</td><td>可靠摄入、同场隔离、实际播放journal、封存修订</td><td>W2用合成归档开发</td><td>voice接点由一位开发者负责，避免并行改server.py</td></tr>
+<tr><td>W2 导入／指标／评分</td><td>CSV／XLSX映射、cohort、基线、四类评分、缓存</td><td>W1、W3均可用固定契约假服务</td><td>不等待真实交易API；真实样本不够时保留能力降级</td></tr>
+<tr><td>W3 Harness／工具／恢复</td><td>Runtime、四中间件、三个角色、Skill、budget、task／finish、trace</td><td>W1／W2用适配器接入；UI可按schema做投影</td><td>不复制播前大运行时；按角色限制实际工具</td></tr>
+<tr><td>W4 API／UI／播前交接</td><td>对话入口、左侧展示与校正、SSE补发、采纳卡与对账</td><td>在W0后可做假数据UI；真实交接在W2／W3后</td><td>不与前端窗口同时改业务contract和voice接点</td></tr>
+<tr><td>W5 合并验收／结构复查</td><td>离线分组→SDK工具回放→冻结构建→少量同版真实调用→授权测试直播／报表</td><td>失败按共同根因批量修，不逐小改全回归</td><td>每个层级证据单独记录，真实链路不足不能升级声明</td></tr>
+<tr><td>W6 部署／回滚</td><td>将W5通过的同一构建更新到既有服务，核实际加载版本和回滚</td><td>不在部署时顺便改业务</td><td>无第三端口／启动器；原声播与播前可用性单独核验</td></tr>
+</table></div>
+<p>W0通过后可以把W1、W2、W3、W4分别交给独立窗口；每份输入、产物、测试与交付要求见05。合并者负责统一接点、schema和最终版本，不能让各包各自自动重启生产服务。</p>
+<h2>10 当前不确定性及实施时的准确处理</h2>
+<div class="table"><table>
+<tr><th>待验证项</th><th>已有条件</th><th>处理方式</th></tr>
+<tr><td>实际经营表表头、时间粒度、订单／退款关联</td><td>用户能导出，尚未核对样本</td><td>开发reader preview，不猜字段；只有商品汇总就只给商品／整场分，不因此阻断基础归档</td></tr>
+<tr><td>平台端音频与事件传输延迟</td><td>本地句子坐标可控，尚无完整平台校准</td><td>实现ClockEvidence与人工标定输入，未标定时禁严格句子归因；保留本地共现</td></tr>
+<tr><td>provider真实自然续期与工具子图恢复</td><td>已有adapter／旧探针，不能代替新链路验证</td><td>先假过期、工具call、取消、重放；授权真实短任务再核，不索取令牌</td></tr>
+<tr><td>小商家历史基线少</td><td>数值政策已明确缺样本不强评分</td><td>仍给内容审核、真实经营数值及用户目标分；攒够条件后再打开相对评分</td></tr>
+<tr><td>真实总耗时</td><td>只有旧播前耗时，Review是新任务</td><td>先分层埋点、真实记录；10分钟是优化目标，不砍必要信息、不伪造承诺</td></tr>
+<tr><td>新开发后是否绝不再出错</td><td>已知根因可提前覆盖</td><td>用负例、同版验收和结构审计减少已知回归；未出现的错误仍允许发现后修订，不声称设计保证零缺陷</td></tr>
+</table></div>
+<h2>11 阅读与执行入口</h2>
+<div class="table"><table>
+<tr><th>文档</th><th>开发时必须解决的具体问题</th></tr>
+<tr><td>01_数据契约与持久化.md</td><td>ID／ref／时间／金额、表／唯一键／事务、采集与封存、报表与cohort、基线／评分缓存</td></tr>
+<tr><td>02_AgentHarness与上下文中间件.md</td><td>create_deep_agent配置、主子协作、四中间件真实hook、预算／摘要／恢复／取消和权限</td></tr>
+<tr><td>03_工具与可调用工作流.md</td><td>每个工具和flow的输入输出、内部步骤、错误与等待、资格与指标统一注册</td></tr>
+<tr><td>04_API前端与播前交接.md</td><td>同源API、异步任务、SSE、左右工作区、确认卡、采纳CAS、完整成功／失败时序</td></tr>
+<tr><td>05_验收与实施任务包.md</td><td>开发包、反例夹具、层级测试、性能计量、同版构建、结构一致性及交付证据</td></tr>
+<tr><td>06_播前迭代教训预防矩阵.md</td><td>真实旧问题→根因→新架构唯一落点→验收ID，不把旧已修缺陷说成当前仍复现</td></tr>
+<tr><td>07_评价体系执行配方.md</td><td>每个指标的输入、粒度、公式、评分资格、四项内容标准、数值与反例，接到同一工具及存储路径</td></tr>
+</table></div>
+<p>所有路径、函数名、阈值与API在实施前以本工程包为统一基线；已有SDK签名和接点证据见research。发现真实样本需要改契约时先升版本并更新消费方夹具，不能在工具、Skill和后端各打一个补丁。</p></article><article id="section-1"><h1>数据契约、归档、报表与评分持久化</h1>
+<p>工程版本LIVE-REVIEW-ENG-1.0；以下为拟实施接口。目录前缀：Agent工程的src/shengbo_live_review/；voice前缀指ecommerce-voice-agent/app/。本稿不执行迁移或业务写入。</p>
+<h2>1 先收口已有草案的格式差异</h2>
+<div class="table"><table>
+<tr><th>当前差异／事实</th><th>本次开发唯一规则</th><th>代码位置／验收</th></tr>
+<tr><td>上级基础Schema用对象ArtifactRef，评分Schema的ref仍是演示字符串</td><td>正式DTO统一ReviewRef对象；旧字符串只在演示fixture适配器解析已登记ID，不按字符串猜文件路径</td><td>shengbo_contracts/live_review.py；legacy_fixture_adapter只在verification使用；R01</td></tr>
+<tr><td>上级来源名public_platform／official_merchant_export与评分样例public_interaction／authorized_business_export不一致</td><td>统一SourceKind为public_platform、local_player、official_merchant_export、manual_note、synthetic。显式映射旧两种别名；禁止到各函数再写兼容猜测</td><td>contracts及migration适配器唯一转换；R01</td></tr>
+<tr><td>文档LIVE-REVIEW-1.1、基础草案Schema1.0、计分政策0.1职责不同</td><td>新实现的wire schema明确LIVE-REVIEW-1.1；score.policy_version独立仍LIVE-SCORE-0.1；来源voice契约仍PRELIVE-2.3</td><td>DTO导出schema后供工具、API、UI同用；既有草案保留并标superseded</td></tr>
+<tr><td>旧common.same_artifact_ref只接受PRELIVE-2.3</td><td>Review有自己的same_review_ref／resolve_ref；不能把Review引用塞进PRELIVE-only比较器</td><td>跨服务只通过feedback适配层投影和得到真实voice recap_ref；R02</td></tr>
+<tr><td>字段看似同义：人数、次数、条数、金额、订单粒度</td><td>每个字段有unit、grain、source_definition、nullable_reason，未知保持null</td><td>字段映射确认后才计算；不靠LLM给未知列起一个熟悉名字</td></tr>
+</table></div>
+<p>Ref约定：ReviewRef={kind,id,revision≥1,content_hash:&#x27;sha256:…&#x27;,schema_version:&#x27;LIVE-REVIEW-1.1&#x27;}。VoiceRef保留原PRELIVE-2.3原件；voice普通RecordRef并不总含schema_version，由VoiceRefAdapter按接口的真实DTO解析，不能往原件伪添字段。跨系统引用使用SourceRef={source_system:&#x27;review&#x27;或&#x27;voice&#x27;,ref:ReviewRef或VoiceRef}，判别与校验由source_system决定；任何Ref解析都再核account和授权对象，hash相等不代表有权限。content_hash只哈希规范化业务body，不包含自身ref／hash或展示时间戳，避免自引用无法稳定计算。</p>
+<p>统一UTC带偏移ISO发生时间和received_at；存储整数毫秒便于排序，显示Asia/Shanghai。源时间为秒／分钟就保留precision与uncertainty，不通过补零制造毫秒精度。单调时钟只在同source_instance＋boot_id内算时长，不能跨重启相减。</p>
+<p>金额全部用int minor：900元CNY存90000、currency=CNY、exponent=2；数量、父订单、SKU子单、买家UV各有独立unit。decimal解析字符串，禁止float乘100直接入账；空白、破折号、不可解析和真正0分开。</p>
+<h2>2 核心对象与不可变边界</h2>
+<div class="table"><table>
+<tr><th>DTO</th><th>必需字段</th><th>所有者与约束</th></tr>
+<tr><td>ReviewScope</td><td>account_id、conversation_id、run_id、invocation_id、role、monitor_session_id、archive_ref、grant_revision、budget_id、cancel_generation</td><td>由API／可信Runtime注入，不出现在模型可随意声明的工具参数中；子任务显式重绑定role</td></tr>
+<tr><td>GoalDefinition</td><td>raw_request_ref、mode、assessment_status、scope_refs、required_deliverables、refresh_mode、required_calculations、constraints、goal_hash、generation</td><td>原要求先保留；API明确字段可直接冻结；自由对话由K00／F01同服务提出assessment，不能悄降范围。冻结后实质改变另建Goal修订</td></tr>
+<tr><td>SessionBinding</td><td>monitor_session_id、voice_room_id、voice_session_id、platform、external_room_id、upstream_live_instance可空、binding_revision、publication_ref、start／end证据</td><td>sessions服务；同房不同场分离，绑定变更是新版本，不改旧事件归属</td></tr>
+<tr><td>IngressEnvelope</td><td>source_instance、source_seq、event_id、received_at、source_time／precision、capture_id、frozen_binding、type、raw_ref、parser_revision</td><td>接收入口立即冻结；异步writer不再读取“现在的房间session”归属过去消息</td></tr>
+<tr><td>ArchiveRevision</td><td>session_ref、revision、parent_ref、cutoff_by_source、included／excluded原件、gaps、coverage、definitions、content_snapshot_refs</td><td>sessions封存生成；不可变；迟到数据写新修订，旧报告仍引用旧归档</td></tr>
+<tr><td>PlaybackSegment</td><td>owner、epoch、attempt_id、segment_index、句子／模块／商品／稿件／发布ref、original_position、cycle_index、start／end事件、evidence_level</td><td>playback服务；确认媒体播放区间并集，暂停／缓冲切段，时间未知不补结束</td></tr>
+<tr><td>ImportPreview</td><td>blob_ref、file_hash、parser_version、sheet／row范围、header_map候选、unit／timezone／grain候选、warnings、sample_refs</td><td>import服务；预览不等于正式经营证据，歧义先确认映射</td></tr>
+<tr><td>BusinessDataset</td><td>import_ref、mapping_revision、source_definition、session_attribution、product_map、order_grain、currency、cohort／as_of、accepted／rejected rows</td><td>report_imports服务；单源版本冻结，可重新映射产生新数据集，不静默覆盖</td></tr>
+<tr><td>MetricResult</td><td>metric_id／definition_revision、archive_ref、dataset_refs、dimension、value、numerator／denominator、unit、cohort_ref、as_of、coverage、status、missing_reason、source_refs</td><td>metrics服务唯一计算；ratio分子必须属于分母；金额率与人数率不混</td></tr>
+<tr><td>BaselineSnapshot</td><td>metric_spec、筛选条件、excluded原因、history_refs、as_of／maturity、聚合规则、B值、policy_ref</td><td>scoring服务；先固定可比历史，不能本场分数计算后滚动改基线</td></tr>
+<tr><td>ContentAssessment</td><td>subject_ref、actual_text_refs、product_fact_ref、customer_brief_ref可空、session_requirements_ref、assessment_policy_ref、criteria[4]、critical_findings、dependency_hash</td><td>每项criterion_id、rating=0或0.5或1或null、reason、evidence_refs、unknown_reason；主／内容子可提交，经营子不可；不是K09评论分类结果</td></tr>
+<tr><td>CalculationReceipt</td><td>run_id、goal_hash、calculation_ref、dependency_hash、calculation_version、origin、cache_source_ref可空、started_at、completed_at</td><td>记录本run实际计算或合法复用；目标要求重算时cache_reuse不能完成该义务，旧created_at不充新执行</td></tr>
+<tr><td>ScoreResult</td><td>score_basis、metric_ref可空、assessment_ref可空、goal_ref／baseline_ref可空、policy_ref、score:float或null、raw_value及unit、status、sample_notes、source_kinds、synthetic、limitations</td><td>score是唯一分数字段，MetricResult.value是原值。target须metric＋goal；relative须metric＋baseline；content须assessment；coverage须quality refs。unavailable仍保留依据及缺失原因，不伪造依赖</td></tr>
+<tr><td>SubReviewResult</td><td>delegation_id、task_goal_hash、parent_run、archive_ref、role、findings、metric／evidence_refs、content_assessment_refs、limitations、status</td><td>子任务独立草稿，主Agent读后采用；不能升级为正式主报告</td></tr>
+<tr><td>ReviewBundle</td><td>report_ref、goal_ref、archive_ref、dataset／metric／score_refs、data_mode、business_outcome、as_of、Findings、Recommendations、limitations</td><td>报告服务；关键数值可复算、缺项可解释；模拟资料不能声明真实达标</td></tr>
+<tr><td>AdoptionDecision</td><td>decision_id、report_ref、selected_recommendation_ids、target_preparation_ref、base_versions、preview_hash、human_principal、operation_id</td><td>feedback控制器；只采纳显示过的具体快照；不得模型自报human</td></tr>
+</table></div>
+<p>所有DTO extra=forbid，导出JSON Schema作为UI和工具参数源；不能另写一套宽松dict“方便接入”。支持性字段可用明确nullable；新增枚举必须同时更新路由、恢复分支和UI，未知枚举不能当COMPLETED。</p>
+<h2>3 存储表、键与事务</h2>
+<p>复盘事实、草稿、任务和trace放独立review.sqlite3，WAL＋单writer短事务，读取走受限查询；checkpoints.sqlite3独立，不声称跨库同事务。大文件放内容寻址artifacts/，先临时写入＋fsync／原子rename，再提交元数据引用；崩溃遗留孤儿可审计清理，不将未落盘文件标可用。</p>
+<div class="table"><table>
+<tr><th>表／索引</th><th>主键／唯一约束</th><th>关键字段与事务边界</th></tr>
+<tr><td>review_sessions</td><td>PK(account_id,monitor_session_id)；同一活跃voice_session＋external room不可重复创建冲突绑定</td><td>状态、绑定版本、observed_start／end、collector lease；创建与session.created进度同事务</td></tr>
+<tr><td>source_cursors</td><td>UNIQUE(consumer_id,source_instance)</td><td>acked_seq、last_digest、gap_ref；目标归档去重写入成功后与cursor在review同事务提交</td></tr>
+<tr><td>ingress_events</td><td>delivery_key=(stable_outbox_owner,event_id)唯一；另建logical_event_key唯一索引（有可靠上游ID时）</td><td>logical key=account＋已确认平台场实例／本场binding＋原始method＋upstream_message_id，不含capture_id或boot_id；无上游ID则仅去重重发同一ingress，不能按文本误合并</td></tr>
+<tr><td>source_intervals</td><td>PK(interval_id)，索引session＋source＋start</td><td>opened／healthy／disconnected、explicit gap、原因和证据；静默不等于断连</td></tr>
+<tr><td>playback_journal_copy</td><td>UNIQUE(voice_source_instance,journal_seq)</td><td>原attempt／epoch／owner、绑定与事件正文；不按同sentence去重掉第二轮播放</td></tr>
+<tr><td>archive_revisions</td><td>UNIQUE(session_id,revision)、UNIQUE(content_hash)</td><td>截止游标、原件清单、缺口、定义与来源版本；封存短事务CAS current_generation</td></tr>
+<tr><td>import_previews／datasets／mapping_revisions</td><td>blob_hash＋reader_version＋preview参数可复用；正式dataset_id不可变</td><td>field map、单位与粒度、accepted／rejected行引用、确认记录；整份导入逻辑operation_key去重</td></tr>
+<tr><td>business_rows／order_facts／refund_facts</td><td>来源dataset＋row_locator唯一；同一dataset order粒度＋business_key唯一</td><td>一行原件可回读；订单与退款不明冲突隔离，不last-write-wins；多数据集重复只在明确优先级合并</td></tr>
+<tr><td>metric_results／baseline_snapshots／score_results</td><td>UNIQUE(cache_key)</td><td>固定输入refs／范围／定义／policy／代码版本；value=null保留reason，不能缓存为0</td></tr>
+<tr><td>content_assessments／calculation_receipts</td><td>assessment_id＋revision；receipt唯一(run_id,goal_hash,calculation_scope,dependency_hash,execution_id)</td><td>四项审核与依赖一次提交；计算／复用分别存，不用更新老产物时间冒充新生成</td></tr>
+<tr><td>analysis_jobs／run_inbox／wait_receipts</td><td>job_id；inbox event_id唯一；wait_id＋generation CAS</td><td>job结果ref／错误／尝试／租约持久化，完成事件不依赖仅内存通知；恢复可扫未消费Inbox</td></tr>
+<tr><td>review_runs／delegations／decisions</td><td>run／delegation／decision PK，run lease_generation CAS</td><td>原Goal、用户消息、scope、状态、budget、cancel；子结果只有唯一owner写入</td></tr>
+<tr><td>review_artifacts／reports</td><td>artifact_ref唯一，body_hash校验；正式report revision单调</td><td>草稿与正式报告分开；提交相同内容可replayed，不变成新报告版本</td></tr>
+<tr><td>model_attempts／usage_observations</td><td>attempt_id唯一；provider_request_id按来源去重</td><td>reserved／sent／response_observed／transport_unknown、公开usage、validation_status；有响应先记usage再校内容</td></tr>
+<tr><td>review_trace</td><td>stream_position全局自增，UNIQUE(run_id,sequence)</td><td>scope、parent_span、type、safe_payload_ref、wall／monotonic、duration；UI全局游标与run内部序号分开</td></tr>
+<tr><td>adoption_operations</td><td>UNIQUE(account_id,operation_id)、request_hash不可变</td><td>proposed→importing→imported→linking→linked／conflict／unknown；跨voice写入先登记后对账</td></tr>
+</table></div>
+<p>不为每次只读工具另建复杂外部动作账本；有成本的模型请求、异步本地作业和跨voice采纳才需要可恢复身份。普通缓存与进度也不能冒充业务完成证据。</p>
+<h2>4 采集与播放从入口走到归档</h2>
+<div class="table"><table>
+<tr><th>序号</th><th>拟议函数／接点</th><th>实际动作</th><th>失败／恢复</th></tr>
+<tr><td>I1</td><td>voice.live_review_ingress.freeze_ingress(raw, receive_clock, binding_snapshot)→FrozenIngress</td><td>在接收／ACK入口取不可变本场坐标和clock，不等排队落盘后读取当前Room</td><td>缺绑定进unassigned并保留原件，不猜上一场或下一场</td></tr>
+<tr><td>I2</td><td>existing live_source._persist扩充同DB事务outbox</td><td>标准事件入原表、去重统计、outbox一起提交；不改现有UI after=0语义</td><td>任一失败整事务回滚；不能原事件存了却outbox永失；旧未存raw不可恢复</td></tr>
+<tr><td>I3</td><td>record_source_ingress(FrozenIngress)→IngressReceipt</td><td>未知方法、system、parse_fail、connect／reconnect由同一个归档入口保存受控原件／schema与健康变化</td><td>队列满／磁盘错误必须产生可追溯gap或健康告警；不得把无法记录的时段继续算完整</td></tr>
+<tr><td>I4</td><td>record_playback_transition(FrozenPlaybackEvent)→JournalReceipt</td><td>在set_current／ack／人工控制的真实变化边界记录；播放器muted／volume、media状态和外部回听等级分列</td><td>Room当前内存状态与journal不具跨库原子性；落盘失败不能假装可完整恢复。优先保持正常播放，明确缺口</td></tr>
+<tr><td>I5</td><td>ingest.consume_page(source,cursor,end_cursor,scope)→ConsumeReceipt</td><td>读可靠增量、核身份、保存原件／归档事件、去重、再提交消费cursor</td><td>崩溃后重读同页可幂等；source seq有全局空洞时不按差值当漏了几条</td></tr>
+<tr><td>I6</td><td>sessions.seal_archive(session_id, expected_generation, drain_deadline)→ArchiveRef</td><td>取每个生产源的accepted fence及当时durable highwater；等待writer按barrier确认≤fence的入口已落盘或明确失败，再消费至durable fence并冻结manifest</td><td>不用持续增长的latest游标等到无穷；5秒为初始排空上限。超时列accepted未durable尾缺口并封partial；fence之后或迟到数据进新修订，不改旧report</td></tr>
+<tr><td>I7</td><td>sessions.revise_archive(base_ref,new_source_refs,reason)→ArchiveRef</td><td>输入新资料、迟到事件或新mapping，重算受影响窗口</td><td>已运行Review继续用旧修订，UI显示有更新；用户选重算建立新run／report</td></tr>
+</table></div>
+<p>共享采集连接由现有owner维护；Review acquire_subscription只取得引用计数租约，release只退订本消费者，不能调用全局disconnect切断仍被直播UI使用的连接。重复start相同逻辑操作返回同一租约／session，停止Review运行不等于停止监控；浏览器关页也不取消后台任务。</p>
+<p><code>acquire_subscription</code>先读active source及配置hash：同scope同配置连接直接adopt并增加Review lease；未连接才由原owner建立；已有不同配置返回SOURCE_BINDING_CONFLICT及人工选择，不能调用现有connect_source“试一下”。该函数当前会先断旧连接，直接复用它会重置原UI连接。源capture／进程boot可改变，但稳定outbox owner和已确认逻辑场次不变；同upstream事件跨capture回放只保留一条语义事件，原始投递及重复原因仍可追溯。若平台场实例未知，不跨不同monitor session猜重复。</p>
+<p>封存的producer fence是接收时已分配的单调ingress序号集合，不要求平台上游序号连续。writer barrier返回持久highwater和失败序号区间；consumer落库与cursor同事务。producer失联不能仅凭“当前没有新消息”认为尾部齐全，要记录unknown tail；停止Review订阅不停止共享生产源。封存Manifest明确included_fence、durable_fence、unresolved_ranges，不将未接收到的上游数据量臆测为精确条数。</p>
+<p>新增历史读取明确from_start／from_seq／from_time＋until_seq、ascending、page_limit。现有after=0返回最近200条的接口继续给UI；归档必须走新history入口。首次300条后启动消费者须补300或明确最早100缺口，不得静默只取尾200。</p>
+<p>播放端同一句因暂停恢复有多个segment，同一轮重复播为不同attempt。只在相同owner／epoch／attempt和boot_id里合并合法媒体播放区间；ended缺失标不完整，不把排队时间或手动暂停全算内容暴露。source=obs仍不是平台取声证据。</p>
+<h2>5 经营报表导入的内部步骤</h2>
+<div class="table"><table>
+<tr><th>步骤</th><th>函数签名（拟议）</th><th>产物与必要规则</th></tr>
+<tr><td>U1 文件入库</td><td>stage_report(bytes_stream, filename, principal)→BlobRef</td><td>校扩展／magic／文件大小、内容hash；文件名只作展示，不做路径；宏和公式不执行</td></tr>
+<tr><td>U2 类型读取</td><td>inspect_report(blob_ref, reader_policy)→ImportPreview</td><td>CSV按UTF-8／GB18030候选只读，XLSX只读实际单元格；保留sheet、行列坐标、合并／公式及缺失标识；首期CSV／XLSX必做</td></tr>
+<tr><td>U3 映射建议</td><td>suggest_mapping(preview_ref, source_profile)→MappingDraft</td><td>优先已确认header alias；单位、币种、时区、人数／次数、父单／子单和场次粒度单独列；必要时模型辅助只产生候选</td></tr>
+<tr><td>U4 人工确认</td><td>confirm_mapping(preview_ref, mapping_hash, human)→MappingRef</td><td>仅歧义／首次口径需要确认；已有完全同profile可复用；不能把同名列当同定义</td></tr>
+<tr><td>U5 规范化</td><td>normalize_report(blob_ref, mapping_ref, session_binding)→PreparedDataset</td><td>decimal→minor、时间→UTC、订单状态枚举、SKU映射、原行定位；不合格行附拒绝码；PDF／截图仅辅助，未经核表不能当精确成交账</td></tr>
+<tr><td>U6 同源去重／冲突</td><td>validate_dataset(prepared_ref)→ValidationResult</td><td>重复上传不双算；同订单来源冲突保留两值并隔离；商品未映射保留unassigned金额，不能硬分当前讲解商品</td></tr>
+<tr><td>U7 正式导入</td><td>commit_dataset(prepared_ref, expected_session_generation, operation_id)→DatasetRef</td><td>一次逻辑操作稳定key与hash，数据集正式版本、进度和回执同事务；重复请求返回replayed</td></tr>
+</table></div>
+<p>legacy XLS先使用现有受控Office读取／另存工具经核验后接入，不能打开宏；没有可靠读取器则请用户另存CSV／XLSX。这个限制是首期报表范围，不影响已有播前多格式资料读取。公式只有缓存显示值时要记录来源／缓存状态，不默认公式语义可信；无缓存的价格／订单关键格必须补资料。</p>
+<p>本场归属优先授权平台session／room／product定义，其次用户确认的精确限定范围；店铺当日全部渠道订单只作背景，不自动计本场。订单粒度先固定parent或SKU子单，不能混加；下单、实付、退款成功的时间与状态分开。</p>
+<h2>6 指标、评分与缓存的精确执行</h2>
+<div class="table"><table>
+<tr><th>函数</th><th>输入</th><th>输出／唯一规则</th></tr>
+<tr><td>resolve_metric_inputs(spec, archive_ref, dataset_refs, scope)</td><td>对象、定义、数据能力和维度</td><td>可计算的正式输入或明确missing；隐式不同队列禁止相除</td></tr>
+<tr><td>build_order_cohort(spec, datasets, as_of)</td><td>固定创建区间／本场归属／订单粒度</td><td>C内支付是C子集；P退款只含P的成功退款；cohort有可回读ref</td></tr>
+<tr><td>calculate_metric(spec, resolved_inputs)</td><td>正式输入</td><td>MetricResult；完整整场收入除整场小时，不除采集在线时长</td></tr>
+<tr><td>build_content_timeline(archive_ref, clock_ref, window_spec)</td><td>实际segment、偏差、精度</td><td>pure／mixed／unassigned；跨桶UV不能相加，逐秒订单不能伪造</td></tr>
+<tr><td>select_comparable_baseline(spec, history_query, policy_ref)</td><td>同商家商品、价格／投流／时段／开场／成熟度</td><td>排除理由和固定history_refs；整场≥5场，模块专项≥10次且≥3场，仅暂定</td></tr>
+<tr><td>score_target(metric_ref, goal_ref, policy_ref)</td><td>同口径正目标与实际值</td><td>封顶100并保留真实完成率；无目标／无数据null</td></tr>
+<tr><td>score_relative(metric_ref, baseline_ref, policy_ref)</td><td>正反向定义、上限和B</td><td>B=0或无资格null；X=B60；正向1.25B80、1.5B100；比例上限修正；反向按既定分段</td></tr>
+<tr><td>score_content(assessment_ref, policy_ref)</td><td>从正式assessment解析完整依赖、四项0／.5／1与证据</td><td>各项×25合计，未知项总分null；错价严重问题独立保留</td></tr>
+<tr><td>persist_content_assessments(items, scope, operation_key)</td><td>K10主或K13内容子提交的typed ContentAssessmentInput[]</td><td>核4项ID／评分枚举、原句和真实事实依赖、权限／scope、policy；一次保存assessment refs，再调用score_content并返回score refs；不强制另请一个审稿模型</td></tr>
+<tr><td>score_coverage(quality_panel, profile)</td><td>各必需覆盖率</td><td>最低覆盖×100；Q04延迟是额外门，不参与平均掩盖；经营汇总不强求句子资格</td></tr>
+<tr><td>persist_panel(results, lineage)</td><td>所有精确ref与计算版本</td><td>可一次返回整张Scorecard、missing与drilldown；模型不逐指标胶水查询</td></tr>
+</table></div>
+<p>CacheKey=canonical_hash(account＋archive_ref＋dataset_refs＋dimension＋metric_definition_revision＋cohort/as_of＋baseline／goal_ref＋score_policy_ref＋parser/classifier／prompt/model依赖＋calculation_version)。只包含真正依赖项，不把无关UI开关导致全量失效；任何实际依赖变化则不能复用旧结果。</p>
+<p>内容审核还依赖商品事实、顾客简报、本场要求、实际稿件和审核政策；文本没变但商品事实撤回也必须失效。评论标签依赖原文、分类器／提示／可用商品上下文、商品归属规则；不能只按正文hash跨商品复用。</p>
+<p>ScoreResult.score_basis统一枚举为target_completion、historical_higher、historical_lower、content_completion、data_coverage，对应四张卡（历史正／反向两种映射）。score.status统一available／provisional／unavailable／not_applicable；后两种score=null且reason必填。metric.status保留available／partial／unavailable／unverified，不与评分状态混用。ContentAssessment四项criterion_id固定criterion_1至criterion_4，具体含义绑定module＋rubric profile；严重问题字段统一critical_findings，不另接受severe_flags别名。所有根稿调用同一个<code>persist_content_assessments(items, scope, operation_key)</code>，防止主／子／报告各维护不同参数和字典字段。</p>
+<h3>6.1 缓存许可与真正重算分别如何证明</h3>
+<p>Goal.refresh_mode枚举：reuse_valid（默认可复用未变依赖）；recompute_metrics（指定指标／评分重新执行，原件解析可复用）；reanalyse_content（指定内容评级／评论标签重做模型判断，原件与无关统计可复用）；refresh_all（本Goal范围所有请求的分析计算重做，不代表重抓历史平台数据）。required_calculations逐项冻结对象、计算类型与义务，不能把“重新复盘”解释为改标题后返旧报告。歧义由K00给合理解释和公开说明，语义实质不清时用K12问，不靠正则静默决定授权。</p>
+<p>每个calculate／score／classification／assessment执行或复用均产生CalculationReceipt。recompute_metrics复用原件reader不违约，但直接返回旧score违约；reanalyse_content不得复用旧assessment，主或子本次生成的四项判断带当前attempt_ref。报告完成服务逐项验证required_calculations已有符合origin的receipt，读取旧卡片不能消除义务。新依赖强制换cachekey；重复相同逻辑操作的重试仍幂等回同一次执行，不能为“重算”双扣费用。请求未要求重算则合法复用，减少无用重复。</p>
+<h2>7 缺失、资格与敏感性</h2>
+<p>公开人数字段目前verified=false，核对前只显示候选数，不计算人分钟响应分。评论主题只分析已读取／已覆盖的范围；抽样标签不能把未分类评论当无意向，也不能除全场人分钟得到伪全量密度。</p>
+<div class="table"><table>
+<tr><th>情况</th><th>结果</th></tr>
+<tr><td>无业务报表</td><td>business_outcome=undetermined；可完成interaction_only复盘；不将null变0</td></tr>
+<tr><td>只有整场／商品汇总</td><td>整场／商品数值与评分；不强分给每次稿件出现</td></tr>
+<tr><td>分钟桶跨模块</td><td>mixed；不按秒拆UV／订单；即使纯桶相邻也先核跨桶去重能力</td></tr>
+<tr><td>只有接收时间且传输滞后无界</td><td>只本地接收共现；平台声音延迟标定不等于事件延迟也已测好</td></tr>
+<tr><td>某评分分母不足／历史不足</td><td>保留事实、样本和missing_reason；不把剩余项加权重标为100</td></tr>
+<tr><td>模拟样例或混入synthetic</td><td>真实经营结论受限，不能声明实际达标；试验与真实档案分开</td></tr>
+<tr><td>已取消后迟到结果</td><td>usage和原件仍保存，run不恢复RUNNING／COMPLETED，不触发采纳</td></tr>
+</table></div>
+<p>预注册评论主窗30秒、敏感性15／60；商品付款探索0–5分钟、敏感性1／3／10。对正式成交总量一单只记一次；不同探索窗不相加。Wilson只用于合法二项计数；退款金额率与相关人分钟密度不套Wilson。样本／区间与得分分开展示，分数不是因果概率。</p>
+<h2>8 一致性及迁移要求</h2>
+<p>迁移使用独立Review migration版本号，新增voice outbox／journal表前备份及验证，不改旧prelive表语义。升级只增加向后可读字段时写兼容适配；关键语义改变给新schema_version并按fixture比较，禁止默默accept any dict。</p>
+<p>每次新归档／报表mapping／评分政策产生新引用与lineage，不在旧报告里换数据。用户删除／撤回证据后保留最小审计状态并撤销相应可访问投影及缓存；不能借旧摘要继续引用已不可访问原件。保存和清理均为普通服务管理，模型没有任意文件删除权。</p></article><article id="section-2"><h1>Agent Harness、模型循环、上下文、中间件与恢复</h1>
+<p>版本LIVE-REVIEW-ENG-1.0。SDK核查以本机Deep Agents 0.7.25／LangChain 1.4.6／LangGraph 1.2.15为准。详细签名、源码位置和离线假模型探针见research/SDK与Harness实现核查.md。本稿是工程设计，不是本轮业务实现。</p>
+<h2>1 Runtime和Agent Factory分别负责什么</h2>
+<div class="table"><table>
+<tr><th>文件／函数签名（拟议）</th><th>唯一职责</th><th>明确不做</th></tr>
+<tr><td>bootstrap.open_review_resources(settings, existing_provider_factory)→ReviewResources</td><td>打开Review DB／checkpoint、加载policy与Skill包、创建共享池、挂API；关闭时释放自己的资源</td><td>不在import时读令牌／启服务，不另注册全局模型profile影响播前</td></tr>
+<tr><td>agent_factory.build_main_agent(resources)→CompiledStateGraph</td><td>配create_deep_agent、固定工具、四业务中间件、Summary、替换受限SubAgentMiddleware、Backend和context_schema</td><td>不放指标计算／SQL／voice采纳业务</td></tr>
+<tr><td>agent_factory.build_specialist(role, resources)→CompiledStateGraph</td><td>显式只读工具／Skill／提示词，checkpointer=False，独立子状态</td><td>不继承主图全部工具和写权限，不无限递归task</td></tr>
+<tr><td>runtime.start_review(request, principal)→RunReceipt</td><td>持久原Goal／用户消息／归档、检查并发和request去重、领取租约后排队</td><td>不由一轮额外路由模型决定所有任务路线</td></tr>
+<tr><td>runtime.invoke_run(run_id, expected_generation)→InvocationReceipt</td><td>建可信scope、运行主图、监听等待／结束、保存正式回执／预算／trace</td><td>不把graph.invoke返回了就判业务成功</td></tr>
+<tr><td>runtime.resume_run(run_id, observation_ref)→InvocationReceipt</td><td>查正式状态和未知操作，装配有界恢复信息；相同thread恢复</td><td>不把完整报表／全部历史塞成新的Human消息</td></tr>
+<tr><td>runtime.cancel_run(run_id, expected_generation)→CancelReceipt</td><td>原子标cancel_generation，停新工具／模型、取消可中断等待，落已有结果与用量</td><td>不关闭采集租约或停止声播，不声称已发请求必然撤销</td></tr>
+<tr><td>runtime.recover_pending_runs()→RecoveryPlan[]</td><td>重启扫描过期租约、已提交结果、待输入／作业／unknown；按明确状态恢复</td><td>不无差别从头重新跑，不把unknown改成failed重发</td></tr>
+<tr><td>control.assess_and_freeze_goal(raw_request_ref, assessment, scope)→GoalRef</td><td>K00／F01／结构化API共用的任务解释与冻结入口</td><td>不加独立路由模型，不缩减用户原要求</td></tr>
+<tr><td>reports.persist_draft／commit_or_reject／find_completion_receipt</td><td>保存草稿和正式报告，核Goal／证据依赖／重算义务并返回可验证回执</td><td>不同时在middleware／API写另一套完成判断</td></tr>
+<tr><td>control.register_wait／find_valid_receipt／consume_inbox</td><td>持久等待与唤醒；完成查询委托reports，同一控制门区分完成／等待</td><td>wait不当completed，答案不丢到内存后即忘</td></tr>
+<tr><td>jobs.submit_or_join_job／run_job／reconcile_job</td><td>持久作业输入去重、租约、状态、结果与完成事件</td><td>不超时再另起第二份计算；不让模型轮询</td></tr>
+</table></div>
+<p>主循环的每一轮仍由Deep Agents模型决定下一动作；Runtime只是提供环境、执行边界与恢复。启动／结束、DB事务和公式是普通程序，没有为复盘再手写一个固定大LangGraph取代主Agent。</p>
+<h2>2 主图构建参数与默认机制</h2>
+<p>拟传create_deep_agent：已初始化provider model实例、build_tools(role=&#x27;review_main&#x27;)、SYSTEM_REVIEW_MAIN、middleware、自定义backend工厂、skills路径、AsyncSqliteSaver、context_schema=ReviewScope、name=&#x27;shengbo-review-main&#x27;。response_format需要时用于小型结构输出，不为整份报告引入固定额外格式化模型轮数。</p>
+<div class="table"><table>
+<tr><th>机制</th><th>具体配置</th><th>核验要求</th></tr>
+<tr><td>SDK计划</td><td>显式添加已安装LangChain的TodoListMiddleware，提供write_todos；0.7.25默认图没有此工具</td><td>这是SDK配置，不是第5个自定义中间件；todo不是业务完成正本，清空todo不证明完成</td></tr>
+<tr><td>SDK文件工具</td><td>先构建BackendProtocol实例再传backend；StateBackend承接受限scratch／SDK会话offload，/skills映射只读包backend</td><td>显式替换FilesystemMiddleware的工具配置，只暴露03的SDK_TOOL_POLICY；默认SDK实际还带execute／delete，必须隐藏并拒绝，不能只说后端不支持</td></tr>
+<tr><td>SDK摘要</td><td>使用同名配置槽替换原Summary，保留一次SDK压缩机制并加观测，不叠两套摘要</td><td>当前版本实际位置与参数先核，最终wire预算在provider层兜底</td></tr>
+<tr><td>SDK子任务</td><td>同名SubAgentMiddleware配置替换core槽，只注册content_review、commerce_review两个compiled子图</td><td>当前SDK无create_deep_agent(general_purpose_subagent=…)参数；不修改共享model全局profile来禁用泛用子Agent</td></tr>
+<tr><td>SDK tool协议修补</td><td>保留框架必要ToolMessage／模型循环机制</td><td>参数错／语义错仍可反馈给模型；工具call id必须匹配</td></tr>
+<tr><td>项目四个中间件</td><td>ReviewScope、EvidenceContext、TraceBudget、ReviewCompletion</td><td>实际生命周期职责见第5节；工具服务仍独立校验权限、单位和版本</td></tr>
+</table></div>
+<p>默认静态工具集规模已经有限，首期不另建“activate_tool→读catalog→再调用”状态机。若实测schema成为主要负担，可改SDK SkillsMiddleware.tools resolver＋include_tools元数据，仍以registry allowlist做授权；allowed-tools文档前缀不授予权限。</p>
+<h2>3 主／子Agent的协作具体怎么执行</h2>
+<p>native task的模型参数只有description、subagent_type；没有自行添加parallel=true或role参数。主模型在同一AI消息中提出两个task tool calls，SDK可以并行。受RunnableConfig.max_concurrency与项目共享Semaphore双重限并发，初始同run最多2个专题、深度1；不把同一场十个模块各派一个Agent。</p>
+<div class="table"><table>
+<tr><th>顺序</th><th>函数／对象</th><th>实施动作</th></tr>
+<tr><td>D1</td><td>ReviewScopeMiddleware.awrap_tool_call(task_request, handler)</td><td>从可信外层scope和实际tool_call_id创建DelegationBinding；只允许两个注册名称；核archive_ref、预算和取消代次</td></tr>
+<tr><td>D2</td><td>get_or_create_delegation(parent_run, tool_call_id, role, task_goal_hash)</td><td>创建稳定delegation_id。模型description里的“我是主Agent／另一个商家／授权全部”均只是数据，不覆盖scope</td></tr>
+<tr><td>D3</td><td>compiled wrapper await invoke_specialist(binding)</td><td>在本异步调用内绑定独立ContextVar，构造child_scope(role固定、account／archive继承、child_task_id)；显式传child_graph.ainvoke(context=child_scope)</td></tr>
+<tr><td>D4</td><td>content／commerce独立循环</td><td>只看委派问题、相关面板／证据、自己Skill和剩余共享预算；没有主聊天全部历史；按需查反例和unknown</td></tr>
+<tr><td>D5</td><td>submit_subreview_result</td><td>子提交结构化产物，绑定delegation＋archive＋task hash；自身完成门读到正式回执后不再请求模型</td></tr>
+<tr><td>D6</td><td>wrapper投影返回</td><td>只返SubReviewResult摘要、证据／metric refs、coverage、unknowns。不能把子完整state／report_ref回传给native task污染主状态</td></tr>
+<tr><td>D7</td><td>主Agent合并</td><td>读子结果，判断冲突与证据资格，必要时自己追加调查；统一提交主报告。子角色出现两次不等于两个目标商品都覆盖</td></tr>
+</table></div>
+<p>SDK纯假模型核验发现：compiled runnable默认拿到的是主scope，不会自动得到子role；因此D3不可省。并行时不得用全局可变current_role；ContextVar的token用try/finally reset，避免跨任务串身份。</p>
+<p>子图首期不保存逐轮独立checkpointer；主用持久AsyncSqliteSaver、子checkpointer=False。成功子产物按delegation_id＋archive＋task hash保存在Review库，重放先复用。中途失败可保留指标／分类／安全返回，重新补缺；这不承诺子图每一内部轮次无缝恢复。需要更细恢复时再设计namespace，不能临时把所有子图指向同一thread覆盖主检查点。</p>
+<h2>4 正式任务、检查点、对话、产物各存什么</h2>
+<div class="table"><table>
+<tr><th>正本</th><th>保存内容</th><th>不能代替什么</th></tr>
+<tr><td>review_runs／GoalDefinition</td><td>原请求、对象／归档、mode、refresh_mode／required_calculations、必要交付、授权、budget、取消与状态</td><td>task assessment通过K00或F01同一服务冻结；不能由摘要、todo或模型降低原目标</td></tr>
+<tr><td>图checkpoint</td><td>消息、下一计算位置、必要scratch与graph状态</td><td>不证明外部API已恰好执行一次，也不是经营原始数据</td></tr>
+<tr><td>正式Archive／Dataset／Metric／Score／Report</td><td>有版本与hash的不可变事实和成果</td><td>不用聊天文本或UI缓存重建</td></tr>
+<tr><td>attempt／adoption账本</td><td>已预留／已发送／已收到／未知／已确认、用量与对账ID</td><td>tool accepted不等于任务成功；估算费用不等于实付</td></tr>
+<tr><td>safe trace</td><td>工具／模型公开行为、状态变化、引用和耗时</td><td>调试日志不是授权或业务状态机，不存私有思维链</td></tr>
+</table></div>
+<p>ReviewRun状态：QUEUED、RUNNING、WAITING_INPUT、WAITING_JOB、RECONCILING、PARTIAL、COMPLETED、FAILED、CANCELLED。status变更、generation与trace同事务；terminal不可被晚到事件改回RUNNING。monitor_session采集生命周期与ReviewRun分析生命周期分开。</p>
+<p>run lease={owner_process,expires_at,generation}；同run只允许一个主invocation持租约，lease续期失败即禁止新模型／工具动作。Graph checkpoint与Review库非跨库原子：恢复先以Review正式回执和unknown账本为准，再决定继续／终止图；不靠某次checkpoint位置决定重发昂贵请求。</p>
+<p>复用小型GraphExecutionRegistry记录同thread真实SDK任务owner。租约到期不代表旧SDK协程已退出；恢复必须先cancel＋join旧任务或确认其已结束，再领取新invocation代次，禁止两个ainvoke同时写同一checkpoint。多进程通过实例锁／持久fence同样约束；等待期间保留checkpoint与正式wait，释放运行租约而非删除任务。</p>
+<h2>5 四个定制中间件：哪里触发、读什么、返回什么</h2>
+<div class="table"><table>
+<tr><th>中间件</th><th>实际hook／触发</th><th>读取／检查</th><th>对调用或状态的具体作用</th><th>失败出口</th></tr>
+<tr><td>ReviewScopeMiddleware</td><td>abefore_agent；awrap_tool_call</td><td>run lease／cancel代次、principal、role allowlist、固定archive、grant；task的可信DelegationBinding</td><td>开始即核租约；每工具校对象、解析Ref；禁止直播写入／任意shell／跨场；task按D1–D3重绑</td><td>SCOPE_DENIED、STALE_REF、CANCELLED；明确not_committed，记录拒绝，不吞成可重试成功</td></tr>
+<tr><td>EvidenceContextMiddleware</td><td>awrap_model_call</td><td>Goal、当前archive／capability、已完成面板／子结果索引、已读覆盖、待决／unknown、当前问题、必要证据</td><td>使用request.override装配新的受控上下文；替换本轮可信投影，不将每轮投影追加成永久历史消息</td><td>证据ref不可用则明确缺项；固定包超预算先减非必要索引／按需取证，不靠重复摘要硬挤</td></tr>
+<tr><td>TraceBudgetMiddleware</td><td>awrap_model_call、awrap_tool_call；provider观测为实际发送最终口径</td><td>公共tool calls／参数、canonical key、span父子、共享预算、重复读与进展指纹</td><td>每工具／模型写一次safe trace；缓存命中／新增信息分开；工具额度、取消及并行配额原子领取</td><td>BUDGET_EXHAUSTED／NO_NEW_INFORMATION等；provider响应已成功不能因日志尾写失败误重调模型</td></tr>
+<tr><td>ReviewCompletionMiddleware</td><td>awrap_tool_call处理提交／finish／等待；abefore_model带hook_config(can_jump_to=[&#x27;end&#x27;])；aafter_model仅防无回执自然结束</td><td>持久delivery／SubReview或WaitReceipt、完整Goal身份和依赖指纹、缺项、角色、取消代次</td><td>合法完成回执结束本次图；合法等待回执也结束本次invocation但保持WAITING状态；无合法回执则给模型正常纠错</td><td>参数／内容错不生成终态；自然答复无回执最多一次补交提示，仍无回执由Runtime标PARTIAL</td></tr>
+</table></div>
+<p>中间件按lifecycle组合，不靠列表位置猜完整最终请求。SDK可能在外层包装前后加入Summary、Patch或Skill schema；实际模型请求预算和usage权威放provider发送边界，防止“中间件以为够了，最终wire又超限”。</p>
+<p>四个中间件只调用统一services，不重复写指标、完成或授权规则。共享实例不保存某个run的可变状态；所有状态取自注入scope和事务仓库。</p>
+<h3>5.1 一轮模型／工具循环中实际放在哪里</h3>
+<div class="figure"><img src="assets/harness-model-cycle.svg" alt="Harness结构图"></div>
+<p class="caption"><a href="assets/harness-model-cycle.svg">单独打开矢量图，可放大查看</a> · 图中组件是待实施设计。</p>
+<details><summary>查看可编辑Mermaid源图</summary><pre>flowchart TB
+  IN[Runtime：可信scope与共享预算包住整个ainvoke] --&gt; ENTRY[ReviewScope：进入／工具前检查身份、租约与允许动作]
+  ENTRY --&gt; CTRL[ReviewCompletion.before_model：完成／等待回执可直接结束本次图]
+  CTRL --&gt; CTX[EvidenceContext：装配本轮Goal、当前成果、证据索引与未知]
+  CTX --&gt; SK[SDK Skills：按需读取本角色Skill；不授予额外权限]
+  SK --&gt; SUM[一套SDK Summary：仅历史确需压缩时执行并记录用量]
+  SUM --&gt; PRO[Provider边界：最终wire预算、发送尝试、响应usage先落账]
+  PRO --&gt; MODEL[主或专题模型自主选择工具／委派／补问／交付]
+  MODEL --&gt; TB[TraceBudget工具边界：计时、共享额度、缓存与无进展观察]
+  TB --&gt; SCOPE[ReviewScope工具边界：role、ref、效果与取消代次]
+  SCOPE --&gt; TOOL[原子工具或F工具流：同一typed服务实现]
+  TOOL --&gt; RETURN[持久产物／ToolMessage／公开trace]
+  RETURN --&gt; CTRL</pre></details>
+<p>图是职责与检查路径，SDK内部Summary／Skills包装的精确先后以固定版本探针为准；不把这张职责图当作可以任意重排SDK hook的伪源码。provider发送边界始终看到实际最终请求，控制门始终在新模型请求前生效。用户过程开关只影响trace显示，不影响这些检查是否运行。</p>
+<h2>6 完成路径：成功少一轮，错误仍能修正</h2>
+<p>实际SDK假模型测试发现：普通工具返回Command(goto=END)仍可能进入下一轮模型；return_direct=True会让错误结果也直接结束。<strong>最终统一采用非direct工具＋before_model持久回执门</strong>，不能在实现时随手换成上面两种写法。</p>
+<pre><code>finish_review(args, runtime):
+    receipt = delivery_service.commit_or_reject(args, trusted_scope)
+    # 非direct普通工具；错误为可读的结构化ToolMessage
+    return Command(update={delivery_ref: receipt.ref,
+                           messages: [ToolMessage(匹配tool_call_id的正式回执)]})
+
+ReviewCompletionMiddleware.abefore_model(state, runtime):
+    receipt = control_service.find_valid_receipt(trusted_scope, frozen_goal_hash,
+                         full_dependency_fingerprint, invocation_generation)
+    if receipt是合格完成回执且未取消:
+        return {delivery_ref: receipt.ref, jump_to: &#x27;end&#x27;}
+    if receipt是有效WaitReceipt:
+        return {wait_ref: receipt.ref, jump_to: &#x27;end&#x27;}  # 不是COMPLETED
+    return None</code></pre>
+<p>错误分支不填正式delivery_ref，不改run COMPLETED；模型收到错误可以补缺／修正。成功不另调一个模型写总结；finish.public_summary直接绑定正式refs作为对话交付。终态工具必须是本条AI消息唯一工具调用，批量混用返回需纠正，防止并行任务未结束就提交。</p>
+<p>完成回执的唯一身份包含account／run／role／delegation（主为null）、完整冻结Goal hash、archive及实际dataset／metric_definition／score_policy／baseline／as_of依赖、required_calculations的执行回执与run generation。主Delivery与子SubReview分命名空间；子完成不能关主图，旧政策／旧目标／另一角色的成功不能复用为本次完成。CalculationReceipt中的new_computation／cache_reuse必须符合Goal.refresh_mode；只换标题或created_at不能算重算。</p>
+<p><code>WaitReceipt={run_id, invocation_id, role, delegation_id?, goal_hash, archive_ref, generation, kind:input|job, decision_ref|job_ref, pending_tool_call_ids, status:active|consumed|invalidated}</code>。K12和异步K02/K08/F流只在保存真实decision／job后提交等待。先收齐本条AI消息其余并行调用的结果再停，未完成的子任务引用由协调器保留；不能把一个早返回的waiting吞掉另一工具的结果。before_model查持久等待回执并jump_to=end，Runtime将invocation标suspended，ReviewRun仍WAITING_INPUT或WAITING_JOB。UI答案／作业完成写持久Inbox，单owner原子消费；核Goal及archive未变、旧wait已consumed后，同thread新invocation附有界ResumeObservation继续。没有持久唤醒事件则不自动轮询；预算耗尽／取消仍优先停止，已正式COMPLETED不能被再唤醒。</p>
+<p>外层<code>runtime.invoke_run</code>必须用try/finally绑定可信ContextVar（run／role／budget／invocation），覆盖整个graph.ainvoke，包括SDK Summary直接发起的模型请求；子wrapper在该上下文内派生，K09分类同样继承。provider工厂按用途注入共享ledger，不靠只观察主模型middleware估计摘要费用。释放token不能提前到模型流尚未结束；scope缺失时provider拒绝发送，而非回落无限预算。</p>
+<p>完成／等待门和Scope门不能互相抢先：可信合法回执先走无新副作用的控制短路；只在确实继续工具或模型发送时检查可执行租约。不能因finish已写COMPLETED而被另一个Scope前置门当“非RUNNING”误拒，导致成功变失败。实际hook组合顺序用05假模型用例锁定，不只凭列表排列推测。</p>
+<p>本轮纯假模型探针：正常完成1次模型；先REPORT_INCOMPLETE再修正2次；参数类型非法后修正2次，均无额外第3次收尾。它只核验SDK控制机制，不代表新Review业务终态服务已实现。</p>
+<p>若模型没有调用finish就自然输出“已完成”，<code>aafter_model</code>只在无tool calls且无任何合法完成／等待回执时，预算内给一次带准确missing的短系统纠正消息并jump_to=model（用对应hook_config声明）；没有对应tool_call时不得伪造ToolMessage。仍不提交则Runtime保存可用草稿并标PARTIAL／FAILED及原因，不写COMPLETED。正常成功已经由before_model止住，不会触发这条补救多付一轮。不能把这条规则扩成每份报告再请模型“全面自检”。</p>
+<p>部分交付也必须有正式DeliveryReceipt，带outcome=partial、原Goal及未完成项、停止原因；控制门允许结束invocation，ReviewRun保持PARTIAL，UI不显示完整完成。只有必要交付全部满足才COMPLETED。原目标缺报表时可以申请等待或交有限报告，不能偷偷改成interaction_only后算完成。Provider结果未知由Runtime停止新的成本动作并标RECONCILING，先查原attempt；若无供应商查询能力则保留unknown与待决，不用换新request ID自动补调。</p>
+<h2>7 上下文怎么装配</h2>
+<div class="table"><table>
+<tr><th>层</th><th>内容</th><th>大小与保留策略</th></tr>
+<tr><td>稳定系统指令</td><td>复盘目标、范围、来源信任、工具选择／停止和输出标准</td><td>不带所有旧错误和全套统计教程；提示词版本冻结</td></tr>
+<tr><td>当前可信投影</td><td>原Goal、scope、archive／policy、金额／单位、数据资格、已提交成果、待确认与unknown</td><td>精确字段及refs；每轮重建，不由摘要代替，不无限追加</td></tr>
+<tr><td>能力／Skill目录</td><td>当前角色工具schema、Skill名称／适用条件</td><td>只加载本角色；详细Skill按需读，必要额外schema才用SDK resolver</td></tr>
+<tr><td>当前证据工作集</td><td>指标卡、相关稿件、代表原文及反例、原件reader</td><td>返回完整单元和覆盖；超预算列未交付项，不截断关键条件冒全文</td></tr>
+<tr><td>最近交互／工作记忆</td><td>新用户纠正、未完成判断、下一步候选、排除路线</td><td>历史过大才摘要；已在正式索引的所有报告不再全文抄入</td></tr>
+<tr><td>恢复观察</td><td>observation_id、changed refs、真实作业状态、需要的精确reader</td><td>初始目标≤256 token的状态通知，必要信息用ref；大表不得成为恢复Human正文</td></tr>
+</table></div>
+<p>上述256等是初始工程预算目标，实际按provider tokenizer／preview测量；不能用字符数冒充token精度。没有可靠回读入口的信息不允许“先扔掉再说”。</p>
+<p>大日志／报表／评论原件在业务artifact中，主图只读已授权view；SDK历史offload在受控虚拟空间，可通过reader恢复。价格、币种、优惠、授权、cohort、关键未知状态与原目标不做有损概括。用户新资料不自动覆盖已封存场次当时事实。</p>
+<h3>7.1 超量处理的准确顺序</h3>
+<ol>
+<li>provider预览最终请求，计system、tool schemas、Skill、可信投影、历史、最新恢复消息及供应商重放占用；输出余量另留，不只数messages。</li>
+<li>固定投影或最新恢复事件自身过大：改用索引／引用／分页，标实际delivered，不反复摘要相同大包；必要证据无法装下时返回CONTEXT_REQUIRED_DATA_TOO_LARGE，保留可读缺项。</li>
+<li>历史确实可压缩：用一套SDK Summary执行，记录before／after／固定包／最新事件各部分及真实模型用量；保留可回读原件。</li>
+<li>摘要后仍超，先判断是否fixed/latest压力或没有新增可压缩内容。相同fingerprint不再付费摘要循环；允许一次有界本地投影修正，仍不合格就部分交付／待输入。</li>
+<li>最终发送前再核一次。发送前失败记录not_sent，不计真实请求；收到usage先落账，再处理内容校验结果。</li>
+</ol>
+<p>预算阈值以实际adapter支持窗口和输出上限为正本，不在文档伪定gpt-6.1-sol上下文长度。优化目标是减少无信息量的历史复制，不是关闭摘要保护。</p>
+<h2>8 四份项目Skill如何使用</h2>
+<p>主目录可发现四个Skill；内容子只注入scope／content两份，经营子只注入scope／commerce两份。每份有frontmatter、when_to_use、必需上下文、步骤、工具、输出、失败出口、来源及policy版本。这里仅列待编写内容，不生成会被现有产品自动加载的SKILL.md。</p>
+<p>物理目录统一<code>skills/review/&lt;skill_name&gt;/SKILL.md</code>，每个Skill只有一份原件；role配置列可见的路径，受限只读Backend只向该角色挂载这些/skills子目录。不能为main／content／commerce复制三份同名scope Skill后分别修改。Skill hash进入build manifest；对Skill的修改不能沿用旧真实测试结果。</p>
+<div class="table"><table>
+<tr><th>Skill</th><th>模型何时读</th><th>内部步骤与产出</th></tr>
+<tr><td>review_scope_and_data_eligibility</td><td>首次复盘、补报表、能力不明或用户换范围</td><td>读manifest→核实际source／粒度→列能回答／不能回答→按Goal选panel；不把采集成功当全量数据</td></tr>
+<tr><td>commercial_funnel_diagnosis</td><td>解释点击、创建、支付、退款、目标和历史对比</td><td>读正式Metric／Score→核cohort／单位／成熟度→找主瓶颈→列替代原因／需补证→给可验证建议，不编优惠与利润</td></tr>
+<tr><td>content_and_customer_feedback</td><td>需要定位某段、顾客疑问／异议、内容四项审核</td><td>读真实已播正文和事实→按目标模块四项判断→批分类必要评论→查反例／歧义→分内容分与响应分，不造单句GMV</td></tr>
+<tr><td>next_session_experiment_and_feedback</td><td>已有发现，用户要下场改进</td><td>指定目标商品／稿件／模块、基准版本、一个主要改变、主指标与护栏、可比条件→生成待采纳候选；不代替人工确认</td></tr>
+</table></div>
+<p>外部Anthropic／K-Dense／A/B Skill只作方法来源，挑有用原则写成项目明确入口，不能同名全部加载、指令互相打架。Skill是模型按需读的方法，不是自动执行安全守卫；守卫由middleware／service保证。</p>
+<h2>9 预算、等待、重试与取消</h2>
+<div class="table"><table>
+<tr><th>项目</th><th>初始政策（待实测校准）</th><th>实施点</th></tr>
+<tr><td>模型预算</td><td>全run默认12个实际请求，主／子／摘要／分类／重试共用；预算不足能交有限结果，不默认追加</td><td>ProviderAttemptLedger原子claim；reserved与sent分开；给最终必要交付留余量，不各子复制12次</td></tr>
+<tr><td>工具预算</td><td>默认40次受控动作／查询；组合工具内部只记细span，不同时把一调用算十次模型工具</td><td>ToolSpec和预算服务；字段查询／缓存不人为膨胀调用数</td></tr>
+<tr><td>并发</td><td>同run最多2专题，深度1；共享provider并发池初始2</td><td>native task＋Semaphore；队列等待也计wall，不加总为多份总耗时</td></tr>
+<tr><td>重试</td><td>只读暂时失败最多2次有界退避；明确not_sent可重试；结果unknown先对账</td><td>统一retry_policy；核adapter／SDK层，避免2×3叠加重试</td></tr>
+<tr><td>格式纠正</td><td>一次局部修正为默认；第二次仍不合格给partial／blocked</td><td>先保存公开响应和usage，格式无效不抹掉费用</td></tr>
+<tr><td>无进展</td><td>同工具、同参数／依赖、无新增信息连续再次调用时纠偏，不一刀切封读取</td><td>读用途／view与新证据指纹；可以补关键反例或另一view</td></tr>
+<tr><td>等待</td><td>Job／人工缺项交还协调器，不让模型轮询</td><td>WAITING_JOB／WAITING_INPUT，事件唤醒带ref和变化</td></tr>
+<tr><td>取消</td><td>接受后禁止新提交／新模型；已发调用可能迟到，仍落usage和安全响应</td><td>cancel_generation每边界校验；终态不被迟到结果改写</td></tr>
+</table></div>
+<p>12／40不是完成任何长度直播的承诺。经营统计可以全量确定性处理；评论理解按有用范围与预算执行，未分类范围必须披露。若用户明确要全量语义分析但预算不够，交待缺项／预计新增工作，不拿抽样结果假装全量。扩大预算由受控运行配置／用户范围决定，不能模型自行改账本。</p>
+<h2>10 恢复的四种情形</h2>
+<div class="table"><table>
+<tr><th>情形</th><th>恢复动作</th><th>不能做的事</th></tr>
+<tr><td>UI断线</td><td>SSE补发＋workspace快照</td><td>不重启主图／采集源</td></tr>
+<tr><td>主进程重启</td><td>读正式Goal／lease／结果／unknown→复用有效面板与子报告→同thread恢复缺项</td><td>不从最开始重读整场，不用新run逃过已有费用／取消</td></tr>
+<tr><td>已收到模型返回，校验／保存失败</td><td>找同attempt的安全输出，允许本地重校验／补提交；成功只计一次</td><td>不把已有有效数据丢掉再请求模型；缺原输出时不能假重验</td></tr>
+<tr><td>已发送模型／voice采纳，但结果未知</td><td>provider请求记录／voice operation receipt／目标回读能核实则推进；无查询能力维持unknown</td><td>不因刷新令牌或换operation_id盲目重发</td></tr>
+</table></div>
+<p>当前天然续期和完整故障矩阵不能靠旧短探针声称已验证。实现时先假过期／并发续期／工具call／网络未知，真实测试仅在已有授权和受控样例下少量运行，绝不让用户复制令牌。</p>
+<h2>11 观测：一次记录、多种展示</h2>
+<div class="table"><table>
+<tr><th>记录</th><th>最少字段</th><th>用途</th></tr>
+<tr><td>任务／阶段span</td><td>build_id、scenario、run／invocation／parent／role、stage、monotonic start/end、UTC、result状态</td><td>比较每阶段wall、活跃区间并集及关键路径</td></tr>
+<tr><td>工具span</td><td>call_id、ToolSpec版本、canonical_args_hash、合法refs／view、输入／交付units、cache／origin、next_reads、elapsed_ms</td><td>定位胶水读取、错误修正、数据覆盖；参数经统一脱敏</td></tr>
+<tr><td>模型attempt</td><td>attempt_id、purpose、role、reserved／sent／response／unknown、公开usage、provider request ID、validation状态</td><td>一次请求多SSE帧只算一次；拒绝输出也计usage；unknown费用不填0</td></tr>
+<tr><td>上下文</td><td>fixed／tools／skills／projected／history／latest_event预算、最终wire、摘要变化与作用域</td><td>能区分恢复消息过大还是历史过多；不保存私有推理</td></tr>
+<tr><td>业务／计算</td><td>archive／dataset／metric／policy／baseline／Goal refs、qualification、cohort、as_of、calculation_ms</td><td>能手算和追溯每个分数</td></tr>
+<tr><td>交付／采纳</td><td>draft／report／selected IDs、preview／operation、target base、CAS与回读状态</td><td>正式结果、用户确认与实际关联一致</td></tr>
+</table></div>
+<p>测量采用perf_counter_ns／monotonic_ns，导出ms可保留三位小数。这是记录分辨率，不承诺0.001ms准确度。阶段包含关系与并行分开：工具时间可能包含解析／模型分类，不能与其子span再次相加；两个并行60秒专题的总墙钟约60秒，不写120秒。未埋点的DNS／TLS等保持未知，不补造。</p></article><article id="section-3"><h1>工具注册、可调用工作流与模型选择范围</h1>
+<p>版本LIVE-REVIEW-ENG-1.0。本稿中的函数、ToolSpec、工具及流程均待实施；已有voice／prelive接口由适配器调用，不重命名成假装存在的Review接口。</p>
+<h2>1 一个注册器生成全部入口</h2>
+<p>ToolSpec放policy.py／tools.py共享的registry中，每项包含name、args_model、result_model、roles、effect、capability_requirement、timeout、idempotency、handler、public_label。注册表同时生成模型schema、role allowlist、调试名称、契约检查和文档清单。Skill中提到的工具必须能从registry解析；构建时检查缺名、重名、角色错配。</p>
+<p>模型工具函数使用LangChain ToolRuntime注入可信ReviewScope；account_id、role、grant、run等不作为模型参数。Scope Middleware检查后，普通服务仍核对象归属与引用；不能只靠提示词声称只读。</p>
+<p>效果分三类：read_business（读事实），analysis_local（计算／缓存／草稿与报告落本次Review库），human_business（采纳关联下一场）。主／子只有前两类；human_business只在人工API控制器，不放入模型工具列表。</p>
+<p><code>SDK_TOOL_POLICY</code>与业务ToolSpec一起组成最终allowlist：主图task仅content_review／commerce_review，子图不注册task；read_file／ls／glob／grep只允许/skills、受控history及scratch虚拟空间；write_file／edit_file只允许scratch；显式SDK TodoList的write_todos只更新计划；execute／delete从FilesystemMiddleware的tools配置排除，并在dispatch兜底拒绝。仅使用StateBackend不会自动移除execute／delete的schema。构建时对最终ToolNode清单断言：每项必须匹配业务registry或SDK_TOOL_POLICY，额外工具即构建失败，不能统一放行SDK来源工具。</p>
+<p>F01–F05同样通过ToolSpec注册为真实模型可调用工具，具有args_model、role、effect、handler和结果schema；不是仅写在Skill里的伪入口。共享handler复用原子服务，不通过再调用一次模型来“执行流程”。主图有F01–F05；内容子可选F03，经营子可选F02／F04；F05只属主。F05既能带草稿一起提交，也能传已验证draft_ref做一调交付，均走同一个finish服务与非direct完成门。</p>
+<h2>2 统一ToolResult与错误</h2>
+<pre><code>ToolResult[T] {
+  schema_version, call_id, run_id, tool_name,
+  outcome: completed|partial|waiting|needs_input|blocked|failed|unknown,
+  commit_state: read_only|not_committed|committed|unknown,
+  data: T|null, artifact_refs: SourceRef[],
+  missing: MissingItem[], next_reads: ExactReader[],
+  job_ref: ReviewRef|null, retry_after_ms: int|null,
+  error: {code, message, retryable, safe_details}|null,
+  timing_ref, origin: new_computation|cache_reuse|human_import|legacy_unknown
+}</code></pre>
+<p>completed只说明本次工具完成，不代表整个用户Goal完成。waiting必须有真实job_ref与可靠唤醒入口；unknown是已发请求可能生效、当前不能确认，不能等同failed。HTTP／SDK错误适配为同一语义，不能HTTP200下错误体被UI记成功。</p>
+<p>ExactReader={tool_name,typed_args,source_ref,view_id,coverage_requirement}；模型可以直接使用，不用猜某个嵌套JSON路径。读取记录保存实际交付的范围与hash；“已读”“已理解”“已核验”“正式提交”分别记录。</p>
+<div class="table"><table>
+<tr><th>错误码</th><th>含义</th><th>正确续办</th></tr>
+<tr><td>INVALID_ARGS／MAPPING_REQUIRED</td><td>明确未提交，缺字段／口径未选</td><td>返回具体字段、合法枚举或确认卡，不抛整任务失败</td></tr>
+<tr><td>REF_NOT_FOUND／STALE_REF</td><td>引用不存在／版本变化</td><td>回读当前受权快照和差异，模型重评，不能猜ID或覆盖</td></tr>
+<tr><td>SCOPE_DENIED／SOURCE_HASH_MISMATCH</td><td>越权或证据篡改</td><td>blocked，不作为可补参数错误吞掉</td></tr>
+<tr><td>METRIC_NOT_ELIGIBLE／COHORT_MISMATCH／UV_NOT_ADDITIVE</td><td>数据资格或统计范围不合格</td><td>给原计数／缺项，保留null，不要求模型修出一个数字</td></tr>
+<tr><td>SOURCE_GAP／CURSOR_EXPIRED</td><td>源端不可重放或游标已过期</td><td>标缺口、给可用快照；UI补发不是原数据补齐</td></tr>
+<tr><td>VERSION_CONFLICT</td><td>CAS失败</td><td>返回实际版本和受影响对象，保留已完成独立产物；不自动覆盖</td></tr>
+<tr><td>PROVIDER_NOT_SENT／TEMPORARY_READ_FAILURE</td><td>明确尚未发模型或只读临时失败</td><td>同逻辑操作有限重试，累计计时与共享预算</td></tr>
+<tr><td>PROVIDER_RESULT_UNKNOWN／HANDOFF_UNKNOWN</td><td>已发送、未获可靠终态</td><td>保存request／operation ID并对账；不能换key盲重试</td></tr>
+<tr><td>OUTPUT_INVALID／REPORT_INCOMPLETE</td><td>返回已收到，但结构／必要目标缺项</td><td>保留安全响应与用量；有限局部纠正，不重做有效分支</td></tr>
+<tr><td>BUDGET_EXHAUSTED／CANCELLED</td><td>没有可用预算或任务取消</td><td>停新请求；交付已有结果和明确未完项，不造完成</td></tr>
+</table></div>
+<p>同一个handler由原子工具与组合flow共同调用。示例：get_metric_panel和build_module_panel遇相同cohort错误必须同code、同commit_state，不能一个抛异常另一个“自动修好”。</p>
+<h2>3 原子工具的精确计划</h2>
+<p>所有工具输入中的Ref必须完整版本化；范围默认为可信scope内，不能默认为全店历史。每次读取都有limit／continuation与覆盖说明。下面秒数为初始本地执行超时配置，待性能验收调整，不是实测速度保证。</p>
+<div class="table"><table>
+<tr><th>ID／工具</th><th>参数与结果（拟议签名）</th><th>内部动作与权限</th><th>超时／缓存／失败</th></tr>
+<tr><td>K00 set_review_task_assessment</td><td>(mode, scope_refs, required_deliverables, refresh_mode, required_calculations, public_interpretation)→GoalRef</td><td>仅主；从已保存raw_request提出任务解释，服务核不扩大权限、不降低原必要要求后冻结Goal；API已明确可直接跳过此工具</td><td>analysis_local；5s；同assessment hash幂等；有实质歧义走K12，不为识别任务多调一个路由模型</td></tr>
+<tr><td>K01 read_archive_manifest</td><td>(archive_ref, view=&#x27;capabilities&#x27;)→ManifestView</td><td>解析固定归档，带数据来源、覆盖／缺口、实际发布、报表粒度、已存在成果索引</td><td>read_business；5s；同ref缓存；无归档不悄选latest</td></tr>
+<tr><td>K02 get_metric_panel</td><td>(archive_ref, metric_ids[], dimensions, as_of, policy_ref?)→MetricPanel</td><td>核资格及Goal重算义务，查缓存或创建唯一计算job；一次返回值、分母、cohort、缺项、分数引用、CalculationReceipt和drilldown</td><td>analysis_local；工具10s，响应预算8s，预计超预算立即登记job；deadline前返回waiting，不等30s才转异步；模型不自旋</td></tr>
+<tr><td>K03 query_evidence</td><td>(archive_ref, time_range?, product_refs?, tags?, query?, limit≤100, cursor?)→EvidenceIndex</td><td>SQLite索引／FTS、明确过滤，返回原件ID、有限片段、精度、商品归属及反例数量</td><td>read_business；5s；固定查询身份；不返回客户订单隐私字段</td></tr>
+<tr><td>K04 read_evidence</td><td>(source_refs[], view, max_units, cursor?)→EvidenceBatch</td><td>精确回读，逐件full／partial／not_delivered；记录实际交付hash和reader</td><td>read_business；5s；不按静默字符串截断假装全文已读；量超限列遗漏项</td></tr>
+<tr><td>K05 read_content_snapshot</td><td>(publication_ref或script_ref, module_refs?, include_facts=true, view=&#x27;selected&#x27;)→ContentBatch</td><td>用真实已采用稿件读所选模块和对应商品事实／本场要求；原稿标签native／derived分开</td><td>read_business；5s；带总项数与下一页；正文与spoken_text相同只交付一份并保留同义说明</td></tr>
+<tr><td>K06 read_playback_span</td><td>(archive_ref, occurrence_ids?或time_range, include_sentences=true)→PlaybackSpan</td><td>真实attempt／segment、暂停／跳播／长短开场、时钟和取声证据；需要时展开句子</td><td>read_business；5s；缺ended不补造时长；不输出排期当实播</td></tr>
+<tr><td>K07 read_review_history</td><td>(same_merchant_product_scope, compatible_filters, before, limit≤20)→HistoryIndex</td><td>只读受权历史指标／报告索引，保留不相容原因；不把摘要当正式数值</td><td>read_business；5s；当前场排除；不能借读历史扩大写权限</td></tr>
+<tr><td>K08 compare_occurrences</td><td>(metric_spec, target_refs[], baseline_spec, comparison_profile)→ComparisonResult</td><td>核对象／定义／价格／流量／成熟度、样本单位；程序算差异、可选区间；输出不匹配及假设</td><td>analysis_local；工具15s、响应预算13s，超预算前交唯一job＋WaitReceipt；不能自动用所有每秒行作独立样本</td></tr>
+<tr><td>K09 classify_comment_batch</td><td>(evidence_batch_ref, label_policy_ref, product_context_ref, budget_limit)→ClassificationArtifact</td><td>先去消息重复、保留未知用户／商品歧义，再一次模型批分类；每标签有原文ID和版本</td><td>analysis_local；共享模型attempt预算；不每条评论调用模型；安全响应先存再验；部分覆盖不得当全量密度</td></tr>
+<tr><td>K10 submit_review_draft</td><td>(goal_ref, archive_ref, findings[], recommendations[], content_assessments:ContentAssessmentInput[], scorecard_refs[], limitations[], public_summary)→DraftReceipt</td><td>主可一次提交四项typed审核；persist_content_assessments核证据并保存，程序score_content返回真实score refs；再存草稿和依据</td><td>analysis_local；10s；request hash稳定；无评论也可审核已播稿；错字段局部纠正，不另起强制审稿模型</td></tr>
+<tr><td>K11 finish_review</td><td>(goal_ref, draft_ref或answer_ref, outcome, public_summary, expected_run_generation)→DeliveryReceipt</td><td>唯一终态服务核原目标与正式证据；正式提交或说明部分；合法后直接结束SDK本轮，不再请求模型写结束语</td><td>analysis_local；10s；幂等；actual refs绑定delivery；unknown／缺稿／缺目标不能成功收尾</td></tr>
+<tr><td>K12 request_review_input</td><td>(question_kind, missing_ids[], question, choices[], related_refs[])→DecisionRef</td><td>保存本次必要缺项问题，转WAITING_INPUT； UI显示清楚影响，已有结果可保留</td><td>analysis_local；5s；同缺项去重；不重新询问用户已确认可手动导出这一事实</td></tr>
+<tr><td>K13 submit_subreview_result</td><td>(delegation_id, archive_ref, findings[], metric／evidence_refs[], content_assessments:ContentAssessmentInput[], unknowns[])→SubReviewReceipt</td><td>仅内容／经营子图；内容子走与K10同一persist_content_assessments服务并返assessment／score refs，经营子只可传空数组；核Goal后提交独立产物</td><td>analysis_local；10s；同delegation重复回原结果；不能提交主报告或把主state覆盖回去</td></tr>
+</table></div>
+<p>K00–K12给主Agent，其中K09含成本模型工作，必须经同provider账本；内容子Agent仅K01、K03–K06、K09、K13；经营子Agent仅K01–K04、K06–K08、K13。分类从content子内调用不允许再无限递归委派。各角色另有本节SDK_TOOL_POLICY允许的工具，宿主shell／任意SQL／HTTP不开放。</p>
+<p>K00不是固定首步骤。API已冻结Goal时可直接任意调查；自由对话的provisional Goal允许先用K01／只读证据了解对象，尚未冻结时成本模型分类、正式计算和交付返回TASK_ASSESSMENT_REQUIRED＋K00精确入参说明。F01可携带同一typed task_assessment并复用K00服务一次冻结再组上下文，所以不强迫多一轮。新目标改变必须显式新修订；普通重新读证据不改变Goal。</p>
+<p>ContentAssessmentInput含subject／原文／事实／本场／政策refs、四个明确criterion_id、rating=0或0.5或1或null、各项公开reason／证据和critical_findings。模型给判断，程序只做一次必要结构／引用／枚举检查和公式计算；不让模型自填最后总分。报告可引用已存assessment；要求reanalyse_content时须本次新判断及对应attempt_ref，不得贴旧ref完成。完整四项标准见07；本机制不生成或改写直播话术。</p>
+<h2>4 五个可选工具流的内部步骤</h2>
+<h3>F01 prepare_review_context</h3>
+<p>签名：<code>(goal_ref, focus?, evidence_budget?, task_assessment?)→ReviewWorkset</code>。既有scope已有原目标／归档；provisional Goal若带assessment先走K00同服务冻结；没有必须的数据返回needs_input，不自造绑定。</p>
+<div class="table"><table>
+<tr><th>步</th><th>执行动作</th><th>输出与缓存</th></tr>
+<tr><td>1</td><td>读目标、固定归档、版本与授权；核是否取消</td><td>authoritative goal／scope，不复制历史任务全文</td></tr>
+<tr><td>2</td><td>读场次能力、gap与实际稿件／商品清单</td><td>capability summary、origin和时间精度</td></tr>
+<tr><td>3</td><td>读当前已完成导入、指标、分数、草稿、专题产物索引</td><td>精确refs和状态，一次到位；不能靠“最新作业”漏掉另一个任务</td></tr>
+<tr><td>4</td><td>按focus和预算取首屏关键事实／所需正文，完整项优先</td><td>delivered／not_delivered清单，精确next_reads；不声明未读内容已审核</td></tr>
+<tr><td>5</td><td>保存workset hash、读取覆盖与使用的实际依赖</td><td>可重复复用；除显式task_assessment冻结外不改变Goal或业务事实</td></tr>
+</table></div>
+<p>该flow不自动派子Agent、不强制全文扫描、不默认重跑全部指标。它解决的是“已知事实和结果在哪里”，不是替模型决定下一步调查什么。</p>
+<h3>F02 build_product_panel</h3>
+<p>签名：<code>(archive_ref, product_ref, metric_profile, include_content=false)→ProductPanel</code>。</p>
+<ol>
+<li>核产品在本场真实快照／授权映射中；区分当前商品库新修订和本场当时版本。</li>
+<li>获取相应官方汇总或订单cohort，映射完整性、币种、订单粒度和as_of同时交付。</li>
+<li>只算该profile所需指标与评分；命中合法缓存即复用，origin明示。</li>
+<li>联合实际出现次数、时长、价格／投流／库存场记以及已分类顾虑；没有分类结果不制造“0疑问”。</li>
+<li>一次返回面板、缺项、原稿／原行／主题展开reader，可选交付本次完整需读正文。读到商品B作背景不能让主Agent把B列为用户要求的修改对象。</li>
+</ol>
+<h3>F03 build_module_panel</h3>
+<p>签名：<code>(archive_ref, product_ref, module_keys[], opening_mode?, window_profile, content_budget)→ModulePanel</code>。</p>
+<ol>
+<li>从真实队列和PlaybackSegment选择发生次数；native模块与derived标签分列，长短开场分开。</li>
+<li>计算已确认媒体播放的区间并集、定位覆盖与平台／事件时钟误差；资格不足即保留事实不评分。</li>
+<li>用固定主窗计算纯关联与mixed；无去重明细时跨分钟UV只逐桶展示。</li>
+<li>按确定性profile取响应指标；评论密度要求选定范围内完整分类及核准在线分母，代表评论仅作解释，不能替代完整计数。</li>
+<li>读取／复用按所有实际依赖冻结的ContentAssessment；没有时返回pending_assessment_requirements和精确原文reader。主可在K10／F05直接提交判断，或选择内容专题在K13提交；K09仍只分类评论，F03不暗调固定审稿模型。</li>
+<li>返回四项内容分、可用响应相对分、样本／缺项、关键原句和证据索引；不把内容87.5与经营48平均成“总体不错”。</li>
+</ol>
+<h3>F04 compare_compatible_history</h3>
+<p>签名：<code>(target_metric_refs[], comparison_spec, policy_ref)→BaselineAndComparison</code>。</p>
+<ol>
+<li>冻结历史可见截止，排除当前场；按同商家／商品／定义／来源／成熟度筛选。</li>
+<li>报价差、付费流量、时段、开场的已知条件按政策核对；未知重要条件显示不可比，不为凑数量混入。</li>
+<li>整场至少5场、模块专项至少10次且3场；不足返回facts_only，不报无限提升。</li>
+<li>保存中位数和全部入选／排除ref，正反向与比例上限显式映射；可比性与统计不确定性分别输出。</li>
+<li>如选择统计比较，先核抽样／聚类单位再算；不能因为存在统计库就默认每分钟独立。多版本结果标探索，不自动改播前。</li>
+</ol>
+<h3>F05 package_review_delivery</h3>
+<p>签名：<code>(goal_ref, draft_content:DraftInput或draft_ref:ReviewRef（二选一）, scorecard_refs, expected_run_generation)→DeliveryReceipt</code>。DraftInput含K10同一content_assessments[]。</p>
+<ol>
+<li>调用与K10相同的draft服务存内容；安全响应已在模型返回处归档，不在本flow重新调模型。</li>
+<li>执行与K11相同的原Goal／数据资格／数字／引用／版本检查，局部失败返回准确missing和可续办reader。</li>
+<li>目标满足则提交正式报告和delivery_ref，同事务更新run终态和进度；用户要求全经营但缺表时只能partial／needs_data，不能偷改Goal为互动成功。</li>
+<li>返回实际ref、公共完整交付说明和应用终态，由02的before_model持久回执门结束；不使用return_direct，不再单独调用finish_turn写一轮计划结束。</li>
+<li>若请求只是回答某问题／重算某分，按对应Goal类型提交AnswerArtifact／Scorecard，不强迫生成整本报告。底层终态仍只由同一个finish服务判断。</li>
+</ol>
+<p>同一flow可被模型任意选用或跳过。flow不隐含“下一flow必跑”；数据依赖只决定某个工具是否具备资格。</p>
+<h2>5 指标注册从草案收口为一个目录</h2>
+<div class="table"><table>
+<tr><th>工程metric_id</th><th>原设计对应／类型</th><th>主要资格</th><th>结果保存</th></tr>
+<tr><td>observed_time_ratio／confirmed_play_seconds</td><td>原23项覆盖／媒体播放</td><td>本场边界、journal、clock</td><td>MetricResult＋区间引用</td></tr>
+<tr><td>observed_member_messages／like_messages／verified_like_increments</td><td>原公开事件项</td><td>同场／去重，点赞语义核验</td><td>原消息量与业务数值不同unit</td></tr>
+<tr><td>online_time_weighted_mean／observed_online_person_minutes</td><td>原在线候选项</td><td>verified在线字段、有限间隔积分</td><td>分母范围与未覆盖秒数</td></tr>
+<tr><td>relevant_question_count／intent_observed_users</td><td>原评论项</td><td>标签版本、原件／用户键、商品归属</td><td>不混同消息、主题组和用户数</td></tr>
+<tr><td>questions_per_100_observed_person_minutes</td><td>原23项中的问题密度，仅诊断</td><td>同窗口完整问题分类及核准人分钟；不是主题组密度</td><td>不新增该项评分，与C01语义分别保存</td></tr>
+<tr><td>intent_theme_density</td><td>新C01，单位groups_per_100_person_minutes</td><td>完整选定窗口评论分类＋同窗核准在线分母</td><td>主题组、用户数、密度分别保留</td></tr>
+<tr><td>confusion_theme_density／necessary_question_coverage</td><td>新C02／C03</td><td>主题证据／选中必要主题／已播原句</td><td>不因零问题给高效果分</td></tr>
+<tr><td>official_30s_retention</td><td>新C04</td><td>完整同进入队列或同定义官方指标</td><td>目前本地插件不可算；null原因</td></tr>
+<tr><td>official_average_watch_seconds</td><td>原官方观看时长</td><td>同场授权定义</td><td>不能拆成开场专属值</td></tr>
+<tr><td>product_click_uv_rate／viewer_to_buyer_rate／clicker_to_buyer_rate</td><td>原B04–B06</td><td>官方定义或合法嵌套队列；跨桶去重</td><td>比率＋分子分母＋适用区间</td></tr>
+<tr><td>created_cohort_payment_rate／paid_order_count</td><td>原订单项</td><td>同创建队列、grain、as_of</td><td>不以本分钟付款／新建求率</td></tr>
+<tr><td>created_orders_per_observed_person_minute</td><td>原活动模块响应政策的工程算子，非新增评分权重</td><td>同本场同窗真实创建时间、去重订单grain、已核在线人分钟</td><td>count／M；仅整场汇总或在线未核时null，不与创建队列支付率混名</td></tr>
+<tr><td>paid_amount_minor／successful_refund_minor／refund_amount_rate／net_paid_asof_minor</td><td>原金额／B01、B08</td><td>同支付P、币种／运费／折扣、退款成功</td><td>integer minor和cohort／as_of</td></tr>
+<tr><td>paid_amount_per_live_hour／net_amount_per_live_hour／paid_per_1000_viewers</td><td>原效率项／B02</td><td>整场或匹配窗口、同定义UV</td><td>采集故障不缩收入对应时长</td></tr>
+<tr><td>net_per_1000_viewers</td><td>新B03，区别原paid_per_1000_viewers</td><td>同场净额、UV、退款龄期</td><td>不把实付与净额混名</td></tr>
+<tr><td>first_identification_seconds／module_duration_seconds</td><td>新T01</td><td>实际播放与原句定位</td><td>内容节奏，不套越短越好</td></tr>
+<tr><td>playback_record_coverage／content_binding_coverage／time_association_coverage</td><td>新Q02–Q04</td><td>同目标区间和可核证据</td><td>额外资格门不能用其他高分抵消</td></tr>
+</table></div>
+<p>表中一行多ID只是并列定义，不表示合成一个统计函数。实施时每个ID有独立spec、unit、允许dimension、data requirement、计算函数和反例fixture；可以批处理共用一次底层扫描，但不可只因同名字段共用不同语义公式。</p>
+<h2>6 模型任务与有限停止</h2>
+<p>系统提示词只定义目标、数据不可信边界、工具选择原则、禁止写入、证据引用和完成方式；不塞整张统计教程、所有历史问题和全量表格。Skill承担详细方法，正式索引承担当前事实，工具承担机械执行。</p>
+<p>正常调查可追加新的问题和工具调用，重复读取本身不一刀切禁止；同tool＋参数hash＋相同依赖版本且没有新增证据时，第一次提醒已有结果与reader，连续再次无进展返回no_new_information并建议缩小范围／结束有限结果。模型给出“要读另一个view／核关键反例”就允许，不用固定路线替它规划。</p>
+<p>异步导入／重算未完成时保存真实job＋WaitReceipt，02控制门停止本次图invocation，应用保留WAITING_JOB；协调器从持久Inbox取job完成事件后，用有界ResumeObservation续办，不以graph返回推断目标完成。JobStatus=QUEUED／RUNNING／SUCCEEDED／PARTIAL／FAILED／UNKNOWN／CANCELLED，DTO含job_ref、operation_key、scope、input_hash、result_refs、error、attempts、generation和时间。GET /review/v1/jobs/{id}给UI／恢复协调器；K01的jobs视图可供模型针对性核查，但正常等待不轮询。各flow使用同一submit_or_join_job，重复请求不启动第二份计算。用户新消息、取消和数据修订都产生独立可恢复事件，不能把旧run静默继续到新archive。</p></article><article id="section-4"><h1>API、Agent工作台、人工确认与播前交接</h1>
+<p>版本LIVE-REVIEW-ENG-1.0，所有新增API均为待实现计划。现有Agent UI仍为产品主体：右侧对话用于提出任务和解释，左侧展示、校对数据与报告；点击交互区沿用原前端方案的聚焦放大逻辑。这里定义后端数据和事件，不另起一套以声播管理页为主体的UI。</p>
+<h2>1 服务挂载与安全边界</h2>
+<p>现有声播8765接收浏览器同源请求<code>/api/review/v1/*</code>，桥接到既有Agent8791的<code>/review/v1/*</code>。Agent app启动增加ReviewRuntime生命周期，独立review DB／checkpoint、作业和trace命名空间；不向浏览器发送服务令牌，不借18791授权测试页作推理base_url。</p>
+<p>实际Agent挂载入口是<code>src/shengbo_prelive/api.py:create_app</code>及其lifespan（本机75／92行附近），由<code>src/shengbo_prelive/__main__.py</code>启动；W4通过集成者在该app挂Review router／资源，不能假定另有http_api.py。voice的server.py由W1接点owner统一合入bridge挂载，避免多窗口各改启动生命周期。</p>
+<p>复用已有Origin／Host／同源会话校验思想，Review bridge仅代理固定路径／方法和已确认scope。principal由受信会话解析，模型／请求JSON中的actor_id或account_id不能授予身份。凭据仅在已有provider／受控服务令牌存储中，禁止放state、SSE、报错或Artifacts。</p>
+<p>Review初始化失败显示feature_unavailable及可重试状态，不能阻止原声播和播前可用。重型报表读取／计算off-loop；浏览器SSE断开只断展示，不能关闭共享HTTP transport或中断后台run。应用关闭按各资源owner释放引用，不让Review关闭播前资源。</p>
+<h2>2 请求与响应合同</h2>
+<p>浏览器Mutation统一提交client_request_id、expected_generation／revision和必要preview_hash；服务生成稳定operation_id或按已登记ID复用。相同ID不同请求hash为409 OPERATION_PAYLOAD_CONFLICT。普通GET不需要operation账本；异步提交202只表示accepted，必须有job／run查询入口。</p>
+<div class="table"><table>
+<tr><th>内部路由（外部加/api）</th><th>输入</th><th>返回与语义</th><th>身份／副作用</th></tr>
+<tr><td>POST /review/v1/monitor-sessions</td><td>voice_room／session、external room、publication ref、绑定说明、client_request_id</td><td>SessionBinding＋generation；重复同操作返回原绑定</td><td>人工controller；只建立监控对象，不开播</td></tr>
+<tr><td>GET /review/v1/monitor-sessions/{id}</td><td>scope与session id</td><td>当前绑定、订阅／采集状态、可用归档、gaps</td><td>本account只读</td></tr>
+<tr><td>POST /review/v1/monitor-sessions/{id}/start</td><td>expected_generation、所用source配置引用</td><td>SubscriptionReceipt，可能waiting_source；不能重置已连接相同source</td><td>人工controller；管理自身订阅，不执行直播动作</td></tr>
+<tr><td>POST /review/v1/monitor-sessions/{id}/stop</td><td>expected_generation、reason</td><td>本订阅释放回执、可封存范围</td><td>人工controller；不调用停止直播／全局disconnect</td></tr>
+<tr><td>POST /review/v1/monitor-sessions/{id}/seal</td><td>expected_generation、drain_policy</td><td>202 job或ArchiveRef＋明确partial</td><td>人工／受权后台协调器；封存分析资料</td></tr>
+<tr><td>GET /review/v1/archives/{id}/revisions/{rev}</td><td>完整ref校验</td><td>不可变manifest、capability、coverage、evidence入口</td><td>只读</td></tr>
+<tr><td>POST /review/v1/imports</td><td>流式文件＋目标session＋client_request_id</td><td>BlobRef＋预览job；不直接当正式交易</td><td>人工controller，受限原件写入</td></tr>
+<tr><td>GET /review/v1/imports/{id}/preview</td><td>import id</td><td>fields／units／grain／scope候选、关键警告和原行定位</td><td>只读；脱敏样例，不返回顾客地址</td></tr>
+<tr><td>POST /review/v1/imports/{id}/confirm</td><td>mapping_ref／hash、商品匹配、human selection、expected_generation</td><td>正式mapping／dataset或局部拒绝清单</td><td>人工确认；复用已确定profile可免重复问同口径</td></tr>
+<tr><td>POST /review/v1/conversations</td><td>monitor_session、可选archive_ref、显示语言</td><td>conversation id＋初始workspace</td><td>本account；本地对话对象</td></tr>
+<tr><td>POST /review/v1/conversations/{id}/messages</td><td>text、goal_mode可选、refresh_mode可选、selected_refs、client_request_id</td><td>202 run_id／GoalRef＋assessment_status；明确请求可直接冻结，自由对话由K00／F01同服务冻结解释</td><td>用户消息；保留raw text，scope不由模型扩大</td></tr>
+<tr><td>GET /review/v1/runs/{id}</td><td>run id</td><td>status、goal、active／waiting、已完成refs、pending问题与budget摘要</td><td>只读；不靠UI从日志猜当前状态</td></tr>
+<tr><td>GET /review/v1/jobs/{id}</td><td>job id＋scope</td><td>JobStatus、输入hash、result_refs／错误、generation、attempts、waiting_run_refs</td><td>只读；独立作业在SSE断线／重启后仍可查；accepted不等于成功</td></tr>
+<tr><td>POST /review/v1/runs/{id}/cancel</td><td>expected_generation、reason</td><td>cancel_requested，后续查询确认已停新动作</td><td>用户；不停止source监控，不撤回已发生模型费用</td></tr>
+<tr><td>POST /review/v1/decisions/{id}/answers</td><td>decision_ref、所选值、preview_hash、expected_generation</td><td>confirmed或stale；同一问题幂等恢复</td><td>用户，不能跨run回答别的decision</td></tr>
+<tr><td>GET /review/v1/events</td><td>conversation／session过滤、after或Last-Event-ID</td><td>SSE，稳定stream_position；断线补发＋快照</td><td>本account只读；过滤后的序号可有空洞，不当漏消息数</td></tr>
+<tr><td>GET /review/v1/workspace</td><td>conversation、选中的archive／report／product</td><td>左侧投影：来源／覆盖、商品指标、模块、报告、待确认</td><td>只读；不把SSE状态当业务正本</td></tr>
+<tr><td>GET /review/v1/reports/{id}/revisions/{rev}</td><td>报告ref及view</td><td>真实正式报告、分数、限制、建议</td><td>只读；按原版本展开，不默认换latest</td></tr>
+<tr><td>GET /review/v1/evidence/{id}</td><td>opaque ref、view、cursor、limit</td><td>安全证据正文／原行／时间线，覆盖与下一页</td><td>只读；不可输入本机任意路径</td></tr>
+<tr><td>POST /review/v1/adoptions/preview</td><td>report_ref、selected_recommendation_ids、target_preparation_ref</td><td>精确计划／差异、已有recap保留策略、preview_hash、到期条件</td><td>人工意向；不写下一场</td></tr>
+<tr><td>POST /review/v1/adoptions/confirm</td><td>preview_ref＋hash、human selection、operation_id、target expected_revision</td><td>202 handoff operation或committed；可查询</td><td>唯一human_business入口；不在模型allowlist</td></tr>
+<tr><td>GET /review/v1/operations/{id}</td><td>operation id</td><td>proposed／imported／linking／linked／conflict／unknown与对账</td><td>只读；超时先查，不新建key盲重试</td></tr>
+</table></div>
+<p>UI目标mode可为full_review、answer_question、score_only或prepare_handoff；原始用户文本与要求不可改写。未明确模式时主Agent用K00或F01的task_assessment提出有限解释，服务核scope、required_deliverables及refresh_mode后冻结；不再增加固定的“识别任务类型”模型调用。明确“重算／重新分析”的义务绑定CalculationReceipt，不能只换新报告标题。单问某商品不被强制生成完整报告。</p>
+<h2>3 左侧／右侧具体展示</h2>
+<div class="table"><table>
+<tr><th>区域</th><th>后端提供的内容</th><th>可微调的范围</th><th>修改后的失效与锁</th></tr>
+<tr><td>左侧来源</td><td>场次、原件／报表、字段映射、采集及缺口、是否已校准</td><td>人工选表／确认映射、商品对应、补资料</td><td>新dataset／archive revision，不改旧报告；Agent正在确认同mapping时锁该项，纯只读不锁</td></tr>
+<tr><td>左侧经营卡</td><td>净额、目标完成、各单项相对分、退款龄期、样本和缺项</td><td>用户新设目标或更正口径应创建新版本</td><td>不覆写历史90分；旧目标分保留，清楚标新目标计算</td></tr>
+<tr><td>左侧商品／模块</td><td>实际播放项、长短开场、内容四项与响应分、句子／评论时间线</td><td>筛选／选中查看；对语义标签作人工更正并留依据</td><td>筛选不是改稿；标签更正新revision，重算受影响统计</td></tr>
+<tr><td>左侧报告／建议</td><td>观察、解释假设、反例、修改目标、指标与验证办法</td><td>选择采纳／暂缓；人工备注</td><td>选择不等于已改声播；操作卡绑定精确报告和下一场</td></tr>
+<tr><td>右侧对话</td><td>用户问题、Agent公开解释、任务进度、缺项确认、最终交付</td><td>可以追加调查、纠正目标或问某个分数怎么来</td><td>新要求进新的Goal／受控修订，不悄换正在跑的归档</td></tr>
+<tr><td>右侧执行过程开关</td><td>主子任务块、工具安全参数、结果摘要、耗时／缓存、缺项</td><td>只控制展示，可展开安全原文；默认关</td><td>关闭不停止trace、不取消run、不改变计分；不显示隐藏思维链／凭据</td></tr>
+</table></div>
+<p>新增Review UI不再放一个能绕过Agent／权限的“直接修改声播数据库”入口。已有声播播控继续由现有应用所有者管理，Review模块只读其当时版本。</p>
+<h2>4 SSE与调试事件</h2>
+<p>EventEnvelope统一含event_id、schema_version、stream_position、run_id可空、run_sequence可空、invocation_id可空、parent_span_id可空、role可空、session_id／job_id／operation_id可空、timestamp_utc、type、status、safe_payload_ref、duration_ms可空。归档／导入可以发生在任何run前，不伪造run_id；每事件至少有session／job／operation／run一种真实所属。stream_position是Review库跨run持久序号；run_sequence只在单run排序，不能互相覆盖。</p>
+<div class="table"><table>
+<tr><th>事件类</th><th>示例</th><th>前端行为</th></tr>
+<tr><td>task／branch</td><td>run.started、delegation.started／finished、run.waiting_input</td><td>新建任务块／子块，公开任务目标与进度，不展示模型私有推理</td></tr>
+<tr><td>tool</td><td>tool.proposed、tool.started、tool.finished、tool.reused、tool.failed</td><td>同一call_id归一块；折叠参数、合法ref、结果概要、origin、耗时</td></tr>
+<tr><td>data／metric</td><td>import.preview_ready、archive.revised、metric.calculated、score.unavailable</td><td>更新对应左侧对象；旧报告不随新数据悄变</td></tr>
+<tr><td>model／context</td><td>model.attempt.sent、model.usage_observed、context.projected、context.summarized</td><td>调试可看用途／用量／预算，不输出令牌、隐藏reasoning或整份私密订单</td></tr>
+<tr><td>delivery／adoption</td><td>review.committed、run.completed、adoption.waiting／linked／conflict</td><td>通过正式refs刷新报告／下一场状态；accepted不显示已关联成功</td></tr>
+</table></div>
+<p>先保存状态＋trace再发事件；断线以Last-Event-ID补发。游标过期返回CURSOR_EXPIRED＋snapshot，不能将UI补发成功等同源事件完整。公开payload由统一投影器产生，后端受控payload也必须先脱敏，不能前端隐藏但接口可取完整密钥。</p>
+<h2>5 四类人工确认点</h2>
+<div class="table"><table>
+<tr><th>确认点</th><th>何时出现</th><th>确认内容</th><th>不需要额外确认的事</th></tr>
+<tr><td>场次／来源绑定歧义</td><td>同房有多个voice session、外部房间不一致、已有源配置不同</td><td>本次监控对象和采用的已有source</td><td>对同一已确认绑定重连／恢复消费，不重复问</td></tr>
+<tr><td>报表关键口径歧义</td><td>人数／次数、父／子单、币种、时区、退款状态或SKU对应不明</td><td>显示过的header／映射快照</td><td>读取／预览、确定性统计、相同profile无需再逐字段问</td></tr>
+<tr><td>缺必要资料</td><td>用户要成交但缺本场经营来源，或关键表无法解析</td><td>补什么、可先交付哪种有限结果</td><td>不再问“能否导出”这一已确认事实，不要求每个读取批准</td></tr>
+<tr><td>采纳反馈到下一场</td><td>用户选建议并准备关联指定preparation</td><td>精确报告、建议ID、旧／新目标refs、影响、保留原有recap策略</td><td>生成报告和候选无需额外批准；后续播前文本到语音仍走原批准，不由本模块代批</td></tr>
+</table></div>
+<p>该Reviewer没有自动业务写工具，因此不为所有read加HumanInTheLoopMiddleware。人工API确认是普通业务回执，与SDK任意tool interrupt并非同一机制；如后续开放Agent主动提交采纳，再另加明确HITL并验证重放语义。</p>
+<h2>6 采纳到播前的完整路径</h2>
+<div class="table"><table>
+<tr><th>顺序</th><th>拟议函数</th><th>读／写与条件</th><th>中断后怎么办</th></tr>
+<tr><td>H1</td><td>feedback.preview_adoption(report_ref, ids, target_ref)</td><td>读正式报告、建议、目标当前版本与已有recap_refs，产生不可变preview</td><td>没用户confirm不调用voice写API</td></tr>
+<tr><td>H2</td><td>feedback.confirm_adoption(preview_ref, hash, principal, op_id)</td><td>核human、同account、报告未撤回、选择范围和目标CAS；登记稳定request_hash</td><td>重复点击回同op；参数不同拒绝</td></tr>
+<tr><td>H3</td><td>build_recap_document(selected, full_report_ref, evidence)</td><td>用稳定namespaced finding ID，保留原source IDs、精确report_ref和原证据摘要／hash；非选项保留在完整报告，不当已拒绝</td><td>模拟包用隔离测试对象；格式错本地纠正，不调模型改事实</td></tr>
+<tr><td>H4</td><td>ensure_voice_blob_and_import_recap(operation)</td><td>用各自稳定子operation ID完成blob staging及import_recap，取得真实PRELIVE-2.3 recap_ref</td><td>每阶段request hash／回执持久；响应不明查该子ID的read_operation_receipt，不能换ID重导</td></tr>
+<tr><td>H5</td><td>link_recap_cas(operation, recap_ref)</td><td>重读仅核对差异，仍传确认preview冻结的expected_revision；按preview保留旧recap_refs再追加本次ref，去重</td><td>现有link整体替换列表；不能只传新ref清旧项，也不能重读新revision后偷偷改CAS。冲突展示新差异</td></tr>
+<tr><td>H6</td><td>verify_handoff(operation)</td><td>回读目标preparation确含本次recap_ref，记录linked_generation和最终回执</td><td>写成功回包丢失可查／回读推进；只import成功但link失败不是整体失败，保留可继续状态</td></tr>
+<tr><td>H7</td><td>既有播前处理</td><td>读取正式recap，结合当前商品／顾客／本场配置决定新稿或局部修改；逐条disposition</td><td>Review不自行重生成话术／语音，不跳过原文本批准门禁</td></tr>
+</table></div>
+<p>旧Recap的findings／evidence仍是部分dict校验：本适配器先严格校验引用支持、对象范围和选项，不以旧接口接受JSON就认定语义合格。若新报告修订将替代旧建议，preview必须明确替代哪些旧recap；默认追加不能隐式删除用户已有准备信息。</p>
+<p>父adoption operation_id只在Review使用。voice每条命令按<code>uuid5(parent_id, plan_version＋&#x27;:stage:blob&#x27;)</code>、<code>&#x27;:stage:import_recap&#x27;</code>、<code>&#x27;:stage:link_recap&#x27;</code>派生不同且可重复计算的子ID，连同principal、command及request_hash保存。现有voice以principal＋operation_id唯一，多命令共用父ID会触发IDEMPOTENCY_KEY_REUSED。重试／回包丢失只查该阶段原子ID；not_found不证明没有在途请求。若目标内容已变，旧计划停conflict，新preview确认后新plan_version派生新子ID，不能用同key改payload。</p>
+<p><code>recap_finding_id=&#x27;rv_&#x27;+canonical_hash(精确report_ref＋源finding_id＋源recommendation_id)</code>，将origin.source_finding_id／source_recommendation_id另存。现有播前把所有recap finding_id合在一个set中核处置，若两份报告都叫finding_1会冲突，所以不能直接保留局部ID作业务主键。一次建议关联多个finding时投影为一条建议对应一个稳定处置项，内部保留supporting_finding_refs[]；不按标题或序号去重。精确同报告同建议重复投影ID相同，不同报告修订必须不同；evidence ID也限定报告命名空间。</p>
+<p>CAS冲突不是要求用户重复批准同一个未变化动作。目标／报告／选择实质变更才生成新preview与确认；仅回包丢失、回执可核实就按原operation继续。目标正在生成／已发布／开播时的限制由现有prelive服务判定；Review不能绕过编辑锁或批准失效规则。</p>
+<h2>7 三条完整运行时序</h2>
+<h3>场景A：正常整场经营复盘</h3>
+<p>用户选择本场→controller绑定并采用已有source租约→播中旁路归档→人工关监控后有界排空／封存→上传CSV／XLSX→口径已明直接导入、歧义一次确认→新ArchiveRevision→用户说“复盘本场”→创建Goal／run／checkpoint→主Agent选F01与必要商品面板→程序给四类卡与缺项→复杂内容和经营才并行task→子返回各自结构化证据→主保存草稿并finish→正式报告回执驱动SDK结束和UI更新→用户勾选建议→preview→confirm→Recap导入／CAS关联／回读→播前另开准备任务。</p>
+<h3>场景B：没有逐单或分钟数据</h3>
+<p>只导出商品汇总→进口声明business_aggregate→整场商品CTR／净额可以算→模块／句子成交分null并给原因→Agent仍可看真实已播稿和评论问题，交付有数据的复盘→用户原目标要求具体模块成效的部分标unavailable／partial，不凭空切分整场金额。</p>
+<h3>场景C：中途重启、晚到退款或采纳冲突</h3>
+<p>重启加载run／budget／正式成果／unknown→主图checkpoint恢复；已完成子结果／指标按精确ref复用→恢复消息只带变化与reader→旧ArchiveRevision不变→晚到退款生成新archive／report修订→原报告仍可查；旧采纳preview不能批准新结论→若voice关联已成功但回包断线，以原op查询并回读目标；若preparation已改，标conflict提供差异，不清空旧recap、不盲重试。</p></article><article id="section-5"><h1>验收矩阵、性能计量与并行实施任务包</h1>
+<p>版本：LIVE-REVIEW-ENG-1.0。日期：2026-10-20，Asia/Shanghai。</p>
+<p><strong>本文件全部实施任务与 R01–R50 验收均为计划，尚未执行通过。</strong>此前纯 SDK 假模型探针只验证了明确列出的框架机制，不代表这里的新业务、评分、采集和交接已经实现。本次只保存开发计划，不运行真实模型、TTS、生产数据库迁移、线上采集或服务更新。</p>
+<p>本计划的完成标准是：已知根因在第一次实施时就有唯一落点与反例；从监控资料到正式复盘、再到人工采纳的链条可追溯、可恢复；模型可以自主选择调查路线，确定性程序减少重复读取与无效等待。10分钟是性能优化目标，不以删除必要资料、减少要求覆盖或冒充已完成换取。</p>
+<h2>1. 每个开发窗口拿到什么</h2>
+<p>交给某个窗口的最小任务包为：本文件对应 W 行、00–04 工程计划、06 旧问题预防矩阵、07 评价执行配方及上级评分政策、冻结的 contracts/schema、所需 fixture、模型和业务 API 的假服务接口、禁止修改范围。只发送一句“你做经营Agent”不足以独立施工。</p>
+<p>每个窗口必须交付：代码改动清单、真实入口与输出合同、针对编号的自动验收结果、fixture 与版本hash、性能span样例、未覆盖项、结构审查表。测试失败不得改为默默跳过；不能把合成场景的良好经营结果描述成真实带货效果。</p>
+<h3>1.1 W0–W6 所有权、依赖与可并行点</h3>
+<p>以下 owner 指职责角色，不预设具体人或对话。<code>src/</code>、<code>tests/</code>、<code>verification/</code>均相对 <code>D:/Codex project/shengbo-ops-agent/</code>；voice路径相对 <code>D:/Codex project/ecommerce-voice-agent/</code>。所有文件均为后续拟新增/改动位置。</p>
+<div class="table"><table>
+<tr><th>包/owner</th><th>独占实现文件与接点</th><th>具体行动与产出</th><th>开工依赖/可并行</th><th>交付门与主要验收</th></tr>
+<tr><td>W0 契约与集成者</td><td><code>src/shengbo_contracts/live_review.py</code>；<code>src/shengbo_live_review/repository.py</code>、<code>artifacts.py</code>；Review迁移目录；<code>tests/live_review/fixtures/</code>与schema导出</td><td>冻结Ref、单位/时间、Goal/Scope、事件/归档、DTO、错误/状态、作业/回执、指标/评分/内容评级、采纳/阶段操作合同；提供SQLite事务/CAS/唯一键和基础假服务；登记所有API/ToolSpec名称与fixture</td><td>最先完成核心schema与假接口；可提前收集真实报表样本，但不把未确认表头写死；其他窗口只提交契约变更提议，不并行改此文件</td><td>G0：R01/R02及schema往返、迁移隔离；下游能仅凭任务包运行假服务</td></tr>
+<tr><td>W1 事实接入与播放记录</td><td><code>ingest.py</code>、<code>sessions.py</code>、<code>playback.py</code>；voice <code>app/live_review_ingress.py</code>；现有<code>app/live_source.py</code>及<code>app/server.py</code>事件产生处的最小补丁</td><td>原源同事务outbox；unknown/连接/解析/gap旁路；本场归属、去重、游标、订阅租约；实际attempt/segment journal与版本映射；封存/排空/迟到修订；不另建采集连接</td><td>依赖W0 schema/事务接口；与W2/W3并行，先输出固定归档fixture；<strong>voice server.py由W1接点owner独占，其他窗口通过提议合入</strong></td><td>G1：R03–R12；原事件/区间/归档可重放、计数可核对、无直播写调用</td></tr>
+<tr><td>W2 经营导入、统计与评分</td><td><code>report_imports.py</code>、<code>metric_definitions.py</code>、<code>metrics.py</code>、<code>scoring.py</code>；对应纯函数/导入测试</td><td>CSV/XLSX读取与映射、商品/场次/父子单口径；支付退款cohort；模块时间资格/响应；四类评分；内容assessment存储服务；基线、缓存、重算作业；输出强类型Metric/Score/Panel</td><td>依赖W0；可用合成归档与报表先做，不等W1真实采集。ContentAssessment服务合同与W3共同评审，但代码归W2，不在中间件再算一套分</td><td>G2：R13–R28；人工可手算的样例及反例全部匹配；不能用LLM做加减乘除</td></tr>
+<tr><td>W3 Deep Agents Harness</td><td><code>bootstrap.py</code>资源层、<code>runtime.py</code>、<code>control.py</code>、<code>reports.py</code>、<code>jobs.py</code>、<code>agent_factory.py</code>、<code>context.py</code>、<code>middleware.py</code>、<code>policy.py</code>、<code>tools.py</code>、<code>flows.py</code>、<code>observability.py</code>；四份<code>skills/review/&lt;skill_name&gt;/SKILL.md</code>唯一原件</td><td>主图+可选两子图；四业务中间件；显式SDK计划/文件/委派/摘要配置；ToolSpec生成schema和权限；shared scope/预算/日志；有界上下文；非direct完成门、等待续办、取消恢复；仅依赖W1/W2受限服务</td><td>W0通过即能针对fake services开发；W1/W2尚未完成时不得import其生产服务启动。<code>policy/tools/flows</code>由同owner统一，避免各窗口各建注册器</td><td>G3/G4：R29–R42；主子SDK工具往返、错误纠正与恢复通过后才允许真实provider小任务</td></tr>
+<tr><td>W4 同源API、工作台与播前交接</td><td><code>api.py</code>、<code>feedback.py</code>；voice <code>app/live_review_bridge.py</code>；既有聚合FastAPI/router及Agent工作台的Review组件</td><td><code>/review/v1</code>路由、HTTP错误/作业/SSE、来源/分数/证据左侧投影、右侧Agent对话与过程开关；typed采纳preview/confirm/对账；Review→Recap适配、保留旧refs、CAS和回读</td><td>W0后可先做contract/fake UI；真实routes依赖W3 Runtime，评分视图依赖W2。8791/8765挂载改动由集成者按单一补丁合入；不与W1并行改server.py</td><td>R43–R49；202/等待/完成区分、无身份泄漏、采纳幂等、UI不再以声播管理页为主体</td></tr>
+<tr><td>W5 集成、冻结与反例验收</td><td><code>tests/live_review/</code>集成套件；<code>verification/live_review/</code>显式验收脚本；<code>verification/live_review/freeze_manifest.json</code>、同build验收输出、故障注入/性能报告</td><td>按第3节分层运行R矩阵；同根因批改；回查播前兼容；冻结源码/依赖/schema/prompt/Skill/policy/fixture；隔离数据根用已授权adapter做3次同版小型真实模型任务；形成完整缺陷/证据台账</td><td>依赖W1–W4各层通过相应门；可提前写fixture，不在业务未通时反复真测。任何影响数据/模型行为的修改都升build，不能拿旧真测给新代码背书。<strong>本轮不启动真实调用</strong></td><td>G5：R01–R50分层证据；无未处理P0/P1；真实调用/回放/平台实测分列，未测不宣称完成</td></tr>
+<tr><td>W6 部署与回滚者</td><td>桌面启动/同源router挂载的已评审发布补丁；迁移/备份/版本核对/回滚说明；部署回执</td><td>仅把W5已冻结且验收的构建更新到既有8765/8791；备份Review与voice新增表、核feature gate与资源owner、检查实际加载build；异常回滚代码/迁移兼容路径，不悄退回宽松旧逻辑</td><td>依赖W5通过；尊重实际进行中的场次和服务owner，先处理已明确可结束的测试场次；不另加端口/启动器；不在部署时顺手改业务并沿用旧验收</td><td>R44/R50部署部分；加载build可核、原声播/播前可用、Review失败可单独降级，回滚后业务正本可读</td></tr>
+</table></div>
+<p>W0–W5与00的编号和含义一致；W6只新增部署/回滚执行责任，不改变W4含义，不增加Agent或服务。</p>
+<h3>1.2 禁止并行编辑与合同变更办法</h3>
+<div class="table"><table>
+<tr><th>共享对象</th><th>唯一owner</th><th>其他窗口怎么协作</th></tr>
+<tr><td><code>shengbo_contracts/live_review.py</code>、基础migration、repository事务骨架</td><td>W0/集成者</td><td>提交所需DTO/查询/唯一键及反例，不另建<code>contracts_v2.py</code>平行正本</td></tr>
+<tr><td><code>voice/app/server.py</code>、<code>live_source.py</code>事件接点</td><td>W1，挂载由集成者协调</td><td>W4只交bridge函数/route需求，集成时顺序应用，不互相覆盖</td></tr>
+<tr><td><code>policy.py</code>的ToolSpec/SDK_TOOL_POLICY</td><td>W3</td><td>W2提供普通服务签名，W4提供HTTP合同，不自行注册同名工具</td></tr>
+<tr><td>指标/评分定义、ContentAssessment语义</td><td>W2</td><td>W3只提交typed判断，不在Skill/中间件抄公式</td></tr>
+<tr><td>当前provider安全adapter、凭据续期</td><td>原组件owner/集成者</td><td>复盘传自己scope与回调；确需调整先给兼容测试，不复制成另一套刷新逻辑</td></tr>
+<tr><td>8791/8765启动与共享资源关闭</td><td>集成者</td><td>单个窗口不自动重启用户服务、不关闭他包HTTP池/checkpointer/source租约</td></tr>
+</table></div>
+<p>契约变更记录最少含：旧/新schema版本、为何旧合同不足、生产者与消费者清单、兼容适配位置、影响的R编号、迁移/回滚路径。先同步fixture和消费方，再合并；禁止由consumer用<code>dict.get(...)</code>吞掉契约变化。</p>
+<h2>2. Fixture与数据证据准备</h2>
+<div class="table"><table>
+<tr><th>fixture族/拟目录</th><th>必备内容</th><th>用途与禁止误用</th></tr>
+<tr><td><code>fixtures/contracts/</code></td><td>每种DTO合法/非法、Ref跨范围、缺字段、null/0、非法金额/时区</td><td>验证真实校验，不用宽松dict让测试假通过</td></tr>
+<tr><td><code>fixtures/ingress/</code></td><td>同房两场、重复消息、不同method同msgID、300条历史页、unknown方法、断连/游标/封存迟到</td><td>固定预期事件集合和gap集合，不能以历史累计量代本场UV</td></tr>
+<tr><td><code>fixtures/playback/</code></td><td>长短开场位置、循环、跳播、暂停恢复、缓冲、多playing、过期owner/epoch ack、原稿导入</td><td>区分计划与实际、attempt与segment；保留当时publication/script/module/sentence refs</td></tr>
+<tr><td><code>fixtures/business/</code></td><td>CSV/XLSX、人数/次数同名列、父/子单、混币、缺缓存公式、当日全店跨渠道、退款申请/成功、重复上传</td><td>每个样例都有原行坐标、正式映射或应询问字段，不推断平台现有表头</td></tr>
+<tr><td><code>fixtures/metrics/</code></td><td>支付cohort反例、整场小时分母、UV不可加、混合时间桶、B=0/1、比例上限、内容未知项、小样本</td><td>以期望值/原因码手算，可由参考统计实现交叉核对</td></tr>
+<tr><td><code>fixtures/sdk/</code></td><td>确定性假模型响应序列、非法tool args、子任务越权、等待/完成/取消、summary压力</td><td>真正走本机SDK循环，不能只mock掉最容易出错的ToolNode和middleware</td></tr>
+<tr><td><code>fixtures/handoff/</code></td><td>finding本地ID碰撞、旧recap保留、跨stage请求key、CAS冲突、提交后回包断连、synthetic限制</td><td>只用隔离voice/prelive假服务或专用测试数据根，不动用户正在准备的本场</td></tr>
+</table></div>
+<p>每个fixture记录<code>synthetic=true</code>或<code>recorded=true</code>、来源/授权、采集时间、是否脱敏、文件hash、已知局限和预期断言。真实采集回放与人工构造样例分开；不可把unknown字段补成“真实订单”让报告看起来完整。</p>
+<h2>3. 分层验证，不逐小改全链真实回归</h2>
+<div class="table"><table>
+<tr><th>层级</th><th>执行内容</th><th>何时执行</th><th>可支持的结论</th></tr>
+<tr><td>L0 静态/契约</td><td>导入无副作用、schema导出、签名、ToolSpec/Skill名称、迁移/schema兼容、依赖检查</td><td>同根因一批改动后；通常秒级/分钟级</td><td>合同一致、没有明显结构漂移；不能证明真实模型规划</td></tr>
+<tr><td>L1 确定性单元/属性</td><td>归属/去重/cohort/评分/时间/缓存/键计算、状态转换</td><td>对应批改动后，一次运行相关模块组</td><td>给定输入数学和程序不变量正确</td></tr>
+<tr><td>L2 SDK假模型</td><td>本机create_deep_agent真实工具节点、主子并行/角色、完成错误/等待/摘要/取消</td><td>W3接通以及影响SDK控制的批改后</td><td>SDK控制机制可运行；不是供应商联网可靠性证明</td></tr>
+<tr><td>L3 离线端到端</td><td>隔离临时DB+录制/合成事件/报表+fake provider+fake voice API</td><td>各包合并后及重要依赖/接口改动后</td><td>从归档到报告/采纳的应用链和恢复、错误语义连通</td></tr>
+<tr><td>L4 小型真实模型</td><td>冻结构建+安全授权adapter+同一小型synthetic样例3次</td><td>L0–L3通过、暂无阻断且已准备好冻结证据之后</td><td>实际provider工具协议/规划/用量/本机性能；不证明真实直播成交效果</td></tr>
+<tr><td>L5 授权现场验证</td><td>用户明确选定的实际场次、真实经营导出、平台音频延迟与取声链校准</td><td>产品可用且有数据/授权时，单独实施</td><td>该场/该账户/该插件版本的采集和评价资格，不外推所有房间</td></tr>
+</table></div>
+<p>先复现根因→一次修改同根因生产者/消费者→跑关联L0–L3→结构复查。只有新改动、失败或未解疑点影响L4结论时才补真实调用。若修改纯UI样式，不再跑三次模型；若改ToolSpec、provider或完成控制，则相关SDK和真实协议证据需要重新取得。</p>
+<p>真实任务失败时先读取trace/账本/已返回结果定位，不反复“再跑一遍看看”；新增监测点应对应怀疑，例如等待门是否触发、最终wire固定包占比、哪个cohort不合格。监测点先记入开发报告，之后再决定是否展示给用户。</p>
+<h2>4. R01–R50 稳定验收矩阵</h2>
+<p>编号用于计划、缺陷、测试和报告交叉引用。实施发现新根因可新增R51以后编号，不重排旧编号；一个R可有多个子用例。下表状态统一为<strong>待实现/待验收</strong>。表中的次数和值是验收断言或合成fixture期望，不是本轮实测结果。</p>
+<h3>4.1 事实、采集与播放</h3>
+<div class="table"><table>
+<tr><th>ID/层级/owner</th><th>场景与操作</th><th>必须观察/断言</th><th>失败需落到的位置</th></tr>
+<tr><td>R01 L0/L1 W0</td><td>所有DTO往返；缺Ref版本、非法enum、负金额、bool冒计数、null当0</td><td>严格schema拒绝；合法null保留reason；公开错误不回显秘密输入；producer/consumer同版本</td><td><code>live_review.py</code>与统一error adapter</td></tr>
+<tr><td>R02 L1/L2 W0/W3</td><td>在资料、task描述、工具参数、历史摘要伪造account/role/grant/run/归档</td><td>当前可信principal/scope不改变；跨范围ref拒绝；不能因“我是主Agent”提权</td><td>scope构造、工具服务对象鉴权、registry</td></tr>
+<tr><td>R03 L1/L3 W1</td><td>同外部房间连续两场；错绑定voice session；边界后事件迟到</td><td>每事件有本场绑定/来源与归属理由；不把room历史counts当本场；歧义未确认不强分</td><td><code>sessions.py</code>、<code>ingest.py</code></td></tr>
+<tr><td>R04 L1/L3 W1</td><td>在原事件写入/outbox前后、消费提交前后强制中断并重放</td><td>voice本地事务事件+outbox一致；Review按稳定key去重；消费cursor只随成功事务前进；无漏记/双记</td><td>voice ingress、outbox、repository事务</td></tr>
+<tr><td>R05 L1/L3 W1</td><td>补读300条、跨页、seq非连续、游标过期、现UI after=0尾页</td><td>专用history reader能从明确起点全部读到；不以seq差当条数；不改变旧UI尾页语义；不可重放明确gap</td><td>history reader/消费cursor/缺口合同</td></tr>
+<tr><td>R06 L1/L3 W1/W3</td><td>旧消费者或run lease过期后恢复，另一个owner已领取新generation</td><td>旧owner不能提交游标/归档/指标/报告；fencing用DB核generation，不只时间判断；terminal不被晚到改回</td><td>repository CAS、lease、epoch guard</td></tr>
+<tr><td>R07 L1/L3 W1</td><td>两个订阅者采用同源；停止Review监控；UI仍使用源</td><td>只一条原采集连接；本订阅释放不全局disconnect、不停止声播/OBS；租约引用数正确</td><td>source subscription owner/lifecycle</td></tr>
+<tr><td>R08 L1/L3 W1</td><td>unknown shopping/ecom/social方法、解析错误、断连重试、进程重启</td><td>受控原件/方法与gap/health耐久；原始字段与归一化来源可回查；unknown不伪造成交/关注；旧无原文记录不假补</td><td>原入口旁路、capability registry、archive manifest</td></tr>
+<tr><td>R09 L1/L3 W1</td><td>同一句多次playing、暂停/缓冲后resume、跳句、新attempt、旧epoch/owner ack</td><td>用确认播放segment区间并集算时长；暂停不计；新attempt与同attempt片段分开；过期ack不能改当前</td><td>playback journal、owner/epoch/attempt fence</td></tr>
+<tr><td>R10 L1/L3 W1</td><td>队列第1/6/11长开场、手动跳原位置、循环、原稿导入</td><td>当时实际publication→item→module→sentence映射准确；长/短互斥；不强造“每稿都七段”；原稿derived标签明确</td><td>compiler/journal adapter、playback.py</td></tr>
+<tr><td>R11 L1/L3 W1/W2</td><td>本地音频已play，但OBS/平台取声未核；事件只有接收时间；延迟不明/漂移</td><td>source=obs自述不证明平台发声；ClockEvidence区分媒体/平台/事件延迟；无资格仅显示共现，不给严格单句效果</td><td>ClockEvidence、时间资格服务</td></tr>
+<tr><td>R12 L1/L3 W1</td><td>有界排空封存、采集中断、封存后迟到退款/事件</td><td>生成明确完整/partial的不可变ArchiveRevision；迟到新修订，旧报告数据不变；封存不无限等</td><td><code>sessions.seal</code>、revision lineage</td></tr>
+</table></div>
+<h3>4.2 报表、数值、内容与评分</h3>
+<div class="table"><table>
+<tr><th>ID/层级/owner</th><th>场景与操作</th><th>必须观察/断言</th><th>失败需落到的位置</th></tr>
+<tr><td>R13 L1/L3 W2</td><td>CSV编码、XLSX合并/公式无缓存、超大文件、错扩展/压缩炸弹/路径名</td><td>无宏/公式执行；关键格缺值明确；原行坐标/拒绝理由保留；文件边界受限；不因任意文件名写宿主路径</td><td>report reader/staging/import preview</td></tr>
+<tr><td>R14 L1/L3 W2</td><td>“人数/次数”同名列、父/子单、混币、店铺全天跨渠道、SKU未匹配</td><td>关键映射/单位/场次需明确确认；不自行把全店订单算本场；未匹配金额unassigned不硬配当前播品</td><td>mapping/normalize/session attribution</td></tr>
+<tr><td>R15 L1/L3 W2</td><td>同报表重复上传、同订单冲突来源、映射修订、旧schema</td><td>不双算；冲突隔离两来源；新mapping新dataset；旧结果可查；相同操作ID不同hash拒绝</td><td>dataset unique keys/版本与导入事务</td></tr>
+<tr><td>R16 L1 W2</td><td>本分钟3个旧创建队列付款、只有2个新建单</td><td>不算150%创建支付率；严格C队列已支付成员/C；跨粒度不相除</td><td><code>build_order_cohort</code>、支付率定义</td></tr>
+<tr><td>R17 L1 W2</td><td>原支付P、外场退款、退款申请/失败/成功、运费/折扣/币种不同</td><td>只P内成功退款；原净额=原P实付−同P成功退款；金额整数minor；不把净额说利润/结算</td><td>refund cohort/金额口径</td></tr>
+<tr><td>R18 L1 W2</td><td>60分钟实付600、采集缺10分钟；跨两分钟各有相同UV</td><td>小时收入仍600而非720；跨桶UV无去重能力不可相加；人次/人/消息不互换</td><td>elapsed window、UV资格、unit registry</td></tr>
+<tr><td>R19 L1 W2</td><td>同口径目标1000、净额900；超额1200；无目标/无经营表</td><td>90分；超额分100且真实完成率120%；缺失为null+reason；四类分数不能重标剩余权重冒总体100</td><td><code>score_target</code>、ScoreResult</td></tr>
+<tr><td>R20 L1 W2</td><td>相对基线B与X；B=0、B=1、正向率B=.8/X=.9、反向退款</td><td>持平60；1.25B为80/1.5B为100依政策与上限修正；.8→.9为80；B=0/不可改善上限明确null；反向按冻结分段</td><td><code>score_relative</code>、baseline/score policy</td></tr>
+<tr><td>R21 L1 W2</td><td>内容四项1/1/1/.5、一个未知、错价但卖点清楚</td><td>87.5；未知项不重分配为100；错价严重问题独立显示；内容分不冒成交效果</td><td><code>score_content</code>与严重问题标识</td></tr>
+<tr><td>R22 L1/L2/L3 W2/W3</td><td>主经K10/F05、内容子经K13提交typed ContentAssessment；经营角色伪提交；事实撤回后同文重用</td><td>同一persist_content_assessments产出assessment_ref；四项等级/原句/事实/本场/政策依赖可核；经营只可空数组；依赖变更不误缓存；K09不替代内容审核</td><td>K10/K13 typed assessments、F05适配、W2唯一保存服务</td></tr>
+<tr><td>R23 L1 W2</td><td>各覆盖率99%、98%、90%；在线字段verified=false；平台延迟缺失</td><td>必需覆盖最低项90；未核在线不算人分钟密度；延迟额外资格门不被其它高覆盖平均掩盖</td><td><code>score_coverage</code>、capability/eligibility</td></tr>
+<tr><td>R24 L1/L2/人工样本 W2/W3</td><td>重复评论、“买了”自述、问题/抱怨/意向、归属歧义、只抽样10%；人工核首批50条或全量较少样本</td><td>不造订单；完整窗口才计全量密度，抽样不得除全场人分钟；批次共用模型预算。首轮目标归属准确率≥90%、意向precision≥85%，报告TP/FP及正预测数；零正预测precision=null，正预测&lt;10标尚未验证，保留分层抽样方法</td><td>comment labels/coverage、K09服务与人工标注集</td></tr>
+<tr><td>R25 L1 W2</td><td>分钟桶跨模块；同一订单落入1/3/5/10分钟探索窗；暂停期间事件</td><td>mixed不强分UV/订单；正式总量一单一次；探索窗独立不相加；时间邻近不写单句因果</td><td>timeline/window policy/attribution limits</td></tr>
+<tr><td>R26 L1 W2</td><td>历史不足、价格/投流/退款龄期不同；3/50和30/500同6%</td><td>不足facts_only；筛选及排除ref固定；同率区间不同；Wilson仅合法二项，不用于金额退款率/人分钟密度；同场重复播放不冒独立受众</td><td>baseline selection、sample/interval资格</td></tr>
+<tr><td>R27 L1/L2/L3 W2/W3</td><td>政策/事实/prompt/as_of修订；UI开关；默认复用与用户明确recompute_metrics/reanalyse_content/refresh_all</td><td>真依赖改变失效，无关UI不失效；默认合法复用。明确重算须本次CalculationReceipt证明执行而非读旧卡；内容重判带本次attempt_ref；同逻辑重试仍幂等不双扣。完成门逐项核required_calculations</td><td>cache key、CalculationReceipt、Goal.refresh_mode、完成服务</td></tr>
+<tr><td>R28 L1/L3 W2/W3</td><td>导入/重算异步job、重复提交、旧owner晚到结果</td><td>waiting有job_ref/真实唤醒；按输入hash复用作业；取消/旧generation不提交；Agent不轮询；错误路径保留已完成结果</td><td>job registry、state/CAS/唤醒</td></tr>
+</table></div>
+<h3>4.3 SDK、Harness、预算、恢复与灵活性</h3>
+<div class="table"><table>
+<tr><th>ID/层级/owner</th><th>场景与操作</th><th>必须观察/断言</th><th>失败需落到的位置</th></tr>
+<tr><td>R29 L0/L2 W3</td><td>实际构建工具schema，读Skill，调用默认execute/delete及write_todos</td><td>显式添加SDK TodoList（若保留计划能力）；SDK/K/F共用明确policy；execute/delete隐藏并拒绝；Skill读取/受限scratch可用；middleware名不重复</td><td><code>agent_factory</code> SDK配置、SDK_TOOL_POLICY</td></tr>
+<tr><td>R30 L2 W3</td><td>同AI消息两个native task；描述伪role；超2并发/递归；异常路径</td><td>task仅description/subagent_type；区间可重叠；固定角色绑定；ContextVar每任务独立finally reset；共享Semaphore/预算；只两子类型、深度1</td><td>delegation binding/wrapper、scope与限并发</td></tr>
+<tr><td>R31 L2 W3</td><td>子返回同名report_ref/files/主权限字段；子请求主报告/采纳工具</td><td>wrapper仅SubReviewResult安全投影，不把child state合回父；子工具名单拒绝；finding/evidence有独立归属</td><td>compiled wrapper/typed子报告、role工具服务</td></tr>
+<tr><td>R32 L2/L3 W3</td><td>主持久saver+子False；子产物保存后主checkpoint前中断</td><td>主checkpoint正确；成功委派按稳定delegation/inputhash复用，不重复子模型；未完子任务不谎称逐轮恢复</td><td>repository子回执、主恢复/原生task适配</td></tr>
+<tr><td>R33 L2 W3</td><td>正常finish或submit_subreview_result；成功提交后还有模型可用响应</td><td>非direct普通工具；正式精确回执后before_model跳END；正常成功不额外请求模型写总结；ToolMessage call_id匹配</td><td>Completion中间件、完成服务/工具adapter</td></tr>
+<tr><td>R34 L2 W3</td><td>第一次finish参数非法/REPORT_INCOMPLETE，下一次正确；连续两次错</td><td>首次无正式回执，模型能修正；成功后停止；不使用return_direct吞错误；预算内一次修正，仍错partial/blocked不伪完成</td><td>typed validation、错误ToolMessage、bounded repair</td></tr>
+<tr><td>R35 L2/L3 W3/W4</td><td>K12缺资料或等待job；重复答案/通知；已等待进程重启</td><td>持久wait receipt使图停止但run保持WAITING_*；同Goal同thread续办，答案/job inbox只消费一次；无等待轮询模型；旧问题不能回答新run</td><td>Completion等待门、Runtime唤醒/inbox</td></tr>
+<tr><td>R36 L2/L3 W3</td><td>取消清理慢、lease失效、新epoch、迟到provider响应</td><td>同thread SDK owner未退出不重开；cancel+join；新发送/新提交阻断；已有usage/结果保存，不恢复COMPLETED、不停止采集/声播</td><td>execution registry、fence、取消和账本</td></tr>
+<tr><td>R37 L2/L3 W3</td><td>主/子/SDKSummary/K09分类并发；最终工具schema/重放占用超限</td><td>整个ainvoke外层可信scope；嵌套模型同run预算、purpose/role正确；final payload发送前校scope/cancel/lease与预算；reserved/not_sent/sent分开；无scope串票</td><td>provider hooks、ContextVar、AttemptLedger</td></tr>
+<tr><td>R38 L2/L3 W3</td><td>长历史、巨大最新恢复通知、巨大固定投影、摘要无压缩收益</td><td>分清fixed/latest/history；先引用/分页；一套SDKSummary；原件可回读；金额/单位/ref/unknown保留；相同指纹不反复付费压缩</td><td><code>context.py</code>、Summary槽、最终wire护栏</td></tr>
+<tr><td>R39 L2/L3 W3</td><td>已收usage后内容拒绝；响应中断unknown；安全返回已存但本地提交失败</td><td>usage先保存；未知不填0或当known_failed；可本地重验/补提交；无结果查询能力不盲重发；重试不多层乘法叠加</td><td>provider observer、attempt/output archive、恢复</td></tr>
+<tr><td>R40 L0/L2/L3 W3/W4</td><td>参数/异常中藏token/cookie/PII/私有reasoning；尾日志失败；关闭UI开关</td><td>落库前脱敏/最小化；公开与受控payload都不泄密；只展示显式依据；尾失败不推翻成功，降级/新动作门可见；关开关不关记录</td><td>safe projection/trace spool/安全前端reader</td></tr>
+<tr><td>R41 L2/L3 W3</td><td>问单个净额、只看某模块、完整复盘、临时新增证据调查；provisional与已冻结Goal</td><td>K00或F01同一assessment服务冻结，不另加固定路由模型；已明确Goal跳过。原Goal不缩水/越权；简单问题不强制全分类/双子/F01到F05；模型能追加调查；未冻结的成本分析不得偷跑</td><td>K00/F01、主prompt/Skill、Goal/完成目标核验</td></tr>
+<tr><td>R42 L0/L2/L3 W3</td><td>直接选任一F，F内部与K同错误；重复读、不变结果；F05新报告</td><td>每F真实注册且可选；内部复用服务/缓存，不添暗模型；无新增信息有界纠偏、不封合法另view；F05一次提交后直接完成，无额外finish胶水轮次</td><td>ToolSpec/flows/进展指纹/完成门</td></tr>
+</table></div>
+<h3>4.4 API、人工采纳、前端与同版交付</h3>
+<div class="table"><table>
+<tr><th>ID/层级/owner</th><th>场景与操作</th><th>必须观察/断言</th><th>失败需落到的位置</th></tr>
+<tr><td>R43 L3/必要UI W4</td><td>打开Review工作区、点右输入框/左数据、开过程卡、显示null和旧报告</td><td>Agent对话为主体，左右按既有设计聚焦；只展示/校正对应资料/候选，不能绕过Agent权限写声播；score_basis、样本/局限、版本清楚</td><td>workspace/view DTO、Review前端组件</td></tr>
+<tr><td>R44 L0/L3 W4</td><td>伪服务token/Origin/Host、跨account、Review初始化失败、关闭Review资源</td><td>身份由受信边界；浏览器无服务token；固定路由/方法代理；feature_unavailable不拖垮播前/声播；只关闭自己的资源</td><td>API/bridge/bootstrap owner</td></tr>
+<tr><td>R45 L3 W4</td><td>SSE断线重连、同ID重复消息、过滤后seq空洞、cursor过期、202作业</td><td>先持久状态与trace；补发+snapshot；gap不当漏数；UI断线不重启run；accepted/waiting/committed分别显示；payload有界可回读</td><td>EventEnvelope/SSE/API/read模型</td></tr>
+<tr><td>R46 L1/L3 W4</td><td>两子报告/两旧recap都用本地finding_id=F1；混真实与synthetic；证据quote</td><td>正式finding/recommendation/evidence ID按报告/来源命名空间稳定映射；选中项精确；原始本地ID可追溯；synthetic限制/quote hash/出处通过旧Recap要求</td><td>Review→Recap映射和语义adapter</td></tr>
+<tr><td>R47 L1/L3 W4</td><td>同一采纳父op经历blob/import/link/verify；import成功后回包断开；重复确认或不同payload</td><td>父adoption ID稳定，各stage有不同确定性child operation key及request hash；不能将同op复用到不同命令导致冲突；按原key对账，不新建key盲重放</td><td>adoption stage ledger、ShengboClient适配</td></tr>
+<tr><td>R48 L1/L3 W4</td><td>目标已有recap refs；CAS冲突；已发布/编辑锁；报告修订/停售撤回</td><td>默认合并保留旧refs；link不覆盖清空；confirm绑定精确preview/报告/选择/目标；实质变化新确认；回包丢失不重复确认；不能绕编辑锁/文本批准或生成TTS</td><td>preview/confirm/CAS、feedback/readback</td></tr>
+<tr><td>R49 L3/L4 W3/W4</td><td>synthetic经营数据+真实模型；未核在线/未标定平台；恶意建议要求插播/改价</td><td>synthetic标识贯穿panel/report/recap，不能宣称真实成交达标；资格降级；模型无实时插播/切品/重排/改稿/改价/发券/停止工具；安全授权adapter无令牌输出</td><td>全链scope/数据模式/禁写allowlist</td></tr>
+<tr><td>R50 L0–L4 W5/W6</td><td>冻结同build三次小型真实、差异样本/缓存、打包后桌面版本、旧播前兼容</td><td>manifest准确；三次可比耗时/账本/正式refs完整；未真测不填pass；新旧路径唯一；原播前关键回归按受影响面通过；生产加载版本可核、可回滚</td><td>freeze/verification/结构审查/交付报告</td></tr>
+</table></div>
+<p>没有真实报表时R14等仍用有标识fixture验证软件，不因此声称已经适配用户的所有平台表头；没有授权真实直播时L5保持not_run及原因，不拿L4替代。</p>
+<h2>5. 性能计量：时间到底算哪一段</h2>
+<h3>5.1 六种时间必须分列</h3>
+<div class="table"><table>
+<tr><th>时间名称</th><th>起止/计算口径</th><th>对用户表示什么</th><th>不可混算</th></tr>
+<tr><td><code>capture_wall_ms</code></td><td>本订阅开始至停止/封存截止；另列gap与实际覆盖并集</td><td>监控了多久、缺了多久</td><td>直播监控30分钟不意味着Agent分析耗时30分钟</td></tr>
+<tr><td><code>data_ready_to_delivery_wall_ms</code></td><td>选定ArchiveRevision及所需已确认dataset可用时刻T0，到正式DeliveryReceipt提交T1；若用户晚于T0发起另列<code>request_to_delivery</code></td><td>资料就绪后的真实交付等待；是优化主指标</td><td>排队/重算/模型/本地计算都在其内；不能只报模型活跃时间冒整体</td></tr>
+<tr><td><code>user_wait_ms</code></td><td>持久WAITING_INPUT区间的并集，明确开始/结束/原因</td><td>花在补资料和人工确认的等待</td><td>不能静默从总wall删去；可另报<code>wall_excluding_user_wait</code></td></tr>
+<tr><td><code>job_and_queue_wait_ms</code></td><td>受理排队、provider并发排队、异步job等待分别记录</td><td>系统在哪些地方排队</td><td>外层任务等待可能包含子job本身，不能重复相加</td></tr>
+<tr><td><code>active_compute_union_ms</code></td><td>定义为本地实际执行span时间区间并集，含解析/统计/校验/投影等，阻塞provider等待另列</td><td>CPU/本地工作的可观察占时</td><td>不是CPU占用精确计量；需要CPU time另加process/thread指标，不能从wall猜</td></tr>
+<tr><td><code>provider_wait_union_ms</code></td><td>模型请求发送至响应/失败的区间并集；主/子/摘要/分类都有purpose</td><td>真正花在模型等待多少墙钟</td><td>两个并行60秒请求union约60秒；attempt时长sum约120秒，两者都可显示但必须命名</td></tr>
+</table></div>
+<p>附加：<code>critical_path_ms</code>从有父子/依赖边的span重建；<code>sdk_invocation_wall_ms</code>包含该次模型、工具、等待但不含整个监控时长。多个并行stage各有自身elapsed，按依赖计算总路径，不能相加得“总耗时”。<code>observed_active_union_ms</code>只能称已埋点范围；未埋点DNS/TLS/内部服务器推理保持未知。</p>
+<p>指标输出包含：<code>run_id/build_id/scenario_id/attempt_index</code>、T0/T1、结果/缺项、输入规模、缓存cold/warm、各stage start/end、duration_ns、UTC wall time、source_instance/boot_id、真实attempt数量/用途/usage、工具总量/缓存/无新增信息计数、摘要前后输入量。原始测量用<code>perf_counter_ns()</code>，ms显示可保留三位小数；这表示记录分辨率，不保证0.001ms测量准确度。跨进程/重启不能直接相减不同monotonic时基。</p>
+<h3>5.2 阶段要细到哪些位置</h3>
+<div class="table"><table>
+<tr><th>阶段</th><th>最小需观测的子span</th><th>量/质量伴随字段</th></tr>
+<tr><td>摄入</td><td>source接收→原DB/outbox→Review消费→cursor提交→封存</td><td>source/cursor、事件数、去重数、gap、队列年龄；不得把seq差当条数</td></tr>
+<tr><td>报表</td><td>staging、reader、preview、确认等待、normalize、dataset validation/commit</td><td>文件字节/行数、accepted/rejected/unassigned、mapping版本、解析器版本</td></tr>
+<tr><td>统计</td><td>输入资格、cohort、时间线、指标batch、baseline、score、panel commit</td><td>扫描行数、cache key/hit、单位、as_of、缺项/资格</td></tr>
+<tr><td>Agent每轮</td><td>scope、context投影、Skill读取、schema/wire预算、模型预留/发送/响应</td><td>role/purpose、固定/历史/最新payload规模、预留与实际发送分开</td></tr>
+<tr><td>每工具/flow</td><td>handler、内部服务调用、cache、结果投影/安全payload</td><td>exact refs、输入/交付coverage、是否新增信息、错误和是否committed</td></tr>
+<tr><td>委派</td><td>delegation创建/等Semaphore、子运行、子成果commit、主合并</td><td>稳定binding、重放命中、重叠区间、共享预算</td></tr>
+<tr><td>收尾</td><td>draft/assessment保存、正式验收、report/delivery commit、before_model停止门</td><td>Goal/输入hash、缺项、receipt、是否避免额外模型</td></tr>
+<tr><td>采纳</td><td>preview、human等待、blob/import/link/verify各stage</td><td>父/子operation ID、请求hash、CAS/unknown/回读，不含秘密</td></tr>
+</table></div>
+<p>若怀疑某处变慢，增加细span与输入量，而不是叠一套“监控Agent”。监测成本也记录：埋点写入延时、payload大小/条数、spool数；批量/异步写不能破坏必须先落账再发动作的门。</p>
+<h3>5.3 初期目标和失败解释</h3>
+<ul>
+<li>正确性目标：fixture预期事件集合去重后100%可核；所有不能恢复的缺口100%显式列出；R中的数值断言100%匹配；不泄密、无未经确认直播写入。</li>
+<li>调查效率目标：已就绪成果不重新付费生成；成功finish不多一次模型；人工/job等待不轮询模型；同依赖缓存命中可复用；无信息重复有界纠偏。</li>
+<li>时间优化目标：小型资料就绪到复盘交付尽量接近或低于600,000ms，同时披露质量/覆盖；这是待测优化目标，不是SLA，也不为达标取消必要事实/报告范围。</li>
+<li>源摄入可设单独本机压测profile，例如100事件/秒持续60秒，记录p50/p95写入/消费滞后、峰值队列与封存耗时；该profile是工程提议，必须记录机器和磁盘条件，不冒称真实直播流量保证。</li>
+<li>三次真实任务只能报告min/median/max、每次明细与达标次数；样本仅3次不估可靠p95或声称提速有统计显著性。若要比较旧/新方案必须同fixture、同缓存、同模型/设置、同构建范围；旧播前11分钟等不能直接当新复盘的基准。</li>
+</ul>
+<h2>6. 冻结manifest与三次小型真实任务</h2>
+<h3>6.1 Freeze manifest 必需内容</h3>
+<pre><code>build_id / created_at_utc / source_commit_or_snapshot_hash
+scoped_source_file_hashes / dirty_worktree_digest / migration_versions
+python_and_sdk_versions / dependency_lock_hash
+contract_schema_version_and_hash / ToolSpec_and_role_schema_hashes
+prompt_hashes / Skill_hashes / parser_classifier_calculator_versions
+metric_policy_ref / score_policy_ref / comparison_profile / goal_hash
+fixture_manifest_ref_and_hash / synthetic_flag / expected_coverage
+model_source_and_model_name / public_model_settings / budget_and_timeout_settings
+dataset_archive_refs / calibration_status / cache_profile
+test_suite_revision / test_result_refs / known_limitations</code></pre>
+<p>不放凭据、cookie、完整环境变量、刷新令牌或其可恢复内容。即使源码有未提交改动，也要记录实际文件内容hash，不能仅写git HEAD冒充真实运行代码。所有真实用例的输出必须回指这个build_id。</p>
+<h3>6.2 三次比较样例</h3>
+<p>拟建立<code>SIM-SMALL-01</code>：2个固定商品、每品2版，4个真实结构播放项；1项长开场/其余短开场；约12分钟合成播放journal，60条有标识合成评论，含购买意向、询问、抱怨、重复与歧义；12个有标识合成订单及2个成功退款，并有跨cohort/非本场反例；已确认CSV/XLSX映射；无伪造真实平台身份。</p>
+<p>此规模只是首轮可控制fixture，生成时冻结准确数字、原件hash和全部预期，不让“约”进入实际验收断言。订单和内容均<code>synthetic=true</code>，输出必须写模拟经营分析；真实的是本机授权模型工具调用与程序运行，不是真实成交。</p>
+<div class="table"><table>
+<tr><th>顺序</th><th>具体执行计划</th><th>防止不可比</th></tr>
+<tr><td>P0 预检</td><td>L0–L3通过；manifest冻结；provider状态只读核验；剩余测试预算明确；trace/数据根可写；不需要复制令牌</td><td>发现阻断先修，不用真实任务替代调试</td></tr>
+<tr><td>P1 第一次</td><td>独立隔离Review数据根，从同一已确认资料/归档快照开始；指标/分类/Agent会话cold；记录完整span与成果</td><td>不混入旧会话、旧子结果或缓存；开始T0定义固定</td></tr>
+<tr><td>P2 第二次</td><td>同build、同fixture、同公开模型参数与预算、另一独立cold数据根；模型仍可自主选择调查路径</td><td>不为了工具路径相同而强制固定DAG；差异作为规划行为记录</td></tr>
+<tr><td>P3 第三次</td><td>同样配置再跑，保留每次正常/partial/失败，不只挑最快成功</td><td>中途若改代码/政策/prompt，停止这一组，升build后重新取得可比证据；不能混用</td></tr>
+<tr><td>P4 分析</td><td>min/median/max、所有阶段/attempt用途、缓存与重复、质量/覆盖/成本/unknown，生成结果表</td><td>平均更快但漏要求不算改进；失败时间也列，不能删掉</td></tr>
+<tr><td>P5 有必要才补</td><td>仅新疑点追加warm复用、重启恢复或指定故障样例</td><td>warm单独列，不与cold三个混算；网络故障样例优先fake而非付费反复制造</td></tr>
+</table></div>
+<p>主模型决定是否委派两子Agent，三次不要求相同工具轨迹；必须满足同一Goal、报告证据与预算边界。并行/错误/等待/摘要的机制已由L2可确定性验证，真实小型用例不需要每次故意触发所有故障。</p>
+<p>若自然授权续期未到期，不为凑场景强制刷新真实旋转凭据；续期/并发旋转/未知状态先用fake transport验证，真实自然触发只记录有无发生。未发生不能写“真实自动续期已通过”。</p>
+<h2>7. 每批之后的结构复查：防止越改越乱</h2>
+<p>每次完成一批同根因修改后，在进入更贵层级之前做一次结构审查；W5合并和W6冻结前再次全量审查。记录不是可选心得，需随测试报告交付。</p>
+<div class="table"><table>
+<tr><th>审查项</th><th>具体查法</th><th>通过/不通过判据</th></tr>
+<tr><td>唯一规则正本</td><td>列“业务规则→唯一函数→调用者→R编号”；搜索同义旧函数/旧配置</td><td>cohort/评分/权限/完成/采纳只有一套权威实现；adapter只转格式，无第二公式</td></tr>
+<tr><td>新旧路径收口</td><td>画实际调用图，核API→Runtime→tools/flows→service；搜索旧tool名与遗留fallback</td><td>不保留“新流程失败自动走旧宽松路径”；兼容路径显式版本化、有期限与反例</td></tr>
+<tr><td>DTO与序列化</td><td>producer/consumer/schema/ToolSpec/Skill名称比对；导出实际模型schema</td><td>不出现多个近似Ref或任意dict接缝；null/单位/时间/来源/错误口径一致</td></tr>
+<tr><td>中间件职责</td><td>对照四M真实hook和SDK实际栈；查重复before_model/摘要/重试</td><td>没有为了一个case再加互相冲突的完成门；成功写COMPLETED后不被Scope误判失败</td></tr>
+<tr><td>共享上下文/状态</td><td>并行测试ContextVar、单例mutable字段、子state输出、checkpoint namespace</td><td>无global current_role；无子report_ref污染主；无跨run缓存/票据串线</td></tr>
+<tr><td>副作用和事务</td><td>查所有command/写DB/API调用者及effect分类、父子operation key</td><td>模型无直播写；采纳唯一人工入口；同stage幂等/跨stage不同key；未知先对账</td></tr>
+<tr><td>重复与性能</td><td>对trace作同tool+args+依赖聚类，查重复零增量、摘要、job轮询</td><td>合法补view不被禁止；无意义重复有证据减少；不是隐藏日志制造“更少调用”</td></tr>
+<tr><td>失败与恢复</td><td>检查断点前后正式成果、unknown、usage、wait/terminal状态</td><td>结果已收到可继续利用；取消后不晚到复活；缺原文不假重校验</td></tr>
+<tr><td>依赖与部署</td><td>diff package/lock、资源owner、feature gate、启动加载build</td><td>不为单个功能引入未经核验大框架；Review失败不拖原产品；无服务端口/启动器蔓延</td></tr>
+<tr><td>文档与弃用</td><td>同步00–07、schema/Skill/迁移/fixture；给废弃路径明确删除/适配表</td><td>没有仅靠解释“旧的是旧的、新的是新的”同时保留两个默认运行入口</td></tr>
+</table></div>
+<p>结构审查发现问题应归到根因批：例如“完成身份太宽”同时修改repository查询、tool回执、middleware读取、fixture，而不是在四处各加不同条件。每批产出一张<code>rule_ownership.json</code>或等价表，并记录新增/移除分支、兼容期与受影响测试。</p>
+<p>新发现的问题允许调整方案，但必须更新唯一落点与R编号，不能只在提示词追加一段“不要再这样做”。Skill负责方法、middleware负责运行边界、普通服务负责语义与原子性；三者不能各自复制同一规则。</p>
+<h2>8. 最终交付与未通过事项怎么呈现</h2>
+<p>最终报告至少给：</p>
+<ol>
+<li>本次build与manifest链接，新增/复用/改动模块及实际依赖版本。</li>
+<li>R01–R50逐项状态：<code>pass/fail/not_run/blocked/not_applicable</code>，证据ref与原因；not_run不能以其它层通过替代。</li>
+<li>正常全链、无经营明细降级、等待续办、取消/重启、未知结果、人工采纳各自的实际轨迹与产物refs。</li>
+<li>三次同版真实任务逐次耗时/用量/覆盖/结果；哪些最小span可测、哪些仍未知；十分钟目标实际达到几次及瓶颈。</li>
+<li>问题表：新/旧、根因、严重度、代码位置、复现路径、修复或降级、对应R、下一步。已修旧问题不能继续列为当前复现，未测也不能叫已解决。</li>
+<li>结构审查结果：是否还有并列旧路径、重复schema/公式/授权/完成门、共享可变状态、SDK假设不符；若有P1不进入交付。</li>
+<li>操作说明：Agent工作区入口、左侧数据与四类评分/缺项、右侧过程开关、如何补报表、如何人工采纳下一场；不要求用户复制模型令牌。</li>
+</ol>
+<p>可交付判据：关键数据与范围/权限/统计/完成/恢复/采纳R无未解P0/P1；数据不足的指标有明确资格降级而不造分；同build证据可追溯；原声播与播前关键操作保持可用。没有实际平台延迟和报表样本验证时，应明确“哪些能力待现场验证”，不把L5缺证据掩盖为上线效果已经证实。</p></article><article id="section-6"><h1>播前迭代教训与首构预防矩阵</h1>
+<p>版本：LIVE-REVIEW-ENG-1.0。日期：2026-10-20。性质：<strong>新播中／播后综合Agent的工程设计与拟验收合同</strong>，不是本轮已经实施新业务、修复旧播前代码或通过真实直播验收的报告。</p>
+<p>本文件把播前三轮修改中的真实失败映射到本工程包的函数、数据合同和负例。旧问题编号L01–L18只用于追溯；对应的稳定预防验收ID为 <strong>PL01–PL18</strong>。05可引用这些ID，实施者不得以更改显示编号掩盖原未结项。</p>
+<p>目录前缀：新包<code>src/shengbo_live_review/</code>；合同<code>src/shengbo_contracts/live_review.py</code>；<code>voice</code>指<code>D:/Codex project/ecommerce-voice-agent/app/</code>。这里的函数／服务名称均为拟议实施位置，以根01–04统一合同为准。</p>
+<h2>1. 旧系统的真实版本与证据边界</h2>
+<div class="table"><table>
+<tr><th>基线</th><th>实际证据</th><th>这项证据不能证明什么</th></tr>
+<tr><td>第一轮修复RC15</td><td>一条完整候选准备真实任务1,080.735225秒，人工阻塞3.329350秒；GPT实际73次，其中摘要12；文案11、本机TTS33。</td><td>不含采用／开播／人工试听；不能合并多个RC版本计算同版中位数；用户缩减后没有继续跑原定全部轮次。</td></tr>
+<tr><td>八项优先修改</td><td>原资料首跑682.165638秒后失败，正式稿0/2；同真实对话续办441.985579秒后正式稿2/2。</td><td>续办成功不等于冷启动七分钟完成；两次活跃用时及修复空档必须分开。</td></tr>
+<tr><td>阅读器升级</td><td>17份Office解析对照；合成图片／扫描PDF隔离真实读取小样5次请求70.229秒；视觉门禁另有离线Runtime测试。</td><td>解析、图像交付、模型理解、报告采纳、业务提交是不同证据；不能称所有商家资料语义准确。</td></tr>
+<tr><td>第三次更新v5失败</td><td>合法后台唤醒的新invocation，固定包38,988 token、剩余9,012；最新恢复Human单条preview9,510；摘要已缩小历史，但最终仍被本地预算拒绝。</td><td>不是M7没有退出；不是摘要完全无效；不能把错误归咎某一个未证实因素，不能把未发送拒绝轮计真实主模型请求。</td></tr>
+<tr><td>第三次更新v6</td><td>最近同冻结构建、同服务连续场景：原DOCX→两份正式稿694.578秒，→30份本机音频未采用候选1,102.578秒；82次GPT，主52、摘要12、子18。</td><td>未达十分钟；模拟确认不是商家批准；不证明真人听感、OBS／平台链路、长期稳定或所有材料泛化。</td></tr>
+<tr><td>v7局部门禁</td><td>170项定向回归及v6真实产物零模型／零TTS／零业务写入重验，修交付模式与完成覆盖。</td><td>无v7新冷启动全链；已验证的D09不等于所有复用来源语义均关闭。</td></tr>
+<tr><td><strong>当前最新v8</strong></td><td>61个唯一针对性测试、v6正式稿只读回放、独立审查无阻断；83个当前文件与v8冻结SHA256一致。</td><td><strong>没有v8新真实自主全链和实测提速；PR01“纯复用旧稿可能算新生成”明确未修。</strong>本计划仅预防新Review出现同型错误。</td></tr>
+</table></div>
+<p>SDK冻结记录：Deep Agents0.7.25、LangChain1.4.6、Core1.6.10、LangGraph1.2.15。新实现应核实际安装与官方文档，不为套用最新教程参数升级现有业务。</p>
+<h2>2. 预防矩阵：每项旧问题落实到哪个元件</h2>
+<div class="table"><table>
+<tr><th>旧项／预防ID</th><th>真实旧问题与触发路径</th><th>已知状态与本地证据</th><th>新Review唯一预防位置／实施动作</th><th>不能提前宣称的事</th></tr>
+<tr><td><strong>L01／PL01</strong></td><td>正式稿已落成，主Agent还逐稿取正文、查作业找引用、猜嵌套路径，再写结束计划。v6最后一稿落成后118.023秒：模型约60.445秒、摘要50.948秒、工具0.828秒。</td><td>v8增加可选<code>wf_script_execution(action=review)</code>和绑定正式refs的finish summary；单job范围、超预算剩余读入口明确；没有新全链提速实测。证据E08。</td><td><code>flows.prepare_review_context</code>一次交付Goal、archive、已有面板／子结果／草稿索引和可直接使用的<code>next_reads</code>；<code>build_product_panel/build_module_panel</code>合并机械查询；<code>package_review_delivery</code>可将存稿与完成服务一次调用。原子工具保留、flow可跳过。</td><td>一次提供内容≠语义审核通过；“减少预计往返”≠已减少若干秒；不能只选最新job漏掉其余成果。</td></tr>
+<tr><td><strong>L02／PL02</strong></td><td>当前事实、历史作业、供应商输出在可信投影／工具回包／恢复Human重复携带；旧v5已有音频结果但后台恢复消息自身超过剩余额度。</td><td>v5/v6分别修历史索引及完成／恢复观察传输，v6全链通过；v8未继续为少量ref重复增加新协议。证据E04/E05/E08。</td><td><code>context.assemble_review_context</code>只投当前硬事实与有界证据索引；<code>runtime.resume_run</code>发送<code>ResumeObservation</code>变化＋精确reader，初始通知目标≤256token；provider最终wire预算覆盖system／Skill／schema／投影／历史／最新消息。单SDKSummary；同fingerprint无进展不再付费重复摘要；原件可精确回读。</td><td>字符数不等于token；索引不能丢金额／cohort／授权／unknown；没有合法reader的内容不能假称已offload。</td></tr>
+<tr><td><strong>L03／PL03</strong></td><td>有A、B要求，只出现A报告就算全部完成；旧稿／空引用／作业succeeded曾被误当用户要求的新成果。</td><td>v7补<code>script_delivery_requirement</code>和按真实回执／正式正文覆盖；定向回归和v6产物guard通过。PR01另一来源语义仍保留。证据E05/E06。</td><td><code>GoalDefinition</code>冻结对象／archive／必要交付；<code>delivery_service.commit_or_reject</code>核各项真实正式refs及资格；<code>ReviewCompletionMiddleware.abefore_model</code>经<code>control_service.find_valid_receipt</code>核完整Goal与依赖指纹，检查完成或等待回执后停止SDK本轮。非<code>return_direct</code>，不以todo／AI文字判完成。</td><td>draft保存不等于最终报告；互动报告不能偷换经营复盘Goal；等待回执仅结束当前invocation，不把run写COMPLETED。</td></tr>
+<tr><td><strong>L04／PL04</strong></td><td><strong>PR01：旧结果纯复用可冒本次新生成。</strong>有正式引用不代表执行过本次要求的计算／审核。</td><td>最新v8明确未修；本文件不改变旧问题状态。证据E08。</td><td><code>Goal.refresh_mode</code>与<code>required_calculations</code>区分默认<code>reuse_valid</code>、<code>recompute_metrics</code>、<code>reanalyse_content</code>、<code>refresh_all</code>；<code>CalculationReceipt</code>记录dependency_hash、calculation_version、started_at／completed_at、执行／复用origin、cache_source_ref与calculation_ref。K02及内容审核提交服务返回真实计算或复用回执；finish核Goal的重算义务，旧产物原时点不改。</td><td>默认仍允许有效缓存；不为所有普通GET造大账本；不能换标题／created_at／origin标签就假装新计算，也不因恢复重跑已完成的新结果。</td></tr>
+<tr><td><strong>L05／PL05</strong></td><td>原子工具与workflow对同一可补参错误行为不同，一个结束任务、另一个可继续；预览ready但真实命令因动作别名被阻断；HTTP200错误体或默认视图身份不一致。</td><td>第三次N03/N04统一alias、错误分类、<code>not_committed</code>与读取参数canonicalization；权限／完整性／unknown不降级。证据E03/E05。</td><td><code>ToolSpec</code>单registry生成schema／权限／结果合同；原子与flow同handler；<code>ToolResult</code>明确outcome、commit_state和next_reads；输入及报告缺项返回匹配call_id的ToolMessage，预算内纠正。权限、篡改和已发送unknown保持阻断／对账。</td><td>不承诺未来新ErrorCode自动可恢复；批量可能部分提交不能标整批not_committed。</td></tr>
+<tr><td><strong>L06／PL06</strong></td><td>可读全场商品误变可改全场；嵌套plan／base／original refs未一致检查；同名异SKU或新候选范围容易串。</td><td>第三次N01在受测入口分action/context、事务授权、精确嵌套目标；任意真实商家输入仍未广泛证明。证据E05。</td><td><code>ReviewScopeMiddleware</code>＋repository行级鉴权固定account/session/archive；task用可信<code>DelegationBinding</code>显式重绑child_scope；Reviewer只读业务；<code>feedback.confirm_adoption</code>才经人工准许关联指定下一场。</td><td>读过B不等于可把B加进建议采纳目标；Hash相等不等于有权限；模型描述不能改变role。</td></tr>
+<tr><td><strong>L07／PL07</strong></td><td>文本解析／嵌图索引／图像交付被当成理解与资料齐全；关键图片／扫描页／Excel文本框可漏读，条件没进生成。</td><td>阅读器升级和第三次N05/N07补结构读取、真实receipt与关键动作门禁；17份仅解析对照，图义泛化未验收。证据E02/E05。</td><td><code>report_imports.inspect_report→confirm_mapping→normalize_report→commit_dataset</code>保留ImportCoverage、未解析区域、原行定位和映射依据；关键经营字段不明只阻相应数值，公开互动仍可有限复盘；截图不冒精确订单账。</td><td>“reader ready”不等于任意报表准确；已交付图片不等于已理解；未知字段不能填0。</td></tr>
+<tr><td><strong>L08／PL08</strong></td><td>Excel字面<code>%</code>曾放大100倍、零值特殊含义丢失；OCR对否定／条件误读不靠DTO校验就能修。</td><td>第三次N06对已知格式窄修、复杂格式raw降级；不是完整Excel渲染器；OCR固定token样本不代表通用正确率。证据E02/E05。</td><td>contracts固定raw/display/unit/currency/grain/source_definition；<code>normalize_report</code>用Decimal转整数minor；映射与原件定位同存；<code>resolve_metric_inputs</code>／cohort资格先校口径，禁止模型猜分子分母。</td><td>5、5%、0.05必须按已确认格式区别；退款申请不是退款成功；不同币种／父单子单不能混加。</td></tr>
+<tr><td><strong>L09／PL09</strong></td><td>同页合法别名重复OCR；大表遍历和冷启动成本；阻塞解析可能拖慢异步主循环。</td><td>第三次N08按真实页与引擎指纹去重；阅读器用off-loop；跨进程恰好一次未保证。证据E02/E05。</td><td><code>metrics/scoring/report_imports</code>确定性cache key含实际依赖版本，按批扫描／复用；singleflight防同进程并发重复计算；解析与重计算off-loop，长任务转可靠job而非模型轮询。冷／热与队列耗时单列。</td><td>缓存不以正文hash跨商品偷复用语义标签；政策／上下文变化必须失效；缓存命中仍按PL04诚实标来源。</td></tr>
+<tr><td><strong>L10／PL10</strong></td><td>模型已返回却被旧校验拒绝，有效结果／用量丢失；重新生成导致再付费，部分成功不能复用。</td><td>八项首跑两份已返回文案0/2正式保存；第三次R12提供<code>revalidate_archived</code>本地恢复，原响应／原拒绝保留。证据E01/E05。</td><td>provider先存allowlisted安全输出与usage；<code>model_attempts.validation_status</code>独立；分类batch、子产物、指标分开正式保存。恢复按同attempt本地重验／补提交，不重做有效分支；没有响应不假重验。</td><td>返回／通过校验／正式提交不是一个状态；本地重验没有真实模型调用不能记新推理。</td></tr>
+<tr><td><strong>L11／PL11</strong></td><td>发出请求后断连，结果未知却被当失败；无脑重试可能重复付费／写入；历史还缺过HTTP状态。</td><td>RC14等保留未知；第三次R12有限重试／幂等／对账；自然过期完整矩阵未验。证据E00/E05。</td><td>统一provider attempt／adoption operation；<code>runtime.recover_pending_runs</code>先读正式回执和unknown；<code>feedback.reconcile</code>查原operation；共享retry_policy避免SDK×provider×flow叠加；续期复用安全adapter，不重发未知请求。</td><td>不可查询时维持unknown，不编失败状态或0费用；lease过期不等于旧执行任务真的退出。</td></tr>
+<tr><td><strong>L12／PL12</strong></td><td>usage只在内容校验通过后累计，漏掉已付费但被拒输出；预算预留、请求、SSE帧、模块行数混算。</td><td>旧修复已将安全usage前置归档并独立attempt，known/partial/unknown保留；历史缺项不补造。证据E00/E01/E05。</td><td><code>ProviderAttemptLedger.before_send/on_request/on_response</code>是实际发送与usage唯一口径；主／子／摘要／分类共享预算；收到公开usage先保存后验内容；成本估算／实付分开。</td><td>一次输出五模块仍一次request；千SSE帧不是千推理；not_sent不计实际请求；拒稿有usage必须计入。</td></tr>
+<tr><td><strong>L13／PL13</strong></td><td>有函数却没在工具／角色／Skill／schema同时可达，用户流程跑不通；研究evidence自由dict难绑定事实。</td><td>第三次已有capability manifest和结构化报告纠正入口，旧自由evidence兼容债仍保留。证据E05。</td><td>registry及<code>SDK_TOOL_POLICY</code>构建时核Skill引用、角色许可和handler；本次<strong>K10/K13的typed <code>content_assessments</code>经同一<code>persist_content_assessments</code>服务</strong>正式保存ContentAssessment→程序score_content，不把K09评论分类冒内容评分。审核依赖事实／要求／稿件／政策及四项原句证据；main可直接审核，content子同服务，经营子仅可传空数组。</td><td>文档写有内容评分≠模型能提交；子返回一段文字不等于正式assessment；新SDK参数不能靠教程名称猜测。</td></tr>
+<tr><td><strong>L14／PL14</strong></td><td>三个角色都返回不等于每商品有必要报告；PREPARED／ACCEPTED／业务保存混用；同run跨branch证据复用曾缺依据。</td><td>第三次角色×商品覆盖与精确绑定／真实receipt复用已做；全SKU含义覆盖未全面验。证据E02/E05。</td><td><code>get_or_create_delegation</code>绑定parent/toolcall/task_goal_hash；子scope固定、子只读；<code>submit_subreview_result</code>写同archive正式子回执，wrapper只返回安全结果不泄子state；主按实际委派目标合并，不按角色次数验收。</td><td>简单任务不强派两子；同一个A被分析两次不能覆盖B；主图checkpoint不等于子未完成轮次精确恢复。</td></tr>
+<tr><td><strong>L15／PL15</strong></td><td>每模块单独生成使上下文分裂／重复；过度复杂的跨商品衔接与兼容七key被当业务必需。</td><td>旧生成改每方案整版一次后拆存，长短替代、无独立transition；单样本不证明普遍质量。证据E00/E05。</td><td><code>metrics.persist_panel</code>批计算；Agent一次组织完整诊断按finding拆存，不每指标／模块一轮模型；<code>build_module_panel</code>区分native/derived，长短开场分别评价，导入稿不强编模块。</td><td>实际五部分不能因七个兼容key扣缺项；没有native边界的整稿不造句级经营归因；新复盘不自动生成话术。</td></tr>
+<tr><td><strong>L16／PL16</strong></td><td>用户批准的内容与实际执行版本不符；方案号／修订号混淆；局部改写扩大到未选范围。</td><td>旧系统精确句IDs／hash、CAS、批准快照已做；全部UI选区／真实编辑矩阵未验。证据E00/E05。</td><td><code>feedback.preview_adoption→confirm_adoption→ensure_voice_blob_and_import_recap→link_recap_cas→verify_handoff</code>绑定report／建议ID／target base／preview hash；默认保留已有recap；导入与链接状态分开，Review不直接改稿。</td><td>报告晚到退款修订后旧批准不能覆盖新结论；CAS冲突不自动取新revision覆盖；停止Review不停止声播。</td></tr>
+<tr><td><strong>L17／PL17</strong></td><td>监控越来越多却计时边界不清、并行求和、测量精度冒准确度；每小改全量测试拖慢迭代。</td><td>旧观测已补分项和span，最小正span0.015ms、导出0.001ms不等于准确度；DNS/TLS未测仍unknown。证据E00/E01/E05。</td><td>一套safe trace引用业务正本；<code>observability</code>记录span父子／cache／actual attempt；stage按wall／active_union／human_wait／模型与工具sum分别报，不累加包含项；合并同根因改动后组合回归，失败定向闭合。</td><td>两并行60秒不是120秒总耗时；UI关过程开关不关后台记录；重复读取候选不自动判浪费；不记录隐藏思维链。</td></tr>
+<tr><td><strong>L18／PL18</strong></td><td>中途变源码、拼不同版本测试成功、旧成功报告覆盖新缺陷，导致“全好了／变快了”声明无依据。</td><td>后续报告已分v6真实链、v7门禁、v8离线／重放；reader旧before不是严格全量修改前快照，限制保留。证据E02/E05/E06/E08。</td><td>bootstrap记录实际版本；05冻结manifest／SDK／runner／schema／Skill并留前后hash；构建中差异使该轮不再算同版。失败原件不改，只追加closure与对应版本；部署另记loaded build。</td><td>A版真链＋B版局部绿不能称B版真链；未启动轮次不计成功／失败；离线token少不能换算实测提速。</td></tr>
+</table></div>
+<h2>3. PL01–PL18：开发前就应写入的具体验收反例</h2>
+<p>这些是<strong>待实施测试</strong>。测试名可以按工程习惯调整，PL编号与断言不可删；同根因可合并一批运行，不能将重叠测试批次数简单相加成独立覆盖量。</p>
+<div class="table"><table>
+<tr><th>用例ID</th><th>最小输入／故障注入</th><th>必须观察的输出</th><th>禁止出现</th></tr>
+<tr><td><strong>PL01</strong></td><td>同Goal有两件已完成面板与两个已提交子结果；调用F01。另造超证据预算样本。</td><td>一次返回完整成果索引与准确reader；未交付整件明确not_delivered；F05可直接带public_summary交付。</td><td>为找ref先迫使N次job查询；只取“最新一个”算全部完成；截断句子还标全文已读。</td></tr>
+<tr><td><strong>PL02</strong></td><td>等待报表job后生成一万行结果，重启／唤醒；另有旧大恢复事件、未知future字段。</td><td>恢复通知只有状态变化与快照reader；最终wire含所有组成且受控；无法安全省略时明确不足；原件hash及unknown不变。</td><td>把大表当最新Human；反复摘要同一不可缩固定包；删未知围栏或提高安全预算掩盖错误。</td></tr>
+<tr><td><strong>PL03</strong></td><td>Goal要求A、B经营复盘，仅A有数据；另造无正式报告的AI结束；等待输入工具合法返回。</td><td>缺目标为partial／needs_input；错误ToolMessage可纠正；完成或等待回执由before_model停本轮；等待不是COMPLETED。</td><td>“有个报告”即全部完成；return_direct把错误退出；成功后额外模型写收尾；等待时模型轮询。</td></tr>
+<tr><td><strong>PL04</strong></td><td>首次算分→相同输入普通查询→用户明确重算→重算提交后checkpoint前崩溃恢复。</td><td>普通查询复用并保留原computed_at；明确重算有新执行CalculationReceipt；恢复用本次已完成新结果，不再算第三遍。</td><td>旧ref换新标题即满足重算；cache_reuse写new_computation；因“fresh”义务无限反复计算。</td></tr>
+<tr><td><strong>PL05</strong></td><td>原子K02和F03都输入同cohort错误；首个finish缺字段，下一轮改正；HTTP200错误体。</td><td>两入口同code／commit_state；缺字段留模型纠错且保留有效成果；错后2轮、正常1轮；HTTP200错误不计成功。</td><td>一个异常杀任务另一个吞错；错误写delivery；权限／unknown包装成可安全重试。</td></tr>
+<tr><td><strong>PL06</strong></td><td>同room两个session、另一account同hash资料、task描述伪造role与额外商品。</td><td>refs逐层核scope；child context来自服务器binding；越权handler不执行；Reviewer写业务工具为0。</td><td>历史可读范围升级为采纳权限；模型自报human／account生效；同房历史串入本场分母。</td></tr>
+<tr><td><strong>PL07</strong></td><td>XLSX关键退款状态在文本框／图片；扫描表无金额列；非关键装饰图未读。</td><td>coverage与关键缺项明确；缺经营字段相应分null；可独立完成interaction_only；非关键图不堵全部报告。</td><td>reader空结果当0成交；仅有image receipt算已理解；截图OCR明细冒原订单。</td></tr>
+<tr><td><strong>PL08</strong></td><td>5、5%、0.05、转义百分号、0／空格／破折号、多币种、父单与子单、退款申请／成功。</td><td>normalized值、raw/display、单位／grain和来源可回算；不合格行隔离；同cohort正确公式。</td><td>百分比放大100倍；空缺变0；退款申请扣净额；重复父子计数。</td></tr>
+<tr><td><strong>PL09</strong></td><td>两并行子请求同面板、同页合法别名、规则版本改变、大表重算。</td><td>有效输入singleflight／缓存；新依赖版本失效；长作业waiting并事件唤醒，解析off-loop；冷／热耗时清楚。</td><td>每子重读全表；主模型轮询；跨商品只按文本hash复用标签；缓存省事冒新计算。</td></tr>
+<tr><td><strong>PL10</strong></td><td>供应商输出与usage已到、校验前崩溃；一子失败、一子已提交；schema修复后重验。</td><td>原attempt公开输出可本地复验／补提交，usage不变；有效分支复用；缺原输出明确不可重验。</td><td>全部从头重做；拒绝输出usage丢失；本地重验记成新模型。</td></tr>
+<tr><td><strong>PL11</strong></td><td>采纳已在voice提交但回包丢；模型发送后断连；并发token过期；旧lease到期但任务仍活。</td><td>原operation／request对账；无法确认保持unknown；续期单飞；确认旧owner退出才可继续同thread。</td><td>换operation_id或令牌盲重发；超时一概known_failed；租约到期立刻第二图并发。</td></tr>
+<tr><td><strong>PL12</strong></td><td>1次模型输出多指标，1000个SSE帧；有usage但格式被拒；not_sent；主／子／摘要／分类并发。</td><td>实际发送1条attempt；usage先落；reserved／sent区分；所有purpose共用预算；unknown不补0。</td><td>模块行／SSE帧算调用数；拒绝后费用消失；子角色各自复制12次预算。</td></tr>
+<tr><td><strong>PL13</strong></td><td>主直接审核一模块四项；内容子提交同typed审核；故意删registry中的handler／role；事实撤回。</td><td>K10/K13共用assessment服务，四项含原句／要求证据，程序求87.5等分；构建缺入口立即失败；依赖变更失效。</td><td>走K09评论分类代内容审核；为“提交审核”隐藏一轮模型；Skill写有但工具不可调；旧事实仍给满分。</td></tr>
+<tr><td><strong>PL14</strong></td><td>native task两个并行分支；各分析A、B；同task结果提交后checkpoint前崩溃；子state也含report_ref。</td><td>distinct delegation＋可信role，无ContextVar串线；已提交子结果复用；wrapper只返白名单结果，主report_ref不被覆盖。</td><td>两个A算覆盖B；子改主正式报告；无结果文字说完成；子未持久轮次被称精确恢复。</td></tr>
+<tr><td><strong>PL15</strong></td><td>当前实际五部分／仅一种开场；导入整稿无native模块；用户只问净额是否达标。</td><td>模块资格按实际来源；一次批计算／主诊断可完成；简单问答不强制专题／评论分类／全本报告。</td><td>七key都必须有；每模块都单调模型；伪造原稿边界或跨商品衔接；自动改话术。</td></tr>
+<tr><td><strong>PL16</strong></td><td>批准建议后晚到退款新报告；target另线程改动；已有两recap；import成功link回包丢。</td><td>旧批准不覆盖新结论；CAS差异可见；默认合并保留旧refs；按原op回读继续，imported与linked区分。</td><td>新revision自动覆盖／自动重批；只传新recap清旧项；model自报确认；Review停止连带停直播。</td></tr>
+<tr><td><strong>PL17</strong></td><td>两60秒专题并行；工具含模型分类子span；UI关闭trace；监控尾写失败／无DNS计时。</td><td>wall约60、子sum120分开；不重加包含项；后台安全记录继续；已提交成功不反转，日志故障可告警／spool；未知DNS为null。</td><td>总用时120；精度0.001ms称准确度；没记录补0；工具成功因尾日志失败再调模型。</td></tr>
+<tr><td><strong>PL18</strong></td><td>冻结后改一文件；只跑局部绿；混mock与真实证据；未启动第三轮。</td><td>manifest不一致明确失效；证据类型／版本分列；旧失败保留及修复closure；部署核实际loaded build。</td><td>混版称同版；离线重放称新真实全链；未运行算成功；无实测报提速百分比。</td></tr>
+</table></div>
+<h2>4. 每个元件如何避免“为修问题又加复杂度”</h2>
+<div class="table"><table>
+<tr><th>元件</th><th>本工程要求</th><th>复杂度控制</th></tr>
+<tr><td>四个业务中间件</td><td>Scope、EvidenceContext、TraceBudget、Completion各管一层；调用同一普通服务</td><td>不为L01–L18各加一个middleware；不复制播前九类守卫和整个Runtime。</td></tr>
+<tr><td>普通业务服务</td><td>唯一指标／评分／合同／完成／采纳语义，事务和版本可核</td><td>工具、UI预检和flow不得各写一套判断。</td></tr>
+<tr><td>可调用flow</td><td>把稳定机械动作封装成一次入口；原子工具保留</td><td>无强制F01→F05总流水线；模型仍能补新调查和选择不委派。</td></tr>
+<tr><td>Skill</td><td>按需读目标／资格、经营、内容、下一场实验四类方法</td><td>不把全部旧错误和第三方Skill灌每轮system；Skill不承担强制权限校验。</td></tr>
+<tr><td>数据与恢复</td><td>不可变refs、有限索引、准确reader、实际receipt</td><td>无有效reader不假省略；无新收益不新造去重协议；缓存与fresh义务同时明确。</td></tr>
+<tr><td>验收</td><td>先纯函数／契约反例，再SDK假模型，最后少量同版真实场景</td><td>合并根因后组合测试；只有新失败／差异再追加，不能为堆通过数反复完整收费链。</td></tr>
+</table></div>
+<p>“一次构建尽可能把已知坑修好”落实为：W0先冻结合同和PL夹具；W1–W4各自实现对应断言；W5在同一冻结构建合并验收。不能把文档中的拟预防机制宣称成旧播前遗留已解决，更不能保证所有未来输入／网络／平台变化永无新错。</p>
+<h2>5. 仍未由旧证据解决或全面验证的边界</h2>
+<div class="table"><table>
+<tr><th>边界</th><th>在新Review中怎样处理</th></tr>
+<tr><td>PR01旧复用计新生成仍未修</td><td>新Review从首版用Goal.refresh_mode／CalculationReceipt预防；不修改旧问题状态或旧测试记录。</td></tr>
+<tr><td>v8没有新真实全链／没有实际提速</td><td>新项目单独采样，按实际阶段span报告；旧v6耗时只作教训，不做Review速度预测。</td></tr>
+<tr><td>自然授权过期、全断网矩阵未证明</td><td>先假过期／并发／unknown测试，再授权真实短任务；不让用户复制令牌。</td></tr>
+<tr><td>真实全部材料／所有OCR／所有SKU语义泛化未验</td><td>报表首次口径／歧义人工确认，保留coverage与unknown；不继承“解析成功＝准确”。</td></tr>
+<tr><td>真人试听、OBS／平台声音链路未验</td><td>声音／播放证据分等级；本地media ACK不冒平台已听到；句级结论按clock与事件延迟资格启用。</td></tr>
+<tr><td>当前公开人数字段未核、公开采集无订单／退出完整能力</td><td>资格不足不给人分钟响应／留存／成交分；手动经营报表按真实字段和grain接入。</td></tr>
+<tr><td>旧报告自由evidence、历史HTTP细节缺失</td><td>legacy／unknown如实标；不能靠新schema回写历史使其看起来完整。</td></tr>
+</table></div>
+<h2>6. 本地证据目录</h2>
+<p>证据前缀：<code>D:/Codex project/shengbo-ops-agent/</code>。本文件只引用结构和统计事实，不复制真实客户文案、直播评论、令牌、图像base64或私有推理。</p>
+<div class="table"><table>
+<tr><th>证据ID</th><th>路径与具体用途</th></tr>
+<tr><td>E00</td><td><code>output/20261017-v1-implementation/声播播前Agent本轮修复与测试报告RC15.html</code>：分RC状态、逐阶段耗时、真实调用、八项修复和未结边界。</td></tr>
+<tr><td>E01</td><td><code>output/20261019-priority-eight/acceptance-summary.json</code>：原资料失败／续办分列、监测单位及reader语义边界。</td></tr>
+<tr><td>E02</td><td><code>output/20261019-reader-upgrade/文件读取工具与关键图片补读_实施测试报告.html</code>与<code>visual-gate-verification.json</code>：SDK读取、图像交付／语义区分、关键门禁和证据层级。</td></tr>
+<tr><td>E03</td><td><code>output/20261020-third-update-implementation/final-structure-review.json</code>：当时v4合同／可达／范围／错误路径审查；不是最新v8全局审查。</td></tr>
+<tr><td>E04</td><td><code>output/20261020-third-update-implementation/v5-context-failure-review.json</code>：恢复Human、固定包、实际invocation、拒绝阶段与撤回错误假设。</td></tr>
+<tr><td>E05</td><td><code>output/20261020-third-update-implementation/third-plan-all-items-closure.json</code>、<code>final-acceptance.json</code>、<code>第三次修改实施与验收报告.json</code>：缺陷映射、v6端点和各范围限定；旧pending描述优先结合最终证据看，不直接当当前状态。</td></tr>
+<tr><td>E06</td><td><code>output/20261020-third-update-implementation/generation-mode-v7-implementation.json</code>、<code>generation-mode-v7-final.xml</code>、<code>generation-mode-v7-independent-review.json</code>：交付模式／完成guard局部修复，非新真链。</td></tr>
+<tr><td>E08</td><td><code>output/20261020-efficiency-fast-fix-v8/final-acceptance-v8.json</code>、<code>test-results.json</code>、<code>independent-review.json</code>、<code>context-review.json</code>、<code>快速修复说明.html</code>、<code>build-manifest-v8.json</code>：当前v8、61唯一测试、取稿／收尾、PR01未修和无实测提速。</td></tr>
+</table></div>
+<p>进一步源码函数与原行号见本目录<code>research/播前迭代教训与预防映射.md</code>；当前SDK机制与终态假模型试验见<code>research/SDK与Harness实现核查.md</code>；新工程具体合同、hook、工具和交接分别以01–04为主。</p></article><article id="section-7"><h1>评价体系执行配方：数据、指标、内容评级、评分与验收</h1>
+<p>工程版本：LIVE-REVIEW-ENG-1.0。对应wire契约LIVE-REVIEW-1.1、计分政策LIVE-SCORE-0.1。日期：2026-10-20。本文只细化已有政策，不新增混合总分、行业标准、模型强制审查轮次或业务自动写入。</p>
+<p>本文所有函数、DTO字段和工具接法都是<strong>待实现开发规格</strong>；数值例子是合成演算，不表示真实直播、模型内容审核、经营报表接入或运行验收已经通过。优先级与权限仍以00—04的工程正文为准；实现时从同一个公共DTO/MetricSpec registry导出工具、API、UI和测试，不独立维护第二套评分实现。</p>
+<h2>1 四张卡、34个指标与内容评级的关系</h2>
+<div class="table"><table>
+<tr><th>输出</th><th>如何产生</th><th>负责回答什么</th><th>不做什么</th></tr>
+<tr><td>经营目标卡</td><td>正式经营MetricResult＋冻结正目标→<code>score_target</code></td><td>截止as_of的净额/实付是否完成预设同口径目标</td><td>不把低目标达成称为盈利或行业优秀</td></tr>
+<tr><td>单项经营/响应相对卡</td><td>合格指标＋冻结BaselineSnapshot→<code>score_relative</code></td><td>与自己可比历史相比的变化</td><td>不自动给每个计数都评分，不将多个相关指标随意加权</td></tr>
+<tr><td>内容完成卡</td><td>主/内容子Agent提交typed ContentAssessment→程序校验落盘→<code>score_content</code></td><td>稿件四项要求是否有依据地完成</td><td>不补成交分，不为每次循环重审，不在K09里另藏审稿</td></tr>
+<tr><td>数据覆盖卡</td><td>质量指标Q01—Q03→<code>score_coverage</code>；Q04另作资格门</td><td>选定时间和内容有多少可靠记录</td><td>不等于所有平台事件召回率，不以其他高分补掉Q04或交易来源缺失</td></tr>
+</table></div>
+<p>本稿列出工程03原32个metric_id，保留旧23项目录中已有的 <code>questions_per_100_observed_person_minutes</code>，并将原政策已有的活动订单密度明确注册为 <code>created_orders_per_observed_person_minute</code>，合计34个。问题消息密度不能与意向主题密度改名混用；活动创建密度也不是创建队列支付率。内容四项总分属于 <code>ContentAssessment→ScoreResult(score_basis=content_completion)</code>，不再创造一个重复的“综合内容经营指标”。</p>
+<p>每个指标有独立MetricSpec：<code>metric_id/definition_revision/unit/allowed_dimensions/source_requirements/cohort_rules/calculator/scoring_profile/fixtures</code>。不同指标可以共用一次底层扫描，但不能因字段都叫“人数”就共用不同语义公式。所有MetricResult都保留固定archive_ref、dataset_refs、实际范围、as_of、分子/分母、来源定义、资格、原证据refs和缺项。</p>
+<h2>2 统一输入与输出；null怎样进入系统</h2>
+<h3>2.1 算子只接以下正式输入</h3>
+<div class="table"><table>
+<tr><th>输入对象</th><th>最小字段</th><th>不接受的替代品</th></tr>
+<tr><td><code>EvaluationScope</code></td><td>account、monitor_session、archive精确ref、product/SKU/occurrence/module维度、起止区间、as_of、synthetic</td><td>“当前房间大概是昨天那场”、未绑定的最新商品头</td></tr>
+<tr><td><code>OfficialDataset</code></td><td>dataset/mapping/source_definition、来源统计窗/粒度、时区、币种/金额基准、parent/child/item grain、session归属、原行定位、完整度</td><td>模型从截图猜的金额、全店全渠道订单自动算本场</td></tr>
+<tr><td><code>OrderCohort</code></td><td>固定集合ID、去重business_key、创建/支付时间与状态、同粒度成员、选择规则、as_of</td><td>同一分钟付款数与新建数两个独立聚合</td></tr>
+<tr><td><code>PaidCohort</code></td><td>固定P、实际paid_minor、currency/exponent、运费/优惠基准、成功refund_id与原单关联、as_of/观察龄期</td><td>退款申请额、今日全店退款直接除本场支付</td></tr>
+<tr><td><code>ObservedEventSet</code></td><td>稳定event_id、冻结binding、source_kind、raw_method、源/接收可能时间区间、完整读取范围、去重状态</td><td>message条数当真实UV；时间相近当实际商品归属</td></tr>
+<tr><td><code>VerifiedOnlineSeries</code></td><td>经核online字段定义、snapshot时间、有效区间、缺口、核验引用</td><td>当前仍verified=false的人数候选、四舍五入“万”当精确人数</td></tr>
+<tr><td><code>PlaybackTimeline</code></td><td>owner/epoch/attempt/segment、boot/clock、真实publication/script/module/sentence、original_position/cycle、起止证据与证据层</td><td>排队计划、理论音频总长、source=&#x27;obs&#x27;标签当平台实播证明</td></tr>
+<tr><td><code>ClassificationArtifact</code></td><td>原事件refs、实际被分类范围、商品归属、用户作用域键、主题/意向/顾虑标签、版本、歧义/排除理由</td><td>摘要里的“大概很多人想买”、模型confidence当概率</td></tr>
+<tr><td><code>ContentAssessment</code></td><td>实际内容与事实/本场/顾客简报依赖refs、rubric/model/prompt版本、四项等级、原句证据、缺项/严重问题</td><td>从评论分类结果自动冒充稿件四项完成度</td></tr>
+</table></div>
+<h3>2.2 统一结果与缺项规则</h3>
+<p><code>MetricResult.value</code>是原始指标数值；<code>ScoreResult.score: float|null</code>才是0—100的分数。数值禁止NaN/Infinity；金额按整数最小货币单位，率内部为0—1。统一typed ReviewRef；voice原有RecordRef/ArtifactRef经SourceRef显式判别，不能把演示字符串ref塞进正式接口。</p>
+<p><code>available/provisional</code>保留数值及适用限制；<code>unavailable/not_applicable</code>的分数必须null并列reason。下文短码是公共缺项枚举的候选名称，最终应在同一DTO注册；外层工具仍使用 <code>METRIC_NOT_ELIGIBLE/COHORT_MISMATCH/UV_NOT_ADDITIVE</code> 等统一错误语义，不另在每个算子里发明不一致HTTP错误。</p>
+<div class="table"><table>
+<tr><th>缺项原因</th><th>含义</th><th>可保留的结果</th></tr>
+<tr><td>MISSING_SOURCE</td><td>所需官方报表/事件/内容未提供</td><td>有资格的其他卡不受影响</td></tr>
+<tr><td>UNVERIFIED_FIELD</td><td>在线/点赞/social等源字段语义尚未核准</td><td>展示候选原值，不能生成正式相关率</td></tr>
+<tr><td>COHORT_NOT_VERIFIED</td><td>不能证明分子属于分母/订单属于本场</td><td>分列原计数或平台原生指标，不强行相除</td></tr>
+<tr><td>ZERO_DENOMINATOR</td><td>分母为0</td><td>已核0个订单事实仍保留，率为null；不返回0%或100%</td></tr>
+<tr><td>GRAIN_NOT_SUPPORTED／UV_NOT_ADDITIVE</td><td>数据太粗、跨桶不能去重</td><td>保留整场/商品或逐桶表，不造模块/句子分</td></tr>
+<tr><td>TIMELINE_INCOMPLETE／CLOCK_UNCALIBRATED</td><td>缺实际回执、时钟或平台/事件延迟边界</td><td>保留已知区间/接收共现和内容卡</td></tr>
+<tr><td>CLASSIFICATION_PARTIAL</td><td>选定窗口未完整分类或商品指代未解决</td><td>已观测标签/歧义量，不拿部分分子除全量人分钟</td></tr>
+<tr><td>EVIDENCE_UNKNOWN</td><td>四项内容的事实依据缺失</td><td>该项null、整段待补证；其他有效判断可复用</td></tr>
+<tr><td>BASELINE_INSUFFICIENT／BASELINE_ZERO／BASELINE_AT_CEILING</td><td>历史不够、不相容、基线0或已达正向率上限</td><td>保留当前事实/目标卡，历史相对分null</td></tr>
+<tr><td>ASOF_OR_MATURITY_MISMATCH</td><td>支付/退款截止或观察龄期不同</td><td>暂定本场事实，不作正式同龄比较</td></tr>
+<tr><td>EMPTY_APPLICABLE_SET</td><td>本次没有必要问题/实际未播放此模块</td><td>not_applicable；不能给100分</td></tr>
+</table></div>
+<p>资料缺失与真实零分开：合格来源明确没有支付可得到0元；只有评论“已买”而没有交易来源，支付/净额和目标分均为null。来源撤回/证据hash失败不能借旧摘要继续维持分数。</p>
+<h2>3 经营指标：每一项怎样算、怎样评分</h2>
+<p>下表的 <code>S↑</code>、<code>S↓</code>和 <code>G</code>分别指第7节的历史正向、历史反向和目标公式。只有比较前已选定的metric profile才开相对分；没有冻结主指标时只展示事实，不从多个指标里挑最好看的一个。相对分还需通过第8节基线门槛。</p>
+<div class="table"><table>
+<tr><th>metric_id／对应</th><th>必需输入字段</th><th>允许时间粒度/范围</th><th>确定性函数/原始公式</th><th>数值评分/资格</th><th>null原因与关键反例</th></tr>
+<tr><td><code>paid_order_count</code></td><td>本场归属、business_key、paid状态/time、order_grain、as_of</td><td>整场/商品；逐单有据才能按创建/支付窗分别看</td><td><code>count_paid_orders(P)</code>；按固定parent或SKU子单去重</td><td>事实计数；明确可比profile可S↑，不能以次数代替买家UV</td><td>缺grain/归属→COHORT_NOT_VERIFIED；父单1+子单2不能算3单</td></tr>
+<tr><td><code>paid_amount_minor</code></td><td>P、实际实付minor、币种/指数、运费/优惠基准、原行ref</td><td>整场/商品；指定窗口必须有匹配归属</td><td><code>sum_paid_amount(P,amount_basis)</code></td><td>实付目标用G；可比profile可S↑；不混净额目标</td><td>MISSING_SOURCE/金额口径不明；两SKU重复展示父单100元仍只100元，不200元</td></tr>
+<tr><td><code>successful_refund_minor</code></td><td>同P原单、refund_id、成功状态/时间、金额基准、as_of</td><td>固定支付队列截至as_of；整场/商品</td><td><code>sum_successful_refunds(P,as_of)</code>；重复状态快照先选观察版本</td><td>原额诊断；不把“退款少”单独当成功总分，比较使用同龄refund_amount_rate</td><td>原单关联/状态不明→COHORT_NOT_VERIFIED；申请100成功60只计60</td></tr>
+<tr><td><code>refund_amount_rate</code>／B08</td><td>上项R与P原paid_minor A，同币种同基准同龄</td><td>截止as_of的同支付队列，不随付款瞬间换分母</td><td><code>calculate_refund_rate(R,A)</code>＝R/A，A&gt;0</td><td>S↓；不套二项Wilson；退款未成熟标暂定</td><td>ZERO_DENOMINATOR/ASOF_OR_MATURITY_MISMATCH；旧单今日退款不得混入本场P</td></tr>
+<tr><td><code>net_paid_asof_minor</code>／B01</td><td>P原实付A、P成功退款R、as_of/成熟度</td><td>整场/商品/有据匹配窗口</td><td><code>calculate_net_paid(A,R)</code>＝A−R</td><td>净额目标主卡G；可比profile可S↑；非利润/到账</td><td>缺退款来源又无同定义官方净额→MISSING_SOURCE，先显示实付初报；不能把退款未知当0</td></tr>
+<tr><td><code>paid_amount_per_live_hour</code></td><td>匹配场次/窗口的实付、真实直播区间小时H</td><td>整场或分子同窗范围</td><td><code>calculate_amount_per_live_hour(A,H)</code>＝A/H</td><td>可比profile S↑；H&gt;0</td><td>ZERO_DENOMINATOR/窗口不匹配；全场600元60分漏采10分仍600元/小时</td></tr>
+<tr><td><code>net_amount_per_live_hour</code>／B02</td><td>同窗净额N、直播小时H、as_of</td><td>整场/商品所占匹配经营窗，不能乱拆</td><td><code>calculate_amount_per_live_hour(N,H)</code>＝N/H</td><td>S↑；同龄、同范围；不将采集在线时长当直播时长</td><td>缺净额/窗口→MISSING_SOURCE/COHORT_NOT_VERIFIED；900元1小时是900元/小时</td></tr>
+<tr><td><code>paid_per_1000_viewers</code></td><td>同场支付A、官方同定义看播UV V</td><td>整场；有整体去重证据的商品/区间才拓展</td><td><code>calculate_amount_per_1000_viewers(A,V)</code>＝1000A/V</td><td>可比profile S↑；不是个体因果转化</td><td>V=0→ZERO_DENOMINATOR；进场消息71条不能填71UV</td></tr>
+<tr><td><code>net_per_1000_viewers</code>／B03</td><td>同场截止净额N、同定义看播UV V、as_of</td><td>同上</td><td><code>calculate_amount_per_1000_viewers(N,V)</code>＝1000N/V</td><td>S↑；与实付千次值分开保存、与小时效率分开解释</td><td>缺V/净额或不同龄→null；不得把paid指标结果换标签称净额</td></tr>
+<tr><td><code>product_click_uv_rate</code>／B04</td><td>同商品曝光队列E、E中点击用户C，或明确定义官方原生率</td><td>官方整场商品/完整去重窗口；不能把整场拆到各模块</td><td><code>calculate_nested_uv_rate(C,E)</code>＝count(C)/count(E)；或<code>preserve_native_rate</code></td><td>S↑；率上界1；二项条件合格可Wilson</td><td>COHORT_NOT_VERIFIED/UV_NOT_ADDITIVE；分钟各100人不能直接相加为整段200人</td></tr>
+<tr><td><code>viewer_to_buyer_rate</code>／B06</td><td>看播队列V、V中截至as_of支付用户B，或同定义官方率</td><td>队列定义范围/整场，按原生口径</td><td><code>calculate_nested_uv_rate(B,V)</code></td><td>S↑；率上界1；同用户单位/商品范围</td><td>两份独立汇总UV不证明嵌套；成员消息不是看播UV，null不是0%</td></tr>
+<tr><td><code>clicker_to_buyer_rate</code>／B05</td><td>商品点击队列C、C中支付用户B、as_of，或同定义官方率</td><td>同商品同队列/官方整场商品率</td><td><code>calculate_nested_uv_rate(B,C)</code></td><td>S↑；率上界1；支付滞后截止相同</td><td>不将公共viewer hash硬join商业买家ID；只有独立人数则COHORT_NOT_VERIFIED</td></tr>
+<tr><td><code>created_cohort_payment_rate</code>／B07</td><td>固定创建区间C、grain/business_key、本场归属、C内支付状态、as_of</td><td>创建区间对应队列；有逐单可看促单期间创建的C</td><td><code>calculate_created_cohort_payment(C,as_of)</code>＝C内paid数/count(C)</td><td>S↑；率上界1；合法二项可Wilson</td><td>本分3旧单付款/2新建不是150%；C为空率null，创建量0仍保留</td></tr>
+<tr><td><code>created_orders_per_observed_person_minute</code>／活动响应</td><td>同本场/商品、官方真实created_at、固定订单grain/business_key、匹配有效区间W、已核在线积分M</td><td>只有真实创建时间能定位且满足纯模块窗口时用于campaign；整场/商品诊断也须同窗</td><td><code>calculate_created_order_density(C_W,M_W)</code>＝去重创建订单数/M，unit=orders_per_observed_person_minute</td><td>合格冻结campaign profile可S↑；不是支付率、UV转化或因果效果；不套Wilson</td><td>无创建时间、仅整场汇总、在线未核或M=0→null；区间外订单不混入，不能拿本分钟旧单付款当新建</td></tr>
+<tr><td><code>official_average_watch_seconds</code>／C05</td><td>官方同场avg_watch_seconds、源定义/分母/窗口</td><td>官方整场或原定义粒度</td><td><code>preserve_official_watch_seconds(dataset)</code></td><td>可比profile S↑；只比较同定义</td><td>插件无逐人轨迹，不能用在线均值/进场条数还原；整场均值不给开场专属分</td></tr>
+<tr><td><code>official_30s_retention</code>／C04</td><td>同进入队列C、每人进入后30秒仍在的状态，或同定义官方率</td><td>原生队列/合格开场曝光队列，长短分别</td><td><code>calculate_retention_30s(C)</code>＝仍在成员/合格C</td><td>S↑；率上界1；保留观察不足30秒的截尾规则</td><td>本地目前不可算；一分钟离场汇总不够；临近关播不足30秒者不可无声当离开</td></tr>
+</table></div>
+<p>退款即使关播后才发生也属于原P的后续观察。晚到退款产生新ArchiveRevision/MetricResult/ScoreResult和新报告候选，不改旧报告；本场D+1与历史D+14不混比较。同原件多次导出先做明确权威观察版本投影，不能把每份快照都累计成交/退款。</p>
+<h2>4 公开互动、内容反馈、响应指标：哪些能评分，哪些只诊断</h2>
+<p>以下结果均是“已观测”而非全体观众。分类标签先经过K09或已有可复用人工/模型标签，统计函数只读正式ClassificationArtifact，不在算数函数里再调用模型。</p>
+<div class="table"><table>
+<tr><th>metric_id</th><th>必需输入字段</th><th>粒度/函数/公式</th><th>评分与资格</th><th>null/部分结果与反例</th></tr>
+<tr><td><code>observed_member_messages</code></td><td>同场已去重member方法事件、scope、稳定消息键</td><td>整场/已知区间；<code>count_observed_method(&#x27;member&#x27;)</code></td><td>消息事实，不自动评分/不命名进场UV</td><td>未读全范围标partial；71条成员消息不是71个独立进场用户，不能算留存</td></tr>
+<tr><td><code>like_messages</code></td><td>去重like消息ID、capture/来源、时窗</td><td>整场/区间；<code>count_observed_method(&#x27;like&#x27;)</code></td><td>仅消息数；不作为经营/模块成效主分</td><td>18条like消息不等于18赞；无源null，可靠观察无消息可0</td></tr>
+<tr><td><code>verified_like_increments</code></td><td>已核count或total定义、增量/累计模式、重置边界、起始快照、窗口</td><td><code>calculate_verified_like_increment(series,basis)</code>；一次只用一种模式</td><td>互动事实；首期不自动加进总分</td><td>未核/缺累计起点→UNVERIFIED_FIELD/不完整；count求和和total差不能双算，重置不能负点赞</td></tr>
+<tr><td><code>online_time_weighted_mean</code></td><td>verified在线值n_i、有效区间I_i、缺口、最大hold政策</td><td>整场/区间；<code>integrate_verified_online</code>＝Σn_i×seconds(I_i)/Σseconds(I_i)</td><td>观测量/人分钟基础，不直接判内容好坏</td><td>未核字段null；不把“万”文本当精确人数，不将最后值无限前推</td></tr>
+<tr><td><code>observed_online_person_minutes</code></td><td>与上项相同的合格在线区间</td><td><code>integrate_verified_online</code>＝Σn_i×seconds(I_i)/60</td><td>代理分母；非真实商品曝光UV</td><td>未核/无有效区间null；默认最长hold15秒，超出区间留缺口</td></tr>
+<tr><td><code>relevant_question_count</code></td><td>去重事件、正式标签、相关商品/主题、排除/歧义、实际分类范围</td><td>整场/商品/模块合格窗；<code>count_relevant_question_messages</code></td><td>诊断，不因问题少给高分；单位messages</td><td>分类部分只报该范围观测数；重复刷屏保留合并规则，不称真实顾客总问题量</td></tr>
+<tr><td><code>intent_observed_users</code></td><td>正意向标签、场次化可识别用户键、商品归属</td><td><code>count_distinct_intent_observers</code></td><td>已表达意向的观测人数；不直接等于支付/转化</td><td>未知用户另列不强去重；“我买了”仍自述，不生成订单</td></tr>
+<tr><td><code>questions_per_100_observed_person_minutes</code></td><td>同一有效区间内完整相关问题messages Q、已核在线人分钟M</td><td><code>calculate_question_message_density(Q,M)</code>＝100Q/M</td><td>保留旧指标，仅诊断；不混C01主题组</td><td>M=0/未核→null；半段人分钟不能除整段问题；抽样未分类不能当无问题</td></tr>
+<tr><td><code>intent_theme_density</code>／C01</td><td>明确意向主题组G、场次化用户键/商品/主题/同次模块出现、匹配M、完整分类范围</td><td><code>calculate_intent_theme_density(G,M)</code>＝100G/M，groups_per_100_person_minutes</td><td>合格、冻结模块响应profile可S↑；模块历史≥10次且≥3场</td><td>CLASSIFICATION_PARTIAL/UNVERIFIED_FIELD/M=0→null；6组若来自1人必须显示1用户，不称6人意向</td></tr>
+<tr><td><code>confusion_theme_density</code>／C02</td><td>规格/价格/证据/步骤等顾虑主题组G、匹配M、分类依据</td><td><code>calculate_confusion_theme_density(G,M)</code>＝100G/M；同时列原组数</td><td>首期只诊断，不套S↓奖励“问题少”</td><td>无M只列原组数；零问题可能是没人看，不能自动100分</td></tr>
+<tr><td><code>necessary_question_coverage</code>／C03</td><td>本次选定必要主题集合T、实际已播明确回答/事实依据、主题与句ref</td><td><code>calculate_necessary_question_coverage(A,T)</code>＝有依据回答的主题数/count(T)</td><td>展示覆盖比例，与四项内容卡并列；不自动新增第五张总分</td><td>T为空→not_applicable，不100%；商品库写了但没实际播，不算已播回答</td></tr>
+</table></div>
+<h3>4.1 主题分组与抽样的硬边界</h3>
+<ol>
+<li>C01主题组依据既定政策按“场次化用户键＋商品＋主题＋同一次模块出现”合并；同用户刷屏不能制造多组，不同真实主题不因同正文模板全部误删。未知用户/未知商品保留unknown并报告，不能强行补ID以满足分母。</li>
+<li>模块意向密度要求<strong>选定有效时间范围内的全部已归档评论完成分类</strong>，并匹配相同在线有效区间。仅取代表性50条供阅读时，不能拿这50条里的正意向除全场人分钟。当全量仍有未分类，应显示已有主题、实际覆盖和CLASSIFICATION_PARTIAL，或显式缩小到完整处理的区间。</li>
+<li>50条是首轮<strong>人工标签抽查量</strong>，并非把统计总体缩成50条。样本不足50就全查；商品归属accuracy目标90%，意向precision目标85%，显示TP、FP、正预测数和抽样方案。零正预测precision=null；正预测不足10标尚未验证，必要时另抽分层样本，不悄改全量标签计数。</li>
+<li>人工审核和模型自报confidence分开；不会拿confidence≥某值就替代precision。达到初轮目标也不表示全部未来场次都可靠；分类器/prompt/商品上下文变更保存新版本和复核范围。</li>
+</ol>
+<h2>5 技术质量与内容节奏：7个指标</h2>
+<p>下表覆盖已列的Q/T/媒体时长指标；<code>online_*</code>已在上节。质量卡用于说明可评价范围，与经营分分开。</p>
+<div class="table"><table>
+<tr><th>metric_id／对应</th><th>必需输入字段</th><th>粒度/函数/原始数值</th><th>评分或用途</th><th>反例/null原因</th></tr>
+<tr><td><code>observed_time_ratio</code>／Q01</td><td>本场目标观测区间、健康/断线/过载/已持久水位区间</td><td>整场/选定窗；<code>calculate_observed_coverage</code>＝可靠健康且已持久区间并集秒数/目标秒数</td><td>×100为单项覆盖；≥98%进入模块分析资格，95%—98%标部分，&lt;95%不作公开互动整场外推</td><td>不等于消息召回率；健康但无评论不能判断线；目标区间未知/0→null</td></tr>
+<tr><td><code>confirmed_play_seconds</code></td><td>合法owner/epoch/attempt/boot的playing segments及结束/暂停/缓冲证据</td><td>句/模块/occurrence/场次；<code>union_confirmed_play_segments</code>并集秒数</td><td>原始媒体播放量；不是观众听见时长，不自动越长越好</td><td>播5秒停10秒再播5秒＝10秒；缺ended不凭音频文件长度补齐</td></tr>
+<tr><td><code>playback_record_coverage</code>／Q02</td><td>预期播放器记录区间、可重建状态区间（包括已知暂停）、journal水位</td><td><code>calculate_playback_record_coverage</code>＝可重建秒数/预期秒数</td><td>×100；≥98%可考虑整场内容时间分析</td><td>人工暂停有完整状态仍属已覆盖；缺记录null/partial，不把暂停当漏采</td></tr>
+<tr><td><code>content_binding_coverage</code>／Q03</td><td>全部确认媒体段、可定位product/script/module/sentence/attempt的子段</td><td><code>calculate_content_binding_coverage</code>＝可定位确认秒数/全部确认播放秒数</td><td>×100；≥99%才给整场模块响应排名，其他只局部表</td><td>无确认播放则率null；排队有稿但未播不算覆盖；不能只删最差未定位段后报全场高分</td></tr>
+<tr><td><code>time_association_coverage</code>／Q04</td><td>申请分析的目标区间、可信时钟/推流/事件延迟区间、pure窗口</td><td><code>calculate_time_association_coverage</code>＝可可靠对齐目标秒数/申请目标秒数</td><td>额外资格门，不与Q01—03平均；不新增未经核定的统一数值及格线</td><td>只有本地接收时共现或未校准则strict响应资格不足；Q04低不抹去完整官方经营分</td></tr>
+<tr><td><code>first_identification_seconds</code>／T01</td><td>内容标签所指首个明确商品/场景句ref、模块实际开始、确认媒体进度</td><td>句粒度；<code>calculate_first_identification_delay</code>＝模块首播到首辨识句开始之间的确认媒体秒数，暂停/缓冲不计；另存wall_elapsed诊断及精度</td><td>内容节奏诊断，无统一越短越好/行业长度分；不把网络故障等待算文稿啰嗦</td><td>没可靠辨识句/时间→EVIDENCE_UNKNOWN/TIMELINE_INCOMPLETE；句级起点不能冒称词级到达时刻</td></tr>
+<tr><td><code>module_duration_seconds</code>／T01</td><td>同module/occurrence/attempt的合法segments、模块边界/来源标签</td><td><code>calculate_module_media_duration</code>＝该模块确认播放并集秒数；长短开场分别</td><td>原时长诊断；不新增“60秒必优”等阈值</td><td>多轮出现分别保留；导入整稿不能伪造原生五段时长</td></tr>
+</table></div>
+<p>confirmed_play_seconds与module_duration_seconds可共享底层并集算子，但目标维度/定义不同。</p>
+<h3>5.1 综合覆盖如何显示</h3>
+<p>单项卡分别为 <code>100×Q01</code>、<code>100×Q02</code>、<code>100×Q03</code>。需要整场模块响应的摘要覆盖分为三项最小值×100；必需项未知则摘要null，直接列缺项。Q04、来源资格、完整分类、分母和基线门槛仍逐项检查，不能因摘要98.33分就跳过。</p>
+<p>仅做经营汇总不强求Q03/Q04。完整官方净额900元、目标1000元，可以目标90分；同场模块时间不合格，模块响应分仍null。不是“任何监控缺一块整场都不许评价”。</p>
+<h2>6 内容四项评级：原句、依据、真实提交路径</h2>
+<h3>6.1 真实播放结构，不为评分制造模块</h3>
+<p>兼容键7个：opening_long、opening_short、product_intro、selling_points、campaign、cta、transition。当前活跃6个排除transition，长短开场二选一，因此普通商品版本实际通常为5段，有时无campaign为4段。原保存队列第1、6、11…项长开场，中间四项短开场；跳播按原位置，循环回首也不按“最近播了几次”重算。</p>
+<p><code>origin=imported</code>原稿当前整体product_intro/merchant_original播放；只做整稿内容审核与商品经营结果，不为了填五行表强拆原稿。可有derived语义段和原句范围，但必须标derived，不能冒充原生module回执或制造逐段成交分。transition不新增文案、不新增评分必做模块。</p>
+<h3>6.2 每模块四条标准</h3>
+<p>统一等级：0＝缺失或明确错误；0.5＝有提及但不完整/不清；1＝明确、正确、有原句和所需事实依据。每项乘25，因此显示0/12.5/25。<strong>“没证据判断”是null而非0.5</strong>；0.5表示确实看到了表达但完成部分。某项null时总分null并待补证；已知严重错价/虚构售后等独立flags，不被另外三项75分抵消。</p>
+<div class="table"><table>
+<tr><th>模块</th><th>criterion_1</th><th>criterion_2</th><th>criterion_3</th><th>criterion_4</th></tr>
+<tr><td>opening_long</td><td>清楚说明商品类别/本场卖什么</td><td>说明谁适合和一个明确使用场景</td><td>说明听下去的实际价值；若提活动条件须有依据</td><td>直接进入具体内容，避免大段重复欢迎/与本场不符承诺</td></tr>
+<tr><td>opening_short</td><td>快速辨认当前商品</td><td>一句定位目标需求/使用场景</td><td>只留必要引入，不复述长欢迎</td><td>可直接进入介绍，不依赖上一件/下一件是谁</td></tr>
+<tr><td>product_intro（原生模块）</td><td>名称/品类/关键规格对应正确商品</td><td>主要用途/适用对象讲清</td><td>影响辨认或购买的必要限制正确</td><td>能区分商品，不被泛化形容词淹没</td></tr>
+<tr><td>selling_points</td><td>优先卖点对应目标顾客真实需求</td><td>价值解释有商品事实依据、不扩大功效</td><td>将特点解释成使用利益/必要演示需求</td><td>卖点分工清晰，不换说法反复重复同结论</td></tr>
+<tr><td>campaign</td><td>本场实际价格/优惠正确</td><td>门槛、适用范围、叠加条件清楚</td><td>有效期/名额等只讲已确认事实</td><td>条件直接，让观众容易知道应付价格</td></tr>
+<tr><td>cta</td><td>真实购买入口/操作步骤正确</td><td>必要规格选择/用券动作说清</td><td>有购买依据，不虚构售后/库存紧迫/疗效</td><td>简短明确地结束，无需额外衔接下一商品</td></tr>
+</table></div>
+<p>原稿整篇审核沿用以上适用标准的<strong>明确selected rubric profile</strong>并标merchant_original：不把其整体product_intro当成“只该讲商品简介”，也不因缺原生campaign/cta五模块就判全稿缺失。缺乏通用原稿rubric时先交整稿事实/问题诊断和必要主题覆盖，不自动套五段总分；不另发明一个未经确认的原稿综合评分。</p>
+<h3>6.3 主/子Agent怎样提交，程序怎样算</h3>
+<div class="table"><table>
+<tr><th>顺序</th><th>调用/所有者</th><th>明确输入输出</th><th>是否调用额外模型</th></tr>
+<tr><td>C1 读内容及依赖</td><td>主Agent或content子用K05/K04，必要时读顾客简报/本场事实</td><td>精确稿件、商品、活动、顾客和rubric refs；实际delivered范围</td><td>不需要额外固定审稿调用；正常调查模型可在同轮理解这些内容</td></tr>
+<tr><td>C2 形成typed判断</td><td>主Agent在K10 <code>content_assessments</code>字段；content子在K13相同typed字段</td><td>criterion_1至criterion_4、rating=0/0.5/1/null、原句refs、事实依据refs、reason/unknown_reason、critical_findings、完整dependency refs</td><td>使用正常主/内容子已发生的判断；不强制再开一个审稿Agent</td></tr>
+<tr><td>C3 校验与落盘</td><td>共享 <code>persist_content_assessments(items, scope, operation_key)→AssessmentReceipts</code></td><td>核角色/范围/4项唯一、枚举、原句实际交付与引用hash、所需依据、依赖版本；去重保存正式assessment refs</td><td>程序，无模型；K10和K13必须调用同一服务</td></tr>
+<tr><td>C4 计算分数</td><td><code>score_content(assessment_ref,policy_ref)→ScoreResult</code></td><td>完整4项×25；有null总分null；独立严重问题保留</td><td>程序，无模型；不根据自然语言重新猜rating</td></tr>
+<tr><td>C5 进入面板/报告</td><td>F03/K02引用已存assessment及score refs；K10主报告采用子产物</td><td>内容四项、总分/null、实际依据、样本/限制</td><td>相同依赖复用，不因每次循环再跑一次</td></tr>
+</table></div>
+<p>K13仍可供经营子提交经营专题findings，但<strong>仅可信role=content的K13允许非空typed content_assessments</strong>；经营子不能绕过角色自己给内容分。主K10可直接提交内容判断；子不能用K13提交正式主报告。K09只负责评论批分类，返回ClassificationArtifact，不能代替C2—C4。</p>
+<p>如同次提交有合法assessment但报告其他字段不合格，合法独立assessment应保存并回ref/修复项，继续提交只修报告缺项；不能重新调用模型审同一段。未知事实可null而非结构错误；引用不存在/跨scope/事实来源不符才拒绝相应assessment。内容实质审核不能由“schema过了”替代，语义理由/原句由模型或人工给出，程序只守住已声明契约与可核事实。</p>
+<p>缓存依赖：实际模块/稿件、商品事实、顾客简报、本场目标/活动、rubric、prompt/model版本、所用语音/语言影响项。纯新订单不使同稿内容卡重审；事实撤回/活动换价必须使受影响项旧卡失效。同文本hash不足以证明可复用。</p>
+<h2>7 分数映射：每个分段、上下限与例子</h2>
+<h3>7.1 经营目标G</h3>
+<p><code>attainment=X/G</code>；<code>score=min(100,max(0,100×X/G))</code>，G必须&gt;0且同口径。actual_completion保留未封顶百分比、差额；净额目标不拿实付实际值去比。目标事后修改创建新GoalSnapshot，旧目标90分不被新目标静默替换成100。</p>
+<div class="table"><table>
+<tr><th>输入</th><th>score</th><th>仍需显示</th></tr>
+<tr><td>X=900元、G=1000元</td><td>90</td><td>完成90%，差100元；as_of净额而非利润</td></tr>
+<tr><td>X=1200元、G=1000元</td><td>100</td><td>实际120%，超200元</td></tr>
+<tr><td>合格真实X=0，G=1000</td><td>0</td><td>真实零、原始来源与范围</td></tr>
+<tr><td>G=0/缺G、X缺来源</td><td>null</td><td>缺项；不将无目标或缺经营等于零成绩</td></tr>
+</table></div>
+<h3>7.2 越高越好S↑</h3>
+<p>B&gt;0、X≥0。r=X/B：r≤1时S=60r；r&gt;1时S=min(100,60+80(r−1))。对应r=0/0.5/0.8/1/1.25/1.5→S=0/30/48/60/80/100。未封顶提升比例继续显示。</p>
+<p>有上界U的率：若1.5B&gt;U，取T=min(1.5B,U)，高于B部分用 <code>60+40×(X−B)/(T−B)</code> 封顶100；低于/等于B仍60X/B。B=U时历史正向分null并说明已达上限。率内部U=1，不写成100后又除一次百分号。</p>
+<h3>7.3 越低越好S↓</h3>
+<p>B&gt;0。0≤X≤B：S=100−40X/B；X&gt;B：S=max(0,60−60(X/B−1))。历史退款率10%时，本场0/5/10/15/20%→100/80/60/30/0。零退款观察短/样本少必须暂定；B=0不除0、不自动编无限改善分。</p>
+<p>60只表示商家自己的可比历史持平，不表示行业及格。S↑、S↓、G与内容分均不叠加成总分；题材、流量、价格、退款龄期不同也不能用相同百分比随意比。</p>
+<h3>7.4 示例复核清单</h3>
+<div class="table"><table>
+<tr><th>样例（均synthetic）</th><th>原始计算</th><th>预期分数</th></tr>
+<tr><td>商品点击</td><td>100/2000=5%，历史4%</td><td>80</td></tr>
+<tr><td>点击→支付</td><td>合格C为100人，16支付=16%，历史20%</td><td>48</td></tr>
+<tr><td>净额/小时</td><td>900元/1小时，历史720元/小时</td><td>80</td></tr>
+<tr><td>同龄退款</td><td>100/1000=10%，历史5%</td><td>0</td></tr>
+<tr><td>有界率</td><td>本场90%、历史80%、U=100%</td><td>80</td></tr>
+<tr><td>内容四项</td><td>25+25+25+12.5</td><td>87.5</td></tr>
+<tr><td>意向响应代理</td><td>6组/250人分钟×100=2.4，历史2.0且资格满足</td><td>76</td></tr>
+<tr><td>覆盖</td><td>Q01=59/60，Q02=59.5/60，Q03=.996</td><td>摘要98.333333…</td></tr>
+</table></div>
+<p>来源：父目录 <code>评分政策与数值样例.json</code> 的 <code>examples.worked_example_scores/module_intent_proxy/goal</code> 及 <code>直播评价体系与数值评分细则.md</code> 第4—9节。本例假定的订单嵌套、同龄退款、在线核验、模块跨场门槛必须在fixture中明确synthetic；不能把假定注册成真实能力。</p>
+<h2>8 基线、样本与模块响应profile</h2>
+<h3>8.1 基线的唯一选择规则</h3>
+<div class="table"><table>
+<tr><th>项目</th><th>已核初轮政策</th><th>实施要求</th></tr>
+<tr><td>选历史</td><td>过去28天，最新最多20场合格可比场</td><td>评分前冻结候选与入选/排除refs，不根据本场分数换一个更差历史</td></tr>
+<tr><td>必须一致</td><td>商家/账号、商品/SKU范围、指标定义/来源、币种、订单grain、退款观察龄期；模块还同模块/长短开场</td><td>记录语言、音色、语速等差异；无法核实影响条件不默认为匹配</td></tr>
+<tr><td>可比提示</td><td>价格差≤5%、付费流量占比差≤10个百分点、开播时段差≤2小时；无缺货/大投流/故障突变</td><td>是筛选提示而非混杂已消除证明；不合格另放探索对照</td></tr>
+<tr><td>场级/商品场级门槛</td><td>&lt;5场不自动历史评分；5—9暂定/基线较少；≥10仍显示波动</td><td>10不是显著性保证</td></tr>
+<tr><td>模块专项门槛</td><td>同商品/同模块/同开场类型，≥10次合格出现且来自≥3场；任一不满足不评分</td><td>该门槛替代上方整场5场规则；模块分始终暂定；单场循环10次不算10个独立实验</td></tr>
+<tr><td>B聚合</td><td>合格历史逐场同口径指标中位数</td><td>各场等权；另列合并率，不悄换成分子分母总计比率</td></tr>
+<tr><td>B=0/正向率已上限</td><td>相对分null，展示原值与变化/目标</td><td>不造∞、不设无法达到150%的满分锚点</td></tr>
+</table></div>
+<h3>8.2 实际模块的主响应指标</h3>
+<div class="table"><table>
+<tr><th>模块</th><th>优先主profile（有真实资格时）</th><th>当前可用代理/诊断</th><th>缺资格时</th></tr>
+<tr><td>opening_long/short（分别）</td><td>official_30s_retention</td><td>first_identification_seconds、相关主题、intent_theme_density</td><td>留存分null，内容分可给；不由在线下降猜离开</td></tr>
+<tr><td>product_intro</td><td>product_click_uv_rate（同商品可定位整体窗口）</td><td>商品辨认/适用问题、意向主题</td><td>整场商品率仍商品级，不分摊给介绍段</td></tr>
+<tr><td>selling_points</td><td>合格窗口product_click_uv_rate；商品级clicker_to_buyer并列</td><td>对应卖点意向密度、顾虑、证据要求</td><td>无曝光分母不算转化；沉默不等于卖点无效</td></tr>
+<tr><td>campaign</td><td><code>created_orders_per_observed_person_minute</code>：真实活动窗创建的去重订单数/同窗已核在线人分钟</td><td>规则理解困难与原句</td><td>无官方创建时间、只有整场汇总或在线未核则null；可以给内容完成与原计数，不能拿支付时刻订单充数</td></tr>
+<tr><td>cta</td><td>促单创建的固定C的created_cohort_payment_rate，截至统一as_of</td><td>“在哪买/怎么选/券怎么用”问题及意向</td><td>缺创建cohort时只给商品整场支付作背景，不伪造促单分</td></tr>
+</table></div>
+<p>活动订单密度是父数值方案已有响应profile，本工程把它显式登记为第34个ID，单位count/M，不另乘100、不改变已有S↑映射。其创建集合C_W与在线积分必须限定在同一有效区间W；缺口外创建单不能计分子，分钟混段且无法精确定位不拆分。与促单 <code>created_cohort_payment_rate</code> 的“C内已付/全部C”完全分开；同一个C可被不同指标有据使用，但不能将二者当两份独立成交增益。</p>
+<h3>8.3 比例区间与样本提示</h3>
+<p>合法二项count才用 <code>wilson_interval(successes,trials,0.95)</code>，实现可用经fixture核验的纯函数；当前环境未安装statsmodels，不能声称已接入。若后续采用statsmodels需固定版本且显式method=&#x27;wilson&#x27;。金额/小时、退款金额率、人分钟事件密度、相关重复曝光不套Wilson。</p>
+<p>父政策样本：3/50的95% Wilson约2.06%—16.22%；30/500约4.23%—8.44%；30/1000约2.11%—4.25%；40/1000约2.95%—5.40%；0/50约0—7.13%。分母&lt;100、成功&lt;10或区间宽于点估计，加小样本/宽区间提示；不是超过这些数就能宣布因果有效。</p>
+<p>基线B也不确定，不能把当前区间除固定B冒充完整历史比较区间。真实改善主张须匹配同单位差异/对照和混杂限制；首版默认描述观察高低、提出验证。重复循环以场/区组处理，不当独立观众。多版本探索保留多重比较/择优限制，不自动选最高分改下一场。</p>
+<h2>9 语音时间线、反应窗口与数据资格执行</h2>
+<ol>
+<li>原稿坐标固定到publication→queue occurrence→product/script/module/sentence→attempt/segment。确认playing区间并集是媒体播放证据，不是平台听到证据；muted/volume、本机输出与平台回听另记。</li>
+<li>平台音频延迟至少用5个分布在开/中/末的标记形成保守区间/误差并观察漂移；这只是初始标定量。互动事件运输延迟另核，不能用推流延迟替代。</li>
+<li>保留发生时间精度，不能将秒/分钟补零变成毫秒真值。仅接收时间且运输滞后无界，只能作接收时共现，不能通过strict模块时间资格。</li>
+<li>本地模块[s,e)、事件可能区间[u,v]、推流延迟[d_low,d_high]、反应[0,R]，相关内容范围为 <code>[u−d_high−R,v−d_low]</code>。整个范围落入同一实际模块/可播segment才pure；否则mixed/unassigned。主表同事件至多一个严格归属。</li>
+<li>评论主反应窗30秒，敏感性15/60秒；付款只在商品出现的0—5分钟探索，敏感性1/3/10分钟。每种窗口独立结果不累加订单，不把时间邻近称因果。窗口结果反转降为不稳健候选。</li>
+<li>延迟边界宽度&gt;5秒默认不做细句精细排名；这指不确定范围宽度，不是要求平台总推流延迟&lt;5秒。10秒句＋30秒反应窗天然跨多句，大多数情况下句子只展示原文/播放量/邻近事件，不能强给GMV分。</li>
+<li>Q01≥98%、Q02≥98%、Q03≥99%只是进入相应整场模块分析检查，Q04/纯窗口/在线口径/分类/分母/基线仍须通过。分钟桶跨段不按秒拆订单/UV；即使多个纯桶全在同模块，UV仍不可无依据相加。</li>
+</ol>
+<p>这些步骤属于普通时间线/统计工具固定内部算法。主Agent可以选择商品面板、只调查某段、改看反例或放弃无资格指标；不规定全局必须从开场到促单顺序分析，也不把所有指标/子Agent固定必跑。</p>
+<h2>10 实施fixture清单与批量验收</h2>
+<div class="table"><table>
+<tr><th>fixture组</th><th>输入</th><th>必须结果</th></tr>
+<tr><td>score_goal</td><td>900/1000、1200/1000、0/1000、无G、G=0、缺金额</td><td>90/100且120%/0/null/null/null；不丢超额信息</td></tr>
+<tr><td>score_relative_higher</td><td>r=0/.5/.8/1/1.25/1.5</td><td>0/30/48/60/80/100</td></tr>
+<tr><td>score_relative_bounds</td><td>X=.9,B=.8,U=1；B=1；B=0</td><td>80/null/null；不∞</td></tr>
+<tr><td>score_relative_lower</td><td>B=.1，X=0/.05/.1/.15/.2</td><td>100/80/60/30/0；同龄限定</td></tr>
+<tr><td>four_cards_independent</td><td>内容87.5、点击80、支付48、退款0、覆盖98.33</td><td>各卡保留，无混合总分；严重错误不被平均抵消</td></tr>
+<tr><td>content_submit</td><td>主K10/content子K13/commerce子K13分别提交相同typed assessment</td><td>前两条共享persist与score；经营角色非空assessments拒绝；K09不接稿件评级</td></tr>
+<tr><td>content_unknown_and_cache</td><td>四项1/1/1/.5；第四null；同依赖重传；事实撤回</td><td>87.5/null/复用同ref/旧卡失效</td></tr>
+<tr><td>imported_and_opening</td><td>原稿整篇product_intro；原位置1/6/11及跳播/循环</td><td>不造五段；长短按原位置且分开基线</td></tr>
+<tr><td>cohort_payment</td><td>旧单付款3，新建2；C只有一笔已支付</td><td>50%，不是150%；C=0时率null</td></tr>
+<tr><td>campaign_created_density</td><td>活动窗真实新建2单、匹配10已核人分钟；缺created_at/只有整场汇总/在线未核</td><td>0.2 orders_per_observed_person_minute；后三种均null，绝不代填支付数</td></tr>
+<tr><td>duplicate_money</td><td>父100两SKU各显示100；同订单重叠导出；退款申请100成功60</td><td>父总额100，重复不增，退款60</td></tr>
+<tr><td>late_refund</td><td>固定P在D+1无成功退款，D+7新增退款</td><td>r1不变/r2新净额；D+1不和历史D+14正式比较</td></tr>
+<tr><td>time_denominator</td><td>全场600元60分，采集缺10分</td><td>600元/小时；不720</td></tr>
+<tr><td>public_units</td><td>18like消息、count批次、71member消息、在线verified=false</td><td>条数分别展示，不变点赞18/UV71/人分钟正式值</td></tr>
+<tr><td>pause_and_play</td><td>5秒播＋10秒停＋5秒播；playing重复ACK</td><td>媒体10秒；完整状态可覆盖20秒；重复不增segment</td></tr>
+<tr><td>module_mixed_uv</td><td>分钟跨模块；两个纯桶各100曝光、不同10点击</td><td>前者mixed；后者无整体去重不合成整段UV率</td></tr>
+<tr><td>comment_sampling</td><td>50条代表阅读/未分类全量；0正预测；正预测9</td><td>不算全场意向密度；precision null；尚未验证</td></tr>
+<tr><td>intent_proxy</td><td>6组250人分钟/历史2；来自1用户；历史10次但1场</td><td>合格假设76分且用户1；跨场不足仅2.4事实不评分</td></tr>
+<tr><td>quality</td><td>59/60、59.5/60、.996；Q04缺校时</td><td>摘要98.3333；模块响应仍null，官方净额卡可有效</td></tr>
+<tr><td>baseline</td><td>4场；5场；9次3场；10次2场；10次3场；B0</td><td>无场分/暂定/无模块分/无模块分/暂定模块/B0相对null</td></tr>
+<tr><td>stats</td><td>五组父样例Wilson；金额率/人分钟率传Wilson</td><td>比例区间与既有演算容差一致；不合资格统计类型拒绝</td></tr>
+</table></div>
+<p>唯一metric_id清单放在文末第12节，供registry与静态一致性检查；不把ScoreResult.score_basis当作metric_id。</p>
+<h3>实施顺序与验证证据</h3>
+<div class="table"><table>
+<tr><th>批次</th><th>做什么</th><th>必须保存的证据</th></tr>
+<tr><td>EVAL-A</td><td>导出同一DTO/registry；null、金额、单位、cohort和34个算子；四张卡的五种score_basis映射（历史正反向分别）</td><td>schema快照/往返测试、固定数学fixture结果，不启动模型</td></tr>
+<tr><td>EVAL-B</td><td>timeline/Q01—04、窗口、UV规则、基线选择与依赖缓存</td><td>临时DB/回执/两场断连/重连重投/迟到退款的批量反例；缓存前后0新增模型</td></tr>
+<tr><td>EVAL-C</td><td>K10/K13 typed ContentAssessment、K09标签、四卡与面板一致</td><td>合成模型响应或fake provider证明结构/角色/失败保留；不冒称模型质量已验</td></tr>
+<tr><td>EVAL-D</td><td>首份真实脱敏经营导出＋合法播放器journal＋授权测试标记核对</td><td>原行控制数/金额/分母回对，实际可用粒度，时钟误差/缺项，标签人工抽查</td></tr>
+<tr><td>EVAL-E</td><td>多场真实样本逐步开放响应分/校准policy</td><td>首批至少10场合格复盘作校准复查起点，仍保留波动与限制；政策新版本，旧分不回写</td></tr>
+</table></div>
+<p>报告每次必须列：正式指标/分数refs、政策版本、来源和单位、分子分母、目标/基线、as_of、覆盖与样本、null原因、原句/原行reader、可公开判断/假设和下一场验证建议。达到任意固定分数都不自动写下一场；采纳仍走04精确preview/human确认/Recap适配/CAS回读。</p>
+<h2>11 原政策出处与实施限制</h2>
+<ul>
+<li><code>../直播评价体系与数值评分细则.md</code>：第3节B/C/T/Q定义、第4—5节评分映射、第6节内容四项与模块目标、第7—8节时间/数据资格、第9节合成演算、第12节校准。</li>
+<li><code>../评分政策与数值样例.json</code>：LIVE-SCORE-0.1配置、28天/20场与专项样本门槛、98/98/99和15秒hold/5秒不确定范围、评论/付款敏感性窗口、人工标签抽查目标、合成数学例子。</li>
+<li><code>../指标口径与数据资格.json</code>：原23个指标仍是来源依据；本稿明确保留questions_per_100_observed_person_minutes，新增响应/质量在同registry归一。</li>
+<li><code>01_数据契约与持久化.md</code>、<code>03_工具与可调用工作流.md</code>：正式DTO、K10/K13提交/共同服务、K09评论分类、metric registry、固定refs与缓存；二者修订后是实现接点，不直接加载旧演示Schema当正式API。</li>
+</ul>
+<p>本文没有启动业务计算或内容审核。上线前仍需实际经营报表、平台回听校时、在线/社交字段口径和真实标签效果的验证；数学fixture能证明公式实现，却不能证明文案提高成交或平台数据完整。</p>
+<h2>12 34个metric_id唯一清单</h2>
+<pre><code>observed_time_ratio
+confirmed_play_seconds
+observed_member_messages
+like_messages
+verified_like_increments
+online_time_weighted_mean
+observed_online_person_minutes
+official_average_watch_seconds
+relevant_question_count
+intent_observed_users
+questions_per_100_observed_person_minutes
+product_click_uv_rate
+viewer_to_buyer_rate
+clicker_to_buyer_rate
+created_cohort_payment_rate
+created_orders_per_observed_person_minute
+paid_order_count
+paid_amount_minor
+successful_refund_minor
+refund_amount_rate
+net_paid_asof_minor
+paid_amount_per_live_hour
+net_amount_per_live_hour
+paid_per_1000_viewers
+intent_theme_density
+confusion_theme_density
+necessary_question_coverage
+official_30s_retention
+net_per_1000_viewers
+first_identification_seconds
+module_duration_seconds
+playback_record_coverage
+content_binding_coverage
+time_association_coverage</code></pre></article></main></body></html>

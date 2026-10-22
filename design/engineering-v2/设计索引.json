@@ -1,0 +1,251 @@
+{
+  "contract_version": "PRELIVE-2.3",
+  "mode": "implementation",
+  "implementation_status": "implemented_and_local_verified",
+  "entry": "00_后端工程设计.md",
+  "business_baseline": "../10_播前Agent首期流程基线.md",
+  "framework": {
+    "name": "Deep Agents",
+    "version": "0.7.25",
+    "langchain": "1.4.6",
+    "langgraph": "1.2.15"
+  },
+  "documents": [
+    "00_后端工程设计.md",
+    "01_类型与持久化.md",
+    "02_运行时与中间件.md",
+    "03_声播业务服务与事务.md",
+    "04_业务执行与上下文.md",
+    "05_实施顺序与验收.md",
+    "06_前端对接合同.md",
+    "08_架构图与中间件Skill挂载说明.md",
+    "09_复盘输入与话术闭环设计.md",
+    "10_人工确认与语音门槛设计.md",
+    "11_原始运行记录与调试台设计.md",
+    "12_用户编排与重排设计.md",
+    "13_任务识别与历史上下文设计.md",
+    "14_任务验收与素材准备设计.md",
+    "15_可复用工具流与Agent协调边界.md",
+    "16_最终复查修订与待讨论事项.md",
+    "17_ChatGPT授权模型来源与后续接入记录.md"
+  ],
+  "architecture": {
+    "package": "shengbo_prelive",
+    "business_authority": "shengbo_database",
+    "runtime_authority": "agent_database",
+    "delegation": "typed_durable_dispatch",
+    "native_task": "hidden_and_execution_denied",
+    "main_thread": "main:{run_id}",
+    "branch_thread": "branch:{branch_task_id}",
+    "report_path": [
+      "worker_typed_report",
+      "agent_PREPARED",
+      "main_accept_analysis_reports",
+      "voice_ACCEPTED"
+    ],
+    "publication_path": [
+      "unadopted_candidate",
+      "human_adopt_snapshot",
+      "human_start_prepared_room"
+    ],
+    "voice_transport": [
+      "/api/prelive/v2/commands",
+      "/api/prelive/v2/queries"
+    ],
+    "assistant_proxy": "/api/assistant/v2",
+    "agent_port_default": 8791,
+    "audio_gate": [
+      "compile_requirements",
+      "human_approve_text_for_audio",
+      "verify_current_approval",
+      "required_only_TTS"
+    ],
+    "recap_authority": "shengbo_business_artifacts",
+    "trace": "append_only_sanitized_original_payloads_and_causal_events",
+    "task_selection": "same_main_model_assessment_with_goal_bounded_validation",
+    "cross_branch_exchange": "accepted_report_then_main_typed_handoff_new_task",
+    "catalog_update_default": [
+      "save_product",
+      "maintain_or_reuse_research",
+      "list_script_impacts",
+      "no_automatic_script_changes"
+    ],
+    "goal_acceptance": "original_goal_compiler_and_actual_evidence_not_model_self_report",
+    "context_management": "role_projection_progressive_refs_sdk_summary_offload_critical_reinjection",
+    "playlist_reorder_modes": [
+      "grouped",
+      "interleave",
+      "full_shuffle"
+    ],
+    "intent_path": [
+      "same_main_graph_read_only_intent",
+      "validated_intent_receipt",
+      "coordinator_freeze_goal_once",
+      "grant_if_needed",
+      "same_run_execute"
+    ],
+    "new_runtime_states": [
+      "ASSESSING_INTENT",
+      "FINALIZING"
+    ],
+    "revision_currentness": "pinned_refs_diff_human_keep_or_refresh_current_withdrawal_blocks",
+    "terminalization": "freeze_revoke_drain_recheck_closure_before_terminal",
+    "checkpoint_exclusion": "data_root_os_lock_and_thread_actual_invoke_lifetime_lock"
+  },
+  "roles": [
+    "product_facts",
+    "session_config",
+    "audience_scenes"
+  ],
+  "main_business_tools": [
+    "read_capabilities",
+    "read_business_schema",
+    "read_source",
+    "search_catalog",
+    "read_product",
+    "read_preparation",
+    "read_room",
+    "read_voice_options",
+    "read_context",
+    "read_script",
+    "read_script_usage",
+    "read_job",
+    "read_run_history",
+    "read_analysis_batch",
+    "dispatch_analysis_batch",
+    "accept_analysis_reports",
+    "request_user_decision",
+    "validate_product_assembly",
+    "save_product",
+    "save_session_draft",
+    "build_context_bundle",
+    "save_script_change_plan",
+    "execute_script_plan",
+    "save_playlist",
+    "compile_playback_plan",
+    "prepare_required_audio",
+    "publish_preparation",
+    "finish_turn",
+    "import_recap",
+    "link_recap_to_preparation",
+    "read_recap",
+    "read_text_review",
+    "preview_playlist_reorder",
+    "find_audience_research",
+    "read_session_history",
+    "inspect_change_impact",
+    "save_task_assessment",
+    "read_asset_checklist",
+    "save_asset_checklist"
+  ],
+  "worker_report_tools": [
+    "submit_product_facts_report",
+    "submit_session_config_report",
+    "submit_audience_scenes_report"
+  ],
+  "sdk_tools": {
+    "main": [
+      "write_todos",
+      "read_only_virtual_files"
+    ],
+    "workers": [
+      "read_only_virtual_files"
+    ]
+  },
+  "module_keys": [
+    "opening_long",
+    "opening_short",
+    "product_intro",
+    "selling_points",
+    "campaign",
+    "cta",
+    "transition"
+  ],
+  "run_outcomes": [
+    "COMPLETED",
+    "READY_FOR_REVIEW",
+    "WAITING_JOBS",
+    "BLOCKED"
+  ],
+  "business_steps": [
+    "1",
+    "2A",
+    "2B",
+    "3",
+    "4A",
+    "4B",
+    "5",
+    "6",
+    "6R",
+    "7",
+    "8"
+  ],
+  "pending_implementation_probes": [
+    "persistent_sqlite_saver",
+    "DeepSeek_tool_runtime_injection",
+    "middleware_execution_order",
+    "cross_process_revoke_commit_race",
+    "OCR_source_locators",
+    "search_connectivity",
+    "partial_module_generation",
+    "supercycle_compilation",
+    "required_only_audio",
+    "OBS_actual_playback",
+    "recap_disposition_coverage",
+    "human_text_audio_approval",
+    "full_payload_trace_and_export",
+    "trace_failure_after_business_commit",
+    "task_selection_and_scope",
+    "audience_history_incremental_binding",
+    "context_compression_constraint_preservation",
+    "playlist_drag_reorder_preview_apply",
+    "goal_evidence_and_asset_checklist",
+    "initial_intent_no_goal_no_grant",
+    "goal_freeze_once_and_phase_resume",
+    "runtime_acceptance_artifact_frontend_read",
+    "same_thread_checkpoint_writer_exclusion",
+    "terminalization_of_all_outcomes",
+    "final_payload_and_model_attempt_recovery",
+    "same_run_review_edits",
+    "pinned_revision_human_choice_and_current_controls",
+    "price_only_preserves_selling_points",
+    "partial_result_continuation",
+    "chatgpt_plan_credential_single_refresher",
+    "chatgpt_plan_tool_roundtrip",
+    "chatgpt_plan_deepagents_sync_async_stream",
+    "chatgpt_plan_summary_and_resume",
+    "chatgpt_plan_refresh_rotation_and_errors"
+  ],
+  "validation_scope": "Design cross-review and static document checks; no business implementation or provider tests.",
+  "registry_counts": {
+    "commands": 30,
+    "queries": 27,
+    "main_business_tools": 39
+  },
+  "model_source_decision": {
+    "recorded_at": "2026-10-16",
+    "scope": "design_record_only",
+    "agent_provider": "chatgpt_plan",
+    "agent_model": "gpt-6.1-sol",
+    "framework": "Deep Agents",
+    "authorization_reported_complete": true,
+    "short_text_reported_completed": true,
+    "evidence_source": "local_handoff_report_and_user",
+    "source_path": "D:/Codex project/shengbo-chatgpt-connection/给Agent开发窗口的接入说明.md",
+    "source_sha256": "c716c78a9a38c1f29ca4ca1dfb5c18ce70f1318717373f882b9914f4a1819b75",
+    "credential_contents_read_this_turn": false,
+    "live_model_calls_this_turn": 0,
+    "adapter_implemented": false,
+    "automatic_renewal_implemented": false,
+    "provider_document": "17_ChatGPT授权模型来源与后续接入记录.md",
+    "voice_copywriting_provider": "deepseek_unchanged",
+    "tts_providers": [
+      "local_mandarin",
+      "minimax"
+    ],
+    "silent_fallback_allowed": false
+  },
+  "implementation_record": "18_首期构建与验收记录.md",
+  "agent_project": "D:/Codex project/shengbo-ops-agent",
+  "verification_report": "D:\\Codex project\\shengbo-ops-agent\\verification\\final-checks.json"
+}

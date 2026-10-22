@@ -1,0 +1,42 @@
+{
+  "run": "final_pipeline_notebook",
+  "versions": [
+    {
+      "version": 1,
+      "program": 39.7,
+      "semantic": 46.0,
+      "total": 85.7,
+      "hard_gate": false,
+      "rule_issues": [],
+      "serious_claims": 0,
+      "cross_version_copy_pass": true,
+      "pass": false,
+      "gaps": [
+        "卖点展开密度不足，80页使用场景较单薄，未呈现‘一段时间’的具体画面。",
+        "点阵格式的收益仅泛泛而谈，未像参考稿那样结合分栏、表格等具体用途。",
+        "颜色介绍简短，未与使用场景或情绪价值关联。"
+      ]
+    },
+    {
+      "version": 2,
+      "program": 40.0,
+      "semantic": 51.0,
+      "total": 91.0,
+      "hard_gate": true,
+      "rule_issues": [],
+      "serious_claims": 0,
+      "cross_version_copy_pass": true,
+      "pass": true,
+      "gaps": [
+        "对点阵格式的书写便利性描述较泛，未结合具体记录场景（如画表格）进一步展开。",
+        "封面颜色的视觉描述较为主观，缺少与使用场景的细腻关联。",
+        "购买引导仅停留在颜色和凑三本，未提及适合人群的差异化推荐。"
+      ]
+    }
+  ],
+  "pair_diversity": {
+    "score": 3,
+    "reason": "两版开场痛点不同（出门带本子 vs 手机记录），卖点展开顺序有差异（版本1规格穿插，版本2先点阵后尺寸），但核心结构均为痛点-规格-颜色-价格，且对点阵、软封面的诠释相似，差异不够鲜明。"
+  },
+  "rubric": "20261007.4-uniform-coverage-content-and-near-copy-checks"
+}

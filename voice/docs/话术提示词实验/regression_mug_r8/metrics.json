@@ -1,0 +1,76 @@
+{
+  "versions": [
+    {
+      "han_characters": 658,
+      "sentences": 23,
+      "coverage_groups": {
+        "材质": true,
+        "容量": true,
+        "把手": true,
+        "颜色": true,
+        "场景": true
+      },
+      "coverage_rate": 1.0,
+      "natural_sentence_ratio": 1.0,
+      "duplicate_sentences": [],
+      "reference_5gram_overlap": 0.0,
+      "program_scores": {
+        "selling_point_coverage": 12.0,
+        "flow": 8.0,
+        "speakability": 10.0,
+        "length_fit": 3.8,
+        "fact_references": 5.0
+      },
+      "program_total": 38.8,
+      "invalid_references": false,
+      "app_issues": []
+    },
+    {
+      "han_characters": 548,
+      "sentences": 26,
+      "coverage_groups": {
+        "材质": true,
+        "容量": true,
+        "把手": true,
+        "颜色": true,
+        "场景": true
+      },
+      "coverage_rate": 1.0,
+      "natural_sentence_ratio": 0.962,
+      "duplicate_sentences": [],
+      "reference_5gram_overlap": 0.0,
+      "program_scores": {
+        "selling_point_coverage": 12.0,
+        "flow": 8.0,
+        "speakability": 9.62,
+        "length_fit": 4.56,
+        "fact_references": 5.0
+      },
+      "program_total": 39.18,
+      "invalid_references": false,
+      "app_issues": []
+    }
+  ],
+  "pair": [
+    {
+      "a": 1,
+      "b": 2,
+      "fivegram_jaccard": 0.157,
+      "shared_narrative_sentences": [],
+      "near_copy_ratio": 0.154,
+      "near_copies": [
+        {
+          "a": "在办公室泡一杯茶，倒一次水能喝上一阵子，不用来回跑茶水间。",
+          "b": "在办公室泡一杯茶，倒一次水能喝上一阵子，不用总往茶水间跑。",
+          "similarity": 0.897
+        },
+        {
+          "a": "陶瓷表面看上去干干净净，日常用起来和玻璃杯、不锈钢杯是两种不同的感觉。",
+          "b": "陶瓷表面看上去干干净净，日常用起来和玻璃杯、不锈钢杯是两种手感。",
+          "similarity": 0.925
+        }
+      ],
+      "opening_similarity": 0.255
+    }
+  ]
+}

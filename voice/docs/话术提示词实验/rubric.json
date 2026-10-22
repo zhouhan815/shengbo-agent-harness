@@ -1,0 +1,39 @@
+{
+  "version": "20261007.4-uniform-coverage-content-and-near-copy-checks",
+  "program_points": {
+    "selling_point_coverage": 12,
+    "flow": 8,
+    "speakability": 10,
+    "length_fit": 5,
+    "fact_references": 5
+  },
+  "judge_points": {
+    "natural_live_speech": 15,
+    "benefit_scene_expansion": 20,
+    "coherent_flow": 10,
+    "non_repetition": 10,
+    "purchase_guidance": 5
+  },
+  "thresholds": {
+    "total_min_each_version": 80,
+    "semantic_min": 45,
+    "pair_diversity_min_0_to_5": 3,
+    "max_shared_narrative_sentences": 1,
+    "near_sentence_similarity": 0.84,
+    "near_copy_ratio_max": 0.15,
+    "coverage_min": 0.9
+  },
+  "hard_gates": [
+    "正确价格、币种、规格及优惠条件",
+    "无严重无依据商品/履约/体验/库存承诺",
+    "新提示词不接收知识库",
+    "版本数量正确、JSON可解析",
+    "每句商品断言有合法事实引用"
+  ],
+  "cautions": [
+    "同模型盲评是辅助证据，不是独立人工结论",
+    "关键词覆盖只能表示提及，展开质量另评",
+    "不以字数推算真实播出时长",
+    "少量样本不能证明全局最优"
+  ]
+}

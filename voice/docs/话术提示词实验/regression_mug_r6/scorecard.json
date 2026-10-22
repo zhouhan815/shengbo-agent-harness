@@ -1,0 +1,42 @@
+{
+  "run": "regression_mug_r6",
+  "versions": [
+    {
+      "version": 1,
+      "program": 39.53,
+      "semantic": 49.0,
+      "total": 88.53,
+      "hard_gate": true,
+      "rule_issues": [],
+      "serious_claims": 0,
+      "cross_version_copy_pass": true,
+      "pass": true,
+      "gaps": [
+        "米白色在颜色段和总结中重复提及，可再精简。",
+        "陶瓷材质的展开偏概括，可增加一个更具体的生活画面。",
+        "容量三百五十毫升的说明较基础，未进一步区分家用和办公的不同倒水习惯。"
+      ]
+    },
+    {
+      "version": 2,
+      "program": 38.2,
+      "semantic": 48.0,
+      "total": 86.2,
+      "hard_gate": true,
+      "rule_issues": [],
+      "serious_claims": 0,
+      "cross_version_copy_pass": true,
+      "pass": true,
+      "gaps": [
+        "米白色卖点在开头和总结前重复出现，略显冗余。",
+        "容量三百五十毫升的展开较常规，未进一步细化不同使用场景的差异。",
+        "结尾总结与前面内容重复度较高，收口不够新鲜。"
+      ]
+    }
+  ],
+  "pair_diversity": {
+    "score": 3,
+    "reason": "两版开场痛点不同，版本1以挑选杯子的关注点切入，版本2以出门端水场景切入，卖点展开顺序也不同；但整体逐点结构相似，均按把手、陶瓷、容量、颜色推进，未达到4分要求的至少两项明显不同且均完整。"
+  },
+  "rubric": "20261007.4-uniform-coverage-content-and-near-copy-checks"
+}

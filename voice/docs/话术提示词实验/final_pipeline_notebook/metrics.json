@@ -1,0 +1,71 @@
+{
+  "versions": [
+    {
+      "han_characters": 715,
+      "sentences": 33,
+      "coverage_groups": {
+        "尺寸": true,
+        "页数": true,
+        "封面": true,
+        "内页": true,
+        "用途": true,
+        "颜色": true,
+        "优惠门槛": true,
+        "不可叠加": true
+      },
+      "coverage_rate": 1.0,
+      "natural_sentence_ratio": 0.97,
+      "duplicate_sentences": [],
+      "reference_5gram_overlap": 0.001,
+      "program_scores": {
+        "selling_point_coverage": 12.0,
+        "flow": 8.0,
+        "speakability": 9.7,
+        "length_fit": 5,
+        "fact_references": 5.0
+      },
+      "program_total": 39.7,
+      "invalid_references": false,
+      "app_issues": []
+    },
+    {
+      "han_characters": 738,
+      "sentences": 28,
+      "coverage_groups": {
+        "尺寸": true,
+        "页数": true,
+        "封面": true,
+        "内页": true,
+        "用途": true,
+        "颜色": true,
+        "优惠门槛": true,
+        "不可叠加": true
+      },
+      "coverage_rate": 1.0,
+      "natural_sentence_ratio": 1.0,
+      "duplicate_sentences": [],
+      "reference_5gram_overlap": 0.003,
+      "program_scores": {
+        "selling_point_coverage": 12.0,
+        "flow": 8.0,
+        "speakability": 10.0,
+        "length_fit": 5,
+        "fact_references": 5.0
+      },
+      "program_total": 40.0,
+      "invalid_references": false,
+      "app_issues": []
+    }
+  ],
+  "pair": [
+    {
+      "a": 1,
+      "b": 2,
+      "fivegram_jaccard": 0.048,
+      "shared_narrative_sentences": [],
+      "near_copy_ratio": 0.0,
+      "near_copies": [],
+      "opening_similarity": 0.277
+    }
+  ]
+}

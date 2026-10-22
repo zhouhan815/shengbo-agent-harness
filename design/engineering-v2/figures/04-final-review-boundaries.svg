@@ -1,0 +1,88 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2200" height="1580" viewBox="0 0 2200 1580">
+<defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 Z" fill="#617889"/></marker></defs>
+<rect width="2200" height="1580" fill="white"/>
+<text x="45.0" y="70" font-family="Microsoft YaHei,sans-serif" font-size="40" fill="#193447">最终复查 · 执行排他、人工修改与历史版本选择</text>
+<text x="45.0" y="108" font-family="Microsoft YaHei,sans-serif" font-size="24" fill="#193447">PRELIVE-2.3 · 这些是自动运行的服务边界与人工决定；没有新增自主 Agent 或第十类中间件。</text>
+<rect x="40" y="145" width="600" height="1310" rx="14" fill="#FFFBEA" stroke="#CFCBAC" stroke-width="2"/>
+<text x="62.0" y="188" font-family="Microsoft YaHei,sans-serif" font-size="28" fill="#193447">前端 / 商家明确决定</text>
+<rect x="690" y="145" width="820" height="1310" rx="14" fill="#FFFBEA" stroke="#CFCBAC" stroke-width="2"/>
+<text x="712.0" y="188" font-family="Microsoft YaHei,sans-serif" font-size="28" fill="#193447">Agent Harness / 运行控制</text>
+<rect x="1560" y="145" width="600" height="1310" rx="14" fill="#FFFBEA" stroke="#CFCBAC" stroke-width="2"/>
+<text x="1582.0" y="188" font-family="Microsoft YaHei,sans-serif" font-size="28" fill="#193447">声播业务服务 / 唯一业务真值</text>
+<rect x="80" y="225" width="520" height="130" rx="9" fill="#E6EDFF" stroke="#A7B7C3" stroke-width="2"/>
+<text x="186.0" y="261.0" font-family="Microsoft YaHei,sans-serif" font-size="28" fill="#193447">对话 / 上传 / 编排 / 配置</text>
+<text x="172.0" y="301.0" font-family="Microsoft YaHei,sans-serif" font-size="28" fill="#193447">仅更新资料：不自动改话术</text>
+<text x="214.0" y="341.0" font-family="Microsoft YaHei,sans-serif" font-size="28" fill="#193447">原始要求与目标保存</text>
+<rect x="730" y="225" width="740" height="130" rx="9" fill="#F0F4F6" stroke="#A7B7C3" stroke-width="2"/>
+<text x="885.5" y="261.0" font-family="Microsoft YaHei,sans-serif" font-size="28" fill="#193447">数据根 OS 独占锁 → Coordinator</text>
+<text x="859.0" y="301.0" font-family="Microsoft YaHei,sans-serif" font-size="28" fill="#193447">每 thread 锁覆盖 SDK 调用至真实退出</text>
+<text x="893.0" y="341.0" font-family="Microsoft YaHei,sans-serif" font-size="28" fill="#193447">业务租约不代替 checkpoint 排他</text>
+<rect x="1600" y="225" width="520" height="130" rx="9" fill="#E3F3E8" stroke="#A7B7C3" stroke-width="2"/>
+<text x="1692.0" y="261.0" font-family="Microsoft YaHei,sans-serif" font-size="28" fill="#193447">商品 / 配置 / 研究 / 原资料</text>
+<text x="1706.0" y="301.0" font-family="Microsoft YaHei,sans-serif" font-size="28" fill="#193447">精确版本引用与历史证据</text>
+<text x="1706.0" y="341.0" font-family="Microsoft YaHei,sans-serif" font-size="28" fill="#193447">固定旧版不自动换成最新</text>
+<rect x="730" y="430" width="740" height="165" rx="9" fill="#E6EDFF" stroke="#A7B7C3" stroke-width="2"/>
+<text x="917.5" y="464.5" font-family="Microsoft YaHei,sans-serif" font-size="27" fill="#193447">同一主 Agent + 按需三路分析</text>
+<text x="902.5" y="503.5" font-family="Microsoft YaHei,sans-serif" font-size="27" fill="#193447">最终 provider payload 预算检查</text>
+<text x="853.5" y="542.5" font-family="Microsoft YaHei,sans-serif" font-size="27" fill="#193447">每次模型请求：reserved → sent → 结算</text>
+<text x="935.5" y="581.5" font-family="Microsoft YaHei,sans-serif" font-size="27" fill="#193447">未知 usage / 费用明确保留</text>
+<rect x="80" y="440" width="520" height="155" rx="9" fill="#FFF0DA" stroke="#A7B7C3" stroke-width="2"/>
+<text x="256.0" y="472.5" font-family="Microsoft YaHei,sans-serif" font-size="24" fill="#193447">审稿卡选择修改</text>
+<text x="196.5" y="508.5" font-family="Microsoft YaHei,sans-serif" font-size="24" fill="#193447">原 Goal 内恢复同 run 改稿</text>
+<text x="202.0" y="544.5" font-family="Microsoft YaHei,sans-serif" font-size="24" fill="#193447">超出 Goal 则明确 replace</text>
+<text x="256.0" y="580.5" font-family="Microsoft YaHei,sans-serif" font-size="24" fill="#193447">修改不等于批准</text>
+<rect x="1600" y="445" width="520" height="135" rx="9" fill="#E3F3E8" stroke="#A7B7C3" stroke-width="2"/>
+<text x="1711.0" y="484.0" font-family="Microsoft YaHei,sans-serif" font-size="27" fill="#193447">商品新旧差异 / 当前控制</text>
+<text x="1671.0" y="523.0" font-family="Microsoft YaHei,sans-serif" font-size="27" fill="#193447">普通差异：保留或刷新由用户选</text>
+<text x="1711.0" y="562.0" font-family="Microsoft YaHei,sans-serif" font-size="27" fill="#193447">停售 / 明确撤回必须拦截</text>
+<rect x="80" y="685" width="520" height="150" rx="9" fill="#FFF0DA" stroke="#A7B7C3" stroke-width="2"/>
+<text x="218.5" y="731.5" font-family="Microsoft YaHei,sans-serif" font-size="27" fill="#193447">选择保留旧版或刷新</text>
+<text x="176.0" y="770.5" font-family="Microsoft YaHei,sans-serif" font-size="27" fill="#193447">决定绑定精确新旧 ref / diff</text>
+<text x="147.5" y="809.5" font-family="Microsoft YaHei,sans-serif" font-size="27" fill="#193447">保留不重 TTS、不改内容 epoch</text>
+<rect x="730" y="695" width="740" height="140" rx="9" fill="#E6EDFF" stroke="#A7B7C3" stroke-width="2"/>
+<text x="903.0" y="736.5" font-family="Microsoft YaHei,sans-serif" font-size="27" fill="#193447">提出修改计划 → 执行授权内模块</text>
+<text x="843.0" y="775.5" font-family="Microsoft YaHei,sans-serif" font-size="27" fill="#193447">失效问题用 typed system resolution 唤醒</text>
+<text x="870.5" y="814.5" font-family="Microsoft YaHei,sans-serif" font-size="27" fill="#193447">随后重新审稿；人工批准才进入新 TTS</text>
+<rect x="1600" y="685" width="520" height="150" rx="9" fill="#E3F3E8" stroke="#A7B7C3" stroke-width="2"/>
+<text x="1746.0" y="716.0" font-family="Microsoft YaHei,sans-serif" font-size="23" fill="#193447">currentness 中央检查</text>
+<text x="1703.0" y="751.0" font-family="Microsoft YaHei,sans-serif" font-size="23" fill="#193447">发布 / 审稿 / 采用 / start 共用</text>
+<text x="1737.5" y="786.0" font-family="Microsoft YaHei,sans-serif" font-size="23" fill="#193447">keep 保存独立选择回执</text>
+<text x="1714.5" y="821.0" font-family="Microsoft YaHei,sans-serif" font-size="23" fill="#193447">refresh 才分析必要内容失效</text>
+<rect x="80" y="950" width="520" height="145" rx="9" fill="#F0F4F6" stroke="#A7B7C3" stroke-width="2"/>
+<text x="150.0" y="994.0" font-family="Microsoft YaHei,sans-serif" font-size="27" fill="#193447">查看成果 / 部分成果 / 继续入口</text>
+<text x="151.5" y="1033.0" font-family="Microsoft YaHei,sans-serif" font-size="27" fill="#193447">收尾时显示 FINALIZING / 对账</text>
+<text x="178.0" y="1072.0" font-family="Microsoft YaHei,sans-serif" font-size="27" fill="#193447">不假称全部停止或已经开播</text>
+<rect x="730" y="925" width="740" height="190" rx="9" fill="#F0F4F6" stroke="#A7B7C3" stroke-width="2"/>
+<text x="850.0" y="972.0" font-family="Microsoft YaHei,sans-serif" font-size="27" fill="#193447">成功 / 失败 / 阻塞 / 取消 → RunFinalizer</text>
+<text x="868.0" y="1011.0" font-family="Microsoft YaHei,sans-serif" font-size="27" fill="#193447">冻结派发 → 撤权对账 → 图执行者退出</text>
+<text x="825.5" y="1050.0" font-family="Microsoft YaHei,sans-serif" font-size="27" fill="#193447">复验业务成果 → ClosureReceipt → 真实终态</text>
+<text x="951.5" y="1089.0" font-family="Microsoft YaHei,sans-serif" font-size="27" fill="#193447">未收拢前保留冲突任务槽</text>
+<rect x="1600" y="950" width="520" height="145" rx="9" fill="#E3F3E8" stroke="#A7B7C3" stroke-width="2"/>
+<text x="1697.5" y="994.0" font-family="Microsoft YaHei,sans-serif" font-size="27" fill="#193447">撤权仅禁止未来写入 / 绑定</text>
+<text x="1711.5" y="1033.0" font-family="Microsoft YaHei,sans-serif" font-size="27" fill="#193447">已合法保存产物继续保留</text>
+<text x="1654.0" y="1072.0" font-family="Microsoft YaHei,sans-serif" font-size="27" fill="#193447">人工采用 / 开播不依赖旧 run 活跃</text>
+<rect x="80" y="1210" width="520" height="150" rx="9" fill="#F1E7FB" stroke="#A7B7C3" stroke-width="2"/>
+<text x="191.5" y="1256.5" font-family="Microsoft YaHei,sans-serif" font-size="27" fill="#193447">复盘建议：二号商品先讲</text>
+<text x="161.5" y="1295.5" font-family="Microsoft YaHei,sans-serif" font-size="27" fill="#193447">商品身份不等于第2版 / 第2项</text>
+<text x="164.5" y="1334.5" font-family="Microsoft YaHei,sans-serif" font-size="27" fill="#193447">未采纳不改序，不自动加商品</text>
+<rect x="730" y="1210" width="740" height="150" rx="9" fill="#F0F4F6" stroke="#A7B7C3" stroke-width="2"/>
+<text x="846.5" y="1256.5" font-family="Microsoft YaHei,sans-serif" font-size="27" fill="#193447">终态后的继续：新合法 Goal 复用真实成果</text>
+<text x="913.0" y="1295.5" font-family="Microsoft YaHei,sans-serif" font-size="27" fill="#193447">只补剩余部分，不继承旧 grant</text>
+<text x="870.5" y="1334.5" font-family="Microsoft YaHei,sans-serif" font-size="27" fill="#193447">未知付费请求先对账，不自动重复执行</text>
+<rect x="1600" y="1210" width="520" height="150" rx="9" fill="#E3F3E8" stroke="#A7B7C3" stroke-width="2"/>
+<text x="1683.5" y="1256.5" font-family="Microsoft YaHei,sans-serif" font-size="27" fill="#193447">商品 / 话术 / 音频回执仍可查</text>
+<text x="1765.5" y="1295.5" font-family="Microsoft YaHei,sans-serif" font-size="27" fill="#193447">未变音频可复用</text>
+<text x="1674.5" y="1334.5" font-family="Microsoft YaHei,sans-serif" font-size="27" fill="#193447">采用与 start 仍是独立人工动作</text>
+<polyline points="600,290 730,290" fill="none" stroke="#617889" stroke-width="3" marker-end="url(#a)"/>
+<polyline points="1100,355 1100,430" fill="none" stroke="#617889" stroke-width="3" marker-end="url(#a)"/>
+<polyline points="1470,290 1600,290" fill="none" stroke="#617889" stroke-width="3" stroke-dasharray="10 8" marker-end="url(#a)"/>
+<polyline points="600,515 680,515 680,765 730,765" fill="none" stroke="#617889" stroke-width="3" marker-end="url(#a)"/>
+<polyline points="1860,580 1860,685" fill="none" stroke="#617889" stroke-width="3" marker-end="url(#a)"/>
+<polyline points="600,760 650,760 650,870 1535,870 1535,760 1600,760" fill="none" stroke="#617889" stroke-width="3" marker-end="url(#a)"/>
+<polyline points="1100,595 1100,695" fill="none" stroke="#617889" stroke-width="3" marker-end="url(#a)"/>
+<polyline points="1100,835 1100,925" fill="none" stroke="#617889" stroke-width="3" marker-end="url(#a)"/>
+<polyline points="730,1020 600,1020" fill="none" stroke="#617889" stroke-width="3" stroke-dasharray="10 8" marker-end="url(#a)"/>
+<polyline points="1470,1020 1600,1020" fill="none" stroke="#617889" stroke-width="3" marker-end="url(#a)"/>
+<polyline points="1100,1115 1100,1210" fill="none" stroke="#617889" stroke-width="3" marker-end="url(#a)"/>
+<text x="55.0" y="1527" font-family="Microsoft YaHei,sans-serif" font-size="27" fill="#193447">完整安全原始记录：模型载荷、工具输入输出、检查决定、并行执行、人工答复、收尾与成果；不声称记录模型私有思维。</text>
+</svg>

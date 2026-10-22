@@ -1,0 +1,147 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>03_工具与可调用工作流</title><style>
+:root{--ink:#24304a;--muted:#626e80;--line:#dbe0e7;--blue:#475ed7;--paper:#fff;--bg:#f5f5f1}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.85 'Segoe UI','Microsoft YaHei',sans-serif}
+nav{position:fixed;left:0;top:0;bottom:0;width:266px;padding:28px 20px;background:#eeefe9;border-right:1px solid var(--line);overflow:auto}
+nav b{display:block;font-size:21px;margin-bottom:12px}nav small{display:block;color:var(--muted);line-height:1.65;margin-bottom:20px}
+nav a{display:block;color:#35426b;text-decoration:none;padding:10px 8px;border-radius:8px;font-size:14px;line-height:1.6}nav a:hover{background:#fff}
+main{margin:28px 28px 80px 294px;max-width:1600px}.hero,article{background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:28px 32px;margin-bottom:26px}
+.hero{border-top:5px solid var(--blue)}.badge{color:#52609c;font-size:13px;letter-spacing:.08em}.note{padding:14px 18px;background:#f1f4ff;border-left:4px solid #6b7ae0;border-radius:6px}
+h1{font-size:30px;line-height:1.45;margin:8px 0 22px}h2{font-size:23px;line-height:1.5;margin:34px 0 16px;border-bottom:1px solid #e6e9ee;padding-bottom:10px}h3{font-size:19px;line-height:1.6;margin:26px 0 12px}p{margin:13px 0}a{color:#425dc7;text-decoration:none}a:hover{text-decoration:underline}
+.table{overflow-x:auto;border:1px solid var(--line);border-radius:10px;margin:18px 0}table{width:100%;border-collapse:collapse;min-width:850px;font-size:14px;line-height:1.8}th,td{padding:13px 15px;text-align:left;vertical-align:top;border-bottom:1px solid #e1e6ed;border-right:1px solid #e1e6ed}th{background:#eef1f7;font-weight:650;position:sticky;top:0}tr:nth-child(even) td{background:#fafbf9}td:first-child{min-width:100px;font-weight:550}tr:last-child td{border-bottom:0}
+code{background:#eef1f7;padding:2px 5px;border-radius:4px;font:13px/1.7 Consolas,'Microsoft YaHei',monospace;overflow-wrap:anywhere}pre{background:#20283a;color:#f0f3f8;padding:20px;border-radius:10px;overflow:auto;font:13px/1.75 Consolas,'Microsoft YaHei',monospace}pre code{background:none;color:inherit;padding:0;white-space:pre}
+.figure{overflow:auto;background:#fafbf8;border:1px solid var(--line);border-radius:12px;padding:8px;margin:20px 0}.figure img{display:block;width:100%;min-width:1080px;height:auto}.caption{font-size:13px;color:var(--muted)}details{margin:12px 0;color:var(--muted)}summary{cursor:pointer}li{margin:7px 0}blockquote{margin:15px 0;padding:10px 18px;border-left:4px solid #adb8ce;background:#f8f9fb}
+@media(max-width:960px){nav{position:static;width:auto}nav a{display:inline-block}main{margin:15px}.hero,article{padding:20px}h1{font-size:25px}}
+@media print{nav{display:none}main{margin:0}.hero,article{border:0;padding:0}.table{overflow:visible}table{min-width:0;font-size:10px}h2{break-after:avoid}tr{break-inside:avoid}.figure img{min-width:0}article{break-before:page}}
+</style></head><body><nav><b>综合复盘 Agent</b><small>Harness工程计划<br>LIVE-REVIEW-ENG-1.0<br>设计完成 · 业务尚未实现</small><a href="播中播后综合Agent完整工程计划.html">返回完整计划</a><a href="00_总开发计划与架构.html">总开发计划与架构</a><a href="01_数据契约与持久化.html">数据契约与持久化</a><a href="02_AgentHarness与上下文中间件.html">AgentHarness与上下文中间件</a><a href="03_工具与可调用工作流.html">工具与可调用工作流</a><a href="04_API前端与播前交接.html">API前端与播前交接</a><a href="05_验收与实施任务包.html">验收与实施任务包</a><a href="06_播前迭代教训预防矩阵.html">播前迭代教训预防矩阵</a><a href="07_评价体系执行配方.html">评价体系执行配方</a></nav><main><article><h1>工具注册、可调用工作流与模型选择范围</h1>
+<p>版本LIVE-REVIEW-ENG-1.0。本稿中的函数、ToolSpec、工具及流程均待实施；已有voice／prelive接口由适配器调用，不重命名成假装存在的Review接口。</p>
+<h2>1 一个注册器生成全部入口</h2>
+<p>ToolSpec放policy.py／tools.py共享的registry中，每项包含name、args_model、result_model、roles、effect、capability_requirement、timeout、idempotency、handler、public_label。注册表同时生成模型schema、role allowlist、调试名称、契约检查和文档清单。Skill中提到的工具必须能从registry解析；构建时检查缺名、重名、角色错配。</p>
+<p>模型工具函数使用LangChain ToolRuntime注入可信ReviewScope；account_id、role、grant、run等不作为模型参数。Scope Middleware检查后，普通服务仍核对象归属与引用；不能只靠提示词声称只读。</p>
+<p>效果分三类：read_business（读事实），analysis_local（计算／缓存／草稿与报告落本次Review库），human_business（采纳关联下一场）。主／子只有前两类；human_business只在人工API控制器，不放入模型工具列表。</p>
+<p><code>SDK_TOOL_POLICY</code>与业务ToolSpec一起组成最终allowlist：主图task仅content_review／commerce_review，子图不注册task；read_file／ls／glob／grep只允许/skills、受控history及scratch虚拟空间；write_file／edit_file只允许scratch；显式SDK TodoList的write_todos只更新计划；execute／delete从FilesystemMiddleware的tools配置排除，并在dispatch兜底拒绝。仅使用StateBackend不会自动移除execute／delete的schema。构建时对最终ToolNode清单断言：每项必须匹配业务registry或SDK_TOOL_POLICY，额外工具即构建失败，不能统一放行SDK来源工具。</p>
+<p>F01–F05同样通过ToolSpec注册为真实模型可调用工具，具有args_model、role、effect、handler和结果schema；不是仅写在Skill里的伪入口。共享handler复用原子服务，不通过再调用一次模型来“执行流程”。主图有F01–F05；内容子可选F03，经营子可选F02／F04；F05只属主。F05既能带草稿一起提交，也能传已验证draft_ref做一调交付，均走同一个finish服务与非direct完成门。</p>
+<h2>2 统一ToolResult与错误</h2>
+<pre><code>ToolResult[T] {
+  schema_version, call_id, run_id, tool_name,
+  outcome: completed|partial|waiting|needs_input|blocked|failed|unknown,
+  commit_state: read_only|not_committed|committed|unknown,
+  data: T|null, artifact_refs: SourceRef[],
+  missing: MissingItem[], next_reads: ExactReader[],
+  job_ref: ReviewRef|null, retry_after_ms: int|null,
+  error: {code, message, retryable, safe_details}|null,
+  timing_ref, origin: new_computation|cache_reuse|human_import|legacy_unknown
+}</code></pre>
+<p>completed只说明本次工具完成，不代表整个用户Goal完成。waiting必须有真实job_ref与可靠唤醒入口；unknown是已发请求可能生效、当前不能确认，不能等同failed。HTTP／SDK错误适配为同一语义，不能HTTP200下错误体被UI记成功。</p>
+<p>ExactReader={tool_name,typed_args,source_ref,view_id,coverage_requirement}；模型可以直接使用，不用猜某个嵌套JSON路径。读取记录保存实际交付的范围与hash；“已读”“已理解”“已核验”“正式提交”分别记录。</p>
+<div class="table"><table>
+<tr><th>错误码</th><th>含义</th><th>正确续办</th></tr>
+<tr><td>INVALID_ARGS／MAPPING_REQUIRED</td><td>明确未提交，缺字段／口径未选</td><td>返回具体字段、合法枚举或确认卡，不抛整任务失败</td></tr>
+<tr><td>REF_NOT_FOUND／STALE_REF</td><td>引用不存在／版本变化</td><td>回读当前受权快照和差异，模型重评，不能猜ID或覆盖</td></tr>
+<tr><td>SCOPE_DENIED／SOURCE_HASH_MISMATCH</td><td>越权或证据篡改</td><td>blocked，不作为可补参数错误吞掉</td></tr>
+<tr><td>METRIC_NOT_ELIGIBLE／COHORT_MISMATCH／UV_NOT_ADDITIVE</td><td>数据资格或统计范围不合格</td><td>给原计数／缺项，保留null，不要求模型修出一个数字</td></tr>
+<tr><td>SOURCE_GAP／CURSOR_EXPIRED</td><td>源端不可重放或游标已过期</td><td>标缺口、给可用快照；UI补发不是原数据补齐</td></tr>
+<tr><td>VERSION_CONFLICT</td><td>CAS失败</td><td>返回实际版本和受影响对象，保留已完成独立产物；不自动覆盖</td></tr>
+<tr><td>PROVIDER_NOT_SENT／TEMPORARY_READ_FAILURE</td><td>明确尚未发模型或只读临时失败</td><td>同逻辑操作有限重试，累计计时与共享预算</td></tr>
+<tr><td>PROVIDER_RESULT_UNKNOWN／HANDOFF_UNKNOWN</td><td>已发送、未获可靠终态</td><td>保存request／operation ID并对账；不能换key盲重试</td></tr>
+<tr><td>OUTPUT_INVALID／REPORT_INCOMPLETE</td><td>返回已收到，但结构／必要目标缺项</td><td>保留安全响应与用量；有限局部纠正，不重做有效分支</td></tr>
+<tr><td>BUDGET_EXHAUSTED／CANCELLED</td><td>没有可用预算或任务取消</td><td>停新请求；交付已有结果和明确未完项，不造完成</td></tr>
+</table></div>
+<p>同一个handler由原子工具与组合flow共同调用。示例：get_metric_panel和build_module_panel遇相同cohort错误必须同code、同commit_state，不能一个抛异常另一个“自动修好”。</p>
+<h2>3 原子工具的精确计划</h2>
+<p>所有工具输入中的Ref必须完整版本化；范围默认为可信scope内，不能默认为全店历史。每次读取都有limit／continuation与覆盖说明。下面秒数为初始本地执行超时配置，待性能验收调整，不是实测速度保证。</p>
+<div class="table"><table>
+<tr><th>ID／工具</th><th>参数与结果（拟议签名）</th><th>内部动作与权限</th><th>超时／缓存／失败</th></tr>
+<tr><td>K00 set_review_task_assessment</td><td>(mode, scope_refs, required_deliverables, refresh_mode, required_calculations, public_interpretation)→GoalRef</td><td>仅主；从已保存raw_request提出任务解释，服务核不扩大权限、不降低原必要要求后冻结Goal；API已明确可直接跳过此工具</td><td>analysis_local；5s；同assessment hash幂等；有实质歧义走K12，不为识别任务多调一个路由模型</td></tr>
+<tr><td>K01 read_archive_manifest</td><td>(archive_ref, view=&#x27;capabilities&#x27;)→ManifestView</td><td>解析固定归档，带数据来源、覆盖／缺口、实际发布、报表粒度、已存在成果索引</td><td>read_business；5s；同ref缓存；无归档不悄选latest</td></tr>
+<tr><td>K02 get_metric_panel</td><td>(archive_ref, metric_ids[], dimensions, as_of, policy_ref?)→MetricPanel</td><td>核资格及Goal重算义务，查缓存或创建唯一计算job；一次返回值、分母、cohort、缺项、分数引用、CalculationReceipt和drilldown</td><td>analysis_local；工具10s，响应预算8s，预计超预算立即登记job；deadline前返回waiting，不等30s才转异步；模型不自旋</td></tr>
+<tr><td>K03 query_evidence</td><td>(archive_ref, time_range?, product_refs?, tags?, query?, limit≤100, cursor?)→EvidenceIndex</td><td>SQLite索引／FTS、明确过滤，返回原件ID、有限片段、精度、商品归属及反例数量</td><td>read_business；5s；固定查询身份；不返回客户订单隐私字段</td></tr>
+<tr><td>K04 read_evidence</td><td>(source_refs[], view, max_units, cursor?)→EvidenceBatch</td><td>精确回读，逐件full／partial／not_delivered；记录实际交付hash和reader</td><td>read_business；5s；不按静默字符串截断假装全文已读；量超限列遗漏项</td></tr>
+<tr><td>K05 read_content_snapshot</td><td>(publication_ref或script_ref, module_refs?, include_facts=true, view=&#x27;selected&#x27;)→ContentBatch</td><td>用真实已采用稿件读所选模块和对应商品事实／本场要求；原稿标签native／derived分开</td><td>read_business；5s；带总项数与下一页；正文与spoken_text相同只交付一份并保留同义说明</td></tr>
+<tr><td>K06 read_playback_span</td><td>(archive_ref, occurrence_ids?或time_range, include_sentences=true)→PlaybackSpan</td><td>真实attempt／segment、暂停／跳播／长短开场、时钟和取声证据；需要时展开句子</td><td>read_business；5s；缺ended不补造时长；不输出排期当实播</td></tr>
+<tr><td>K07 read_review_history</td><td>(same_merchant_product_scope, compatible_filters, before, limit≤20)→HistoryIndex</td><td>只读受权历史指标／报告索引，保留不相容原因；不把摘要当正式数值</td><td>read_business；5s；当前场排除；不能借读历史扩大写权限</td></tr>
+<tr><td>K08 compare_occurrences</td><td>(metric_spec, target_refs[], baseline_spec, comparison_profile)→ComparisonResult</td><td>核对象／定义／价格／流量／成熟度、样本单位；程序算差异、可选区间；输出不匹配及假设</td><td>analysis_local；工具15s、响应预算13s，超预算前交唯一job＋WaitReceipt；不能自动用所有每秒行作独立样本</td></tr>
+<tr><td>K09 classify_comment_batch</td><td>(evidence_batch_ref, label_policy_ref, product_context_ref, budget_limit)→ClassificationArtifact</td><td>先去消息重复、保留未知用户／商品歧义，再一次模型批分类；每标签有原文ID和版本</td><td>analysis_local；共享模型attempt预算；不每条评论调用模型；安全响应先存再验；部分覆盖不得当全量密度</td></tr>
+<tr><td>K10 submit_review_draft</td><td>(goal_ref, archive_ref, findings[], recommendations[], content_assessments:ContentAssessmentInput[], scorecard_refs[], limitations[], public_summary)→DraftReceipt</td><td>主可一次提交四项typed审核；persist_content_assessments核证据并保存，程序score_content返回真实score refs；再存草稿和依据</td><td>analysis_local；10s；request hash稳定；无评论也可审核已播稿；错字段局部纠正，不另起强制审稿模型</td></tr>
+<tr><td>K11 finish_review</td><td>(goal_ref, draft_ref或answer_ref, outcome, public_summary, expected_run_generation)→DeliveryReceipt</td><td>唯一终态服务核原目标与正式证据；正式提交或说明部分；合法后直接结束SDK本轮，不再请求模型写结束语</td><td>analysis_local；10s；幂等；actual refs绑定delivery；unknown／缺稿／缺目标不能成功收尾</td></tr>
+<tr><td>K12 request_review_input</td><td>(question_kind, missing_ids[], question, choices[], related_refs[])→DecisionRef</td><td>保存本次必要缺项问题，转WAITING_INPUT； UI显示清楚影响，已有结果可保留</td><td>analysis_local；5s；同缺项去重；不重新询问用户已确认可手动导出这一事实</td></tr>
+<tr><td>K13 submit_subreview_result</td><td>(delegation_id, archive_ref, findings[], metric／evidence_refs[], content_assessments:ContentAssessmentInput[], unknowns[])→SubReviewReceipt</td><td>仅内容／经营子图；内容子走与K10同一persist_content_assessments服务并返assessment／score refs，经营子只可传空数组；核Goal后提交独立产物</td><td>analysis_local；10s；同delegation重复回原结果；不能提交主报告或把主state覆盖回去</td></tr>
+</table></div>
+<p>K00–K12给主Agent，其中K09含成本模型工作，必须经同provider账本；内容子Agent仅K01、K03–K06、K09、K13；经营子Agent仅K01–K04、K06–K08、K13。分类从content子内调用不允许再无限递归委派。各角色另有本节SDK_TOOL_POLICY允许的工具，宿主shell／任意SQL／HTTP不开放。</p>
+<p>K00不是固定首步骤。API已冻结Goal时可直接任意调查；自由对话的provisional Goal允许先用K01／只读证据了解对象，尚未冻结时成本模型分类、正式计算和交付返回TASK_ASSESSMENT_REQUIRED＋K00精确入参说明。F01可携带同一typed task_assessment并复用K00服务一次冻结再组上下文，所以不强迫多一轮。新目标改变必须显式新修订；普通重新读证据不改变Goal。</p>
+<p>ContentAssessmentInput含subject／原文／事实／本场／政策refs、四个明确criterion_id、rating=0或0.5或1或null、各项公开reason／证据和critical_findings。模型给判断，程序只做一次必要结构／引用／枚举检查和公式计算；不让模型自填最后总分。报告可引用已存assessment；要求reanalyse_content时须本次新判断及对应attempt_ref，不得贴旧ref完成。完整四项标准见07；本机制不生成或改写直播话术。</p>
+<h2>4 五个可选工具流的内部步骤</h2>
+<h3>F01 prepare_review_context</h3>
+<p>签名：<code>(goal_ref, focus?, evidence_budget?, task_assessment?)→ReviewWorkset</code>。既有scope已有原目标／归档；provisional Goal若带assessment先走K00同服务冻结；没有必须的数据返回needs_input，不自造绑定。</p>
+<div class="table"><table>
+<tr><th>步</th><th>执行动作</th><th>输出与缓存</th></tr>
+<tr><td>1</td><td>读目标、固定归档、版本与授权；核是否取消</td><td>authoritative goal／scope，不复制历史任务全文</td></tr>
+<tr><td>2</td><td>读场次能力、gap与实际稿件／商品清单</td><td>capability summary、origin和时间精度</td></tr>
+<tr><td>3</td><td>读当前已完成导入、指标、分数、草稿、专题产物索引</td><td>精确refs和状态，一次到位；不能靠“最新作业”漏掉另一个任务</td></tr>
+<tr><td>4</td><td>按focus和预算取首屏关键事实／所需正文，完整项优先</td><td>delivered／not_delivered清单，精确next_reads；不声明未读内容已审核</td></tr>
+<tr><td>5</td><td>保存workset hash、读取覆盖与使用的实际依赖</td><td>可重复复用；除显式task_assessment冻结外不改变Goal或业务事实</td></tr>
+</table></div>
+<p>该flow不自动派子Agent、不强制全文扫描、不默认重跑全部指标。它解决的是“已知事实和结果在哪里”，不是替模型决定下一步调查什么。</p>
+<h3>F02 build_product_panel</h3>
+<p>签名：<code>(archive_ref, product_ref, metric_profile, include_content=false)→ProductPanel</code>。</p>
+<ol>
+<li>核产品在本场真实快照／授权映射中；区分当前商品库新修订和本场当时版本。</li>
+<li>获取相应官方汇总或订单cohort，映射完整性、币种、订单粒度和as_of同时交付。</li>
+<li>只算该profile所需指标与评分；命中合法缓存即复用，origin明示。</li>
+<li>联合实际出现次数、时长、价格／投流／库存场记以及已分类顾虑；没有分类结果不制造“0疑问”。</li>
+<li>一次返回面板、缺项、原稿／原行／主题展开reader，可选交付本次完整需读正文。读到商品B作背景不能让主Agent把B列为用户要求的修改对象。</li>
+</ol>
+<h3>F03 build_module_panel</h3>
+<p>签名：<code>(archive_ref, product_ref, module_keys[], opening_mode?, window_profile, content_budget)→ModulePanel</code>。</p>
+<ol>
+<li>从真实队列和PlaybackSegment选择发生次数；native模块与derived标签分列，长短开场分开。</li>
+<li>计算已确认媒体播放的区间并集、定位覆盖与平台／事件时钟误差；资格不足即保留事实不评分。</li>
+<li>用固定主窗计算纯关联与mixed；无去重明细时跨分钟UV只逐桶展示。</li>
+<li>按确定性profile取响应指标；评论密度要求选定范围内完整分类及核准在线分母，代表评论仅作解释，不能替代完整计数。</li>
+<li>读取／复用按所有实际依赖冻结的ContentAssessment；没有时返回pending_assessment_requirements和精确原文reader。主可在K10／F05直接提交判断，或选择内容专题在K13提交；K09仍只分类评论，F03不暗调固定审稿模型。</li>
+<li>返回四项内容分、可用响应相对分、样本／缺项、关键原句和证据索引；不把内容87.5与经营48平均成“总体不错”。</li>
+</ol>
+<h3>F04 compare_compatible_history</h3>
+<p>签名：<code>(target_metric_refs[], comparison_spec, policy_ref)→BaselineAndComparison</code>。</p>
+<ol>
+<li>冻结历史可见截止，排除当前场；按同商家／商品／定义／来源／成熟度筛选。</li>
+<li>报价差、付费流量、时段、开场的已知条件按政策核对；未知重要条件显示不可比，不为凑数量混入。</li>
+<li>整场至少5场、模块专项至少10次且3场；不足返回facts_only，不报无限提升。</li>
+<li>保存中位数和全部入选／排除ref，正反向与比例上限显式映射；可比性与统计不确定性分别输出。</li>
+<li>如选择统计比较，先核抽样／聚类单位再算；不能因为存在统计库就默认每分钟独立。多版本结果标探索，不自动改播前。</li>
+</ol>
+<h3>F05 package_review_delivery</h3>
+<p>签名：<code>(goal_ref, draft_content:DraftInput或draft_ref:ReviewRef（二选一）, scorecard_refs, expected_run_generation)→DeliveryReceipt</code>。DraftInput含K10同一content_assessments[]。</p>
+<ol>
+<li>调用与K10相同的draft服务存内容；安全响应已在模型返回处归档，不在本flow重新调模型。</li>
+<li>执行与K11相同的原Goal／数据资格／数字／引用／版本检查，局部失败返回准确missing和可续办reader。</li>
+<li>目标满足则提交正式报告和delivery_ref，同事务更新run终态和进度；用户要求全经营但缺表时只能partial／needs_data，不能偷改Goal为互动成功。</li>
+<li>返回实际ref、公共完整交付说明和应用终态，由02的before_model持久回执门结束；不使用return_direct，不再单独调用finish_turn写一轮计划结束。</li>
+<li>若请求只是回答某问题／重算某分，按对应Goal类型提交AnswerArtifact／Scorecard，不强迫生成整本报告。底层终态仍只由同一个finish服务判断。</li>
+</ol>
+<p>同一flow可被模型任意选用或跳过。flow不隐含“下一flow必跑”；数据依赖只决定某个工具是否具备资格。</p>
+<h2>5 指标注册从草案收口为一个目录</h2>
+<div class="table"><table>
+<tr><th>工程metric_id</th><th>原设计对应／类型</th><th>主要资格</th><th>结果保存</th></tr>
+<tr><td>observed_time_ratio／confirmed_play_seconds</td><td>原23项覆盖／媒体播放</td><td>本场边界、journal、clock</td><td>MetricResult＋区间引用</td></tr>
+<tr><td>observed_member_messages／like_messages／verified_like_increments</td><td>原公开事件项</td><td>同场／去重，点赞语义核验</td><td>原消息量与业务数值不同unit</td></tr>
+<tr><td>online_time_weighted_mean／observed_online_person_minutes</td><td>原在线候选项</td><td>verified在线字段、有限间隔积分</td><td>分母范围与未覆盖秒数</td></tr>
+<tr><td>relevant_question_count／intent_observed_users</td><td>原评论项</td><td>标签版本、原件／用户键、商品归属</td><td>不混同消息、主题组和用户数</td></tr>
+<tr><td>questions_per_100_observed_person_minutes</td><td>原23项中的问题密度，仅诊断</td><td>同窗口完整问题分类及核准人分钟；不是主题组密度</td><td>不新增该项评分，与C01语义分别保存</td></tr>
+<tr><td>intent_theme_density</td><td>新C01，单位groups_per_100_person_minutes</td><td>完整选定窗口评论分类＋同窗核准在线分母</td><td>主题组、用户数、密度分别保留</td></tr>
+<tr><td>confusion_theme_density／necessary_question_coverage</td><td>新C02／C03</td><td>主题证据／选中必要主题／已播原句</td><td>不因零问题给高效果分</td></tr>
+<tr><td>official_30s_retention</td><td>新C04</td><td>完整同进入队列或同定义官方指标</td><td>目前本地插件不可算；null原因</td></tr>
+<tr><td>official_average_watch_seconds</td><td>原官方观看时长</td><td>同场授权定义</td><td>不能拆成开场专属值</td></tr>
+<tr><td>product_click_uv_rate／viewer_to_buyer_rate／clicker_to_buyer_rate</td><td>原B04–B06</td><td>官方定义或合法嵌套队列；跨桶去重</td><td>比率＋分子分母＋适用区间</td></tr>
+<tr><td>created_cohort_payment_rate／paid_order_count</td><td>原订单项</td><td>同创建队列、grain、as_of</td><td>不以本分钟付款／新建求率</td></tr>
+<tr><td>created_orders_per_observed_person_minute</td><td>原活动模块响应政策的工程算子，非新增评分权重</td><td>同本场同窗真实创建时间、去重订单grain、已核在线人分钟</td><td>count／M；仅整场汇总或在线未核时null，不与创建队列支付率混名</td></tr>
+<tr><td>paid_amount_minor／successful_refund_minor／refund_amount_rate／net_paid_asof_minor</td><td>原金额／B01、B08</td><td>同支付P、币种／运费／折扣、退款成功</td><td>integer minor和cohort／as_of</td></tr>
+<tr><td>paid_amount_per_live_hour／net_amount_per_live_hour／paid_per_1000_viewers</td><td>原效率项／B02</td><td>整场或匹配窗口、同定义UV</td><td>采集故障不缩收入对应时长</td></tr>
+<tr><td>net_per_1000_viewers</td><td>新B03，区别原paid_per_1000_viewers</td><td>同场净额、UV、退款龄期</td><td>不把实付与净额混名</td></tr>
+<tr><td>first_identification_seconds／module_duration_seconds</td><td>新T01</td><td>实际播放与原句定位</td><td>内容节奏，不套越短越好</td></tr>
+<tr><td>playback_record_coverage／content_binding_coverage／time_association_coverage</td><td>新Q02–Q04</td><td>同目标区间和可核证据</td><td>额外资格门不能用其他高分抵消</td></tr>
+</table></div>
+<p>表中一行多ID只是并列定义，不表示合成一个统计函数。实施时每个ID有独立spec、unit、允许dimension、data requirement、计算函数和反例fixture；可以批处理共用一次底层扫描，但不可只因同名字段共用不同语义公式。</p>
+<h2>6 模型任务与有限停止</h2>
+<p>系统提示词只定义目标、数据不可信边界、工具选择原则、禁止写入、证据引用和完成方式；不塞整张统计教程、所有历史问题和全量表格。Skill承担详细方法，正式索引承担当前事实，工具承担机械执行。</p>
+<p>正常调查可追加新的问题和工具调用，重复读取本身不一刀切禁止；同tool＋参数hash＋相同依赖版本且没有新增证据时，第一次提醒已有结果与reader，连续再次无进展返回no_new_information并建议缩小范围／结束有限结果。模型给出“要读另一个view／核关键反例”就允许，不用固定路线替它规划。</p>
+<p>异步导入／重算未完成时保存真实job＋WaitReceipt，02控制门停止本次图invocation，应用保留WAITING_JOB；协调器从持久Inbox取job完成事件后，用有界ResumeObservation续办，不以graph返回推断目标完成。JobStatus=QUEUED／RUNNING／SUCCEEDED／PARTIAL／FAILED／UNKNOWN／CANCELLED，DTO含job_ref、operation_key、scope、input_hash、result_refs、error、attempts、generation和时间。GET /review/v1/jobs/{id}给UI／恢复协调器；K01的jobs视图可供模型针对性核查，但正常等待不轮询。各flow使用同一submit_or_join_job，重复请求不启动第二份计算。用户新消息、取消和数据修订都产生独立可恢复事件，不能把旧run静默继续到新archive。</p></article></main></body></html>

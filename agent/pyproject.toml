@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "shengbo-prelive-agent"
+version = "0.1.0"
+description = "声播播前 Deep Agents Harness and shared wire contracts"
+requires-python = ">=3.12"
+dependencies = ["pydantic>=2.10,<3"]
+
+[project.optional-dependencies]
+runtime = [
+  "deepagents==0.7.25", "langchain==1.4.6", "langchain-core==1.6.10",
+  "langgraph==1.2.15", "langgraph-checkpoint-sqlite==3.1.2",
+  "httpx==0.28.1", "fastapi==0.142.2", "uvicorn==0.54.0",
+  "python-multipart==0.0.32", "PyJWT==2.15.1", "cryptography==50.0.2",
+  "pypdf==6.20.1", "python-docx==1.2.0", "Pillow==12.3.0", "ddgs==9.16.0",
+  "liteparse==2.16.0", "openpyxl==3.1.5", "striprtf==0.0.33",
+  "rapidocr==3.10.0", "onnxruntime==1.31.0", "pywin32==312; sys_platform == 'win32'",
+]
+test = ["pytest==9.1.1", "pytest-asyncio==1.4.0", "opencc-python-reimplemented==0.1.7"]
+
+[project.scripts]
+shengbo-prelive = "shengbo_prelive.__main__:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+

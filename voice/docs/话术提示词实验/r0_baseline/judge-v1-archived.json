@@ -1,0 +1,73 @@
+{
+  "versions": [
+    {
+      "index": 1,
+      "scores": {
+        "natural_live_speech": 9,
+        "benefit_scene_expansion": 5,
+        "coherent_flow": 5,
+        "non_repetition": 4,
+        "purchase_guidance": 3
+      },
+      "score_reasons": [
+        "natural_live_speech: 开场比第一版自然一些，如“如果你也在意浴室、厨房久站的脚感，先别划走”，但后段仍大量字段式播报，例如“风格是居家休闲、高级简约、夏日轻便、旅行便携”“颜色有粉色、红色、绿色……”，不够像真人直播。",
+        "benefit_scene_expansion: 卖点基本是资料复述，具体情境和收益有限，例如“厚底带来软弹缓震体验，久站时能缓解足部压力”缺少具体生活场景和限度说明；整体有效展开卖点少于4个。",
+        "coherent_flow: 结构较平，痛点、身份、规格、价格收口都有但像清单排列，例如材质、颜色、尺码、价格逐项念出，缺少自然承接。",
+        "non_repetition: 有重复和空话成分，例如“颜色有粉色、红色、绿色……”直接罗列，和第一版素材高度重合，表达缺少变化。",
+        "purchase_guidance: 提到原价一百七十八新台币、活动价一百零七新台币，并说“活动状态和条件以页面说明为准”，但选择引导和优惠条件仍不具体。"
+      ],
+      "unsupported_claims": [],
+      "price_and_terms_correct": true,
+      "knowledge_leaks": [
+        "直接播出 knowledge 中关于新鞋气味、避免阳光曝晒与高温、颜色以实物为准、券规则待确认等内容，例如“新鞋气味可以通风阴干”“平时避免阳光曝晒与高温”。"
+      ],
+      "main_gaps": [
+        "卖点展开不足，材料、功能、场景多为一行带过，没有形成具体情境下的有限度生活收益。",
+        "口播像规格说明书，颜色、尺码、适用人群逐项罗列，直播聆听体验偏弱。",
+        "促销信息没有结合真实优惠条件自然引导，选择建议较弱。"
+      ]
+    },
+    {
+      "index": 2,
+      "scores": {
+        "natural_live_speech": 8,
+        "benefit_scene_expansion": 6,
+        "coherent_flow": 4,
+        "non_repetition": 3,
+        "purchase_guidance": 3
+      },
+      "score_reasons": [
+        "natural_live_speech: 部分句子像产品说明或字段播报，例如“它的完整名称是足弓支撑静音防滑厚底凉拖鞋，小蛮腰女款”“风格走居家休闲、高级简约、夏日轻便和旅行便携”，消费者能听懂但不够像直播口语。",
+        "benefit_scene_expansion: 多数卖点只停留在特点或一句场景，没有把核心特点→具体情境→有限度生活收益充分展开，例如“鞋底有静音特性，在家里走动可以减少打扰家人”只是单一收益，未形成有效生活展开；至少4个卖点有有效展开才可17分以上，这版明显不足。",
+        "coherent_flow: 有按痛点、身份、规格、价格收口的大致顺序，但中间像逐项贴标签，转折也偏机械，例如从材质、颜色、尺码、价格逐段播报，连贯感一般。",
+        "non_repetition: 反复出现字段式枚举和相似句式，例如多处“它还有”“同时”“另外”，信息密度低，存在凑字感。",
+        "purchase_guidance: 有提到原价一百七十八新台币、活动价一百零七新台币及优惠条件以页面显示为准，但没有明确真实优惠条件适用方式，选择引导较弱。"
+      ],
+      "unsupported_claims": [],
+      "price_and_terms_correct": true,
+      "knowledge_leaks": [
+        "常态备货、配送时间、券规则、新鞋气味处理、避免阳光曝晒与高温、颜色以实物为准等 knowledge 内容被直接口播，例如“新鞋刚拿到如果有气味，可以放在通风处阴干”“日常存放要避免阳光曝晒与高温”“券的具体规则待确认”。"
+      ],
+      "main_gaps": [
+        "卖点展开偏浅，足弓支撑、静音防滑、厚底软弹等多是特点罗列，缺少具体情境和有限度收益。",
+        "口播偏说明书，字段式列举颜色、尺码、材质，直播自然感不足。",
+        "优惠条件只引用“以页面显示为准”，没有把原价、活动价和促销规则整合成自然的购买决策引导。"
+      ]
+    }
+  ],
+  "pair_diversity": {
+    "score": 2,
+    "reason": "两版都换了个开场，但正文结构和逐点模板高度相似，均按材质、足弓支撑、静音防滑、颜色尺码、价格收口顺序推进，卖点展开方式和节奏没有明显差异，因此属于换开场但同样逐点模板。"
+  },
+  "judge_model": "deepseek-flash",
+  "usage": {
+    "prompt_tokens": 4202,
+    "completion_tokens": 1173,
+    "total_tokens": 5375,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    },
+    "prompt_cache_hit_tokens": 0,
+    "prompt_cache_miss_tokens": 4202
+  }
+}

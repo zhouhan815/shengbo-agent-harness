@@ -1,0 +1,123 @@
+{
+  "date": "2026-10-15",
+  "repo": "langchain-ai/langchain-skills",
+  "ref": "16a992f09ab3ccfb642dd4f08d350d833d1990bf",
+  "existing": [
+    {
+      "name": "deep-agents-core",
+      "repo_path": "config/skills/deep-agents-core",
+      "installed": [
+        "C:\\Users\\lizhe\\.agents\\skills\\deep-agents-core"
+      ]
+    }
+  ],
+  "missing": [
+    {
+      "name": "deep-agents-memory",
+      "repo_path": "config/skills/deep-agents-memory",
+      "installed": []
+    },
+    {
+      "name": "deep-agents-orchestration",
+      "repo_path": "config/skills/deep-agents-orchestration",
+      "installed": []
+    },
+    {
+      "name": "deepagents-python-quickstart",
+      "repo_path": "config/skills/deepagents-python-quickstart",
+      "installed": []
+    },
+    {
+      "name": "deepagents-typescript-quickstart",
+      "repo_path": "config/skills/deepagents-typescript-quickstart",
+      "installed": []
+    },
+    {
+      "name": "ecosystem-primer",
+      "repo_path": "config/skills/ecosystem-primer",
+      "installed": []
+    },
+    {
+      "name": "eval-engineering",
+      "repo_path": "config/skills/eval-engineering",
+      "installed": []
+    },
+    {
+      "name": "langchain-dependencies",
+      "repo_path": "config/skills/langchain-dependencies",
+      "installed": []
+    },
+    {
+      "name": "langchain-fundamentals",
+      "repo_path": "config/skills/langchain-fundamentals",
+      "installed": []
+    },
+    {
+      "name": "langchain-middleware",
+      "repo_path": "config/skills/langchain-middleware",
+      "installed": []
+    },
+    {
+      "name": "langchain-python-quickstart",
+      "repo_path": "config/skills/langchain-python-quickstart",
+      "installed": []
+    },
+    {
+      "name": "langchain-rag",
+      "repo_path": "config/skills/langchain-rag",
+      "installed": []
+    },
+    {
+      "name": "langchain-typescript-quickstart",
+      "repo_path": "config/skills/langchain-typescript-quickstart",
+      "installed": []
+    },
+    {
+      "name": "langgraph-cli",
+      "repo_path": "config/skills/langgraph-cli",
+      "installed": []
+    },
+    {
+      "name": "langgraph-decision-models",
+      "repo_path": "config/skills/langgraph-decision-models",
+      "installed": []
+    },
+    {
+      "name": "langgraph-fundamentals",
+      "repo_path": "config/skills/langgraph-fundamentals",
+      "installed": []
+    },
+    {
+      "name": "langgraph-human-in-the-loop",
+      "repo_path": "config/skills/langgraph-human-in-the-loop",
+      "installed": []
+    },
+    {
+      "name": "langgraph-persistence",
+      "repo_path": "config/skills/langgraph-persistence",
+      "installed": []
+    },
+    {
+      "name": "langgraph-python-quickstart",
+      "repo_path": "config/skills/langgraph-python-quickstart",
+      "installed": []
+    },
+    {
+      "name": "langgraph-typescript-quickstart",
+      "repo_path": "config/skills/langgraph-typescript-quickstart",
+      "installed": []
+    },
+    {
+      "name": "managed-deep-agents",
+      "repo_path": "config/skills/managed-deep-agents",
+      "installed": []
+    },
+    {
+      "name": "swarm",
+      "repo_path": "config/skills/swarm",
+      "installed": []
+    }
+  ],
+  "all_count": 22,
+  "scope": "Official complete skills bundle; retained installed copies and install missing entries only"
+}

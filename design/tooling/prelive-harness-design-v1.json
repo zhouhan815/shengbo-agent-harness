@@ -1,0 +1,282 @@
+{
+  "contract_version": "PRELIVE-HARNESS-1.0",
+  "mode": "design_only",
+  "business_baseline": "10_播前Agent首期流程基线.md",
+  "framework": {
+    "name": "Deep Agents",
+    "deepagents": "0.7.25",
+    "langchain": "1.4.6",
+    "langgraph": "1.2.15"
+  },
+  "main_agent": "prelive-coordinator",
+  "optional_workers": [
+    "catalog-analyst",
+    "session-analyst",
+    "audience-researcher"
+  ],
+  "control": "goal_directed_native_loop_with_callable_local_workflows_and_service_guards",
+  "business_steps": [
+    "1",
+    "2A",
+    "2B",
+    "3",
+    "4A",
+    "4B",
+    "5",
+    "6",
+    "7",
+    "8"
+  ],
+  "logical_tools": [
+    "read_capabilities",
+    "read_business_schema",
+    "ingest_material",
+    "read_source",
+    "read_preparation",
+    "search_catalog",
+    "read_product",
+    "read_room",
+    "create_room",
+    "read_voice_options",
+    "save_branch_artifact",
+    "validate_product_candidate",
+    "validate_session_draft",
+    "price_preview",
+    "save_product",
+    "save_session_draft",
+    "publish_session_config",
+    "search_web",
+    "fetch_web_source",
+    "read_script",
+    "read_script_usage",
+    "build_context_bundle",
+    "read_context",
+    "save_script_change_plan",
+    "execute_script_plan",
+    "compile_playback_plan",
+    "save_playback_plan",
+    "inspect_required_audio",
+    "submit_required_audio",
+    "read_job",
+    "cancel_job",
+    "record_user_decision",
+    "request_user_decision",
+    "evaluate_preparation",
+    "build_review_packet",
+    "accept_review_snapshot"
+  ],
+  "runtime_probes": [
+    "G0-01",
+    "G0-02",
+    "G0-03",
+    "G0-04",
+    "G0-05",
+    "G0-06",
+    "G0-07",
+    "G0-08",
+    "G0-09",
+    "G0-10"
+  ],
+  "runtime_acceptance_cases": [
+    "H01",
+    "H02",
+    "H03",
+    "H04",
+    "H05",
+    "H06",
+    "H07",
+    "H08",
+    "H09",
+    "H10",
+    "H11",
+    "H12",
+    "H13",
+    "H14",
+    "H15",
+    "H16",
+    "H17",
+    "H18",
+    "H19",
+    "H20",
+    "H21",
+    "H22",
+    "H23",
+    "H24",
+    "H25",
+    "H26",
+    "H27",
+    "H28",
+    "H29",
+    "H30",
+    "H31",
+    "H32",
+    "H33",
+    "H34",
+    "H35",
+    "H36"
+  ],
+  "runtime_tests_executed": false,
+  "requirement_coverage": [
+    {
+      "id": "B01",
+      "requirement": "统一商品源及本场覆盖",
+      "case_refs": [
+        "H02",
+        "H07",
+        "H11",
+        "H17"
+      ],
+      "status": "specified_not_runtime_verified"
+    },
+    {
+      "id": "B02",
+      "requirement": "4A全字段与正式回读",
+      "case_refs": [
+        "H01",
+        "H04",
+        "H11"
+      ],
+      "status": "specified_not_runtime_verified"
+    },
+    {
+      "id": "B03",
+      "requirement": "研究与事实分离、最低输入并行",
+      "case_refs": [
+        "H05",
+        "H06",
+        "H10"
+      ],
+      "status": "specified_not_runtime_verified"
+    },
+    {
+      "id": "B04",
+      "requirement": "4B完整上下文与模块行动",
+      "case_refs": [
+        "H08",
+        "H11",
+        "H12"
+      ],
+      "status": "specified_not_runtime_verified"
+    },
+    {
+      "id": "B05",
+      "requirement": "自动更新和用户决定边界",
+      "case_refs": [
+        "H02",
+        "H03",
+        "H12",
+        "H15",
+        "H28"
+      ],
+      "status": "specified_not_runtime_verified"
+    },
+    {
+      "id": "B06",
+      "requirement": "选品版本顺序优惠由用户决定",
+      "case_refs": [
+        "H16",
+        "H19",
+        "H35"
+      ],
+      "status": "specified_not_runtime_verified"
+    },
+    {
+      "id": "B07",
+      "requirement": "局部模块更新与主体使用年龄",
+      "case_refs": [
+        "H12",
+        "H14",
+        "H15"
+      ],
+      "status": "specified_not_runtime_verified"
+    },
+    {
+      "id": "B08",
+      "requirement": "1/6/11出现项及跨圈模式",
+      "case_refs": [
+        "H19",
+        "H20",
+        "H21",
+        "H22"
+      ],
+      "status": "specified_not_runtime_verified"
+    },
+    {
+      "id": "B09",
+      "requirement": "所需音频、缓存及修订绑定",
+      "case_refs": [
+        "H13",
+        "H22",
+        "H23",
+        "H24",
+        "H34"
+      ],
+      "status": "specified_not_runtime_verified"
+    },
+    {
+      "id": "B10",
+      "requirement": "并行隔离、恢复、取消及预算",
+      "case_refs": [
+        "H05",
+        "H09",
+        "H24",
+        "H25",
+        "H27",
+        "H28",
+        "H29",
+        "H30",
+        "H31"
+      ],
+      "status": "specified_not_runtime_verified"
+    },
+    {
+      "id": "B11",
+      "requirement": "声播正式发布、整包检查与用户启动",
+      "case_refs": [
+        "H11",
+        "H17",
+        "H18",
+        "H26",
+        "H32",
+        "H33",
+        "H36"
+      ],
+      "status": "specified_not_runtime_verified"
+    },
+    {
+      "id": "B12",
+      "requirement": "首期范围与不虚报业务收益",
+      "case_refs": [
+        "H06",
+        "H16",
+        "H35",
+        "H36"
+      ],
+      "status": "specified_not_runtime_verified"
+    }
+  ],
+  "documents": [
+    {
+      "path": "13_播前Agent_Harness总体设计.md",
+      "sha256": "c88de4478c6a1163c87c319040f6c7b0421c6e45edb2b2fbf3987d561aa675a3",
+      "bytes": 42863
+    },
+    {
+      "path": "14_逐步执行与工具数据契约.md",
+      "sha256": "e5bc6979c31e30812d654271d1f59f808e40ab8eee666282b197c0dc1d7e39a3",
+      "bytes": 44413
+    },
+    {
+      "path": "15_LearnClaudeCode对照与验收实施计划.md",
+      "sha256": "d4042f872e30ba3b3326cf124f37035eb5c87200a2f89712c5610ac5b712c53d",
+      "bytes": 27860
+    }
+  ],
+  "pending": [
+    "manual_skip_policy",
+    "real_deepseek_capability_probes",
+    "durable_sqlite_dependency_and_lifespan",
+    "search_provider_credentials_and_channel_probes",
+    "business_backend_and_ui_implementation"
+  ]
+}

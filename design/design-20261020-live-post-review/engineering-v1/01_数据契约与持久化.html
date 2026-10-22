@@ -1,0 +1,137 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>01_数据契约与持久化</title><style>
+:root{--ink:#24304a;--muted:#626e80;--line:#dbe0e7;--blue:#475ed7;--paper:#fff;--bg:#f5f5f1}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.85 'Segoe UI','Microsoft YaHei',sans-serif}
+nav{position:fixed;left:0;top:0;bottom:0;width:266px;padding:28px 20px;background:#eeefe9;border-right:1px solid var(--line);overflow:auto}
+nav b{display:block;font-size:21px;margin-bottom:12px}nav small{display:block;color:var(--muted);line-height:1.65;margin-bottom:20px}
+nav a{display:block;color:#35426b;text-decoration:none;padding:10px 8px;border-radius:8px;font-size:14px;line-height:1.6}nav a:hover{background:#fff}
+main{margin:28px 28px 80px 294px;max-width:1600px}.hero,article{background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:28px 32px;margin-bottom:26px}
+.hero{border-top:5px solid var(--blue)}.badge{color:#52609c;font-size:13px;letter-spacing:.08em}.note{padding:14px 18px;background:#f1f4ff;border-left:4px solid #6b7ae0;border-radius:6px}
+h1{font-size:30px;line-height:1.45;margin:8px 0 22px}h2{font-size:23px;line-height:1.5;margin:34px 0 16px;border-bottom:1px solid #e6e9ee;padding-bottom:10px}h3{font-size:19px;line-height:1.6;margin:26px 0 12px}p{margin:13px 0}a{color:#425dc7;text-decoration:none}a:hover{text-decoration:underline}
+.table{overflow-x:auto;border:1px solid var(--line);border-radius:10px;margin:18px 0}table{width:100%;border-collapse:collapse;min-width:850px;font-size:14px;line-height:1.8}th,td{padding:13px 15px;text-align:left;vertical-align:top;border-bottom:1px solid #e1e6ed;border-right:1px solid #e1e6ed}th{background:#eef1f7;font-weight:650;position:sticky;top:0}tr:nth-child(even) td{background:#fafbf9}td:first-child{min-width:100px;font-weight:550}tr:last-child td{border-bottom:0}
+code{background:#eef1f7;padding:2px 5px;border-radius:4px;font:13px/1.7 Consolas,'Microsoft YaHei',monospace;overflow-wrap:anywhere}pre{background:#20283a;color:#f0f3f8;padding:20px;border-radius:10px;overflow:auto;font:13px/1.75 Consolas,'Microsoft YaHei',monospace}pre code{background:none;color:inherit;padding:0;white-space:pre}
+.figure{overflow:auto;background:#fafbf8;border:1px solid var(--line);border-radius:12px;padding:8px;margin:20px 0}.figure img{display:block;width:100%;min-width:1080px;height:auto}.caption{font-size:13px;color:var(--muted)}details{margin:12px 0;color:var(--muted)}summary{cursor:pointer}li{margin:7px 0}blockquote{margin:15px 0;padding:10px 18px;border-left:4px solid #adb8ce;background:#f8f9fb}
+@media(max-width:960px){nav{position:static;width:auto}nav a{display:inline-block}main{margin:15px}.hero,article{padding:20px}h1{font-size:25px}}
+@media print{nav{display:none}main{margin:0}.hero,article{border:0;padding:0}.table{overflow:visible}table{min-width:0;font-size:10px}h2{break-after:avoid}tr{break-inside:avoid}.figure img{min-width:0}article{break-before:page}}
+</style></head><body><nav><b>综合复盘 Agent</b><small>Harness工程计划<br>LIVE-REVIEW-ENG-1.0<br>设计完成 · 业务尚未实现</small><a href="播中播后综合Agent完整工程计划.html">返回完整计划</a><a href="00_总开发计划与架构.html">总开发计划与架构</a><a href="01_数据契约与持久化.html">数据契约与持久化</a><a href="02_AgentHarness与上下文中间件.html">AgentHarness与上下文中间件</a><a href="03_工具与可调用工作流.html">工具与可调用工作流</a><a href="04_API前端与播前交接.html">API前端与播前交接</a><a href="05_验收与实施任务包.html">验收与实施任务包</a><a href="06_播前迭代教训预防矩阵.html">播前迭代教训预防矩阵</a><a href="07_评价体系执行配方.html">评价体系执行配方</a></nav><main><article><h1>数据契约、归档、报表与评分持久化</h1>
+<p>工程版本LIVE-REVIEW-ENG-1.0；以下为拟实施接口。目录前缀：Agent工程的src/shengbo_live_review/；voice前缀指ecommerce-voice-agent/app/。本稿不执行迁移或业务写入。</p>
+<h2>1 先收口已有草案的格式差异</h2>
+<div class="table"><table>
+<tr><th>当前差异／事实</th><th>本次开发唯一规则</th><th>代码位置／验收</th></tr>
+<tr><td>上级基础Schema用对象ArtifactRef，评分Schema的ref仍是演示字符串</td><td>正式DTO统一ReviewRef对象；旧字符串只在演示fixture适配器解析已登记ID，不按字符串猜文件路径</td><td>shengbo_contracts/live_review.py；legacy_fixture_adapter只在verification使用；R01</td></tr>
+<tr><td>上级来源名public_platform／official_merchant_export与评分样例public_interaction／authorized_business_export不一致</td><td>统一SourceKind为public_platform、local_player、official_merchant_export、manual_note、synthetic。显式映射旧两种别名；禁止到各函数再写兼容猜测</td><td>contracts及migration适配器唯一转换；R01</td></tr>
+<tr><td>文档LIVE-REVIEW-1.1、基础草案Schema1.0、计分政策0.1职责不同</td><td>新实现的wire schema明确LIVE-REVIEW-1.1；score.policy_version独立仍LIVE-SCORE-0.1；来源voice契约仍PRELIVE-2.3</td><td>DTO导出schema后供工具、API、UI同用；既有草案保留并标superseded</td></tr>
+<tr><td>旧common.same_artifact_ref只接受PRELIVE-2.3</td><td>Review有自己的same_review_ref／resolve_ref；不能把Review引用塞进PRELIVE-only比较器</td><td>跨服务只通过feedback适配层投影和得到真实voice recap_ref；R02</td></tr>
+<tr><td>字段看似同义：人数、次数、条数、金额、订单粒度</td><td>每个字段有unit、grain、source_definition、nullable_reason，未知保持null</td><td>字段映射确认后才计算；不靠LLM给未知列起一个熟悉名字</td></tr>
+</table></div>
+<p>Ref约定：ReviewRef={kind,id,revision≥1,content_hash:&#x27;sha256:…&#x27;,schema_version:&#x27;LIVE-REVIEW-1.1&#x27;}。VoiceRef保留原PRELIVE-2.3原件；voice普通RecordRef并不总含schema_version，由VoiceRefAdapter按接口的真实DTO解析，不能往原件伪添字段。跨系统引用使用SourceRef={source_system:&#x27;review&#x27;或&#x27;voice&#x27;,ref:ReviewRef或VoiceRef}，判别与校验由source_system决定；任何Ref解析都再核account和授权对象，hash相等不代表有权限。content_hash只哈希规范化业务body，不包含自身ref／hash或展示时间戳，避免自引用无法稳定计算。</p>
+<p>统一UTC带偏移ISO发生时间和received_at；存储整数毫秒便于排序，显示Asia/Shanghai。源时间为秒／分钟就保留precision与uncertainty，不通过补零制造毫秒精度。单调时钟只在同source_instance＋boot_id内算时长，不能跨重启相减。</p>
+<p>金额全部用int minor：900元CNY存90000、currency=CNY、exponent=2；数量、父订单、SKU子单、买家UV各有独立unit。decimal解析字符串，禁止float乘100直接入账；空白、破折号、不可解析和真正0分开。</p>
+<h2>2 核心对象与不可变边界</h2>
+<div class="table"><table>
+<tr><th>DTO</th><th>必需字段</th><th>所有者与约束</th></tr>
+<tr><td>ReviewScope</td><td>account_id、conversation_id、run_id、invocation_id、role、monitor_session_id、archive_ref、grant_revision、budget_id、cancel_generation</td><td>由API／可信Runtime注入，不出现在模型可随意声明的工具参数中；子任务显式重绑定role</td></tr>
+<tr><td>GoalDefinition</td><td>raw_request_ref、mode、assessment_status、scope_refs、required_deliverables、refresh_mode、required_calculations、constraints、goal_hash、generation</td><td>原要求先保留；API明确字段可直接冻结；自由对话由K00／F01同服务提出assessment，不能悄降范围。冻结后实质改变另建Goal修订</td></tr>
+<tr><td>SessionBinding</td><td>monitor_session_id、voice_room_id、voice_session_id、platform、external_room_id、upstream_live_instance可空、binding_revision、publication_ref、start／end证据</td><td>sessions服务；同房不同场分离，绑定变更是新版本，不改旧事件归属</td></tr>
+<tr><td>IngressEnvelope</td><td>source_instance、source_seq、event_id、received_at、source_time／precision、capture_id、frozen_binding、type、raw_ref、parser_revision</td><td>接收入口立即冻结；异步writer不再读取“现在的房间session”归属过去消息</td></tr>
+<tr><td>ArchiveRevision</td><td>session_ref、revision、parent_ref、cutoff_by_source、included／excluded原件、gaps、coverage、definitions、content_snapshot_refs</td><td>sessions封存生成；不可变；迟到数据写新修订，旧报告仍引用旧归档</td></tr>
+<tr><td>PlaybackSegment</td><td>owner、epoch、attempt_id、segment_index、句子／模块／商品／稿件／发布ref、original_position、cycle_index、start／end事件、evidence_level</td><td>playback服务；确认媒体播放区间并集，暂停／缓冲切段，时间未知不补结束</td></tr>
+<tr><td>ImportPreview</td><td>blob_ref、file_hash、parser_version、sheet／row范围、header_map候选、unit／timezone／grain候选、warnings、sample_refs</td><td>import服务；预览不等于正式经营证据，歧义先确认映射</td></tr>
+<tr><td>BusinessDataset</td><td>import_ref、mapping_revision、source_definition、session_attribution、product_map、order_grain、currency、cohort／as_of、accepted／rejected rows</td><td>report_imports服务；单源版本冻结，可重新映射产生新数据集，不静默覆盖</td></tr>
+<tr><td>MetricResult</td><td>metric_id／definition_revision、archive_ref、dataset_refs、dimension、value、numerator／denominator、unit、cohort_ref、as_of、coverage、status、missing_reason、source_refs</td><td>metrics服务唯一计算；ratio分子必须属于分母；金额率与人数率不混</td></tr>
+<tr><td>BaselineSnapshot</td><td>metric_spec、筛选条件、excluded原因、history_refs、as_of／maturity、聚合规则、B值、policy_ref</td><td>scoring服务；先固定可比历史，不能本场分数计算后滚动改基线</td></tr>
+<tr><td>ContentAssessment</td><td>subject_ref、actual_text_refs、product_fact_ref、customer_brief_ref可空、session_requirements_ref、assessment_policy_ref、criteria[4]、critical_findings、dependency_hash</td><td>每项criterion_id、rating=0或0.5或1或null、reason、evidence_refs、unknown_reason；主／内容子可提交，经营子不可；不是K09评论分类结果</td></tr>
+<tr><td>CalculationReceipt</td><td>run_id、goal_hash、calculation_ref、dependency_hash、calculation_version、origin、cache_source_ref可空、started_at、completed_at</td><td>记录本run实际计算或合法复用；目标要求重算时cache_reuse不能完成该义务，旧created_at不充新执行</td></tr>
+<tr><td>ScoreResult</td><td>score_basis、metric_ref可空、assessment_ref可空、goal_ref／baseline_ref可空、policy_ref、score:float或null、raw_value及unit、status、sample_notes、source_kinds、synthetic、limitations</td><td>score是唯一分数字段，MetricResult.value是原值。target须metric＋goal；relative须metric＋baseline；content须assessment；coverage须quality refs。unavailable仍保留依据及缺失原因，不伪造依赖</td></tr>
+<tr><td>SubReviewResult</td><td>delegation_id、task_goal_hash、parent_run、archive_ref、role、findings、metric／evidence_refs、content_assessment_refs、limitations、status</td><td>子任务独立草稿，主Agent读后采用；不能升级为正式主报告</td></tr>
+<tr><td>ReviewBundle</td><td>report_ref、goal_ref、archive_ref、dataset／metric／score_refs、data_mode、business_outcome、as_of、Findings、Recommendations、limitations</td><td>报告服务；关键数值可复算、缺项可解释；模拟资料不能声明真实达标</td></tr>
+<tr><td>AdoptionDecision</td><td>decision_id、report_ref、selected_recommendation_ids、target_preparation_ref、base_versions、preview_hash、human_principal、operation_id</td><td>feedback控制器；只采纳显示过的具体快照；不得模型自报human</td></tr>
+</table></div>
+<p>所有DTO extra=forbid，导出JSON Schema作为UI和工具参数源；不能另写一套宽松dict“方便接入”。支持性字段可用明确nullable；新增枚举必须同时更新路由、恢复分支和UI，未知枚举不能当COMPLETED。</p>
+<h2>3 存储表、键与事务</h2>
+<p>复盘事实、草稿、任务和trace放独立review.sqlite3，WAL＋单writer短事务，读取走受限查询；checkpoints.sqlite3独立，不声称跨库同事务。大文件放内容寻址artifacts/，先临时写入＋fsync／原子rename，再提交元数据引用；崩溃遗留孤儿可审计清理，不将未落盘文件标可用。</p>
+<div class="table"><table>
+<tr><th>表／索引</th><th>主键／唯一约束</th><th>关键字段与事务边界</th></tr>
+<tr><td>review_sessions</td><td>PK(account_id,monitor_session_id)；同一活跃voice_session＋external room不可重复创建冲突绑定</td><td>状态、绑定版本、observed_start／end、collector lease；创建与session.created进度同事务</td></tr>
+<tr><td>source_cursors</td><td>UNIQUE(consumer_id,source_instance)</td><td>acked_seq、last_digest、gap_ref；目标归档去重写入成功后与cursor在review同事务提交</td></tr>
+<tr><td>ingress_events</td><td>delivery_key=(stable_outbox_owner,event_id)唯一；另建logical_event_key唯一索引（有可靠上游ID时）</td><td>logical key=account＋已确认平台场实例／本场binding＋原始method＋upstream_message_id，不含capture_id或boot_id；无上游ID则仅去重重发同一ingress，不能按文本误合并</td></tr>
+<tr><td>source_intervals</td><td>PK(interval_id)，索引session＋source＋start</td><td>opened／healthy／disconnected、explicit gap、原因和证据；静默不等于断连</td></tr>
+<tr><td>playback_journal_copy</td><td>UNIQUE(voice_source_instance,journal_seq)</td><td>原attempt／epoch／owner、绑定与事件正文；不按同sentence去重掉第二轮播放</td></tr>
+<tr><td>archive_revisions</td><td>UNIQUE(session_id,revision)、UNIQUE(content_hash)</td><td>截止游标、原件清单、缺口、定义与来源版本；封存短事务CAS current_generation</td></tr>
+<tr><td>import_previews／datasets／mapping_revisions</td><td>blob_hash＋reader_version＋preview参数可复用；正式dataset_id不可变</td><td>field map、单位与粒度、accepted／rejected行引用、确认记录；整份导入逻辑operation_key去重</td></tr>
+<tr><td>business_rows／order_facts／refund_facts</td><td>来源dataset＋row_locator唯一；同一dataset order粒度＋business_key唯一</td><td>一行原件可回读；订单与退款不明冲突隔离，不last-write-wins；多数据集重复只在明确优先级合并</td></tr>
+<tr><td>metric_results／baseline_snapshots／score_results</td><td>UNIQUE(cache_key)</td><td>固定输入refs／范围／定义／policy／代码版本；value=null保留reason，不能缓存为0</td></tr>
+<tr><td>content_assessments／calculation_receipts</td><td>assessment_id＋revision；receipt唯一(run_id,goal_hash,calculation_scope,dependency_hash,execution_id)</td><td>四项审核与依赖一次提交；计算／复用分别存，不用更新老产物时间冒充新生成</td></tr>
+<tr><td>analysis_jobs／run_inbox／wait_receipts</td><td>job_id；inbox event_id唯一；wait_id＋generation CAS</td><td>job结果ref／错误／尝试／租约持久化，完成事件不依赖仅内存通知；恢复可扫未消费Inbox</td></tr>
+<tr><td>review_runs／delegations／decisions</td><td>run／delegation／decision PK，run lease_generation CAS</td><td>原Goal、用户消息、scope、状态、budget、cancel；子结果只有唯一owner写入</td></tr>
+<tr><td>review_artifacts／reports</td><td>artifact_ref唯一，body_hash校验；正式report revision单调</td><td>草稿与正式报告分开；提交相同内容可replayed，不变成新报告版本</td></tr>
+<tr><td>model_attempts／usage_observations</td><td>attempt_id唯一；provider_request_id按来源去重</td><td>reserved／sent／response_observed／transport_unknown、公开usage、validation_status；有响应先记usage再校内容</td></tr>
+<tr><td>review_trace</td><td>stream_position全局自增，UNIQUE(run_id,sequence)</td><td>scope、parent_span、type、safe_payload_ref、wall／monotonic、duration；UI全局游标与run内部序号分开</td></tr>
+<tr><td>adoption_operations</td><td>UNIQUE(account_id,operation_id)、request_hash不可变</td><td>proposed→importing→imported→linking→linked／conflict／unknown；跨voice写入先登记后对账</td></tr>
+</table></div>
+<p>不为每次只读工具另建复杂外部动作账本；有成本的模型请求、异步本地作业和跨voice采纳才需要可恢复身份。普通缓存与进度也不能冒充业务完成证据。</p>
+<h2>4 采集与播放从入口走到归档</h2>
+<div class="table"><table>
+<tr><th>序号</th><th>拟议函数／接点</th><th>实际动作</th><th>失败／恢复</th></tr>
+<tr><td>I1</td><td>voice.live_review_ingress.freeze_ingress(raw, receive_clock, binding_snapshot)→FrozenIngress</td><td>在接收／ACK入口取不可变本场坐标和clock，不等排队落盘后读取当前Room</td><td>缺绑定进unassigned并保留原件，不猜上一场或下一场</td></tr>
+<tr><td>I2</td><td>existing live_source._persist扩充同DB事务outbox</td><td>标准事件入原表、去重统计、outbox一起提交；不改现有UI after=0语义</td><td>任一失败整事务回滚；不能原事件存了却outbox永失；旧未存raw不可恢复</td></tr>
+<tr><td>I3</td><td>record_source_ingress(FrozenIngress)→IngressReceipt</td><td>未知方法、system、parse_fail、connect／reconnect由同一个归档入口保存受控原件／schema与健康变化</td><td>队列满／磁盘错误必须产生可追溯gap或健康告警；不得把无法记录的时段继续算完整</td></tr>
+<tr><td>I4</td><td>record_playback_transition(FrozenPlaybackEvent)→JournalReceipt</td><td>在set_current／ack／人工控制的真实变化边界记录；播放器muted／volume、media状态和外部回听等级分列</td><td>Room当前内存状态与journal不具跨库原子性；落盘失败不能假装可完整恢复。优先保持正常播放，明确缺口</td></tr>
+<tr><td>I5</td><td>ingest.consume_page(source,cursor,end_cursor,scope)→ConsumeReceipt</td><td>读可靠增量、核身份、保存原件／归档事件、去重、再提交消费cursor</td><td>崩溃后重读同页可幂等；source seq有全局空洞时不按差值当漏了几条</td></tr>
+<tr><td>I6</td><td>sessions.seal_archive(session_id, expected_generation, drain_deadline)→ArchiveRef</td><td>取每个生产源的accepted fence及当时durable highwater；等待writer按barrier确认≤fence的入口已落盘或明确失败，再消费至durable fence并冻结manifest</td><td>不用持续增长的latest游标等到无穷；5秒为初始排空上限。超时列accepted未durable尾缺口并封partial；fence之后或迟到数据进新修订，不改旧report</td></tr>
+<tr><td>I7</td><td>sessions.revise_archive(base_ref,new_source_refs,reason)→ArchiveRef</td><td>输入新资料、迟到事件或新mapping，重算受影响窗口</td><td>已运行Review继续用旧修订，UI显示有更新；用户选重算建立新run／report</td></tr>
+</table></div>
+<p>共享采集连接由现有owner维护；Review acquire_subscription只取得引用计数租约，release只退订本消费者，不能调用全局disconnect切断仍被直播UI使用的连接。重复start相同逻辑操作返回同一租约／session，停止Review运行不等于停止监控；浏览器关页也不取消后台任务。</p>
+<p><code>acquire_subscription</code>先读active source及配置hash：同scope同配置连接直接adopt并增加Review lease；未连接才由原owner建立；已有不同配置返回SOURCE_BINDING_CONFLICT及人工选择，不能调用现有connect_source“试一下”。该函数当前会先断旧连接，直接复用它会重置原UI连接。源capture／进程boot可改变，但稳定outbox owner和已确认逻辑场次不变；同upstream事件跨capture回放只保留一条语义事件，原始投递及重复原因仍可追溯。若平台场实例未知，不跨不同monitor session猜重复。</p>
+<p>封存的producer fence是接收时已分配的单调ingress序号集合，不要求平台上游序号连续。writer barrier返回持久highwater和失败序号区间；consumer落库与cursor同事务。producer失联不能仅凭“当前没有新消息”认为尾部齐全，要记录unknown tail；停止Review订阅不停止共享生产源。封存Manifest明确included_fence、durable_fence、unresolved_ranges，不将未接收到的上游数据量臆测为精确条数。</p>
+<p>新增历史读取明确from_start／from_seq／from_time＋until_seq、ascending、page_limit。现有after=0返回最近200条的接口继续给UI；归档必须走新history入口。首次300条后启动消费者须补300或明确最早100缺口，不得静默只取尾200。</p>
+<p>播放端同一句因暂停恢复有多个segment，同一轮重复播为不同attempt。只在相同owner／epoch／attempt和boot_id里合并合法媒体播放区间；ended缺失标不完整，不把排队时间或手动暂停全算内容暴露。source=obs仍不是平台取声证据。</p>
+<h2>5 经营报表导入的内部步骤</h2>
+<div class="table"><table>
+<tr><th>步骤</th><th>函数签名（拟议）</th><th>产物与必要规则</th></tr>
+<tr><td>U1 文件入库</td><td>stage_report(bytes_stream, filename, principal)→BlobRef</td><td>校扩展／magic／文件大小、内容hash；文件名只作展示，不做路径；宏和公式不执行</td></tr>
+<tr><td>U2 类型读取</td><td>inspect_report(blob_ref, reader_policy)→ImportPreview</td><td>CSV按UTF-8／GB18030候选只读，XLSX只读实际单元格；保留sheet、行列坐标、合并／公式及缺失标识；首期CSV／XLSX必做</td></tr>
+<tr><td>U3 映射建议</td><td>suggest_mapping(preview_ref, source_profile)→MappingDraft</td><td>优先已确认header alias；单位、币种、时区、人数／次数、父单／子单和场次粒度单独列；必要时模型辅助只产生候选</td></tr>
+<tr><td>U4 人工确认</td><td>confirm_mapping(preview_ref, mapping_hash, human)→MappingRef</td><td>仅歧义／首次口径需要确认；已有完全同profile可复用；不能把同名列当同定义</td></tr>
+<tr><td>U5 规范化</td><td>normalize_report(blob_ref, mapping_ref, session_binding)→PreparedDataset</td><td>decimal→minor、时间→UTC、订单状态枚举、SKU映射、原行定位；不合格行附拒绝码；PDF／截图仅辅助，未经核表不能当精确成交账</td></tr>
+<tr><td>U6 同源去重／冲突</td><td>validate_dataset(prepared_ref)→ValidationResult</td><td>重复上传不双算；同订单来源冲突保留两值并隔离；商品未映射保留unassigned金额，不能硬分当前讲解商品</td></tr>
+<tr><td>U7 正式导入</td><td>commit_dataset(prepared_ref, expected_session_generation, operation_id)→DatasetRef</td><td>一次逻辑操作稳定key与hash，数据集正式版本、进度和回执同事务；重复请求返回replayed</td></tr>
+</table></div>
+<p>legacy XLS先使用现有受控Office读取／另存工具经核验后接入，不能打开宏；没有可靠读取器则请用户另存CSV／XLSX。这个限制是首期报表范围，不影响已有播前多格式资料读取。公式只有缓存显示值时要记录来源／缓存状态，不默认公式语义可信；无缓存的价格／订单关键格必须补资料。</p>
+<p>本场归属优先授权平台session／room／product定义，其次用户确认的精确限定范围；店铺当日全部渠道订单只作背景，不自动计本场。订单粒度先固定parent或SKU子单，不能混加；下单、实付、退款成功的时间与状态分开。</p>
+<h2>6 指标、评分与缓存的精确执行</h2>
+<div class="table"><table>
+<tr><th>函数</th><th>输入</th><th>输出／唯一规则</th></tr>
+<tr><td>resolve_metric_inputs(spec, archive_ref, dataset_refs, scope)</td><td>对象、定义、数据能力和维度</td><td>可计算的正式输入或明确missing；隐式不同队列禁止相除</td></tr>
+<tr><td>build_order_cohort(spec, datasets, as_of)</td><td>固定创建区间／本场归属／订单粒度</td><td>C内支付是C子集；P退款只含P的成功退款；cohort有可回读ref</td></tr>
+<tr><td>calculate_metric(spec, resolved_inputs)</td><td>正式输入</td><td>MetricResult；完整整场收入除整场小时，不除采集在线时长</td></tr>
+<tr><td>build_content_timeline(archive_ref, clock_ref, window_spec)</td><td>实际segment、偏差、精度</td><td>pure／mixed／unassigned；跨桶UV不能相加，逐秒订单不能伪造</td></tr>
+<tr><td>select_comparable_baseline(spec, history_query, policy_ref)</td><td>同商家商品、价格／投流／时段／开场／成熟度</td><td>排除理由和固定history_refs；整场≥5场，模块专项≥10次且≥3场，仅暂定</td></tr>
+<tr><td>score_target(metric_ref, goal_ref, policy_ref)</td><td>同口径正目标与实际值</td><td>封顶100并保留真实完成率；无目标／无数据null</td></tr>
+<tr><td>score_relative(metric_ref, baseline_ref, policy_ref)</td><td>正反向定义、上限和B</td><td>B=0或无资格null；X=B60；正向1.25B80、1.5B100；比例上限修正；反向按既定分段</td></tr>
+<tr><td>score_content(assessment_ref, policy_ref)</td><td>从正式assessment解析完整依赖、四项0／.5／1与证据</td><td>各项×25合计，未知项总分null；错价严重问题独立保留</td></tr>
+<tr><td>persist_content_assessments(items, scope, operation_key)</td><td>K10主或K13内容子提交的typed ContentAssessmentInput[]</td><td>核4项ID／评分枚举、原句和真实事实依赖、权限／scope、policy；一次保存assessment refs，再调用score_content并返回score refs；不强制另请一个审稿模型</td></tr>
+<tr><td>score_coverage(quality_panel, profile)</td><td>各必需覆盖率</td><td>最低覆盖×100；Q04延迟是额外门，不参与平均掩盖；经营汇总不强求句子资格</td></tr>
+<tr><td>persist_panel(results, lineage)</td><td>所有精确ref与计算版本</td><td>可一次返回整张Scorecard、missing与drilldown；模型不逐指标胶水查询</td></tr>
+</table></div>
+<p>CacheKey=canonical_hash(account＋archive_ref＋dataset_refs＋dimension＋metric_definition_revision＋cohort/as_of＋baseline／goal_ref＋score_policy_ref＋parser/classifier／prompt/model依赖＋calculation_version)。只包含真正依赖项，不把无关UI开关导致全量失效；任何实际依赖变化则不能复用旧结果。</p>
+<p>内容审核还依赖商品事实、顾客简报、本场要求、实际稿件和审核政策；文本没变但商品事实撤回也必须失效。评论标签依赖原文、分类器／提示／可用商品上下文、商品归属规则；不能只按正文hash跨商品复用。</p>
+<p>ScoreResult.score_basis统一枚举为target_completion、historical_higher、historical_lower、content_completion、data_coverage，对应四张卡（历史正／反向两种映射）。score.status统一available／provisional／unavailable／not_applicable；后两种score=null且reason必填。metric.status保留available／partial／unavailable／unverified，不与评分状态混用。ContentAssessment四项criterion_id固定criterion_1至criterion_4，具体含义绑定module＋rubric profile；严重问题字段统一critical_findings，不另接受severe_flags别名。所有根稿调用同一个<code>persist_content_assessments(items, scope, operation_key)</code>，防止主／子／报告各维护不同参数和字典字段。</p>
+<h3>6.1 缓存许可与真正重算分别如何证明</h3>
+<p>Goal.refresh_mode枚举：reuse_valid（默认可复用未变依赖）；recompute_metrics（指定指标／评分重新执行，原件解析可复用）；reanalyse_content（指定内容评级／评论标签重做模型判断，原件与无关统计可复用）；refresh_all（本Goal范围所有请求的分析计算重做，不代表重抓历史平台数据）。required_calculations逐项冻结对象、计算类型与义务，不能把“重新复盘”解释为改标题后返旧报告。歧义由K00给合理解释和公开说明，语义实质不清时用K12问，不靠正则静默决定授权。</p>
+<p>每个calculate／score／classification／assessment执行或复用均产生CalculationReceipt。recompute_metrics复用原件reader不违约，但直接返回旧score违约；reanalyse_content不得复用旧assessment，主或子本次生成的四项判断带当前attempt_ref。报告完成服务逐项验证required_calculations已有符合origin的receipt，读取旧卡片不能消除义务。新依赖强制换cachekey；重复相同逻辑操作的重试仍幂等回同一次执行，不能为“重算”双扣费用。请求未要求重算则合法复用，减少无用重复。</p>
+<h2>7 缺失、资格与敏感性</h2>
+<p>公开人数字段目前verified=false，核对前只显示候选数，不计算人分钟响应分。评论主题只分析已读取／已覆盖的范围；抽样标签不能把未分类评论当无意向，也不能除全场人分钟得到伪全量密度。</p>
+<div class="table"><table>
+<tr><th>情况</th><th>结果</th></tr>
+<tr><td>无业务报表</td><td>business_outcome=undetermined；可完成interaction_only复盘；不将null变0</td></tr>
+<tr><td>只有整场／商品汇总</td><td>整场／商品数值与评分；不强分给每次稿件出现</td></tr>
+<tr><td>分钟桶跨模块</td><td>mixed；不按秒拆UV／订单；即使纯桶相邻也先核跨桶去重能力</td></tr>
+<tr><td>只有接收时间且传输滞后无界</td><td>只本地接收共现；平台声音延迟标定不等于事件延迟也已测好</td></tr>
+<tr><td>某评分分母不足／历史不足</td><td>保留事实、样本和missing_reason；不把剩余项加权重标为100</td></tr>
+<tr><td>模拟样例或混入synthetic</td><td>真实经营结论受限，不能声明实际达标；试验与真实档案分开</td></tr>
+<tr><td>已取消后迟到结果</td><td>usage和原件仍保存，run不恢复RUNNING／COMPLETED，不触发采纳</td></tr>
+</table></div>
+<p>预注册评论主窗30秒、敏感性15／60；商品付款探索0–5分钟、敏感性1／3／10。对正式成交总量一单只记一次；不同探索窗不相加。Wilson只用于合法二项计数；退款金额率与相关人分钟密度不套Wilson。样本／区间与得分分开展示，分数不是因果概率。</p>
+<h2>8 一致性及迁移要求</h2>
+<p>迁移使用独立Review migration版本号，新增voice outbox／journal表前备份及验证，不改旧prelive表语义。升级只增加向后可读字段时写兼容适配；关键语义改变给新schema_version并按fixture比较，禁止默默accept any dict。</p>
+<p>每次新归档／报表mapping／评分政策产生新引用与lineage，不在旧报告里换数据。用户删除／撤回证据后保留最小审计状态并撤销相应可访问投影及缓存；不能借旧摘要继续引用已不可访问原件。保存和清理均为普通服务管理，模型没有任意文件删除权。</p></article></main></body></html>

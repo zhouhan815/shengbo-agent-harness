@@ -1,0 +1,87 @@
+{
+  "versions": [
+    {
+      "index": 1,
+      "scores": {
+        "natural_live_speech": 14,
+        "benefit_scene_expansion": 15,
+        "coherent_flow": 8,
+        "non_repetition": 8,
+        "purchase_guidance": 5
+      },
+      "score_reasons": [
+        "natural_live_speech：口语自然，如“姐妹平时出门，是喜欢手里拎着，还是习惯往肩上一挂？”亲切。",
+        "benefit_scene_expansion：卖点展开良好，如“早上买早餐，你可以单肩背着，两只手拿豆浆和零钱”“下班回家，不用把整个包倒过来找钥匙，伸手往小口袋里一摸就行”“周末去周边玩，或者出差住酒店”，覆盖肩带、小口袋、折叠、材质等。",
+        "coherent_flow：从痛点开场到卖点、尺寸、颜色、价格、收口，顺序合理，但末尾“浴室走动还是要留意地面”与商品无关，打断连贯。",
+        "non_repetition：无空话重复，但部分卖点（如主袋拉链）展开较简，整体不重复。",
+        "purchase_guidance：正确播报原价99元、活动价79元，引导“看看黑色和米色哪个更合你心意”“觉得合适再下单”。"
+      ],
+      "unsupported_claims": [
+        {
+          "quote": "这次是限时活动价，具体到什么时候结束，页面会写清楚。",
+          "reason": "商品资料仅写“活动价79元；活动截至时间未提供”，未说明是限时活动。",
+          "severity": "minor"
+        },
+        {
+          "quote": "最后提一句，浴室走动还是要留意地面。",
+          "reason": "商品与浴室无关，此句为无关添加，可能造成困惑。",
+          "severity": "minor"
+        }
+      ],
+      "price_and_terms_correct": true,
+      "knowledge_leaks": [],
+      "main_gaps": [
+        "末尾无关句“浴室走动还是要留意地面”与商品无关，影响收口连贯。",
+        "活动价性质（是否为限时）未获资料支持，但稿中称“限时活动价”，属于轻微添加。",
+        "未提尺寸38×30×12厘米，遗漏规格信息，但非必须，仍算可补充点。"
+      ]
+    },
+    {
+      "index": 2,
+      "scores": {
+        "natural_live_speech": 14,
+        "benefit_scene_expansion": 16,
+        "coherent_flow": 9,
+        "non_repetition": 9,
+        "purchase_guidance": 5
+      },
+      "score_reasons": [
+        "natural_live_speech：口语自然，如“这双眼睛可以往这儿停一停”“不用把整个包翻个底朝天”，无说明书感。",
+        "benefit_scene_expansion：卖点展开充分，如“周末去趟超市”“住酒店时想换上自己的拖鞋”“早上买早餐，你单肩背着，两只手拿豆浆和包子也不耽误”“伸手往小口袋一摸，门禁卡就在那儿”，覆盖折叠、拉链、小口袋、长肩带、材质等多个卖点。",
+        "coherent_flow：从痛点纠结到商品、卖点、颜色、尺寸、价格、收口，顺序顺畅。",
+        "non_repetition：无空话重复，每个卖点有独立场景或说明。",
+        "purchase_guidance：明确原价99元、活动价79元，引导“根据自己平时出门要带的东西来选”“觉得合适再下单”。"
+      ],
+      "unsupported_claims": [
+        {
+          "quote": "这个活动价是限时活动，具体截止时间以页面为准。",
+          "reason": "商品资料仅写“活动价79元；活动截至时间未提供”，未说明该价格是限时活动。",
+          "severity": "minor"
+        }
+      ],
+      "price_and_terms_correct": true,
+      "knowledge_leaks": [],
+      "main_gaps": [
+        "活动价性质（是否为限时）未获资料支持，但稿中称“限时活动”，属于轻微添加。",
+        "可折叠卖点的场景展开较充分，但未提折叠后体积或收纳形态，不过资料本身未提供，不扣分。",
+        "尺寸单位厘米播报正确，但未进一步解释与日常物品的适配，资料未提供具体适配，不扣分。"
+      ]
+    }
+  ],
+  "pair_diversity": {
+    "score": 4,
+    "reason": "两版开场痛点不同（版1纠结背大包小袋，版2问拎还是挂），卖点顺序和重点展开不同（版1先讲折叠后讲拉链小口袋，版2先讲肩带拉链后讲折叠），且各有独立场景，均完整自然，差异鲜明。但版2末尾无关句略微影响整体体验，故给4分。"
+  },
+  "judge_model": "deepseek-flash",
+  "judge_protocol": "v2-core-facts-only-no-unsupported-reference-priming",
+  "usage": {
+    "prompt_tokens": 2068,
+    "completion_tokens": 1126,
+    "total_tokens": 3194,
+    "prompt_tokens_details": {
+      "cached_tokens": 768
+    },
+    "prompt_cache_hit_tokens": 768,
+    "prompt_cache_miss_tokens": 1300
+  }
+}

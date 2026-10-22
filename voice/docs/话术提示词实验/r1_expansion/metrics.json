@@ -1,0 +1,114 @@
+{
+  "versions": [
+    {
+      "han_characters": 1123,
+      "sentences": 37,
+      "coverage_groups": {
+        "材质成型": false,
+        "足弓": true,
+        "厚底软弹": true,
+        "静音防滑": true,
+        "清洗快干防臭": true,
+        "轻便场景": true,
+        "规格": true,
+        "选码": true
+      },
+      "coverage_rate": 0.875,
+      "natural_sentence_ratio": 1.0,
+      "duplicate_sentences": [],
+      "reference_5gram_overlap": 0.031,
+      "program_scores": {
+        "selling_point_coverage": 10.5,
+        "flow": 8.0,
+        "speakability": 10.0,
+        "length_fit": 5,
+        "fact_references": 5.0
+      },
+      "program_total": 38.5,
+      "invalid_references": false,
+      "app_issues": []
+    },
+    {
+      "han_characters": 1008,
+      "sentences": 32,
+      "coverage_groups": {
+        "材质成型": true,
+        "足弓": true,
+        "厚底软弹": true,
+        "静音防滑": true,
+        "清洗快干防臭": true,
+        "轻便场景": true,
+        "规格": true,
+        "选码": true
+      },
+      "coverage_rate": 1.0,
+      "natural_sentence_ratio": 1.0,
+      "duplicate_sentences": [],
+      "reference_5gram_overlap": 0.038,
+      "program_scores": {
+        "selling_point_coverage": 12.0,
+        "flow": 8.0,
+        "speakability": 10.0,
+        "length_fit": 5,
+        "fact_references": 5.0
+      },
+      "program_total": 40.0,
+      "invalid_references": false,
+      "app_issues": []
+    }
+  ],
+  "pair": [
+    {
+      "a": 1,
+      "b": 2,
+      "fivegram_jaccard": 0.187,
+      "shared_narrative_sentences": [
+        "防滑这一点，在浴室或厨房这种容易有水汽的地方，多一分摩擦就多一分安心。"
+      ],
+      "near_copy_ratio": 0.364,
+      "near_copies": [
+        {
+          "a": "你在家做饭、打扫、站着整理东西的时候，脚底有支撑，和穿一双软塌塌的拖鞋感受不一样。",
+          "b": "你在家做饭、打扫、整理东西，需要站一会儿的时候，脚底有支撑，和穿一双软塌塌的拖鞋感受不一样。",
+          "similarity": 0.897
+        },
+        {
+          "a": "你晚上起来喝水、早上赶着洗漱，如果不想脚步声太响，这种静音设计就比较贴心。",
+          "b": "你在浴室洗澡，或者夜里起来喝水、早上赶着洗漱，如果不想脚步声太响，这种静音设计就比较贴心。",
+          "similarity": 0.854
+        },
+        {
+          "a": "先选好颜色和尺码，脚背较宽或脚型偏肉记得斟酌大一号，再按需要选择。",
+          "b": "先选好颜色和尺码，脚背较宽或脚型偏肉记得斟酌大一号，再按需要选择就可以了。",
+          "similarity": 0.943
+        },
+        {
+          "a": "接着说足弓支撑，这是这款鞋的重点设计之一，专门为女性足部曲线打造。",
+          "b": "再看足弓支撑，这是这款鞋的重点设计之一，专为女性足部曲线量身打造。",
+          "similarity": 0.879
+        },
+        {
+          "a": "当然，湿地面情况各不相同，走路还是需要自己留意，但鞋底有这个特性，日常会多一层照顾。",
+          "b": "当然，湿地面情况各不相同，走路还是需要自己留意，但鞋底有防滑特性，日常会多一层照顾。",
+          "similarity": 0.952
+        },
+        {
+          "a": "总的来说，这双鞋适合女性、追求足部舒适的人、居家生活者和旅行爱好者。",
+          "b": "总结一下，这双鞋适合女性、追求足部舒适的人，也适合居家生活者和旅行爱好者。",
+          "similarity": 0.845
+        },
+        {
+          "a": "最重要的特点就是足弓支撑、小蛮腰厚底软弹、静音防滑、快干防臭和轻便。",
+          "b": "最重要的特点就是足弓支撑、小蛮腰厚底软弹，加上静音防滑、快干易清洗和防臭。",
+          "similarity": 0.845
+        },
+        {
+          "a": "防滑这一点，在浴室或厨房这种容易有水汽的地方，多一分摩擦就多一分安心。",
+          "b": "防滑这一点，在浴室或厨房这种容易有水汽的地方，多一分摩擦就多一分安心。",
+          "similarity": 1.0
+        }
+      ],
+      "opening_similarity": 0.36
+    }
+  ]
+}

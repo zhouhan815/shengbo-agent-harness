@@ -1,0 +1,70 @@
+{
+  "versions": [
+    {
+      "index": 1,
+      "scores": {
+        "natural_live_speech": 14,
+        "benefit_scene_expansion": 18,
+        "coherent_flow": 10,
+        "non_repetition": 9,
+        "purchase_guidance": 5
+      },
+      "score_reasons": [
+        "口语自然，如'今天咱们来聊一双在家的轻松感''换鞋方便，走几步也不觉得脚上拖着沉东西'。",
+        "卖点展开充分：足弓支撑做饭打扫、小蛮腰厚底厨房阳台、材质轻便倒垃圾取快递、静音防滑浴室夜间、防臭快干洗澡后、颜色分类场景、尺码选择等。",
+        "结构类似但顺畅：痛点→商品→足弓支撑→小蛮腰厚底→材质轻便→静音防滑→快干→颜色→尺码→价格→收口。",
+        "存在少量重复，如'做饭、打扫卫生'和'厨房站一会儿、阳台收衣服'场景相近，整体仍可。",
+        "给出价格178→107新台币，引导选颜色尺码并考虑大一号，购买引导自然。"
+      ],
+      "unsupported_claims": [],
+      "price_and_terms_correct": true,
+      "knowledge_leaks": [],
+      "main_gaps": [
+        "颜色分类'耐脏百搭'黑色卡其，'耐脏'属于合理场景联想还是性能暗示？但未直接说产品耐脏，仅说颜色百搭，可接受。",
+        "未提及'耐磨'。",
+        "防臭快干场景与版本1类似，重复度高。"
+      ]
+    },
+    {
+      "index": 2,
+      "scores": {
+        "natural_live_speech": 14,
+        "benefit_scene_expansion": 18,
+        "coherent_flow": 10,
+        "non_repetition": 9,
+        "purchase_guidance": 5
+      },
+      "score_reasons": [
+        "口语自然，像'咱们慢慢看一双适合日常穿的凉拖鞋''挑起来更自由'等，没有说明书腔。",
+        "卖点展开充分：颜色对应心情、旅行便携、浴室快干、静音夜间走动、防滑浴室、足弓支撑做饭打扫、小蛮腰厚底厨房阳台、尺码选择等至少4个卖点有具体情境和有限收益。",
+        "结构清晰：痛点引入→商品信息→颜色携带→材质场景→静音防滑→足弓支撑→小蛮腰厚底→尺码→价格→收口，连贯不机械。",
+        "整体不重复，但'防臭快干，一冲即净'与'洗澡后顺手冲一下，晾着就好打理'略重复表达。",
+        "给出原价178、活动价107新台币，并引导'先选好颜色和尺码，脚背宽或脚型偏肉记得往大一号斟酌，合适再下单'，价格币种正确，选择引导自然。"
+      ],
+      "unsupported_claims": [],
+      "price_and_terms_correct": true,
+      "knowledge_leaks": [],
+      "main_gaps": [
+        "未提及厚底平底的具体版型信息，但product name已含厚底，selling_points有版型，不算大问题；主要缺点可能是未强调'轻便耐磨'中的耐磨。",
+        "防臭快干、一冲即净场景重复，可更丰富。",
+        "颜色过多逐一列举稍显啰嗦，但不算事实问题。"
+      ]
+    }
+  ],
+  "pair_diversity": {
+    "score": 3,
+    "reason": "两版开场和卖点展开顺序有明显不同：版本1先从颜色携带切入，版本2先从足弓支撑切入；情境选择有差异，但整体结构仍是类似逐点模板，核心场景如做饭打扫、浴室防滑、快干等重复较多，故给3分。"
+  },
+  "judge_model": "deepseek-flash",
+  "judge_protocol": "v2-core-facts-only-no-unsupported-reference-priming",
+  "usage": {
+    "prompt_tokens": 2712,
+    "completion_tokens": 764,
+    "total_tokens": 3476,
+    "prompt_tokens_details": {
+      "cached_tokens": 1024
+    },
+    "prompt_cache_hit_tokens": 1024,
+    "prompt_cache_miss_tokens": 1688
+  }
+}

@@ -1,0 +1,92 @@
+{
+  "versions": [
+    {
+      "index": 1,
+      "scores": {
+        "natural_live_speech": 14,
+        "benefit_scene_expansion": 17,
+        "coherent_flow": 9,
+        "non_repetition": 9,
+        "purchase_guidance": 4
+      },
+      "score_reasons": [
+        "natural_live_speech:14分——口语化强，互动感好，如“姐妹平时在家走动多吗？”“有没有这种感觉：在厨房站久了，脚底又酸又胀，恨不得马上坐下。”表达自然流畅。",
+        "benefit_scene_expansion:17分——至少4个卖点有有效展开，如足弓支撑、静音防滑、快干防臭、轻便旅行均有具体情境和收益，且展开生动。",
+        "coherent_flow:9分——从痛点身份展开到规格价格收口连贯，如“其实选拖鞋，不只是看颜色……”“价格方面，原价一百七十八新台币，现在活动价一百零七新台币。”过渡自然。",
+        "non_repetition:9分——无明显空话或重复，颜色列举一次并给出建议，尺码集中说明，结构紧凑。",
+        "purchase_guidance:4分——自然引导，如“大家可以去看看颜色和尺码，选自己合适的，合适再下单。”价格条件准确，但购买引导较简短。"
+      ],
+      "unsupported_claims": [
+        {
+          "quote": "晚上家人都睡了，你去浴室洗漱、回房间，鞋底和地面碰触的声音小，减少打扰。",
+          "reason": "产品资料仅提到‘静音’，未说明具体静音程度或对比，此处描述带有一定夸张，但属合理场景联想。",
+          "severity": "minor"
+        },
+        {
+          "quote": "一体成型意味着拼接少，结构简单，不容易藏污纳垢。",
+          "reason": "产品资料未直接说明‘不容易藏污纳垢’，但基于一体成型和易清洗特性的合理推断。",
+          "severity": "minor"
+        }
+      ],
+      "price_and_terms_correct": true,
+      "knowledge_leaks": [],
+      "main_gaps": [
+        "价格部分未提及原价与活动价的对比细节，仅陈述价格。",
+        "颜色列举用‘等等’带过，可能遗漏部分颜色信息。",
+        "整体语速可能较快，部分场景切换稍显急促。"
+      ]
+    },
+    {
+      "index": 2,
+      "scores": {
+        "natural_live_speech": 13,
+        "benefit_scene_expansion": 16,
+        "coherent_flow": 9,
+        "non_repetition": 8,
+        "purchase_guidance": 4
+      },
+      "score_reasons": [
+        "natural_live_speech:13分——语言自然口语，消费者易听懂，例如“如果你正在找一双旅行能塞进行李、平时倒垃圾散步也能穿的拖鞋，可以先停一停。”没有说明书式播报，但部分句子略带清单感。",
+        "benefit_scene_expansion:16分——核心卖点如足弓支撑、静音防滑、轻便、快干易清洗等均展开了具体情境和收益，如“你站着洗碗、切菜、熨衣服的时候，脚底内侧有支撑，久站带来的足部压力能得到一定缓解。”展开有效，未达17分因部分场景如旅行便携重复较多。",
+        "coherent_flow:9分——从痛点身份到规格价格收口连贯，如“如果你正在找一双旅行能塞进行李……”“这双的原价是一百七十八新台币，活动价一百零七新台币。”结构自然。",
+        "non_repetition:8分——没有空话凑字，但颜色和尺码部分有重复陈述，如颜色列举两次，尺码出现多次，略有冗余。",
+        "purchase_guidance:4分——自然选择引导，如“颜色和尺码按自己的喜好与实际需要来选，合适再下单。”价格币种优惠条件准确，但未提供额外紧迫感。"
+      ],
+      "unsupported_claims": [
+        {
+          "quote": "晚上家人都睡了，你去浴室洗漱、回房间，鞋底和地面摩擦的声音比较小，能减少打扰家人。",
+          "reason": "产品资料仅提到‘静音’特性，未说明具体噪音水平或对比效果，此处描述有一定夸张，但属合理场景联想，非严重编造。",
+          "severity": "minor"
+        },
+        {
+          "quote": "一体成型意味着拼接少，结构简单，鞋面不容易藏污纳垢，打理起来省事。",
+          "reason": "产品资料提到‘一体成型’和‘快干易清洗’，但未直接关联‘不容易藏污纳垢’，此为合理推断，未超出资料范畴。",
+          "severity": "minor"
+        }
+      ],
+      "price_and_terms_correct": true,
+      "knowledge_leaks": [],
+      "main_gaps": [
+        "部分卖点如‘轻便耐磨’在口播中一笔带过，未充分展开使用情境和收益。",
+        "颜色选择建议中遗漏了红色，虽不影响核心信息，但列举不全。",
+        "整体节奏在颜色和尺码部分略显拖沓，可更紧凑。"
+      ]
+    }
+  ],
+  "pair_diversity": {
+    "score": 4,
+    "reason": "两版卖点展开顺序和情境节奏明显不同：版1以旅行和颜色开场，后聚焦居家舒适；版2以姐妹对话和厨房痛点切入，再展开卖点。两版均自然完整，差异鲜明。"
+  },
+  "judge_model": "deepseek-flash",
+  "judge_protocol": "v2-core-facts-only-no-unsupported-reference-priming",
+  "usage": {
+    "prompt_tokens": 2819,
+    "completion_tokens": 1267,
+    "total_tokens": 4086,
+    "prompt_tokens_details": {
+      "cached_tokens": 1024
+    },
+    "prompt_cache_hit_tokens": 1024,
+    "prompt_cache_miss_tokens": 1795
+  }
+}

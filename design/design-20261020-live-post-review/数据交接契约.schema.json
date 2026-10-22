@@ -1,0 +1,919 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:shengbo:live-review:design:v1",
+  "title": "LIVE-REVIEW-1.0 proposed contracts",
+  "description": "设计契约，未注册为现有API。结构校验不代替来源、cohort、归属、授权或数值复算。",
+  "$defs": {
+    "ArtifactRef": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "type": "string",
+          "minLength": 1
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "content_hash": {
+          "type": "string",
+          "pattern": "^sha256:[a-f0-9]{64}$"
+        },
+        "schema_version": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "kind",
+        "id",
+        "revision",
+        "content_hash"
+      ],
+      "additionalProperties": false
+    },
+    "SourceKind": {
+      "enum": [
+        "public_platform",
+        "local_player",
+        "official_merchant_export",
+        "manual_note",
+        "synthetic"
+      ]
+    },
+    "Clock": {
+      "type": "object",
+      "properties": {
+        "occurred_at": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
+        },
+        "received_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "source_precision": {
+          "enum": [
+            "millisecond",
+            "second",
+            "minute",
+            "unknown"
+          ]
+        },
+        "clock_domain": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_instance": {
+          "type": "string",
+          "minLength": 1
+        },
+        "boot_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "monotonic_ns": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "estimated_offset_ms": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "uncertainty_ms": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        }
+      },
+      "required": [
+        "occurred_at",
+        "received_at",
+        "source_precision",
+        "clock_domain",
+        "source_instance",
+        "boot_id",
+        "uncertainty_ms"
+      ],
+      "additionalProperties": false
+    },
+    "ObservationEvent": {
+      "type": "object",
+      "properties": {
+        "schema_version": {
+          "const": "LIVE-REVIEW-1.0"
+        },
+        "event_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "monitor_session_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "merchant_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_kind": {
+          "$ref": "#/$defs/SourceKind"
+        },
+        "source_message_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "source_cursor": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "local_seq": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "event_type": {
+          "type": "string",
+          "minLength": 1
+        },
+        "clock": {
+          "$ref": "#/$defs/Clock"
+        },
+        "definition_status": {
+          "enum": [
+            "verified",
+            "unverified",
+            "not_applicable"
+          ]
+        },
+        "raw_ref": {
+          "$ref": "#/$defs/ArtifactRef"
+        },
+        "payload": {
+          "type": "object"
+        },
+        "parser_revision": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "schema_version",
+        "event_id",
+        "monitor_session_id",
+        "merchant_id",
+        "source_kind",
+        "source_message_id",
+        "local_seq",
+        "event_type",
+        "clock",
+        "definition_status",
+        "raw_ref",
+        "payload",
+        "parser_revision"
+      ],
+      "additionalProperties": false
+    },
+    "PlaybackOccurrence": {
+      "type": "object",
+      "properties": {
+        "monitor_session_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "item_occurrence_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "module_occurrence_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "playback_attempt_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "compiled_entry_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_sentence_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "playback_sentence_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "variant_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "module_key": {
+          "type": "string",
+          "minLength": 1
+        },
+        "original_position": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "cycle_index": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "segment_index": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "owner_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "epoch": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "product_ref": {
+          "$ref": "#/$defs/ArtifactRef"
+        },
+        "script_ref": {
+          "$ref": "#/$defs/ArtifactRef"
+        },
+        "module_ref": {
+          "$ref": "#/$defs/ArtifactRef"
+        },
+        "publication_ref": {
+          "$ref": "#/$defs/ArtifactRef"
+        },
+        "approval_ref": {
+          "$ref": "#/$defs/ArtifactRef"
+        },
+        "clock": {
+          "$ref": "#/$defs/Clock"
+        },
+        "status": {
+          "enum": [
+            "created",
+            "playing",
+            "paused",
+            "buffering",
+            "ended",
+            "interrupted",
+            "failed",
+            "unknown"
+          ]
+        },
+        "evidence_level": {
+          "enum": [
+            "server_scheduled",
+            "player_acknowledged",
+            "local_audio_observed",
+            "platform_recording_verified"
+          ]
+        },
+        "opening_mode": {
+          "enum": [
+            "long",
+            "short",
+            "merchant_original",
+            "not_applicable"
+          ]
+        },
+        "raw_event_ref": {
+          "$ref": "#/$defs/ArtifactRef"
+        }
+      },
+      "required": [
+        "monitor_session_id",
+        "item_occurrence_id",
+        "module_occurrence_id",
+        "playback_attempt_id",
+        "compiled_entry_id",
+        "source_sentence_id",
+        "playback_sentence_id",
+        "variant_id",
+        "module_key",
+        "original_position",
+        "cycle_index",
+        "segment_index",
+        "owner_id",
+        "epoch",
+        "product_ref",
+        "script_ref",
+        "module_ref",
+        "publication_ref",
+        "approval_ref",
+        "clock",
+        "status",
+        "evidence_level",
+        "opening_mode",
+        "raw_event_ref"
+      ],
+      "additionalProperties": false
+    },
+    "MetricResult": {
+      "type": "object",
+      "properties": {
+        "metric_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "definition_revision": {
+          "type": "string",
+          "minLength": 1
+        },
+        "archive_ref": {
+          "$ref": "#/$defs/ArtifactRef"
+        },
+        "dimensions": {
+          "type": "object",
+          "additionalProperties": {
+            "type": [
+              "string",
+              "integer",
+              "null"
+            ]
+          }
+        },
+        "status": {
+          "enum": [
+            "available",
+            "partial",
+            "unavailable",
+            "unverified"
+          ]
+        },
+        "unit": {
+          "type": "string",
+          "minLength": 1
+        },
+        "value": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "numerator": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "denominator": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "missing_reason": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "as_of": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "cohort_ref": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/ArtifactRef"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "coverage_status": {
+          "enum": [
+            "full",
+            "partial",
+            "unknown"
+          ]
+        },
+        "sample_size": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "denominator_basis": {
+          "enum": [
+            "official_metric",
+            "verified_cohort",
+            "observed_participants",
+            "time_integral_proxy",
+            "matching_time_window",
+            "not_applicable",
+            "unknown"
+          ]
+        },
+        "amount_basis": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "currency": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "formula_text": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_refs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ArtifactRef"
+          }
+        },
+        "limitations": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "required": [
+        "metric_id",
+        "definition_revision",
+        "archive_ref",
+        "dimensions",
+        "status",
+        "unit",
+        "value",
+        "numerator",
+        "denominator",
+        "missing_reason",
+        "as_of",
+        "cohort_ref",
+        "coverage_status",
+        "sample_size",
+        "denominator_basis",
+        "formula_text",
+        "source_refs",
+        "limitations"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "enum": [
+                  "unavailable",
+                  "unverified"
+                ]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "value": {
+                "type": "null"
+              },
+              "missing_reason": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "unit": {
+                "const": "ratio"
+              },
+              "status": {
+                "enum": [
+                  "available",
+                  "partial"
+                ]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "denominator": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              },
+              "numerator": {
+                "type": "number",
+                "minimum": 0
+              },
+              "value": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              }
+            }
+          }
+        }
+      ]
+    },
+    "Finding": {
+      "type": "object",
+      "properties": {
+        "finding_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "observation": {
+          "type": "string",
+          "minLength": 1
+        },
+        "hypothesis": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "claim_strength": {
+          "enum": [
+            "observed",
+            "time_association",
+            "hypothesis",
+            "insufficient_evidence"
+          ]
+        },
+        "metric_refs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ArtifactRef"
+          }
+        },
+        "evidence_refs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ArtifactRef"
+          }
+        },
+        "alternative_explanations": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "limitations": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "required": [
+        "finding_id",
+        "observation",
+        "hypothesis",
+        "claim_strength",
+        "metric_refs",
+        "evidence_refs",
+        "alternative_explanations",
+        "limitations"
+      ],
+      "additionalProperties": false
+    },
+    "Recommendation": {
+      "type": "object",
+      "properties": {
+        "recommendation_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "finding_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "type": {
+          "enum": [
+            "script_revision",
+            "faq_add",
+            "material_request",
+            "display_material_request",
+            "lineup_suggestion",
+            "verification_request",
+            "technical_fix",
+            "experiment"
+          ]
+        },
+        "target_ref": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/ArtifactRef"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "target_module_keys": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "old_issue": {
+          "type": "string",
+          "minLength": 1
+        },
+        "proposed_change": {
+          "type": "string",
+          "minLength": 1
+        },
+        "evidence_refs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ArtifactRef"
+          }
+        },
+        "expected_metric_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "applicability": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "validation_plan": {
+          "type": "string",
+          "minLength": 1
+        },
+        "priority": {
+          "enum": [
+            "high",
+            "medium",
+            "low"
+          ]
+        },
+        "adoption_state": {
+          "const": "pending"
+        }
+      },
+      "required": [
+        "recommendation_id",
+        "finding_ids",
+        "type",
+        "target_ref",
+        "target_module_keys",
+        "old_issue",
+        "proposed_change",
+        "evidence_refs",
+        "expected_metric_ids",
+        "applicability",
+        "validation_plan",
+        "priority",
+        "adoption_state"
+      ],
+      "additionalProperties": false
+    },
+    "ReviewBundle": {
+      "type": "object",
+      "properties": {
+        "schema_version": {
+          "const": "LIVE-REVIEW-1.0"
+        },
+        "review_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "archive_ref": {
+          "$ref": "#/$defs/ArtifactRef"
+        },
+        "metric_panel_ref": {
+          "$ref": "#/$defs/ArtifactRef"
+        },
+        "monitor_session_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "merchant_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "data_mode": {
+          "enum": [
+            "interaction_only",
+            "business_aggregate",
+            "time_association",
+            "mature_business"
+          ]
+        },
+        "data_origins": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SourceKind"
+          },
+          "description": "参与本报告统计或结论的来源；被排除的模拟来源只列excluded_source_refs。"
+        },
+        "excluded_source_refs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ArtifactRef"
+          }
+        },
+        "review_status": {
+          "enum": [
+            "complete",
+            "partial",
+            "needs_data"
+          ]
+        },
+        "business_outcome": {
+          "enum": [
+            "goal_met",
+            "goal_not_met",
+            "undetermined"
+          ]
+        },
+        "maturity": {
+          "enum": [
+            "initial",
+            "as_of",
+            "matured"
+          ]
+        },
+        "as_of": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "goal_definition": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "findings": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Finding"
+          }
+        },
+        "recommendations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Recommendation"
+          }
+        },
+        "limitations": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "trace_ref": {
+          "$ref": "#/$defs/ArtifactRef"
+        }
+      },
+      "required": [
+        "schema_version",
+        "review_id",
+        "archive_ref",
+        "metric_panel_ref",
+        "monitor_session_id",
+        "merchant_id",
+        "data_mode",
+        "data_origins",
+        "excluded_source_refs",
+        "review_status",
+        "business_outcome",
+        "maturity",
+        "as_of",
+        "goal_definition",
+        "findings",
+        "recommendations",
+        "limitations",
+        "trace_ref"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "data_mode": {
+                "const": "interaction_only"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "business_outcome": {
+                "const": "undetermined"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "data_origins": {
+                "contains": {
+                  "const": "synthetic"
+                }
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "business_outcome": {
+                "const": "undetermined"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "NextSessionFeedback": {
+      "type": "object",
+      "properties": {
+        "schema_version": {
+          "const": "LIVE-REVIEW-1.0"
+        },
+        "report_ref": {
+          "$ref": "#/$defs/ArtifactRef"
+        },
+        "archive_ref": {
+          "$ref": "#/$defs/ArtifactRef"
+        },
+        "recommendations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Recommendation"
+          }
+        },
+        "state": {
+          "const": "candidate"
+        },
+        "requires_user_selection": {
+          "const": true
+        },
+        "business_side_effects_authorized": {
+          "const": false
+        }
+      },
+      "required": [
+        "schema_version",
+        "report_ref",
+        "archive_ref",
+        "recommendations",
+        "state",
+        "requires_user_selection",
+        "business_side_effects_authorized"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "oneOf": [
+    {
+      "$ref": "#/$defs/ObservationEvent"
+    },
+    {
+      "$ref": "#/$defs/PlaybackOccurrence"
+    },
+    {
+      "$ref": "#/$defs/MetricResult"
+    },
+    {
+      "$ref": "#/$defs/ReviewBundle"
+    },
+    {
+      "$ref": "#/$defs/NextSessionFeedback"
+    }
+  ]
+}

@@ -1,0 +1,97 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2000" height="1880" viewBox="0 0 2000 1880">
+<defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 Z" fill="#617889"/></marker></defs>
+<rect width="2000" height="1880" fill="white"/>
+<text x="45.0" y="70" font-family="Microsoft YaHei,sans-serif" font-size="40" fill="#193447">任务判断、上下文与可复用工具流</text>
+<text x="45.0" y="108" font-family="Microsoft YaHei,sans-serif" font-size="24" fill="#193447">PRELIVE-2.3 · Agent 选择能力，程序执行确定步骤；按本次目标验收，不强制每轮全跑。</text>
+<rect x="50" y="150" width="1900" height="90" rx="9" fill="#E6EDFF" stroke="#A7B7C3" stroke-width="2"/>
+<text x="437.5" y="207.0" font-family="Microsoft YaHei,sans-serif" font-size="30" fill="#193447">真实用户指令 + 精确选区：更新商品 / 只做分析 / 修改本场 / 改稿 / 重排 / 完整准备</text>
+<rect x="460" y="310" width="1080" height="155" rx="9" fill="#E6EDFF" stroke="#A7B7C3" stroke-width="2"/>
+<text x="825.0" y="358.0" font-family="Microsoft YaHei,sans-serif" font-size="29" fill="#193447">同一个主 Deep Agent · S1</text>
+<text x="581.5" y="399.0" font-family="Microsoft YaHei,sans-serif" font-size="29" fill="#193447">只读意图识别 → 必要澄清 → Coordinator 首次冻结 Goal / 授权</text>
+<text x="526.5" y="440.0" font-family="Microsoft YaHei,sans-serif" font-size="29" fill="#193447">TaskAssessment：读哪些历史、复用或派谁、调用什么工具流、怎样验收</text>
+<rect x="50" y="550" width="410" height="520" rx="14" fill="#FFFBEA" stroke="#CFCBAC" stroke-width="2"/>
+<text x="72.0" y="593" font-family="Microsoft YaHei,sans-serif" font-size="28" fill="#193447">业务历史 / 版本化保存</text>
+<rect x="80" y="635" width="350" height="365" rx="9" fill="#E3F3E8" stroke="#A7B7C3" stroke-width="2"/>
+<text x="177.0" y="713.5" font-family="Microsoft YaHei,sans-serif" font-size="26" fill="#193447">商品完整修订</text>
+<text x="137.5" y="751.5" font-family="Microsoft YaHei,sans-serif" font-size="26" fill="#193447">顾客场景研究 / 证据</text>
+<text x="138.0" y="789.5" font-family="Microsoft YaHei,sans-serif" font-size="26" fill="#193447">本场配置与历史差异</text>
+<text x="124.0" y="827.5" font-family="Microsoft YaHei,sans-serif" font-size="26" fill="#193447">旧稿 / 使用记录 / 复盘</text>
+<text x="137.5" y="865.5" font-family="Microsoft YaHei,sans-serif" font-size="26" fill="#193447">素材清单 / 已有文件</text>
+<text x="129.0" y="903.5" font-family="Microsoft YaHei,sans-serif" font-size="26" fill="#193447">按精确 ID 和依赖查回</text>
+<text x="99.0" y="941.5" font-family="Microsoft YaHei,sans-serif" font-size="26" fill="#193447">未变化复用，变化才补分析</text>
+<rect x="520" y="550" width="960" height="520" rx="14" fill="#FFFBEA" stroke="#CFCBAC" stroke-width="2"/>
+<text x="542.0" y="593" font-family="Microsoft YaHei,sans-serif" font-size="28" fill="#193447">多 Agent 协调 / 普通程序调度</text>
+<rect x="560" y="620" width="880" height="75" rx="9" fill="#F0F4F6" stroke="#A7B7C3" stroke-width="2"/>
+<text x="675.0" y="668.0" font-family="Microsoft YaHei,sans-serif" font-size="27" fill="#193447">持久 batch / Supervisor：仅执行已授权、必要的分析</text>
+<rect x="560" y="755" width="260" height="115" rx="9" fill="#E3F3E8" stroke="#A7B7C3" stroke-width="2"/>
+<text x="622.0" y="803.5" font-family="Microsoft YaHei,sans-serif" font-size="25" fill="#193447">S2 商品事实</text>
+<text x="590.0" y="840.5" font-family="Microsoft YaHei,sans-serif" font-size="25" fill="#193447">来源 / 冲突 / 缺项</text>
+<rect x="870" y="755" width="260" height="115" rx="9" fill="#E3F3E8" stroke="#A7B7C3" stroke-width="2"/>
+<text x="932.0" y="803.5" font-family="Microsoft YaHei,sans-serif" font-size="25" fill="#193447">S3 本场配置</text>
+<text x="900.0" y="840.5" font-family="Microsoft YaHei,sans-serif" font-size="25" fill="#193447">主题 / 活动 / 历史</text>
+<rect x="1180" y="755" width="260" height="115" rx="9" fill="#E3F3E8" stroke="#A7B7C3" stroke-width="2"/>
+<text x="1242.0" y="803.5" font-family="Microsoft YaHei,sans-serif" font-size="25" fill="#193447">S4 顾客场景</text>
+<text x="1222.5" y="840.5" font-family="Microsoft YaHei,sans-serif" font-size="25" fill="#193447">研究复用 / 增量</text>
+<rect x="560" y="930" width="880" height="85" rx="9" fill="#E3F3E8" stroke="#A7B7C3" stroke-width="2"/>
+<text x="685.5" y="963.5" font-family="Microsoft YaHei,sans-serif" font-size="25" fill="#193447">独立上下文 → PREPARED → 主校验 → 声播 ACCEPTED</text>
+<text x="737.0" y="1000.5" font-family="Microsoft YaHei,sans-serif" font-size="25" fill="#193447">必要时由主带精确引用定向 refine，不互传聊天</text>
+<rect x="1540" y="550" width="410" height="520" rx="14" fill="#FFFBEA" stroke="#CFCBAC" stroke-width="2"/>
+<text x="1562.0" y="593" font-family="Microsoft YaHei,sans-serif" font-size="28" fill="#193447">上下文管理 / M3 + SDK</text>
+<rect x="1570" y="635" width="350" height="365" rx="9" fill="#F1E7FB" stroke="#A7B7C3" stroke-width="2"/>
+<text x="1614.5" y="713.5" font-family="Microsoft YaHei,sans-serif" font-size="26" fill="#193447">始终：目标 / 禁止事项</text>
+<text x="1601.0" y="751.5" font-family="Microsoft YaHei,sans-serif" font-size="26" fill="#193447">关键条件 / 版本 / 待确认</text>
+<text x="1628.0" y="789.5" font-family="Microsoft YaHei,sans-serif" font-size="26" fill="#193447">按需：相关完整原文</text>
+<text x="1617.5" y="827.5" font-family="Microsoft YaHei,sans-serif" font-size="26" fill="#193447">过长：offload + 摘要</text>
+<text x="1615.0" y="865.5" font-family="Microsoft YaHei,sans-serif" font-size="26" fill="#193447">压缩后补当前关键约束</text>
+<text x="1615.0" y="903.5" font-family="Microsoft YaHei,sans-serif" font-size="26" fill="#193447">原文与调试记录不覆盖</text>
+<text x="1601.5" y="941.5" font-family="Microsoft YaHei,sans-serif" font-size="26" fill="#193447">不足时按商品 / 模块拆分</text>
+<rect x="50" y="1140" width="1900" height="410" rx="14" fill="#FFFBEA" stroke="#CFCBAC" stroke-width="2"/>
+<text x="72.0" y="1183" font-family="Microsoft YaHei,sans-serif" font-size="28" fill="#193447">可复用工具流：固定 typed 入口 + 声播服务 / JobRunner</text>
+<rect x="90" y="1230" width="400" height="230" rx="9" fill="#E6EDFF" stroke="#A7B7C3" stroke-width="2"/>
+<text x="225.5" y="1274.5" font-family="Microsoft YaHei,sans-serif" font-size="29" fill="#193447">F01—F04</text>
+<text x="159.0" y="1315.5" font-family="Microsoft YaHei,sans-serif" font-size="29" fill="#193447">材料解析 / 历史影响</text>
+<text x="188.5" y="1356.5" font-family="Microsoft YaHei,sans-serif" font-size="29" fill="#193447">商品校验与保存</text>
+<text x="203.0" y="1397.5" font-family="Microsoft YaHei,sans-serif" font-size="29" fill="#193447">本场草案保存</text>
+<text x="174.0" y="1438.5" font-family="Microsoft YaHei,sans-serif" font-size="29" fill="#193447">CAS / 回执 / 缺项</text>
+<rect x="550" y="1230" width="400" height="230" rx="9" fill="#E6EDFF" stroke="#A7B7C3" stroke-width="2"/>
+<text x="688.0" y="1276.0" font-family="Microsoft YaHei,sans-serif" font-size="28" fill="#193447">F05—F06</text>
+<text x="610.0" y="1316.0" font-family="Microsoft YaHei,sans-serif" font-size="28" fill="#193447">完整上下文与模块计划</text>
+<text x="610.0" y="1356.0" font-family="Microsoft YaHei,sans-serif" font-size="28" fill="#193447">按冻结计划生成 / 局改</text>
+<text x="666.0" y="1396.0" font-family="Microsoft YaHei,sans-serif" font-size="28" fill="#193447">保留未改模块</text>
+<text x="605.5" y="1436.0" font-family="Microsoft YaHei,sans-serif" font-size="28" fill="#193447">后台 job ≠ 自主 Agent</text>
+<rect x="1010" y="1230" width="400" height="230" rx="9" fill="#E6EDFF" stroke="#A7B7C3" stroke-width="2"/>
+<text x="1187.0" y="1277.5" font-family="Microsoft YaHei,sans-serif" font-size="27" fill="#193447">F07</text>
+<text x="1074.5" y="1316.5" font-family="Microsoft YaHei,sans-serif" font-size="27" fill="#193447">卡片拖拽 / 同商品连续</text>
+<text x="1088.0" y="1355.5" font-family="Microsoft YaHei,sans-serif" font-size="27" fill="#193447">尽量穿插 / 完全随机</text>
+<text x="1059.0" y="1394.5" font-family="Microsoft YaHei,sans-serif" font-size="27" fill="#193447">预览 → 用户应用 → 编译</text>
+<text x="1075.0" y="1433.5" font-family="Microsoft YaHei,sans-serif" font-size="27" fill="#193447">精确版本和重复项不丢</text>
+<rect x="1470" y="1230" width="400" height="230" rx="9" fill="#E6EDFF" stroke="#A7B7C3" stroke-width="2"/>
+<text x="1608.0" y="1276.0" font-family="Microsoft YaHei,sans-serif" font-size="28" fill="#193447">F08—F10</text>
+<text x="1544.0" y="1316.0" font-family="Microsoft YaHei,sans-serif" font-size="28" fill="#193447">人工批准后必需 TTS</text>
+<text x="1544.0" y="1356.0" font-family="Microsoft YaHei,sans-serif" font-size="28" fill="#193447">复盘导入与精确绑定</text>
+<text x="1544.0" y="1396.0" font-family="Microsoft YaHei,sans-serif" font-size="28" fill="#193447">素材需求 / 已有文件</text>
+<text x="1516.0" y="1436.0" font-family="Microsoft YaHei,sans-serif" font-size="28" fill="#193447">不生成视频，不自动开播</text>
+<rect x="50" y="1630" width="1900" height="140" rx="9" fill="#FFF0DA" stroke="#A7B7C3" stroke-width="2"/>
+<text x="786.5" y="1671.0" font-family="Microsoft YaHei,sans-serif" font-size="28" fill="#193447">F11 · 按原 Goal 回读验收真实成果</text>
+<text x="599.0" y="1711.0" font-family="Microsoft YaHei,sans-serif" font-size="28" fill="#193447">只更新商品：商品 + 有效研究维护 + 话术影响清单；不自动改稿</text>
+<text x="482.0" y="1751.0" font-family="Microsoft YaHei,sans-serif" font-size="28" fill="#193447">要求生稿：必须有实际正文；整场才检查批准 / 音频 / 候选；可选视觉缺失不挡声音</text>
+<polyline points="1000,240 1000,310" fill="none" stroke="#617889" stroke-width="3" marker-end="url(#a)"/>
+<polyline points="1000,465 1000,620" fill="none" stroke="#617889" stroke-width="3" marker-end="url(#a)"/>
+<polyline points="1510,465 1510,1140" fill="none" stroke="#617889" stroke-width="3" marker-end="url(#a)"/>
+<text x="1030.0" y="517" font-family="Microsoft YaHei,sans-serif" font-size="22" fill="#193447">需要独立分析时</text>
+<polyline points="255,550 255,500 600,500 600,465" fill="none" stroke="#617889" stroke-width="3" marker-end="url(#a)"/>
+<polyline points="1400,465 1400,505 1745,505 1745,550" fill="none" stroke="#617889" stroke-width="3" stroke-dasharray="10 8" marker-end="url(#a)"/>
+<polyline points="1000,695 1000,720 690,720 690,755" fill="none" stroke="#617889" stroke-width="3" marker-end="url(#a)"/>
+<polyline points="690,870 690,900 1000,900 1000,930" fill="none" stroke="#617889" stroke-width="3" marker-end="url(#a)"/>
+<polyline points="1000,695 1000,720 1000,720 1000,755" fill="none" stroke="#617889" stroke-width="3" marker-end="url(#a)"/>
+<polyline points="1000,870 1000,900 1000,900 1000,930" fill="none" stroke="#617889" stroke-width="3" marker-end="url(#a)"/>
+<polyline points="1000,695 1000,720 1310,720 1310,755" fill="none" stroke="#617889" stroke-width="3" marker-end="url(#a)"/>
+<polyline points="1310,870 1310,900 1000,900 1000,930" fill="none" stroke="#617889" stroke-width="3" marker-end="url(#a)"/>
+<polyline points="560,970 490,970 490,490 700,490 700,465" fill="none" stroke="#617889" stroke-width="3" stroke-dasharray="10 8" marker-end="url(#a)"/>
+<polyline points="1000,1070 1000,1140" fill="none" stroke="#617889" stroke-width="3" marker-end="url(#a)"/>
+<polyline points="290,1460 290,1630" fill="none" stroke="#617889" stroke-width="3" marker-end="url(#a)"/>
+<polyline points="750,1460 750,1630" fill="none" stroke="#617889" stroke-width="3" marker-end="url(#a)"/>
+<polyline points="1210,1460 1210,1630" fill="none" stroke="#617889" stroke-width="3" marker-end="url(#a)"/>
+<polyline points="1670,1460 1670,1630" fill="none" stroke="#617889" stroke-width="3" marker-end="url(#a)"/>
+<text x="60.0" y="1837" font-family="Microsoft YaHei,sans-serif" font-size="27" fill="#193447">全程记录：原始模型与工具输入输出、许可与版本检查、主从时间线、实际成果和失败；不依赖模型自述完成。</text>
+</svg>

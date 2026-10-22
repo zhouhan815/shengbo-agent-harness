@@ -1,0 +1,47 @@
+{
+  "run": "r5_compact_summary",
+  "versions": [
+    {
+      "version": 1,
+      "program": 39.41,
+      "semantic": 53.0,
+      "total": 92.41,
+      "hard_gate": false,
+      "rule_issues": [
+        "遗漏输入中明确的重要特点：耐磨"
+      ],
+      "serious_claims": 0,
+      "cross_version_copy_pass": true,
+      "pass": false,
+      "gaps": [
+        "颜色推荐连续三句同一结构，略有填充感",
+        "'全新上架'来自商品资料，但作为口播卖点略空，可少提",
+        "开头先讲选鞋误区再进产品，节奏稍绕，进入产品慢"
+      ]
+    },
+    {
+      "version": 2,
+      "program": 38.99,
+      "semantic": 53.0,
+      "total": 91.99,
+      "hard_gate": false,
+      "rule_issues": [
+        "遗漏输入中明确的重要特点：耐磨",
+        "丰富商品展开过短，请把重要卖点放入具体生活场景展开，不靠重复参数凑字"
+      ],
+      "serious_claims": 0,
+      "cross_version_copy_pass": true,
+      "pass": false,
+      "gaps": [
+        "颜色十种全部播报，口播偏长，可精简为色系建议",
+        "开头旅行场景展开较长，真正进入产品略慢",
+        "静音效果只停在'脚步声会小一些'，没有进一步说明对家人的影响边界，可更自然收束"
+      ]
+    }
+  ],
+  "pair_diversity": {
+    "score": 4,
+    "reason": "两版开场切入点明显不同：第1版从旅行收纳纠结切入，第2版从居家选拖鞋只看软不软的误区切入；卖点展开顺序也不同，第1版先旅行便携再足弓支撑，第2版先足弓支撑再居家静音快干；颜色处理方式不同，第1版按夏浅色系概括，第2版按清爽/居家/活泼推荐；节奏和语言差异明显，且均保留足弓支撑、静音防滑、快干、尺码、价格等核心信息，给4分。"
+  },
+  "rubric": "20261007.4-uniform-coverage-content-and-near-copy-checks"
+}

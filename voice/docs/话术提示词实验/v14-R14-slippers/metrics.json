@@ -1,0 +1,84 @@
+{
+  "versions": [
+    {
+      "han_characters": 753,
+      "sentences": 28,
+      "coverage_groups": {
+        "材质成型": true,
+        "足弓": true,
+        "厚底软弹": true,
+        "静音防滑": true,
+        "清洗快干防臭": true,
+        "轻便场景": true,
+        "规格": true,
+        "选码": true
+      },
+      "coverage_rate": 1.0,
+      "natural_sentence_ratio": 1.0,
+      "duplicate_sentences": [],
+      "reference_5gram_overlap": 0.04,
+      "program_scores": {
+        "selling_point_coverage": 12.0,
+        "flow": 8.0,
+        "speakability": 10.0,
+        "length_fit": 4.43,
+        "fact_references": 5.0
+      },
+      "program_total": 39.43,
+      "invalid_references": false,
+      "app_issues": []
+    },
+    {
+      "han_characters": 761,
+      "sentences": 26,
+      "coverage_groups": {
+        "材质成型": true,
+        "足弓": true,
+        "厚底软弹": true,
+        "静音防滑": true,
+        "清洗快干防臭": true,
+        "轻便场景": true,
+        "规格": true,
+        "选码": true
+      },
+      "coverage_rate": 1.0,
+      "natural_sentence_ratio": 1.0,
+      "duplicate_sentences": [],
+      "reference_5gram_overlap": 0.05,
+      "program_scores": {
+        "selling_point_coverage": 12.0,
+        "flow": 8.0,
+        "speakability": 10.0,
+        "length_fit": 4.48,
+        "fact_references": 5.0
+      },
+      "program_total": 39.48,
+      "invalid_references": false,
+      "app_issues": []
+    }
+  ],
+  "pair": [
+    {
+      "a": 1,
+      "b": 2,
+      "fivegram_jaccard": 0.154,
+      "shared_narrative_sentences": [
+        "鞋底有静音特性，晚上在室内走动，能减少对家人的打扰。"
+      ],
+      "near_copy_ratio": 0.125,
+      "near_copies": [
+        {
+          "a": "想选一双兼顾足弓支撑和软弹脚感的凉拖鞋，先把喜欢的颜色选好，再核对自己的尺码。",
+          "b": "想选一双兼顾足弓支撑和软弹脚感、旅行也能带走的凉拖鞋，先把喜欢的颜色选好，再核对自己的尺码。",
+          "similarity": 0.918
+        },
+        {
+          "a": "鞋底有静音特性，晚上在室内走动，能减少对家人的打扰。",
+          "b": "鞋底有静音特性，晚上在室内走动，能减少对家人的打扰。",
+          "similarity": 1.0
+        }
+      ],
+      "opening_similarity": 0.521
+    }
+  ]
+}

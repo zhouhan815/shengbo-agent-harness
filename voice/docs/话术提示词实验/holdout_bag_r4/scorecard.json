@@ -1,0 +1,42 @@
+{
+  "run": "holdout_bag_r4",
+  "versions": [
+    {
+      "version": 1,
+      "program": 40.0,
+      "semantic": 50.0,
+      "total": 90.0,
+      "hard_gate": true,
+      "rule_issues": [],
+      "serious_claims": 0,
+      "cross_version_copy_pass": false,
+      "pass": false,
+      "gaps": [
+        "“黑色比较耐脏”属于未支持的颜色功效断言，资料只给了颜色选项。",
+        "“遇到一点小雨”暗示防水或耐雨，而商品资料明确未提供防水性能，属于轻微越界。",
+        "价格和活动只说原价九十九、活动价七十九，没有提醒以页面实际活动条件和结算价为准。"
+      ]
+    },
+    {
+      "version": 2,
+      "program": 40.0,
+      "semantic": 50.0,
+      "total": 90.0,
+      "hard_gate": true,
+      "rule_issues": [],
+      "serious_claims": 0,
+      "cross_version_copy_pass": false,
+      "pass": false,
+      "gaps": [
+        "尺寸口播为“三十八乘三十乘十二厘米”，虽然可听懂，但未精确读作三十八乘三十乘十二厘米，对照商品资料不够严谨。",
+        "对“涤纶面料”展开为“打理起来相对简单”，但商品资料未明确说易打理或耐脏，属于轻微延伸。",
+        "没有说明活动价七十九元对应的活动条件或截止时间，虽然资料未提供截止时间，但可提醒用户以页面为准。"
+      ]
+    }
+  ],
+  "pair_diversity": {
+    "score": 3,
+    "reason": "两版开场和重点展开顺序有有效不同：版本1从通勤购物痛点切入，按颜色、肩带、尺寸、开合、面料、折叠展开；版本2从可折叠切入，随后讲主袋、面料、肩带、颜色、尺寸。两版均自然且完整，但整体仍使用相似的逐点模板和总结句式，差异未到卖点情境与节奏两项都明显不同的程度。"
+  },
+  "rubric": "20261007.4-uniform-coverage-content-and-near-copy-checks"
+}

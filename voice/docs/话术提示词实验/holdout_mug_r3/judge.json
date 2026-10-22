@@ -1,0 +1,69 @@
+{
+  "versions": [
+    {
+      "index": 1,
+      "scores": {
+        "natural_live_speech": 13,
+        "benefit_scene_expansion": 15,
+        "coherent_flow": 9,
+        "non_repetition": 8,
+        "purchase_guidance": 4
+      },
+      "score_reasons": [
+        "natural_live_speech=13：口语流畅，'咱们聊一只每天都会用到的杯子''不用整只手去捧杯身'等句自然，但'这只日常陶瓷马克杯，就是给家庭餐桌和办公室场景准备的'等句仍有模板感。",
+        "benefit_scene_expansion=15：对陶瓷、米白色、把手、350ml容量四个卖点均展开到早晨、下午、办公室、餐桌等情境，有具体生活画面，但收益描述较克制，未额外延伸。",
+        "coherent_flow=9：开场痛点、规格展开、价格、总结收口顺序自然，不机械。",
+        "non_repetition=8：无空话，但'米白色''350毫升''陶瓷材质'在正文和总结中重复，结构上略有复读感。",
+        "purchase_guidance=4：明确'售价49元''没有另设活动价，就是49元'，币种正确，引导'先确认颜色和容量是不是你想要的，合适再下单'自然。"
+      ],
+      "unsupported_claims": [],
+      "price_and_terms_correct": true,
+      "knowledge_leaks": [],
+      "main_gaps": [
+        "未说明杯子能否微波炉加热、洗碗机清洗或耐温范围，稿中未提示这些使用限制。",
+        "只提供米白色，稿中虽提到'目前提供的就是米白色这一种颜色'，但未说明容量是否唯一。",
+        "无促销信息，价格正确，但可补充邮费或优惠条件说明。"
+      ]
+    },
+    {
+      "index": 2,
+      "scores": {
+        "natural_live_speech": 13,
+        "benefit_scene_expansion": 15,
+        "coherent_flow": 9,
+        "non_repetition": 8,
+        "purchase_guidance": 4
+      },
+      "score_reasons": [
+        "natural_live_speech=13：整体口语化，如'你平时在工位上一坐就是大半天，手边那杯水放哪儿、端起来顺不顺手，慢慢就会变成一件在意的事'自然好懂，但部分表述偏书面（'这些日常场景准备的'、'实实在在会用到的部分'），略带播报感。",
+        "benefit_scene_expansion=15：对带把手、350ml容量、陶瓷材质、米白色四个卖点均展开到办公、家庭、端拿等情境，核心特点→情境→有限收益基本完整，但深度中等，未出现夸张收益。",
+        "coherent_flow=9：按欢迎、痛点、具体卖点、价格、总结收口推进，连贯不机械贴标签。",
+        "non_repetition=8：无空话凑字，但'日常''顺手''米白色''350毫升'在总结和正文中重复出现，略显冗余。",
+        "purchase_guidance=4：真实报出'售价49元'，人民币明确，引导'先确认米白色和350毫升是不是你日常想要的，再决定要不要入手'自然，不假设挂购物车。"
+      ],
+      "unsupported_claims": [],
+      "price_and_terms_correct": true,
+      "knowledge_leaks": [],
+      "main_gaps": [
+        "未提供耐温范围、微波炉/洗碗机适用性和保温功能，但稿中未提及这些限制，可能让观众产生不明确预期。",
+        "仅提供米白色一种颜色，未说明是否有其他颜色可选，但稿中未重申颜色唯一性。",
+        "无促销活动，价格49元正确，但未提及邮费或优惠条件，属于可补充信息。"
+      ]
+    }
+  ],
+  "pair_diversity": {
+    "score": 2,
+    "reason": "两版开场问候不同（'欢迎来到直播间' vs '欢迎来到直播间，今天咱们聊'），但后续均按材质、把手、容量、颜色、价格逐点展开，卖点顺序和叙述结构高度相似，属于换开场但同样逐点模板。"
+  },
+  "judge_model": "deepseek-flash",
+  "usage": {
+    "prompt_tokens": 1616,
+    "completion_tokens": 972,
+    "total_tokens": 2588,
+    "prompt_tokens_details": {
+      "cached_tokens": 384
+    },
+    "prompt_cache_hit_tokens": 384,
+    "prompt_cache_miss_tokens": 1232
+  }
+}

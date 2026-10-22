@@ -1,0 +1,44 @@
+{
+  "run": "r1_expansion",
+  "versions": [
+    {
+      "version": 1,
+      "program": 38.5,
+      "semantic": 47.0,
+      "total": 85.5,
+      "hard_gate": false,
+      "rule_issues": [
+        "遗漏输入中明确的重要特点：EVA材质、一体成型、耐磨"
+      ],
+      "serious_claims": 0,
+      "cross_version_copy_pass": false,
+      "pass": false,
+      "gaps": [
+        "对EVA环保材质的益处展开不够",
+        "旅行出游场景只简单提及，缺少具体画面",
+        "颜色部分列举后未给出有效选购建议"
+      ]
+    },
+    {
+      "version": 2,
+      "program": 40.0,
+      "semantic": 47.0,
+      "total": 87.0,
+      "hard_gate": true,
+      "rule_issues": [],
+      "serious_claims": 0,
+      "cross_version_copy_pass": false,
+      "pass": false,
+      "gaps": [
+        "未提及轻便耐磨的具体适用场景展开",
+        "浴室防滑场景只简单带过，缺少具体情境",
+        "颜色尺码部分以报数为主，缺少选购搭配建议"
+      ]
+    }
+  ],
+  "pair_diversity": {
+    "score": 3,
+    "reason": "两版开场痛点不同，版1侧重旅行和洗澡，版2侧重居家安静；卖点展开顺序不同（版1材质优先，版2静音防滑优先），价格话术有差异（版1直接报价，版2强调以页面为准）。但两版均完整覆盖核心卖点，差异明显，属于有效不同。"
+  },
+  "rubric": "20261007.4-uniform-coverage-content-and-near-copy-checks"
+}

@@ -1,0 +1,5684 @@
+[
+  {
+    "run": "calibration_original_reference",
+    "case": "slippers",
+    "requested_versions": 2,
+    "scorecard": {
+      "run": "calibration_original_reference",
+      "versions": [
+        {
+          "version": 1,
+          "program": 34.0,
+          "semantic": 36.0,
+          "total": 70.0,
+          "hard_gate": false,
+          "rule_issues": [
+            "遗漏输入中明确的重要特点：EVA材质、轻便、耐磨",
+            "当前输入没有提供已开通的下单入口，不得说直播间就能拍或指定购物车位置；改为按需要选择、合适再下单"
+          ],
+          "serious_claims": 6,
+          "cross_version_copy_pass": true,
+          "pass": false,
+          "gaps": [
+            "编造亲身试用和穿了大半个月体验，影响可信度",
+            "未准确完整讲颜色，且加入资料没有的奶白色、樱花粉",
+            "未说明标准码及宽脚/肉脚建议斟酌大一号"
+          ]
+        },
+        {
+          "version": 2,
+          "program": 32.08,
+          "semantic": 37.0,
+          "total": 69.08,
+          "hard_gate": false,
+          "rule_issues": [
+            "遗漏输入中明确的重要特点：EVA材质、轻便、耐磨、快干、防臭",
+            "一体成型或软弹不能推导出不磨脚；删除未提供的不磨脚性能承诺",
+            "当前输入没有提供已开通的下单入口，不得说直播间就能拍或指定购物车位置；改为按需要选择、合适再下单"
+          ],
+          "serious_claims": 8,
+          "cross_version_copy_pass": true,
+          "pass": false,
+          "gaps": [
+            "未说明标准码、脚背较宽或脚型偏肉建议斟酌大一号",
+            "颜色仅说浅色深色，未列明商品资料中的粉色、红色、绿色、蓝色、橙色、葡萄紫、烟熏紫、卡其、黑色、白色",
+            "未讲清原价178与限时107的优惠条件，也未自然引导按颜色和尺码选择下单"
+          ]
+        }
+      ],
+      "pair_diversity": {
+        "score": 3,
+        "reason": "两版开场、痛点组织、卖点展开顺序和节奏有有效不同：版本1先列核心优点再逐点讲，版本2用个人换鞋经验切入并更多场景化；但核心足弓、小蛮腰、静音防滑、价格收口仍高度相似，且版本2加入不合规个人体验与库存承诺，因此整体差异明显但未达两版均自然完整。"
+      },
+      "rubric": "20261007.4-uniform-coverage-content-and-near-copy-checks"
+    },
+    "metrics": {
+      "versions": [
+        {
+          "han_characters": 1035,
+          "sentences": 24,
+          "coverage_groups": {
+            "材质成型": false,
+            "足弓": true,
+            "厚底软弹": true,
+            "静音防滑": true,
+            "清洗快干防臭": true,
+            "轻便场景": false,
+            "规格": false,
+            "选码": false
+          },
+          "coverage_rate": 0.5,
+          "natural_sentence_ratio": 1.0,
+          "duplicate_sentences": [],
+          "reference_5gram_overlap": 1.0,
+          "program_scores": {
+            "selling_point_coverage": 6.0,
+            "flow": 8.0,
+            "speakability": 10.0,
+            "length_fit": 5,
+            "fact_references": 5.0
+          },
+          "program_total": 34.0,
+          "invalid_references": false,
+          "app_issues": []
+        },
+        {
+          "han_characters": 1170,
+          "sentences": 24,
+          "coverage_groups": {
+            "材质成型": false,
+            "足弓": true,
+            "厚底软弹": false,
+            "静音防滑": true,
+            "清洗快干防臭": false,
+            "轻便场景": false,
+            "规格": false,
+            "选码": true
+          },
+          "coverage_rate": 0.375,
+          "natural_sentence_ratio": 0.958,
+          "duplicate_sentences": [],
+          "reference_5gram_overlap": 1.0,
+          "program_scores": {
+            "selling_point_coverage": 4.5,
+            "flow": 8.0,
+            "speakability": 9.58,
+            "length_fit": 5,
+            "fact_references": 5.0
+          },
+          "program_total": 32.08,
+          "invalid_references": false,
+          "app_issues": [
+            "第11句有待核实的保证、体验或促销说法",
+            "第13句有待核实的保证、体验或促销说法",
+            "第23句有待核实的保证、体验或促销说法"
+          ]
+        }
+      ],
+      "pair": [
+        {
+          "a": 1,
+          "b": 2,
+          "fivegram_jaccard": 0.035,
+          "shared_narrative_sentences": [],
+          "near_copy_ratio": 0.0,
+          "near_copies": [],
+          "opening_similarity": 0.323
+        }
+      ]
+    },
+    "completed_versions": 2
+  },
+  {
+    "run": "final_pipeline_bag",
+    "case": "bag",
+    "requested_versions": 2,
+    "scorecard": {
+      "run": "final_pipeline_bag",
+      "versions": [
+        {
+          "version": 1,
+          "program": 40.0,
+          "semantic": 50.0,
+          "total": 90.0,
+          "hard_gate": true,
+          "rule_issues": [],
+          "serious_claims": 0,
+          "cross_version_copy_pass": true,
+          "pass": true,
+          "gaps": [
+            "数据多但缺少把尺寸翻译成具体可放物品的细项，用户难判断日常实际容量。",
+            "颜色选择只给风格方向，没有结合通勤/购物等场景给出快速二选一建议。",
+            "长肩带只提可手提可单肩，未说肩带是否可调或长度，单肩适配性信息不足。"
+          ]
+        },
+        {
+          "version": 2,
+          "program": 40.0,
+          "semantic": 53.0,
+          "total": 93.0,
+          "hard_gate": false,
+          "rule_issues": [
+            "促销输入没有明确限时，不能把普通活动价说成限时价"
+          ],
+          "serious_claims": 0,
+          "cross_version_copy_pass": true,
+          "pass": false,
+          "gaps": [
+            "规格换算不够直观，只说38×30×12厘米，未给出现场可感知的容量说明（如A4纸、水杯等）。",
+            "颜色选择建议较笼统，黑色/米色只给搭配方向，未帮用户按通勤/购物场景快速选色。",
+            "全篇未明确‘长肩带’能否调节或长度信息，用户无法判断单肩背是否适合自己身高。"
+          ]
+        }
+      ],
+      "pair_diversity": {
+        "score": 3,
+        "reason": "两版开场痛点不同，一版从小包/大包纠结切入，一版从上班买菜场景切入；重点展开顺序和节奏也有差异，比如第一版先折叠后内部口袋，第二版先拉链和内部口袋再折叠，但核心卖点和收口结构仍较接近，未达到4分要求的至少两项明显不同且均完整。"
+      },
+      "rubric": "20261007.4-uniform-coverage-content-and-near-copy-checks"
+    },
+    "metrics": {
+      "versions": [
+        {
+          "han_characters": 689,
+          "sentences": 27,
+          "coverage_groups": {
+            "材质": true,
+            "折叠": true,
+            "尺寸": true,
+            "拉链": true,
+            "口袋": true,
+            "携带": true,
+            "颜色": true,
+            "场景": true
+          },
+          "coverage_rate": 1.0,
+          "natural_sentence_ratio": 1.0,
+          "duplicate_sentences": [],
+          "reference_5gram_overlap": 0.003,
+          "program_scores": {
+            "selling_point_coverage": 12.0,
+            "flow": 8.0,
+            "speakability": 10.0,
+            "length_fit": 5,
+            "fact_references": 5.0
+          },
+          "program_total": 40.0,
+          "invalid_references": false,
+          "app_issues": []
+        },
+        {
+          "han_characters": 582,
+          "sentences": 23,
+          "coverage_groups": {
+            "材质": true,
+            "折叠": true,
+            "尺寸": true,
+            "拉链": true,
+            "口袋": true,
+            "携带": true,
+            "颜色": true,
+            "场景": true
+          },
+          "coverage_rate": 1.0,
+          "natural_sentence_ratio": 1.0,
+          "duplicate_sentences": [],
+          "reference_5gram_overlap": 0.0,
+          "program_scores": {
+            "selling_point_coverage": 12.0,
+            "flow": 8.0,
+            "speakability": 10.0,
+            "length_fit": 5,
+            "fact_references": 5.0
+          },
+          "program_total": 40.0,
+          "invalid_references": false,
+          "app_issues": []
+        }
+      ],
+      "pair": [
+        {
+          "a": 1,
+          "b": 2,
+          "fivegram_jaccard": 0.127,
+          "shared_narrative_sentences": [],
+          "near_copy_ratio": 0.071,
+          "near_copies": [
+            {
+              "a": "比如早上拿杯咖啡、撑个伞，手提着就走；东西多的时候往肩上一挂，两只手也能腾出来。",
+              "b": "早上拿杯咖啡、撑把伞，手提着就走；东西多的时候往肩上一挎，两只手能空出来。",
+              "similarity": 0.883
+            }
+          ],
+          "opening_similarity": 0.402
+        }
+      ]
+    },
+    "completed_versions": 2,
+    "prompt_sha256": "83debc0f9b279717e47d0686e1427a41947ea006554746449f90debfa81de738"
+  },
+  {
+    "run": "final_pipeline_mug",
+    "case": "mug",
+    "requested_versions": 2,
+    "scorecard": {
+      "run": "final_pipeline_mug",
+      "versions": [
+        {
+          "version": 1,
+          "program": 38.43,
+          "semantic": 53.0,
+          "total": 91.43,
+          "hard_gate": true,
+          "rule_issues": [],
+          "serious_claims": 0,
+          "cross_version_copy_pass": true,
+          "pass": true,
+          "gaps": [
+            "对陶瓷材质的实际特性如易碎、清洗等未展开，仅停留于触感。",
+            "容量350ml的适用性描述较泛，未结合具体饮品种类细化。",
+            "米白色搭配场景重复提及桌面，缺乏更多生活场景变化。"
+          ]
+        },
+        {
+          "version": 2,
+          "program": 38.7,
+          "semantic": 47.0,
+          "total": 85.7,
+          "hard_gate": true,
+          "rule_issues": [],
+          "serious_claims": 0,
+          "cross_version_copy_pass": true,
+          "pass": true,
+          "gaps": [
+            "场景展开虽有四个卖点，但部分情境较为泛化，缺少更具体的生活画面。",
+            "部分口语表达偏说明书化，如“规格就是三百五十毫升带把手，没有其他容量可选”。",
+            "对“陶瓷材质”和“带把手”的展开略显单薄，未充分体现使用差异。"
+          ]
+        }
+      ],
+      "pair_diversity": {
+        "score": 3,
+        "reason": "两版开场不同，版2以握杯暖手提问开场，版1以喝水偏好开场；卖点展开顺序和情境略有差异，如版1先颜色后容量，版2先材质后把手，但整体结构仍相似，均按痛点、卖点、价格收口，因此评3分。"
+      },
+      "rubric": "20261007.4-uniform-coverage-content-and-near-copy-checks"
+    },
+    "metrics": {
+      "versions": [
+        {
+          "han_characters": 728,
+          "sentences": 25,
+          "coverage_groups": {
+            "材质": true,
+            "容量": true,
+            "把手": true,
+            "颜色": true,
+            "场景": true
+          },
+          "coverage_rate": 1.0,
+          "natural_sentence_ratio": 1.0,
+          "duplicate_sentences": [],
+          "reference_5gram_overlap": 0.006,
+          "program_scores": {
+            "selling_point_coverage": 12.0,
+            "flow": 8.0,
+            "speakability": 10.0,
+            "length_fit": 3.43,
+            "fact_references": 5.0
+          },
+          "program_total": 38.43,
+          "invalid_references": false,
+          "app_issues": []
+        },
+        {
+          "han_characters": 675,
+          "sentences": 27,
+          "coverage_groups": {
+            "材质": true,
+            "容量": true,
+            "把手": true,
+            "颜色": true,
+            "场景": true
+          },
+          "coverage_rate": 1.0,
+          "natural_sentence_ratio": 1.0,
+          "duplicate_sentences": [],
+          "reference_5gram_overlap": 0.002,
+          "program_scores": {
+            "selling_point_coverage": 12.0,
+            "flow": 8.0,
+            "speakability": 10.0,
+            "length_fit": 3.7,
+            "fact_references": 5.0
+          },
+          "program_total": 38.7,
+          "invalid_references": false,
+          "app_issues": []
+        }
+      ],
+      "pair": [
+        {
+          "a": 1,
+          "b": 2,
+          "fivegram_jaccard": 0.136,
+          "shared_narrative_sentences": [],
+          "near_copy_ratio": 0.0,
+          "near_copies": [],
+          "opening_similarity": 0.306
+        }
+      ]
+    },
+    "completed_versions": 2,
+    "prompt_sha256": "83debc0f9b279717e47d0686e1427a41947ea006554746449f90debfa81de738"
+  },
+  {
+    "run": "final_pipeline_notebook",
+    "case": "notebook",
+    "requested_versions": 2,
+    "scorecard": {
+      "run": "final_pipeline_notebook",
+      "versions": [
+        {
+          "version": 1,
+          "program": 39.7,
+          "semantic": 46.0,
+          "total": 85.7,
+          "hard_gate": false,
+          "rule_issues": [],
+          "serious_claims": 0,
+          "cross_version_copy_pass": true,
+          "pass": false,
+          "gaps": [
+            "卖点展开密度不足，80页使用场景较单薄，未呈现‘一段时间’的具体画面。",
+            "点阵格式的收益仅泛泛而谈，未像参考稿那样结合分栏、表格等具体用途。",
+            "颜色介绍简短，未与使用场景或情绪价值关联。"
+          ]
+        },
+        {
+          "version": 2,
+          "program": 40.0,
+          "semantic": 51.0,
+          "total": 91.0,
+          "hard_gate": true,
+          "rule_issues": [],
+          "serious_claims": 0,
+          "cross_version_copy_pass": true,
+          "pass": true,
+          "gaps": [
+            "对点阵格式的书写便利性描述较泛，未结合具体记录场景（如画表格）进一步展开。",
+            "封面颜色的视觉描述较为主观，缺少与使用场景的细腻关联。",
+            "购买引导仅停留在颜色和凑三本，未提及适合人群的差异化推荐。"
+          ]
+        }
+      ],
+      "pair_diversity": {
+        "score": 3,
+        "reason": "两版开场痛点不同（出门带本子 vs 手机记录），卖点展开顺序有差异（版本1规格穿插，版本2先点阵后尺寸），但核心结构均为痛点-规格-颜色-价格，且对点阵、软封面的诠释相似，差异不够鲜明。"
+      },
+      "rubric": "20261007.4-uniform-coverage-content-and-near-copy-checks"
+    },
+    "metrics": {
+      "versions": [
+        {
+          "han_characters": 715,
+          "sentences": 33,
+          "coverage_groups": {
+            "尺寸": true,
+            "页数": true,
+            "封面": true,
+            "内页": true,
+            "用途": true,
+            "颜色": true,
+            "优惠门槛": true,
+            "不可叠加": true
+          },
+          "coverage_rate": 1.0,
+          "natural_sentence_ratio": 0.97,
+          "duplicate_sentences": [],
+          "reference_5gram_overlap": 0.001,
+          "program_scores": {
+            "selling_point_coverage": 12.0,
+            "flow": 8.0,
+            "speakability": 9.7,
+            "length_fit": 5,
+            "fact_references": 5.0
+          },
+          "program_total": 39.7,
+          "invalid_references": false,
+          "app_issues": []
+        },
+        {
+          "han_characters": 738,
+          "sentences": 28,
+          "coverage_groups": {
+            "尺寸": true,
+            "页数": true,
+            "封面": true,
+            "内页": true,
+            "用途": true,
+            "颜色": true,
+            "优惠门槛": true,
+            "不可叠加": true
+          },
+          "coverage_rate": 1.0,
+          "natural_sentence_ratio": 1.0,
+          "duplicate_sentences": [],
+          "reference_5gram_overlap": 0.003,
+          "program_scores": {
+            "selling_point_coverage": 12.0,
+            "flow": 8.0,
+            "speakability": 10.0,
+            "length_fit": 5,
+            "fact_references": 5.0
+          },
+          "program_total": 40.0,
+          "invalid_references": false,
+          "app_issues": []
+        }
+      ],
+      "pair": [
+        {
+          "a": 1,
+          "b": 2,
+          "fivegram_jaccard": 0.048,
+          "shared_narrative_sentences": [],
+          "near_copy_ratio": 0.0,
+          "near_copies": [],
+          "opening_similarity": 0.277
+        }
+      ]
+    },
+    "completed_versions": 2,
+    "prompt_sha256": "83debc0f9b279717e47d0686e1427a41947ea006554746449f90debfa81de738"
+  },
+  {
+    "run": "final_pipeline_slippers",
+    "case": "slippers",
+    "requested_versions": 2,
+    "scorecard": {
+      "run": "final_pipeline_slippers",
+      "versions": [
+        {
+          "version": 1,
+          "program": 39.99,
+          "semantic": 50.0,
+          "total": 89.99,
+          "hard_gate": true,
+          "rule_issues": [],
+          "serious_claims": 0,
+          "cross_version_copy_pass": true,
+          "pass": true,
+          "gaps": [
+            "对‘耐磨’卖点仅简单提及‘很耐磨’，未结合具体使用场景或有限收益进行展开，影响卖点充分性。",
+            "颜色描述虽丰富但偏向主观推荐，如‘温柔一点可以看粉色’，未基于商品客观特点，可能造成选择引导不够客观。",
+            "整体播报结构虽完整但稍显冗长，部分卖点展开重复，节奏可进一步优化。"
+          ]
+        },
+        {
+          "version": 2,
+          "program": 34.96,
+          "semantic": 44.0,
+          "total": 78.96,
+          "hard_gate": false,
+          "rule_issues": [
+            "遗漏输入中明确的重要特点：EVA材质、一体成型、耐磨",
+            "丰富商品展开过短，请把重要卖点放入具体生活场景展开，不靠重复参数凑字"
+          ],
+          "serious_claims": 0,
+          "cross_version_copy_pass": true,
+          "pass": false,
+          "gaps": [
+            "痛点引入较浅，仅简单提及旅行带拖鞋纠结和酒店换鞋担忧，未深入展开，导致后续卖点说服力减弱。",
+            "卖点展开不够充分，多个卖点（如旅行出游、沙滩漫步）仅一笔带过，缺乏具体情境和有限生活收益的细化描述。",
+            "规格描述较简略，仅列举颜色种类和尺码区间，未根据颜色或尺码特点提供选择建议，购买引导稍显泛泛。"
+          ]
+        }
+      ],
+      "pair_diversity": {
+        "score": 3,
+        "reason": "两版开场和生活痛点展开明显不同：版本1以旅行带拖鞋纠结引入，版本2以厨房久站和浴室静音场景引入，重点展开有效不同；但版本2后续卖点展开顺序仍沿袭模板化结构，情境和节奏有差异但未达两项明显不同且均完整，故评为3分。"
+      },
+      "rubric": "20261007.4-uniform-coverage-content-and-near-copy-checks"
+    },
+    "metrics": {
+      "versions": [
+        {
+          "han_characters": 849,
+          "sentences": 27,
+          "coverage_groups": {
+            "材质成型": true,
+            "足弓": true,
+            "厚底软弹": true,
+            "静音防滑": true,
+            "清洗快干防臭": true,
+            "轻便场景": true,
+            "规格": true,
+            "选码": true
+          },
+          "coverage_rate": 1.0,
+          "natural_sentence_ratio": 1.0,
+          "duplicate_sentences": [],
+          "reference_5gram_overlap": 0.05,
+          "program_scores": {
+            "selling_point_coverage": 12.0,
+            "flow": 8.0,
+            "speakability": 10.0,
+            "length_fit": 4.99,
+            "fact_references": 5.0
+          },
+          "program_total": 39.99,
+          "invalid_references": false,
+          "app_issues": []
+        },
+        {
+          "han_characters": 503,
+          "sentences": 23,
+          "coverage_groups": {
+            "材质成型": false,
+            "足弓": true,
+            "厚底软弹": true,
+            "静音防滑": true,
+            "清洗快干防臭": false,
+            "轻便场景": true,
+            "规格": true,
+            "选码": true
+          },
+          "coverage_rate": 0.75,
+          "natural_sentence_ratio": 1.0,
+          "duplicate_sentences": [],
+          "reference_5gram_overlap": 0.051,
+          "program_scores": {
+            "selling_point_coverage": 9.0,
+            "flow": 8.0,
+            "speakability": 10.0,
+            "length_fit": 2.96,
+            "fact_references": 5.0
+          },
+          "program_total": 34.96,
+          "invalid_references": false,
+          "app_issues": []
+        }
+      ],
+      "pair": [
+        {
+          "a": 1,
+          "b": 2,
+          "fivegram_jaccard": 0.103,
+          "shared_narrative_sentences": [],
+          "near_copy_ratio": 0.0,
+          "near_copies": [],
+          "opening_similarity": 0.232
+        }
+      ]
+    },
+    "completed_versions": 2,
+    "prompt_sha256": "83debc0f9b279717e47d0686e1427a41947ea006554746449f90debfa81de738"
+  },
+  {
+    "run": "final_pipeline_slippers_repeat",
+    "case": "slippers",
+    "requested_versions": 2,
+    "scorecard": {
+      "run": "final_pipeline_slippers_repeat",
+      "versions": [
+        {
+          "version": 1,
+          "program": 38.78,
+          "semantic": 55.0,
+          "total": 93.78,
+          "hard_gate": false,
+          "rule_issues": [
+            "丰富商品展开过短，请把重要卖点放入具体生活场景展开，不靠重复参数凑字"
+          ],
+          "serious_claims": 0,
+          "cross_version_copy_pass": true,
+          "pass": false,
+          "gaps": [
+            "对防臭特性的描述仅'材质本身防臭快干'一句，未结合脚汗、闷热等常见居家使用情境，卖点展开偏薄。",
+            "颜色建议虽给了冷暖方向，但未说明不同颜色在家居搭配中的差异，颜色卖点偏罗列。",
+            "对'静音防滑'的'静音'和'防滑'在不同地面上的表现没有进一步结合浴室、卧室等地板材质差异，场景延展空间未用足。"
+          ]
+        },
+        {
+          "version": 2,
+          "program": 38.74,
+          "semantic": 53.0,
+          "total": 91.74,
+          "hard_gate": false,
+          "rule_issues": [
+            "遗漏输入中明确的重要特点：耐磨",
+            "丰富商品展开过短，请把重要卖点放入具体生活场景展开，不靠重复参数凑字"
+          ],
+          "serious_claims": 0,
+          "cross_version_copy_pass": true,
+          "pass": false,
+          "gaps": [
+            "未提及材质一体成型的工艺优势，但资料本身未强调可讲，不构成缺点；实际较大的缺口是未说明日常外穿场景中'散步/倒垃圾'的具体收益，仅一笔带过。",
+            "对防臭特性几乎没有展开，仅与快干一起带过，降低了核心卖点密度。",
+            "对'旅行出游、海边漫步'的携带和踩沙场景只讲轻便，没有连接足弓支撑或静音等差异点，卖点与场景结合略浅。"
+          ]
+        }
+      ],
+      "pair_diversity": {
+        "score": 4,
+        "reason": "两版开场不同，第1版从旅行和出门场景切入，第2版从久站和夜间打扰切入；卖点展开顺序也不同，第1版先轻便旅行再足弓，第2版先足弓静音再轻便，情境与节奏有明显区别，且均较完整，符合卖点展开顺序/情境/节奏至少两项明显不同。"
+      },
+      "rubric": "20261007.4-uniform-coverage-content-and-near-copy-checks"
+    },
+    "metrics": {
+      "versions": [
+        {
+          "han_characters": 642,
+          "sentences": 24,
+          "coverage_groups": {
+            "材质成型": true,
+            "足弓": true,
+            "厚底软弹": true,
+            "静音防滑": true,
+            "清洗快干防臭": true,
+            "轻便场景": true,
+            "规格": true,
+            "选码": true
+          },
+          "coverage_rate": 1.0,
+          "natural_sentence_ratio": 1.0,
+          "duplicate_sentences": [],
+          "reference_5gram_overlap": 0.065,
+          "program_scores": {
+            "selling_point_coverage": 12.0,
+            "flow": 8.0,
+            "speakability": 10.0,
+            "length_fit": 3.78,
+            "fact_references": 5.0
+          },
+          "program_total": 38.78,
+          "invalid_references": false,
+          "app_issues": []
+        },
+        {
+          "han_characters": 635,
+          "sentences": 28,
+          "coverage_groups": {
+            "材质成型": true,
+            "足弓": true,
+            "厚底软弹": true,
+            "静音防滑": true,
+            "清洗快干防臭": true,
+            "轻便场景": true,
+            "规格": true,
+            "选码": true
+          },
+          "coverage_rate": 1.0,
+          "natural_sentence_ratio": 1.0,
+          "duplicate_sentences": [],
+          "reference_5gram_overlap": 0.054,
+          "program_scores": {
+            "selling_point_coverage": 12.0,
+            "flow": 8.0,
+            "speakability": 10.0,
+            "length_fit": 3.74,
+            "fact_references": 5.0
+          },
+          "program_total": 38.74,
+          "invalid_references": false,
+          "app_issues": []
+        }
+      ],
+      "pair": [
+        {
+          "a": 1,
+          "b": 2,
+          "fivegram_jaccard": 0.156,
+          "shared_narrative_sentences": [],
+          "near_copy_ratio": 0.125,
+          "near_copies": [
+            {
+              "a": "先看脚底这一块，它有足弓支撑，不是完全平塌塌的鞋床。",
+              "b": "再看脚底这一块，它做了足弓支撑，不是完全平塌塌的鞋底。",
+              "similarity": 0.868
+            },
+            {
+              "a": "材质本身防臭快干，洗澡沾了水，冲一冲就干净，晾着也干得快。",
+              "b": "材质防臭快干，洗澡沾了水，冲一冲就干净，晾着也干得快。",
+              "similarity": 0.964
+            }
+          ],
+          "opening_similarity": 0.161
+        }
+      ]
+    },
+    "completed_versions": 2,
+    "prompt_sha256": "83debc0f9b279717e47d0686e1427a41947ea006554746449f90debfa81de738"
+  },
+  {
+    "run": "heldout_notebook_r6",
+    "case": "notebook",
+    "requested_versions": 2,
+    "scorecard": {
+      "run": "heldout_notebook_r6",
+      "versions": [
+        {
+          "version": 1,
+          "program": 40.0,
+          "semantic": 52.0,
+          "total": 92.0,
+          "hard_gate": true,
+          "rule_issues": [],
+          "serious_claims": 0,
+          "cross_version_copy_pass": true,
+          "pass": true,
+          "gaps": [
+            "没有提及可用于日常记录之外，结合简单手账的更多具体例子略少。",
+            "软封面收益的展开不如版本1充分，未点出可摊平等合理场景。",
+            "活动截止时间未提供，稿中已说明没有说明，不算事实错误，但购买紧迫感自然弱。"
+          ]
+        },
+        {
+          "version": 2,
+          "program": 40.0,
+          "semantic": 53.0,
+          "total": 93.0,
+          "hard_gate": true,
+          "rule_issues": [],
+          "serious_claims": 0,
+          "cross_version_copy_pass": true,
+          "pass": true,
+          "gaps": [
+            "未提及可作为简单手账用途，虽然资料允许。",
+            "没有提示购买多本作为拼单或备用，数量选择引导可更具体。",
+            "活动截止时间未提供，但稿中已说明没有说明，此处不算缺失；更主要的不足是缺少对点阵格式学习场景的更多具体示例。"
+          ]
+        }
+      ],
+      "pair_diversity": {
+        "score": 3,
+        "reason": "两版开场明显不同：版本1从‘出门带本子’的痛点切入，版本2从‘横线本限制’切入；核心卖点展开顺序也不同，版本1先软封面再尺寸页数，版本2先点阵再尺寸页数。但两版对多数卖点的具体情境和节奏差异还不够鲜明，属于开场和重点顺序有效不同但整体结构仍较接近。"
+      },
+      "rubric": "20261007.4-uniform-coverage-content-and-near-copy-checks"
+    },
+    "metrics": {
+      "versions": [
+        {
+          "han_characters": 733,
+          "sentences": 28,
+          "coverage_groups": {
+            "尺寸": true,
+            "页数": true,
+            "封面": true,
+            "内页": true,
+            "用途": true,
+            "颜色": true,
+            "优惠门槛": true,
+            "不可叠加": true
+          },
+          "coverage_rate": 1.0,
+          "natural_sentence_ratio": 1.0,
+          "duplicate_sentences": [],
+          "reference_5gram_overlap": 0.003,
+          "program_scores": {
+            "selling_point_coverage": 12.0,
+            "flow": 8.0,
+            "speakability": 10.0,
+            "length_fit": 5,
+            "fact_references": 5.0
+          },
+          "program_total": 40.0,
+          "invalid_references": false,
+          "app_issues": []
+        },
+        {
+          "han_characters": 698,
+          "sentences": 29,
+          "coverage_groups": {
+            "尺寸": true,
+            "页数": true,
+            "封面": true,
+            "内页": true,
+            "用途": true,
+            "颜色": true,
+            "优惠门槛": true,
+            "不可叠加": true
+          },
+          "coverage_rate": 1.0,
+          "natural_sentence_ratio": 1.0,
+          "duplicate_sentences": [],
+          "reference_5gram_overlap": 0.001,
+          "program_scores": {
+            "selling_point_coverage": 12.0,
+            "flow": 8.0,
+            "speakability": 10.0,
+            "length_fit": 5,
+            "fact_references": 5.0
+          },
+          "program_total": 40.0,
+          "invalid_references": false,
+          "app_issues": []
+        }
+      ],
+      "pair": [
+        {
+          "a": 1,
+          "b": 2,
+          "fivegram_jaccard": 0.15,
+          "shared_narrative_sentences": [],
+          "near_copy_ratio": 0.143,
+          "near_copies": [
+            {
+              "a": "做简单手账的时候，贴贴纸、画箭头、框重点，点阵都能当成一个淡淡的底稿。",
+              "b": "做简单手账的时候，贴贴纸、画箭头、框重点，点阵都能当个淡淡的参考线。",
+              "similarity": 0.899
+            },
+            {
+              "a": "哪天需要画个小格子、列个清单，点阵又能帮你把位置对齐，不用专门去找尺子。",
+              "b": "哪天需要画个小格子、列个清单，点阵又能帮你把位置对齐。",
+              "similarity": 0.857
+            }
+          ],
+          "opening_similarity": 0.262
+        }
+      ]
+    },
+    "completed_versions": 2,
+    "prompt_sha256": "a2aa188e6072320c8962ec0c017fa076e5ecf36030988ef6fe5885e07f885f32"
+  },
+  {
+    "run": "holdout_bag_r3",
+    "case": "bag",
+    "requested_versions": 2,
+    "scorecard": {
+      "run": "holdout_bag_r3",
+      "versions": [
+        {
+          "version": 1,
+          "program": 40.0,
+          "semantic": 53.0,
+          "total": 93.0,
+          "hard_gate": true,
+          "rule_issues": [],
+          "serious_claims": 0,
+          "cross_version_copy_pass": false,
+          "pass": false,
+          "gaps": [
+            "活动截止时间未提供，口播未作提示。",
+            "未说明资料未覆盖的电脑适配尺寸、承重、防水、防盗等边界。",
+            "购买引导停留在“先选色再考虑”，缺少对活动价当前性的自然提醒。"
+          ]
+        },
+        {
+          "version": 2,
+          "program": 40.0,
+          "semantic": 48.0,
+          "total": 88.0,
+          "hard_gate": true,
+          "rule_issues": [],
+          "serious_claims": 0,
+          "cross_version_copy_pass": false,
+          "pass": false,
+          "gaps": [
+            "活动截止时间未提供，原稿未提示可能变化。",
+            "未说明具体不适合的边界，如资料未提供电脑适配尺寸、承重、防水、防盗。",
+            "颜色选择引导较笼统，未按黑色、米色给出更多日常搭配场景。"
+          ]
+        }
+      ],
+      "pair_diversity": {
+        "score": 4,
+        "reason": "两版开场不同，第一版从“带的东西不少、不想拎好几个袋子”切入，第二版从“纠结背哪个包、包身占地方”切入；卖点展开顺序也不同，第一版先讲内部分区再讲背法，第二版先讲可折叠再讲内部分区和背法；情境和节奏有明显差异，均较完整。"
+      },
+      "rubric": "20261007.4-uniform-coverage-content-and-near-copy-checks"
+    },
+    "metrics": {
+      "versions": [
+        {
+          "han_characters": 704,
+          "sentences": 22,
+          "coverage_groups": {
+            "材质": true,
+            "折叠": true,
+            "尺寸": true,
+            "拉链": true,
+            "口袋": true,
+            "携带": true,
+            "颜色": true,
+            "场景": true
+          },
+          "coverage_rate": 1.0,
+          "natural_sentence_ratio": 1.0,
+          "duplicate_sentences": [],
+          "reference_5gram_overlap": 0.0,
+          "program_scores": {
+            "selling_point_coverage": 12.0,
+            "flow": 8.0,
+            "speakability": 10.0,
+            "length_fit": 5,
+            "fact_references": 5.0
+          },
+          "program_total": 40.0,
+          "invalid_references": false,
+          "app_issues": []
+        },
+        {
+          "han_characters": 686,
+          "sentences": 24,
+          "coverage_groups": {
+            "材质": true,
+            "折叠": true,
+            "尺寸": true,
+            "拉链": true,
+            "口袋": true,
+            "携带": true,
+            "颜色": true,
+            "场景": true
+          },
+          "coverage_rate": 1.0,
+          "natural_sentence_ratio": 1.0,
+          "duplicate_sentences": [],
+          "reference_5gram_overlap": 0.0,
+          "program_scores": {
+            "selling_point_coverage": 12.0,
+            "flow": 8.0,
+            "speakability": 10.0,
+            "length_fit": 5,
+            "fact_references": 5.0
+          },
+          "program_total": 40.0,
+          "invalid_references": false,
+          "app_issues": []
+        }
+      ],
+      "pair": [
+        {
+          "a": 1,
+          "b": 2,
+          "fivegram_jaccard": 0.19,
+          "shared_narrative_sentences": [],
+          "near_copy_ratio": 0.312,
+          "near_copies": [
+            {
+              "a": "再看包内结构，主袋是拉链开合，里面还有一个小口袋。",
+              "b": "先看包内结构，主袋是拉链开合，里面还带一个小口袋。",
+              "similarity": 0.92
+            },
+            {
+              "a": "然后是背法，这款包配的是长肩带，可以手提也可以单肩背。",
+              "b": "再看背法，这款包配的是长肩带，可以手提，也可以单肩背。",
+              "similarity": 0.889
+            },
+            {
+              "a": "平时在家不用的时候，也可以折叠收纳，对家里放置空间比较在意的人来说，这个方式就比较顺手。",
+              "b": "平常在家不用的时候，也可以折叠收好，对放置空间比较在意的人来说，这个方式就比较顺手。",
+              "similarity": 0.93
+            },
+            {
+              "a": "早高峰赶地铁的时候，你可以单肩背着空出手来看手机、拿交通卡。",
+              "b": "早高峰赶地铁的时候，你可以单肩背着，空出一只手来看手机、拿交通卡。",
+              "similarity": 0.952
+            },
+            {
+              "a": "出差或者短途出行前把它折起来收进行李箱，到了目的地需要装东西时再展开用，不用一直带着一个撑得鼓鼓的空包。",
+              "b": "短途出行前把它折好放进箱子，到了目的地需要装东西时再展开用，就不用一直拎着一个撑得鼓鼓的空包。",
+              "similarity": 0.848
+            }
+          ],
+          "opening_similarity": 0.507
+        }
+      ]
+    },
+    "completed_versions": 2,
+    "prompt_sha256": "0295a0dfd9b26b801b5559a6527d9fc37baa36bed72b3014d2f1da0ecfa9437d"
+  },
+  {
+    "run": "holdout_bag_r4",
+    "case": "bag",
+    "requested_versions": 2,
+    "scorecard": {
+      "run": "holdout_bag_r4",
+      "versions": [
+        {
+          "version": 1,
+          "program": 40.0,
+          "semantic": 50.0,
+          "total": 90.0,
+          "hard_gate": true,
+          "rule_issues": [],
+          "serious_claims": 0,
+          "cross_version_copy_pass": false,
+          "pass": false,
+          "gaps": [
+            "“黑色比较耐脏”属于未支持的颜色功效断言，资料只给了颜色选项。",
+            "“遇到一点小雨”暗示防水或耐雨，而商品资料明确未提供防水性能，属于轻微越界。",
+            "价格和活动只说原价九十九、活动价七十九，没有提醒以页面实际活动条件和结算价为准。"
+          ]
+        },
+        {
+          "version": 2,
+          "program": 40.0,
+          "semantic": 50.0,
+          "total": 90.0,
+          "hard_gate": true,
+          "rule_issues": [],
+          "serious_claims": 0,
+          "cross_version_copy_pass": false,
+          "pass": false,
+          "gaps": [
+            "尺寸口播为“三十八乘三十乘十二厘米”，虽然可听懂，但未精确读作三十八乘三十乘十二厘米，对照商品资料不够严谨。",
+            "对“涤纶面料”展开为“打理起来相对简单”，但商品资料未明确说易打理或耐脏，属于轻微延伸。",
+            "没有说明活动价七十九元对应的活动条件或截止时间，虽然资料未提供截止时间，但可提醒用户以页面为准。"
+          ]
+        }
+      ],
+      "pair_diversity": {
+        "score": 3,
+        "reason": "两版开场和重点展开顺序有有效不同：版本1从通勤购物痛点切入，按颜色、肩带、尺寸、开合、面料、折叠展开；版本2从可折叠切入，随后讲主袋、面料、肩带、颜色、尺寸。两版均自然且完整，但整体仍使用相似的逐点模板和总结句式，差异未到卖点情境与节奏两项都明显不同的程度。"
+      },
+      "rubric": "20261007.4-uniform-coverage-content-and-near-copy-checks"
+    },
+    "metrics": {
+      "versions": [
+        {
+          "han_characters": 697,
+          "sentences": 23,
+          "coverage_groups": {
+            "材质": true,
+            "折叠": true,
+            "尺寸": true,
+            "拉链": true,
+            "口袋": true,
+            "携带": true,
+            "颜色": true,
+            "场景": true
+          },
+          "coverage_rate": 1.0,
+          "natural_sentence_ratio": 1.0,
+          "duplicate_sentences": [],
+          "reference_5gram_overlap": 0.0,
+          "program_scores": {
+            "selling_point_coverage": 12.0,
+            "flow": 8.0,
+            "speakability": 10.0,
+            "length_fit": 5,
+            "fact_references": 5.0
+          },
+          "program_total": 40.0,
+          "invalid_references": false,
+          "app_issues": []
+        },
+        {
+          "han_characters": 799,
+          "sentences": 29,
+          "coverage_groups": {
+            "材质": true,
+            "折叠": true,
+            "尺寸": true,
+            "拉链": true,
+            "口袋": true,
+            "携带": true,
+            "颜色": true,
+            "场景": true
+          },
+          "coverage_rate": 1.0,
+          "natural_sentence_ratio": 1.0,
+          "duplicate_sentences": [],
+          "reference_5gram_overlap": 0.0,
+          "program_scores": {
+            "selling_point_coverage": 12.0,
+            "flow": 8.0,
+            "speakability": 10.0,
+            "length_fit": 5,
+            "fact_references": 5.0
+          },
+          "program_total": 40.0,
+          "invalid_references": false,
+          "app_issues": []
+        }
+      ],
+      "pair": [
+        {
+          "a": 1,
+          "b": 2,
+          "fivegram_jaccard": 0.414,
+          "shared_narrative_sentences": [
+            "一个包有两种拿法，出门可以根据当天穿什么、要带多少东西来换着用。",
+            "你先选好黑色或米色，确认尺寸符合自己的日常需要，合适再下单。",
+            "对喜欢轻装出门的人来说，这种能收能放的方式，比一直拎着一个空包要省事。",
+            "比如出门前想带个备用包，或者家里柜子空间有限，折起来收着就不占地方。",
+            "这样你找小物件的时候不用把整个包翻一遍，拿取会更有条理。"
+          ],
+          "near_copy_ratio": 0.444,
+          "near_copies": [
+            {
+              "a": "一个包有两种拿法，出门可以根据当天穿什么、要带多少东西来换着用。",
+              "b": "一个包有两种拿法，出门可以根据当天穿什么、要带多少东西来换着用。",
+              "similarity": 1.0
+            },
+            {
+              "a": "你上班赶路的时候单肩一挎，腾出手拿咖啡、刷手机；去超市买东西，手提也方便。",
+              "b": "你上班赶路的时候单肩一挎，腾出手来拿咖啡、刷门禁；去超市买东西，手提也方便。",
+              "similarity": 0.933
+            },
+            {
+              "a": "你先选好黑色或米色，确认尺寸符合自己的日常需要，合适再下单。",
+              "b": "你先选好黑色或米色，确认尺寸符合自己的日常需要，合适再下单。",
+              "similarity": 1.0
+            },
+            {
+              "a": "平时坐地铁、过安检，或者在人多的商场里，拉上拉链心里会踏实一些；小口袋可以放钥匙、耳机这类容易翻不到的东西。",
+              "b": "坐地铁、过安检或者在人多的商场里，拉上拉链会让包里的东西安稳一些；小口袋可以放钥匙、耳机这类容易翻不到的东西。",
+              "similarity": 0.862
+            },
+            {
+              "a": "对喜欢轻装出门的人来说，这种能收能放的方式，比一直拎着一个空包要省事。",
+              "b": "对喜欢轻装出门的人来说，这种能收能放的方式，比一直拎着一个空包要省事。",
+              "similarity": 1.0
+            },
+            {
+              "a": "比如出门前想带个备用包，或者家里柜子空间有限，折起来收着就不占地方。",
+              "b": "比如出门前想带个备用包，或者家里柜子空间有限，折起来收着就不占地方。",
+              "similarity": 1.0
+            },
+            {
+              "a": "比如通勤路上遇到一点小雨、包里蹭到灰尘，或者放在座位旁边沾了脏东西，涤纶面料打理起来相对简单。",
+              "b": "比如通勤路上包里蹭到一点灰，或者放在座位旁边沾了脏东西，涤纶面料打理起来相对简单。",
+              "similarity": 0.886
+            },
+            {
+              "a": "这样你找小物件的时候不用把整个包翻一遍，拿取会更有条理。",
+              "b": "这样你找小物件的时候不用把整个包翻一遍，拿取会更有条理。",
+              "similarity": 1.0
+            }
+          ],
+          "opening_similarity": 0.712
+        }
+      ]
+    },
+    "completed_versions": 2,
+    "prompt_sha256": "81a4e47ce8ede2e94ae898d76fe9a2b453b164f9ddfff13353ae3045febb1d58"
+  },
+  {
+    "run": "holdout_bag_r5",
+    "case": "bag",
+    "requested_versions": 2,
+    "scorecard": {
+      "run": "holdout_bag_r5",
+      "versions": [
+        {
+          "version": 1,
+          "program": 40.0,
+          "semantic": 50.0,
+          "total": 90.0,
+          "hard_gate": false,
+          "rule_issues": [
+            "促销输入没有明确限时，不能把普通活动价说成限时价"
+          ],
+          "serious_claims": 0,
+          "cross_version_copy_pass": true,
+          "pass": false,
+          "gaps": [
+            "部分过渡词较模板化，如'先看面料和包身结构'、'接着看开合和收纳设计'。",
+            "短途出行举例'装几样替换衣物'未在资料中明确，但属于合理场景延伸，风险较低。",
+            "对通勤、购物、短途出行的场景描述仍可更具体。"
+          ]
+        },
+        {
+          "version": 2,
+          "program": 40.0,
+          "semantic": 50.0,
+          "total": 90.0,
+          "hard_gate": false,
+          "rule_issues": [
+            "促销输入没有明确限时，不能把普通活动价说成限时价"
+          ],
+          "serious_claims": 0,
+          "cross_version_copy_pass": true,
+          "pass": false,
+          "gaps": [
+            "尺寸和颜色在规格部分重复播报，稍显冗余。",
+            "可折叠收纳的展开情境描述较泛，如'柜子角落'，对实际折叠后体积无具体参照。",
+            "对通勤场景的描述缺少更具体的收纳示例，如日常随身物品清单。"
+          ]
+        }
+      ],
+      "pair_diversity": {
+        "score": 4,
+        "reason": "两版开场痛点不同（柜子占地vs小包大包切换），卖点展开顺序不同（版1先折叠再尺寸颜色开合，版2先面料折叠再开合肩带场景颜色），情境举例和节奏有明显差异，且均完整，符合4分标准。"
+      },
+      "rubric": "20261007.4-uniform-coverage-content-and-near-copy-checks"
+    },
+    "metrics": {
+      "versions": [
+        {
+          "han_characters": 750,
+          "sentences": 29,
+          "coverage_groups": {
+            "材质": true,
+            "折叠": true,
+            "尺寸": true,
+            "拉链": true,
+            "口袋": true,
+            "携带": true,
+            "颜色": true,
+            "场景": true
+          },
+          "coverage_rate": 1.0,
+          "natural_sentence_ratio": 1.0,
+          "duplicate_sentences": [],
+          "reference_5gram_overlap": 0.001,
+          "program_scores": {
+            "selling_point_coverage": 12.0,
+            "flow": 8.0,
+            "speakability": 10.0,
+            "length_fit": 5,
+            "fact_references": 5.0
+          },
+          "program_total": 40.0,
+          "invalid_references": false,
+          "app_issues": []
+        },
+        {
+          "han_characters": 590,
+          "sentences": 24,
+          "coverage_groups": {
+            "材质": true,
+            "折叠": true,
+            "尺寸": true,
+            "拉链": true,
+            "口袋": true,
+            "携带": true,
+            "颜色": true,
+            "场景": true
+          },
+          "coverage_rate": 1.0,
+          "natural_sentence_ratio": 1.0,
+          "duplicate_sentences": [],
+          "reference_5gram_overlap": 0.004,
+          "program_scores": {
+            "selling_point_coverage": 12.0,
+            "flow": 8.0,
+            "speakability": 10.0,
+            "length_fit": 5,
+            "fact_references": 5.0
+          },
+          "program_total": 40.0,
+          "invalid_references": false,
+          "app_issues": []
+        }
+      ],
+      "pair": [
+        {
+          "a": 1,
+          "b": 2,
+          "fivegram_jaccard": 0.125,
+          "shared_narrative_sentences": [],
+          "near_copy_ratio": 0.0,
+          "near_copies": [],
+          "opening_similarity": 0.415
+        }
+      ]
+    },
+    "completed_versions": 2,
+    "prompt_sha256": "497e050cd6cce583f0f6fa3966ae501bff6e23e6282ef96e3a99b53d2f262c25"
+  },
+  {
+    "run": "holdout_mug_r3",
+    "case": "mug",
+    "requested_versions": 2,
+    "scorecard": {
+      "run": "holdout_mug_r3",
+      "versions": [
+        {
+          "version": 1,
+          "program": 39.95,
+          "semantic": 49.0,
+          "total": 88.95,
+          "hard_gate": true,
+          "rule_issues": [],
+          "serious_claims": 0,
+          "cross_version_copy_pass": true,
+          "pass": false,
+          "gaps": [
+            "未说明杯子能否微波炉加热、洗碗机清洗或耐温范围，稿中未提示这些使用限制。",
+            "只提供米白色，稿中虽提到'目前提供的就是米白色这一种颜色'，但未说明容量是否唯一。",
+            "无促销信息，价格正确，但可补充邮费或优惠条件说明。"
+          ]
+        },
+        {
+          "version": 2,
+          "program": 39.02,
+          "semantic": 49.0,
+          "total": 88.02,
+          "hard_gate": true,
+          "rule_issues": [],
+          "serious_claims": 0,
+          "cross_version_copy_pass": true,
+          "pass": false,
+          "gaps": [
+            "未提供耐温范围、微波炉/洗碗机适用性和保温功能，但稿中未提及这些限制，可能让观众产生不明确预期。",
+            "仅提供米白色一种颜色，未说明是否有其他颜色可选，但稿中未重申颜色唯一性。",
+            "无促销活动，价格49元正确，但未提及邮费或优惠条件，属于可补充信息。"
+          ]
+        }
+      ],
+      "pair_diversity": {
+        "score": 2,
+        "reason": "两版开场问候不同（'欢迎来到直播间' vs '欢迎来到直播间，今天咱们聊'），但后续均按材质、把手、容量、颜色、价格逐点展开，卖点顺序和叙述结构高度相似，属于换开场但同样逐点模板。"
+      },
+      "rubric": "20261007.4-uniform-coverage-content-and-near-copy-checks"
+    },
+    "metrics": {
+      "versions": [
+        {
+          "han_characters": 505,
+          "sentences": 20,
+          "coverage_groups": {
+            "材质": true,
+            "容量": true,
+            "把手": true,
+            "颜色": true,
+            "场景": true
+          },
+          "coverage_rate": 1.0,
+          "natural_sentence_ratio": 1.0,
+          "duplicate_sentences": [],
+          "reference_5gram_overlap": 0.002,
+          "program_scores": {
+            "selling_point_coverage": 12.0,
+            "flow": 8.0,
+            "speakability": 10.0,
+            "length_fit": 4.95,
+            "fact_references": 5.0
+          },
+          "program_total": 39.95,
+          "invalid_references": false,
+          "app_issues": []
+        },
+        {
+          "han_characters": 555,
+          "sentences": 21,
+          "coverage_groups": {
+            "材质": true,
+            "容量": true,
+            "把手": true,
+            "颜色": true,
+            "场景": true
+          },
+          "coverage_rate": 1.0,
+          "natural_sentence_ratio": 0.952,
+          "duplicate_sentences": [],
+          "reference_5gram_overlap": 0.0,
+          "program_scores": {
+            "selling_point_coverage": 12.0,
+            "flow": 8.0,
+            "speakability": 9.52,
+            "length_fit": 4.5,
+            "fact_references": 5.0
+          },
+          "program_total": 39.02,
+          "invalid_references": false,
+          "app_issues": []
+        }
+      ],
+      "pair": [
+        {
+          "a": 1,
+          "b": 2,
+          "fivegram_jaccard": 0.096,
+          "shared_narrative_sentences": [],
+          "near_copy_ratio": 0.0,
+          "near_copies": [],
+          "opening_similarity": 0.42
+        }
+      ]
+    },
+    "completed_versions": 2,
+    "prompt_sha256": "0295a0dfd9b26b801b5559a6527d9fc37baa36bed72b3014d2f1da0ecfa9437d"
+  },
+  {
+    "run": "holdout_mug_r4",
+    "case": "mug",
+    "requested_versions": 2,
+    "scorecard": {
+      "run": "holdout_mug_r4",
+      "versions": [
+        {
+          "version": 1,
+          "program": 39.05,
+          "semantic": 51.0,
+          "total": 90.05,
+          "hard_gate": true,
+          "rule_issues": [],
+          "serious_claims": 0,
+          "cross_version_copy_pass": true,
+          "pass": true,
+          "gaps": [
+            "未提示陶瓷杯易碎，需避免磕碰。",
+            "未说明杯子是否适合盛放热饮或冷饮的耐温信息。",
+            "缺少对杯口设计、杯身厚度等使用细节的描述。"
+          ]
+        },
+        {
+          "version": 2,
+          "program": 39.11,
+          "semantic": 51.0,
+          "total": 90.11,
+          "hard_gate": true,
+          "rule_issues": [],
+          "serious_claims": 0,
+          "cross_version_copy_pass": true,
+          "pass": true,
+          "gaps": [
+            "未提及陶瓷材质需注意轻拿轻放等日常使用注意事项。",
+            "缺少对杯身具体形状、重量等外观细节的描述。",
+            "未说明是否可用于微波炉或洗碗机，虽然资料未提供，但未提示消费者注意。"
+          ]
+        }
+      ],
+      "pair_diversity": {
+        "score": 3,
+        "reason": "版本2以更互动的问题开场，卖点展开顺序有调整，情境描述也略有不同，但整体结构相似，属于开场和重点展开有效不同。"
+      },
+      "rubric": "20261007.4-uniform-coverage-content-and-near-copy-checks"
+    },
+    "metrics": {
+      "versions": [
+        {
+          "han_characters": 618,
+          "sentences": 20,
+          "coverage_groups": {
+            "材质": true,
+            "容量": true,
+            "把手": true,
+            "颜色": true,
+            "场景": true
+          },
+          "coverage_rate": 1.0,
+          "natural_sentence_ratio": 1.0,
+          "duplicate_sentences": [],
+          "reference_5gram_overlap": 0.002,
+          "program_scores": {
+            "selling_point_coverage": 12.0,
+            "flow": 8.0,
+            "speakability": 10.0,
+            "length_fit": 4.05,
+            "fact_references": 5.0
+          },
+          "program_total": 39.05,
+          "invalid_references": false,
+          "app_issues": []
+        },
+        {
+          "han_characters": 609,
+          "sentences": 20,
+          "coverage_groups": {
+            "材质": true,
+            "容量": true,
+            "把手": true,
+            "颜色": true,
+            "场景": true
+          },
+          "coverage_rate": 1.0,
+          "natural_sentence_ratio": 1.0,
+          "duplicate_sentences": [],
+          "reference_5gram_overlap": 0.003,
+          "program_scores": {
+            "selling_point_coverage": 12.0,
+            "flow": 8.0,
+            "speakability": 10.0,
+            "length_fit": 4.11,
+            "fact_references": 5.0
+          },
+          "program_total": 39.11,
+          "invalid_references": false,
+          "app_issues": []
+        }
+      ],
+      "pair": [
+        {
+          "a": 1,
+          "b": 2,
+          "fivegram_jaccard": 0.056,
+          "shared_narrative_sentences": [],
+          "near_copy_ratio": 0.083,
+          "near_copies": [
+            {
+              "a": "欢迎来到直播间，今天咱们来看一只日常用的陶瓷马克杯。",
+              "b": "欢迎来到直播间，今天咱们看一只日常用的陶瓷马克杯。",
+              "similarity": 0.98
+            }
+          ],
+          "opening_similarity": 0.375
+        }
+      ]
+    },
+    "completed_versions": 2,
+    "prompt_sha256": "81a4e47ce8ede2e94ae898d76fe9a2b453b164f9ddfff13353ae3045febb1d58"
+  },
+  {
+    "run": "holdout_mug_r5",
+    "case": "mug",
+    "requested_versions": 2,
+    "scorecard": {
+      "run": "holdout_mug_r5",
+      "versions": [
+        {
+          "version": 1,
+          "program": 38.38,
+          "semantic": 56.0,
+          "total": 94.38,
+          "hard_gate": false,
+          "rule_issues": [
+            "输入未提供保温或防烫性能，不得说杯壁不烫手或新增保温功能；改为准确的把手或容量讲解"
+          ],
+          "serious_claims": 0,
+          "cross_version_copy_pass": true,
+          "pass": false,
+          "gaps": [
+            "陶瓷材质的介绍仍局限在手感和不保温不防烫提醒，未补充耐温范围、微波炉/洗碗机适用性等资料可用信息，材质卖点深度有限。",
+            "对米白色的展开主要停留在颜色搭配和显脏提醒，缺少更具体、正面的场景收益。",
+            "规格说明集中在‘没有其他容量和颜色可选’，对已有规格的选择引导较弱。"
+          ]
+        },
+        {
+          "version": 2,
+          "program": 38.15,
+          "semantic": 56.0,
+          "total": 94.15,
+          "hard_gate": false,
+          "rule_issues": [
+            "输入未提供保温或防烫性能，不得说杯壁不烫手或新增保温功能；改为准确的把手或容量讲解"
+          ],
+          "serious_claims": 0,
+          "cross_version_copy_pass": true,
+          "pass": false,
+          "gaps": [
+            "关于陶瓷材质的说明主要停留在‘偏扎实手感’和‘不保温不防烫’的提醒上，未提供耐温范围、微波炉/洗碗机适用性等可用信息，导致材质卖点展开受限。",
+            "对带把手设计仅描述端拿顺手，未进一步结合资料支持的使用场景或注意点，展开深度一般。",
+            "结尾总结重复了前文三点，未额外提供选择判断信息，收口略显常规。"
+          ]
+        }
+      ],
+      "pair_diversity": {
+        "score": 4,
+        "reason": "两版开场方向不同：第1版从选杯纠结切入并先讲颜色容量再讲材质把手，第2版从端拿体验切入并先讲材质把手再讲容量颜色；卖点展开顺序、情境和节奏均有明显差异，且均完整自然。"
+      },
+      "rubric": "20261007.4-uniform-coverage-content-and-near-copy-checks"
+    },
+    "metrics": {
+      "versions": [
+        {
+          "han_characters": 740,
+          "sentences": 25,
+          "coverage_groups": {
+            "材质": true,
+            "容量": true,
+            "把手": true,
+            "颜色": true,
+            "场景": true
+          },
+          "coverage_rate": 1.0,
+          "natural_sentence_ratio": 1.0,
+          "duplicate_sentences": [],
+          "reference_5gram_overlap": 0.001,
+          "program_scores": {
+            "selling_point_coverage": 12.0,
+            "flow": 8.0,
+            "speakability": 10.0,
+            "length_fit": 3.38,
+            "fact_references": 5.0
+          },
+          "program_total": 38.38,
+          "invalid_references": false,
+          "app_issues": []
+        },
+        {
+          "han_characters": 793,
+          "sentences": 28,
+          "coverage_groups": {
+            "材质": true,
+            "容量": true,
+            "把手": true,
+            "颜色": true,
+            "场景": true
+          },
+          "coverage_rate": 1.0,
+          "natural_sentence_ratio": 1.0,
+          "duplicate_sentences": [],
+          "reference_5gram_overlap": 0.004,
+          "program_scores": {
+            "selling_point_coverage": 12.0,
+            "flow": 8.0,
+            "speakability": 10.0,
+            "length_fit": 3.15,
+            "fact_references": 5.0
+          },
+          "program_total": 38.15,
+          "invalid_references": false,
+          "app_issues": []
+        }
+      ],
+      "pair": [
+        {
+          "a": 1,
+          "b": 2,
+          "fivegram_jaccard": 0.06,
+          "shared_narrative_sentences": [],
+          "near_copy_ratio": 0.0,
+          "near_copies": [],
+          "opening_similarity": 0.318
+        }
+      ]
+    },
+    "completed_versions": 2,
+    "prompt_sha256": "497e050cd6cce583f0f6fa3966ae501bff6e23e6282ef96e3a99b53d2f262c25"
+  },
+  {
+    "run": "r0_baseline",
+    "case": "slippers",
+    "requested_versions": 2,
+    "scorecard": {
+      "run": "r0_baseline",
+      "versions": [
+        {
+          "version": 1,
+          "program": 38.47,
+          "semantic": 31.0,
+          "total": 69.47,
+          "hard_gate": false,
+          "rule_issues": [
+            "遗漏输入中明确的重要特点：耐磨",
+            "丰富商品展开过短，请把重要卖点放入具体生活场景展开，不靠重复参数凑字"
+          ],
+          "serious_claims": 2,
+          "cross_version_copy_pass": true,
+          "pass": false,
+          "gaps": [
+            "卖点展开不够充分，核心特点如足弓支撑、静音防滑、快干防臭等大多一句带过，缺少具体情境和收益。",
+            "规格、适用人群、颜色仍是逐项罗列，节奏偏字段播报，削弱自然口播感。",
+            "购买引导中再次出现未经资料支持的优惠券和折扣信息，且作为主推条件之一，影响价格条款准确性。"
+          ]
+        },
+        {
+          "version": 2,
+          "program": 40.0,
+          "semantic": 26.0,
+          "total": 66.0,
+          "hard_gate": false,
+          "rule_issues": [],
+          "serious_claims": 3,
+          "cross_version_copy_pass": true,
+          "pass": false,
+          "gaps": [
+            "功能点展开偏浅，如足弓支撑、静音防滑等大多停留在复述标签，缺少生动画面和有限度生活收益。",
+            "颜色和尺码几乎逐项播报，影响直播自然语感，也拉长篇幅。",
+            "购买引导中夹杂未经商品资料支持的优惠券和折扣条件，且规则待确认，削弱可信度。"
+          ]
+        }
+      ],
+      "pair_diversity": {
+        "score": 2,
+        "reason": "两版开场不同，第一版从出门宅家切入，第二版从浴室厨房久站切入；但后续都是先介绍商品名、材质、功能，再规格、颜色、尺码、价格，结构骨架相同，属于换开场但同样逐点模板。"
+      },
+      "rubric": "20261007.4-uniform-coverage-content-and-near-copy-checks"
+    },
+    "metrics": {
+      "versions": [
+        {
+          "han_characters": 590,
+          "sentences": 32,
+          "coverage_groups": {
+            "材质成型": true,
+            "足弓": true,
+            "厚底软弹": true,
+            "静音防滑": true,
+            "清洗快干防臭": true,
+            "轻便场景": true,
+            "规格": true,
+            "选码": true
+          },
+          "coverage_rate": 1.0,
+          "natural_sentence_ratio": 1.0,
+          "duplicate_sentences": [],
+          "reference_5gram_overlap": 0.074,
+          "program_scores": {
+            "selling_point_coverage": 12.0,
+            "flow": 8.0,
+            "speakability": 10.0,
+            "length_fit": 3.47,
+            "fact_references": 5.0
+          },
+          "program_total": 38.47,
+          "invalid_references": false,
+          "app_issues": []
+        },
+        {
+          "han_characters": 966,
+          "sentences": 42,
+          "coverage_groups": {
+            "材质成型": true,
+            "足弓": true,
+            "厚底软弹": true,
+            "静音防滑": true,
+            "清洗快干防臭": true,
+            "轻便场景": true,
+            "规格": true,
+            "选码": true
+          },
+          "coverage_rate": 1.0,
+          "natural_sentence_ratio": 1.0,
+          "duplicate_sentences": [],
+          "reference_5gram_overlap": 0.036,
+          "program_scores": {
+            "selling_point_coverage": 12.0,
+            "flow": 8.0,
+            "speakability": 10.0,
+            "length_fit": 5,
+            "fact_references": 5.0
+          },
+          "program_total": 40.0,
+          "invalid_references": false,
+          "app_issues": []
+        }
+      ],
+      "pair": [
+        {
+          "a": 1,
+          "b": 2,
+          "fivegram_jaccard": 0.113,
+          "shared_narrative_sentences": [],
+          "near_copy_ratio": 0.0,
+          "near_copies": [],
+          "opening_similarity": 0.326
+        }
+      ]
+    },
+    "completed_versions": 2,
+    "prompt_sha256": "8df51be1cd0b854772c84c2fd2275cac193a7160581c04152aa4b46877b48c81"
+  },
+  {
+    "run": "r1_expansion",
+    "case": "slippers",
+    "requested_versions": 2,
+    "scorecard": {
+      "run": "r1_expansion",
+      "versions": [
+        {
+          "version": 1,
+          "program": 38.5,
+          "semantic": 47.0,
+          "total": 85.5,
+          "hard_gate": false,
+          "rule_issues": [
+            "遗漏输入中明确的重要特点：EVA材质、一体成型、耐磨"
+          ],
+          "serious_claims": 0,
+          "cross_version_copy_pass": false,
+          "pass": false,
+          "gaps": [
+            "对EVA环保材质的益处展开不够",
+            "旅行出游场景只简单提及，缺少具体画面",
+            "颜色部分列举后未给出有效选购建议"
+          ]
+        },
+        {
+          "version": 2,
+          "program": 40.0,
+          "semantic": 47.0,
+          "total": 87.0,
+          "hard_gate": true,
+          "rule_issues": [],
+          "serious_claims": 0,
+          "cross_version_copy_pass": false,
+          "pass": false,
+          "gaps": [
+            "未提及轻便耐磨的具体适用场景展开",
+            "浴室防滑场景只简单带过，缺少具体情境",
+            "颜色尺码部分以报数为主，缺少选购搭配建议"
+          ]
+        }
+      ],
+      "pair_diversity": {
+        "score": 3,
+        "reason": "两版开场痛点不同，版1侧重旅行和洗澡，版2侧重居家安静；卖点展开顺序不同（版1材质优先，版2静音防滑优先），价格话术有差异（版1直接报价，版2强调以页面为准）。但两版均完整覆盖核心卖点，差异明显，属于有效不同。"
+      },
+      "rubric": "20261007.4-uniform-coverage-content-and-near-copy-checks"
+    },
+    "metrics": {
+      "versions": [
+        {
+          "han_characters": 1123,
+          "sentences": 37,
+          "coverage_groups": {
+            "材质成型": false,
+            "足弓": true,
+            "厚底软弹": true,
+            "静音防滑": true,
+            "清洗快干防臭": true,
+            "轻便场景": true,
+            "规格": true,
+            "选码": true
+          },
+          "coverage_rate": 0.875,
+          "natural_sentence_ratio": 1.0,
+          "duplicate_sentences": [],
+          "reference_5gram_overlap": 0.031,
+          "program_scores": {
+            "selling_point_coverage": 10.5,
+            "flow": 8.0,
+            "speakability": 10.0,
+            "length_fit": 5,
+            "fact_references": 5.0
+          },
+          "program_total": 38.5,
+          "invalid_references": false,
+          "app_issues": []
+        },
+        {
+          "han_characters": 1008,
+          "sentences": 32,
+          "coverage_groups": {
+            "材质成型": true,
+            "足弓": true,
+            "厚底软弹": true,
+            "静音防滑": true,
+            "清洗快干防臭": true,
+            "轻便场景": true,
+            "规格": true,
+            "选码": true
+          },
+          "coverage_rate": 1.0,
+          "natural_sentence_ratio": 1.0,
+          "duplicate_sentences": [],
+          "reference_5gram_overlap": 0.038,
+          "program_scores": {
+            "selling_point_coverage": 12.0,
+            "flow": 8.0,
+            "speakability": 10.0,
+            "length_fit": 5,
+            "fact_references": 5.0
+          },
+          "program_total": 40.0,
+          "invalid_references": false,
+          "app_issues": []
+        }
+      ],
+      "pair": [
+        {
+          "a": 1,
+          "b": 2,
+          "fivegram_jaccard": 0.187,
+          "shared_narrative_sentences": [
+            "防滑这一点，在浴室或厨房这种容易有水汽的地方，多一分摩擦就多一分安心。"
+          ],
+          "near_copy_ratio": 0.364,
+          "near_copies": [
+            {
+              "a": "你在家做饭、打扫、站着整理东西的时候，脚底有支撑，和穿一双软塌塌的拖鞋感受不一样。",
+              "b": "你在家做饭、打扫、整理东西，需要站一会儿的时候，脚底有支撑，和穿一双软塌塌的拖鞋感受不一样。",
+              "similarity": 0.897
+            },
+            {
+              "a": "你晚上起来喝水、早上赶着洗漱，如果不想脚步声太响，这种静音设计就比较贴心。",
+              "b": "你在浴室洗澡，或者夜里起来喝水、早上赶着洗漱，如果不想脚步声太响，这种静音设计就比较贴心。",
+              "similarity": 0.854
+            },
+            {
+              "a": "先选好颜色和尺码，脚背较宽或脚型偏肉记得斟酌大一号，再按需要选择。",
+              "b": "先选好颜色和尺码，脚背较宽或脚型偏肉记得斟酌大一号，再按需要选择就可以了。",
+              "similarity": 0.943
+            },
+            {
+              "a": "接着说足弓支撑，这是这款鞋的重点设计之一，专门为女性足部曲线打造。",
+              "b": "再看足弓支撑，这是这款鞋的重点设计之一，专为女性足部曲线量身打造。",
+              "similarity": 0.879
+            },
+            {
+              "a": "当然，湿地面情况各不相同，走路还是需要自己留意，但鞋底有这个特性，日常会多一层照顾。",
+              "b": "当然，湿地面情况各不相同，走路还是需要自己留意，但鞋底有防滑特性，日常会多一层照顾。",
+              "similarity": 0.952
+            },
+            {
+              "a": "总的来说，这双鞋适合女性、追求足部舒适的人、居家生活者和旅行爱好者。",
+              "b": "总结一下，这双鞋适合女性、追求足部舒适的人，也适合居家生活者和旅行爱好者。",
+              "similarity": 0.845
+            },
+            {
+              "a": "最重要的特点就是足弓支撑、小蛮腰厚底软弹、静音防滑、快干防臭和轻便。",
+              "b": "最重要的特点就是足弓支撑、小蛮腰厚底软弹，加上静音防滑、快干易清洗和防臭。",
+              "similarity": 0.845
+            },
+            {
+              "a": "防滑这一点，在浴室或厨房这种容易有水汽的地方，多一分摩擦就多一分安心。",
+              "b": "防滑这一点，在浴室或厨房这种容易有水汽的地方，多一分摩擦就多一分安心。",
+              "similarity": 1.0
+            }
+          ],
+          "opening_similarity": 0.36
+        }
+      ]
+    },
+    "completed_versions": 2,
+    "prompt_sha256": "1369b0ad9f7cbb26767baac345292bbbf06716f4e33df4a2962d9ae721de7af2"
+  },
+  {
+    "run": "r2_complete_varied",
+    "case": "slippers",
+    "requested_versions": 2,
+    "scorecard": {
+      "run": "r2_complete_varied",
+      "versions": [
+        {
+          "version": 1,
+          "program": 39.53,
+          "semantic": 55.0,
+          "total": 94.53,
+          "hard_gate": true,
+          "rule_issues": [],
+          "serious_claims": 0,
+          "cross_version_copy_pass": false,
+          "pass": false,
+          "gaps": [
+            "对'耐磨'性能未具体说明，但资料有'轻便耐磨'，属合理引用。"
+          ]
+        },
+        {
+          "version": 2,
+          "program": 39.71,
+          "semantic": 54.0,
+          "total": 93.71,
+          "hard_gate": false,
+          "rule_issues": [
+            "遗漏输入中明确的重要特点：耐磨"
+          ],
+          "serious_claims": 0,
+          "cross_version_copy_pass": false,
+          "pass": false,
+          "gaps": [
+            "便携性场景（如'放进包里不占太多分量'）虽合理联想，但资料仅提'轻便'，无具体重量或体积数据支持，属于轻微夸大风险。",
+            "提到'视觉上也能修饰脚型'，但商品资料未明确提及修饰脚型效果，属于无依据的附加宣称。",
+            "整体虽贴合资料，但部分功能表述（如'防臭快干'）未具体说明快干程度或防臭原理，可能让消费者期待过高。"
+          ]
+        }
+      ],
+      "pair_diversity": {
+        "score": 4,
+        "reason": "两版开场痛点不同（一版从旅行和浴室切入，另一版从居家做饭打扫切入），卖点展开顺序有明显差异，情境描述各有侧重，节奏和重点变化，均自然完整，差异鲜明。"
+      },
+      "rubric": "20261007.4-uniform-coverage-content-and-near-copy-checks"
+    },
+    "metrics": {
+      "versions": [
+        {
+          "han_characters": 834,
+          "sentences": 26,
+          "coverage_groups": {
+            "材质成型": true,
+            "足弓": true,
+            "厚底软弹": true,
+            "静音防滑": true,
+            "清洗快干防臭": true,
+            "轻便场景": true,
+            "规格": true,
+            "选码": true
+          },
+          "coverage_rate": 1.0,
+          "natural_sentence_ratio": 0.962,
+          "duplicate_sentences": [],
+          "reference_5gram_overlap": 0.056,
+          "program_scores": {
+            "selling_point_coverage": 12.0,
+            "flow": 8.0,
+            "speakability": 9.62,
+            "length_fit": 4.91,
+            "fact_references": 5.0
+          },
+          "program_total": 39.53,
+          "invalid_references": false,
+          "app_issues": []
+        },
+        {
+          "han_characters": 948,
+          "sentences": 35,
+          "coverage_groups": {
+            "材质成型": true,
+            "足弓": true,
+            "厚底软弹": true,
+            "静音防滑": true,
+            "清洗快干防臭": true,
+            "轻便场景": true,
+            "规格": true,
+            "选码": true
+          },
+          "coverage_rate": 1.0,
+          "natural_sentence_ratio": 0.971,
+          "duplicate_sentences": [],
+          "reference_5gram_overlap": 0.04,
+          "program_scores": {
+            "selling_point_coverage": 12.0,
+            "flow": 8.0,
+            "speakability": 9.71,
+            "length_fit": 5,
+            "fact_references": 5.0
+          },
+          "program_total": 39.71,
+          "invalid_references": false,
+          "app_issues": []
+        }
+      ],
+      "pair": [
+        {
+          "a": 1,
+          "b": 2,
+          "fivegram_jaccard": 0.218,
+          "shared_narrative_sentences": [
+            "比如你晚上起来倒水、家里有人已经休息了，脚步轻一点，声音小一点，自己走动也自在。",
+            "这双鞋底做了静音和防滑的特性，在浴室或者室内走动的时候，可以减少打扰家人。",
+            "这款拖鞋有足弓支撑，配合小蛮腰厚底设计，上脚是软弹缓震的体验。"
+          ],
+          "near_copy_ratio": 0.211,
+          "near_copies": [
+            {
+              "a": "再看这个厚底造型，它不只是穿着舒服，视觉上也能修饰脚型，日常在家穿或者出门走两步，看起来都利落。",
+              "b": "再看这个厚底造型，它不只是穿着舒服，视觉上也能修饰脚型，日常在家穿或者出门散步、倒垃圾，看起来都利落。",
+              "similarity": 0.929
+            },
+            {
+              "a": "比如你晚上起来倒水、家里有人已经休息了，脚步轻一点，声音小一点，自己走动也自在。",
+              "b": "比如你晚上起来倒水、家里有人已经休息了，脚步轻一点，声音小一点，自己走动也自在。",
+              "similarity": 1.0
+            },
+            {
+              "a": "这双鞋底做了静音和防滑的特性，在浴室或者室内走动的时候，可以减少打扰家人。",
+              "b": "这双鞋底做了静音和防滑的特性，在浴室或者室内走动的时候，可以减少打扰家人。",
+              "similarity": 1.0
+            },
+            {
+              "a": "这款拖鞋有足弓支撑，配合小蛮腰厚底设计，上脚是软弹缓震的体验。",
+              "b": "这款拖鞋有足弓支撑，配合小蛮腰厚底设计，上脚是软弹缓震的体验。",
+              "similarity": 1.0
+            }
+          ],
+          "opening_similarity": 0.357
+        }
+      ]
+    },
+    "completed_versions": 2,
+    "prompt_sha256": "6bb88df42b08d39edfbbe3cf2c43568af50d4e85562f6876e66804cb147de0fe"
+  },
+  {
+    "run": "r3_no_copy",
+    "case": "slippers",
+    "requested_versions": 2,
+    "failure": {
+      "version": 2,
+      "error_type": "RuntimeError",
+      "message": "DeepSeek返回0版，要求1版；未覆盖已有稿件，可重试生成",
+      "evidence": "当次实际命令退出记录；发生在启用原始响应留存之前。第1版成功稿保留。"
+    },
+    "completed_versions": 1,
+    "prompt_sha256": "0295a0dfd9b26b801b5559a6527d9fc37baa36bed72b3014d2f1da0ecfa9437d"
+  },
+  {
+    "run": "r4_contract_route",
+    "case": "slippers",
+    "requested_versions": 2,
+    "scorecard": {
+      "run": "r4_contract_route",
+      "versions": [
+        {
+          "version": 1,
+          "program": 39.54,
+          "semantic": 56.0,
+          "total": 95.54,
+          "hard_gate": false,
+          "rule_issues": [
+            "遗漏输入中明确的重要特点：耐磨"
+          ],
+          "serious_claims": 0,
+          "cross_version_copy_pass": false,
+          "pass": false,
+          "gaps": [
+            "颜色分类'耐脏百搭'黑色卡其，'耐脏'属于合理场景联想还是性能暗示？但未直接说产品耐脏，仅说颜色百搭，可接受。",
+            "未提及'耐磨'。",
+            "防臭快干场景与版本1类似，重复度高。"
+          ]
+        },
+        {
+          "version": 2,
+          "program": 40.0,
+          "semantic": 56.0,
+          "total": 96.0,
+          "hard_gate": false,
+          "rule_issues": [
+            "遗漏输入中明确的重要特点：耐磨"
+          ],
+          "serious_claims": 0,
+          "cross_version_copy_pass": false,
+          "pass": false,
+          "gaps": [
+            "未提及厚底平底的具体版型信息，但product name已含厚底，selling_points有版型，不算大问题；主要缺点可能是未强调'轻便耐磨'中的耐磨。",
+            "防臭快干、一冲即净场景重复，可更丰富。",
+            "颜色过多逐一列举稍显啰嗦，但不算事实问题。"
+          ]
+        }
+      ],
+      "pair_diversity": {
+        "score": 3,
+        "reason": "两版开场和卖点展开顺序有明显不同：版本1先从颜色携带切入，版本2先从足弓支撑切入；情境选择有差异，但整体结构仍是类似逐点模板，核心场景如做饭打扫、浴室防滑、快干等重复较多，故给3分。"
+      },
+      "rubric": "20261007.4-uniform-coverage-content-and-near-copy-checks"
+    },
+    "metrics": {
+      "versions": [
+        {
+          "han_characters": 772,
+          "sentences": 25,
+          "coverage_groups": {
+            "材质成型": true,
+            "足弓": true,
+            "厚底软弹": true,
+            "静音防滑": true,
+            "清洗快干防臭": true,
+            "轻便场景": true,
+            "规格": true,
+            "选码": true
+          },
+          "coverage_rate": 1.0,
+          "natural_sentence_ratio": 1.0,
+          "duplicate_sentences": [],
+          "reference_5gram_overlap": 0.055,
+          "program_scores": {
+            "selling_point_coverage": 12.0,
+            "flow": 8.0,
+            "speakability": 10.0,
+            "length_fit": 4.54,
+            "fact_references": 5.0
+          },
+          "program_total": 39.54,
+          "invalid_references": false,
+          "app_issues": []
+        },
+        {
+          "han_characters": 960,
+          "sentences": 28,
+          "coverage_groups": {
+            "材质成型": true,
+            "足弓": true,
+            "厚底软弹": true,
+            "静音防滑": true,
+            "清洗快干防臭": true,
+            "轻便场景": true,
+            "规格": true,
+            "选码": true
+          },
+          "coverage_rate": 1.0,
+          "natural_sentence_ratio": 1.0,
+          "duplicate_sentences": [],
+          "reference_5gram_overlap": 0.043,
+          "program_scores": {
+            "selling_point_coverage": 12.0,
+            "flow": 8.0,
+            "speakability": 10.0,
+            "length_fit": 5,
+            "fact_references": 5.0
+          },
+          "program_total": 40.0,
+          "invalid_references": false,
+          "app_issues": []
+        }
+      ],
+      "pair": [
+        {
+          "a": 1,
+          "b": 2,
+          "fivegram_jaccard": 0.311,
+          "shared_narrative_sentences": [],
+          "near_copy_ratio": 0.286,
+          "near_copies": [
+            {
+              "a": "你做饭、打扫卫生的时候，脚下多一个贴着足弓的支撑点，走起来会感觉更稳当，不用把力全压在脚掌上。",
+              "b": "你做饭、打扫卫生的时候，脚下多一个贴着足弓的承托点，走起来会感觉更稳当，不用把力全压在脚掌上。",
+              "similarity": 0.957
+            },
+            {
+              "a": "再看这个“小蛮腰”厚底，鞋底加厚不是硬邦邦的，而是带软弹缓震的脚感。",
+              "b": "再看小蛮腰厚底，鞋底加厚不是硬邦邦的，而是带软弹缓震的脚感。",
+              "similarity": 0.938
+            },
+            {
+              "a": "平时在厨房站一会儿、在阳台收衣服，脚底有这种回弹，就像踩在微微有弹性的垫子上，久站带来的压力能缓和一些。",
+              "b": "在厨房站一会儿、在阳台收衣服，脚底有这种回弹，就像踩在微微有弹性的垫子上，久站带来的压力能缓和一些。",
+              "similarity": 0.98
+            },
+            {
+              "a": "这双鞋比较适合想要足弓支撑、看重软弹脚感，又需要静音防滑和好打理的人。",
+              "b": "总结一下，这双鞋比较适合想要足弓支撑、看重软弹脚感，又需要静音防滑和好打理的人。",
+              "similarity": 0.933
+            },
+            {
+              "a": "另外它的材质防臭快干，一冲即净，洗澡后顺手冲一下，晾着就好打理。",
+              "b": "材质本身防臭快干，一冲即净，洗澡后顺手冲一下，晾着就好打理。",
+              "similarity": 0.903
+            },
+            {
+              "a": "防滑这个点在浴室和室内比较实用，地面有水的时候也能多一层抓地，但湿滑地面还是要小心，不能完全依赖鞋子。",
+              "b": "防滑这个特点在浴室和室内比较实用，地面有水的时候也能多一层抓地，但湿滑地面还是要小心，不能完全依赖鞋子。",
+              "similarity": 0.99
+            }
+          ],
+          "opening_similarity": 0.525
+        }
+      ]
+    },
+    "completed_versions": 2,
+    "prompt_sha256": "81a4e47ce8ede2e94ae898d76fe9a2b453b164f9ddfff13353ae3045febb1d58"
+  },
+  {
+    "run": "r5_compact_summary",
+    "case": "slippers",
+    "requested_versions": 2,
+    "scorecard": {
+      "run": "r5_compact_summary",
+      "versions": [
+        {
+          "version": 1,
+          "program": 39.41,
+          "semantic": 53.0,
+          "total": 92.41,
+          "hard_gate": false,
+          "rule_issues": [
+            "遗漏输入中明确的重要特点：耐磨"
+          ],
+          "serious_claims": 0,
+          "cross_version_copy_pass": true,
+          "pass": false,
+          "gaps": [
+            "颜色推荐连续三句同一结构，略有填充感",
+            "'全新上架'来自商品资料，但作为口播卖点略空，可少提",
+            "开头先讲选鞋误区再进产品，节奏稍绕，进入产品慢"
+          ]
+        },
+        {
+          "version": 2,
+          "program": 38.99,
+          "semantic": 53.0,
+          "total": 91.99,
+          "hard_gate": false,
+          "rule_issues": [
+            "遗漏输入中明确的重要特点：耐磨",
+            "丰富商品展开过短，请把重要卖点放入具体生活场景展开，不靠重复参数凑字"
+          ],
+          "serious_claims": 0,
+          "cross_version_copy_pass": true,
+          "pass": false,
+          "gaps": [
+            "颜色十种全部播报，口播偏长，可精简为色系建议",
+            "开头旅行场景展开较长，真正进入产品略慢",
+            "静音效果只停在'脚步声会小一些'，没有进一步说明对家人的影响边界，可更自然收束"
+          ]
+        }
+      ],
+      "pair_diversity": {
+        "score": 4,
+        "reason": "两版开场切入点明显不同：第1版从旅行收纳纠结切入，第2版从居家选拖鞋只看软不软的误区切入；卖点展开顺序也不同，第1版先旅行便携再足弓支撑，第2版先足弓支撑再居家静音快干；颜色处理方式不同，第1版按夏浅色系概括，第2版按清爽/居家/活泼推荐；节奏和语言差异明显，且均保留足弓支撑、静音防滑、快干、尺码、价格等核心信息，给4分。"
+      },
+      "rubric": "20261007.4-uniform-coverage-content-and-near-copy-checks"
+    },
+    "metrics": {
+      "versions": [
+        {
+          "han_characters": 749,
+          "sentences": 24,
+          "coverage_groups": {
+            "材质成型": true,
+            "足弓": true,
+            "厚底软弹": true,
+            "静音防滑": true,
+            "清洗快干防臭": true,
+            "轻便场景": true,
+            "规格": true,
+            "选码": true
+          },
+          "coverage_rate": 1.0,
+          "natural_sentence_ratio": 1.0,
+          "duplicate_sentences": [],
+          "reference_5gram_overlap": 0.056,
+          "program_scores": {
+            "selling_point_coverage": 12.0,
+            "flow": 8.0,
+            "speakability": 10.0,
+            "length_fit": 4.41,
+            "fact_references": 5.0
+          },
+          "program_total": 39.41,
+          "invalid_references": false,
+          "app_issues": [
+            "第12句有待核实的保证、体验或促销说法"
+          ]
+        },
+        {
+          "han_characters": 679,
+          "sentences": 26,
+          "coverage_groups": {
+            "材质成型": true,
+            "足弓": true,
+            "厚底软弹": true,
+            "静音防滑": true,
+            "清洗快干防臭": true,
+            "轻便场景": true,
+            "规格": true,
+            "选码": true
+          },
+          "coverage_rate": 1.0,
+          "natural_sentence_ratio": 1.0,
+          "duplicate_sentences": [],
+          "reference_5gram_overlap": 0.039,
+          "program_scores": {
+            "selling_point_coverage": 12.0,
+            "flow": 8.0,
+            "speakability": 10.0,
+            "length_fit": 3.99,
+            "fact_references": 5.0
+          },
+          "program_total": 38.99,
+          "invalid_references": false,
+          "app_issues": []
+        }
+      ],
+      "pair": [
+        {
+          "a": 1,
+          "b": 2,
+          "fivegram_jaccard": 0.197,
+          "shared_narrative_sentences": [],
+          "near_copy_ratio": 0.1,
+          "near_copies": [
+            {
+              "a": "晚上起夜、清晨倒水，不想吵醒家里人，这个细节就比较贴心。",
+              "b": "晚上起夜、清晨倒水，不想吵醒家里人，这个细节就挺贴心。",
+              "similarity": 0.945
+            },
+            {
+              "a": "鞋底做了静音和防滑特性，在浴室或室内走动，脚步声会小一些，减少打扰家人。",
+              "b": "鞋底具备静音与防滑特性，在浴室或室内走动，脚步声会小一些，减少打扰家人。",
+              "similarity": 0.917
+            }
+          ],
+          "opening_similarity": 0.159
+        }
+      ]
+    },
+    "completed_versions": 2,
+    "prompt_sha256": "497e050cd6cce583f0f6fa3966ae501bff6e23e6282ef96e3a99b53d2f262c25"
+  },
+  {
+    "run": "r6_final_candidate",
+    "case": "slippers",
+    "requested_versions": 2,
+    "scorecard": {
+      "run": "r6_final_candidate",
+      "versions": [
+        {
+          "version": 1,
+          "program": 39.97,
+          "semantic": 53.0,
+          "total": 92.97,
+          "hard_gate": true,
+          "rule_issues": [],
+          "serious_claims": 0,
+          "cross_version_copy_pass": false,
+          "pass": false,
+          "gaps": [
+            "耐磨特性一笔带过“也做了耐磨处理”，未结合场景展开。",
+            "颜色仅部分列举，未说明全部颜色但资料有，不算事实错误。",
+            "鞋底防滑只在浴室和室内提及，未扩展至海边等场景。"
+          ]
+        },
+        {
+          "version": 2,
+          "program": 40.0,
+          "semantic": 55.0,
+          "total": 95.0,
+          "hard_gate": false,
+          "rule_issues": [
+            "遗漏输入中明确的重要特点：耐磨"
+          ],
+          "serious_claims": 0,
+          "cross_version_copy_pass": false,
+          "pass": false,
+          "gaps": [
+            "未提及鞋底耐磨特性，虽然稿中说了“轻便耐磨”但未展开，不过资料有体现，不算严重缺口。",
+            "颜色列举后只给部分颜色建议，未覆盖全部颜色属性，但颜色本身不需要全部展开。",
+            "尺码范围数字口语混用（三十六码到三十七码等），但未造成事实错误。"
+          ]
+        }
+      ],
+      "pair_diversity": {
+        "score": 3,
+        "reason": "两版开场不同，一版从旅行收拾行李切入，一版从居家站久脚底累切入，足弓支撑、静音防滑等卖点展开顺序和情境略有差异，但整体模板结构相似，均按痛点-卖点-规格-价格收口。"
+      },
+      "rubric": "20261007.4-uniform-coverage-content-and-near-copy-checks"
+    },
+    "metrics": {
+      "versions": [
+        {
+          "han_characters": 845,
+          "sentences": 31,
+          "coverage_groups": {
+            "材质成型": true,
+            "足弓": true,
+            "厚底软弹": true,
+            "静音防滑": true,
+            "清洗快干防臭": true,
+            "轻便场景": true,
+            "规格": true,
+            "选码": true
+          },
+          "coverage_rate": 1.0,
+          "natural_sentence_ratio": 1.0,
+          "duplicate_sentences": [],
+          "reference_5gram_overlap": 0.052,
+          "program_scores": {
+            "selling_point_coverage": 12.0,
+            "flow": 8.0,
+            "speakability": 10.0,
+            "length_fit": 4.97,
+            "fact_references": 5.0
+          },
+          "program_total": 39.97,
+          "invalid_references": false,
+          "app_issues": []
+        },
+        {
+          "han_characters": 1012,
+          "sentences": 31,
+          "coverage_groups": {
+            "材质成型": true,
+            "足弓": true,
+            "厚底软弹": true,
+            "静音防滑": true,
+            "清洗快干防臭": true,
+            "轻便场景": true,
+            "规格": true,
+            "选码": true
+          },
+          "coverage_rate": 1.0,
+          "natural_sentence_ratio": 1.0,
+          "duplicate_sentences": [],
+          "reference_5gram_overlap": 0.046,
+          "program_scores": {
+            "selling_point_coverage": 12.0,
+            "flow": 8.0,
+            "speakability": 10.0,
+            "length_fit": 5,
+            "fact_references": 5.0
+          },
+          "program_total": 40.0,
+          "invalid_references": false,
+          "app_issues": []
+        }
+      ],
+      "pair": [
+        {
+          "a": 1,
+          "b": 2,
+          "fivegram_jaccard": 0.145,
+          "shared_narrative_sentences": [],
+          "near_copy_ratio": 0.19,
+          "near_copies": [
+            {
+              "a": "大家可以根据自己喜欢的颜色和合适的尺码来选，觉得合适再下单。",
+              "b": "你可以根据自己喜欢的颜色和合适的尺码去选，合适再下单。",
+              "similarity": 0.877
+            },
+            {
+              "a": "平时在家做家务、站着叠衣服，脚底如果一直是平的，站久了会感觉压力集中。",
+              "b": "平时在家做家务、站着叠衣服，脚底如果一直是平的，站久了容易觉得累。",
+              "similarity": 0.853
+            },
+            {
+              "a": "晚上家人都休息了，你去浴室洗漱或者到厨房倒水，鞋底声音小一点，对家人的打扰也会少一些。",
+              "b": "晚上家人都休息了，你去浴室洗漱或者到厨房倒水，鞋底静音一点，走动时对家人的打扰就少一些。",
+              "similarity": 0.897
+            },
+            {
+              "a": "防滑这一点在浴室和室内走动时比较实用，但浴室地面有水，走动时还是要留意脚下。",
+              "b": "防滑这一点在浴室和室内走动时比较实用，当然浴室地面有水，走动还是要留意脚下。",
+              "similarity": 0.947
+            }
+          ],
+          "opening_similarity": 0.283
+        }
+      ]
+    },
+    "completed_versions": 2,
+    "prompt_sha256": "a2aa188e6072320c8962ec0c017fa076e5ecf36030988ef6fe5885e07f885f32"
+  },
+  {
+    "run": "r6_repeat",
+    "case": "slippers",
+    "requested_versions": 2,
+    "scorecard": {
+      "run": "r6_repeat",
+      "versions": [
+        {
+          "version": 1,
+          "program": 38.26,
+          "semantic": 46.0,
+          "total": 84.26,
+          "hard_gate": false,
+          "rule_issues": [
+            "丰富商品展开过短，请把重要卖点放入具体生活场景展开，不靠重复参数凑字"
+          ],
+          "serious_claims": 0,
+          "cross_version_copy_pass": true,
+          "pass": false,
+          "gaps": [
+            "轻便卖点展开不足，仅说“轻便好带”，未像版本1那样放入旅行装箱、减少行李重量等具体情境。",
+            "颜色建议较泛，只说“清爽看白色或粉色，稳一点选卡其或黑色”，缺少更贴合使用场景的搭配说明。",
+            "防臭快干只提“一冲即净，打理省事”，没有充分说明“防臭快干”带来的实际生活便利。"
+          ]
+        },
+        {
+          "version": 2,
+          "program": 39.73,
+          "semantic": 53.0,
+          "total": 92.73,
+          "hard_gate": true,
+          "rule_issues": [],
+          "serious_claims": 0,
+          "cross_version_copy_pass": true,
+          "pass": true,
+          "gaps": [
+            "对“小蛮腰”厚底的视觉修饰脚型说明较好，但可更具体地关联到日常穿搭场景，如“配阔腿裤或家居短裤时从侧面看更利落”。",
+            "颜色分段建议较泛，若能结合风格或肤色给更具体的搭配示例会更实用。",
+            "防臭快干的展开偏短，可补充诸如“洗完澡脚上带水直接穿也不易闷出味道”的合理场景。"
+          ]
+        }
+      ],
+      "pair_diversity": {
+        "score": 4,
+        "reason": "两版开场痛点不同：版本1从旅行装拖鞋和居家外穿切换切入，版本2从居家久站脚底发紧切入；卖点展开顺序不同，版本1先轻便旅行、再小蛮腰外观、再足弓支撑、静音防滑，版本2先足弓支撑、再静音防滑、再轻便旅行；情境细节也有差异，如版本1有海边、出差、倒垃圾，版本2有做饭、收拾屋子、倒杯水。两版均完整且自然，差异鲜明。"
+      },
+      "rubric": "20261007.4-uniform-coverage-content-and-near-copy-checks"
+    },
+    "metrics": {
+      "versions": [
+        {
+          "han_characters": 554,
+          "sentences": 25,
+          "coverage_groups": {
+            "材质成型": true,
+            "足弓": true,
+            "厚底软弹": true,
+            "静音防滑": true,
+            "清洗快干防臭": true,
+            "轻便场景": true,
+            "规格": true,
+            "选码": true
+          },
+          "coverage_rate": 1.0,
+          "natural_sentence_ratio": 1.0,
+          "duplicate_sentences": [],
+          "reference_5gram_overlap": 0.074,
+          "program_scores": {
+            "selling_point_coverage": 12.0,
+            "flow": 8.0,
+            "speakability": 10.0,
+            "length_fit": 3.26,
+            "fact_references": 5.0
+          },
+          "program_total": 38.26,
+          "invalid_references": false,
+          "app_issues": []
+        },
+        {
+          "han_characters": 932,
+          "sentences": 37,
+          "coverage_groups": {
+            "材质成型": true,
+            "足弓": true,
+            "厚底软弹": true,
+            "静音防滑": true,
+            "清洗快干防臭": true,
+            "轻便场景": true,
+            "规格": true,
+            "选码": true
+          },
+          "coverage_rate": 1.0,
+          "natural_sentence_ratio": 0.973,
+          "duplicate_sentences": [],
+          "reference_5gram_overlap": 0.048,
+          "program_scores": {
+            "selling_point_coverage": 12.0,
+            "flow": 8.0,
+            "speakability": 9.73,
+            "length_fit": 5,
+            "fact_references": 5.0
+          },
+          "program_total": 39.73,
+          "invalid_references": false,
+          "app_issues": []
+        }
+      ],
+      "pair": [
+        {
+          "a": 1,
+          "b": 2,
+          "fivegram_jaccard": 0.202,
+          "shared_narrative_sentences": [],
+          "near_copy_ratio": 0.059,
+          "near_copies": [
+            {
+              "a": "鞋底有静音和防滑特性，在浴室或室内走动时能减少打扰家人。",
+              "b": "鞋底还有静音和防滑特性，在浴室或室内走动时能减少打扰家人。",
+              "similarity": 0.982
+            }
+          ],
+          "opening_similarity": 0.316
+        }
+      ]
+    },
+    "completed_versions": 2,
+    "prompt_sha256": "a2aa188e6072320c8962ec0c017fa076e5ecf36030988ef6fe5885e07f885f32"
+  },
+  {
+    "run": "r7_expanded_clean",
+    "case": "slippers",
+    "requested_versions": 2,
+    "scorecard": {
+      "run": "r7_expanded_clean",
+      "versions": [
+        {
+          "version": 1,
+          "program": 40.0,
+          "semantic": 47.0,
+          "total": 87.0,
+          "hard_gate": true,
+          "rule_issues": [],
+          "serious_claims": 0,
+          "cross_version_copy_pass": true,
+          "pass": true,
+          "gaps": [
+            "价格部分只是陈述原价和活动价，缺乏购买理由强化。",
+            "颜色和尺码只是罗列，没有结合场景做选择建议。",
+            "总结段落重复前文特点，收口力度不足。"
+          ]
+        },
+        {
+          "version": 2,
+          "program": 39.88,
+          "semantic": 46.0,
+          "total": 85.88,
+          "hard_gate": true,
+          "rule_issues": [],
+          "serious_claims": 0,
+          "cross_version_copy_pass": true,
+          "pass": true,
+          "gaps": [
+            "价格引导不够自然，仅罗列价格，未强化下单动力或选购逻辑。",
+            "颜色和尺码的展开较机械，缺少针对不同人群的推荐。",
+            "收口部分重复卖点，缺乏有力收尾。"
+          ]
+        }
+      ],
+      "pair_diversity": {
+        "score": 3,
+        "reason": "两版开场不同（“今天咱们看” vs “今天想跟你聊”），但卖点展开顺序和结构基本一致，均为逐一介绍功能，情境描述有部分差异（如版1强调装行李箱，版2强调日常出门），但整体差异不够鲜明，属于换开场但同样逐点模板。"
+      },
+      "rubric": "20261007.4-uniform-coverage-content-and-near-copy-checks"
+    },
+    "metrics": {
+      "versions": [
+        {
+          "han_characters": 883,
+          "sentences": 27,
+          "coverage_groups": {
+            "材质成型": true,
+            "足弓": true,
+            "厚底软弹": true,
+            "静音防滑": true,
+            "清洗快干防臭": true,
+            "轻便场景": true,
+            "规格": true,
+            "选码": true
+          },
+          "coverage_rate": 1.0,
+          "natural_sentence_ratio": 1.0,
+          "duplicate_sentences": [],
+          "reference_5gram_overlap": 0.062,
+          "program_scores": {
+            "selling_point_coverage": 12.0,
+            "flow": 8.0,
+            "speakability": 10.0,
+            "length_fit": 5,
+            "fact_references": 5.0
+          },
+          "program_total": 40.0,
+          "invalid_references": false,
+          "app_issues": []
+        },
+        {
+          "han_characters": 830,
+          "sentences": 28,
+          "coverage_groups": {
+            "材质成型": true,
+            "足弓": true,
+            "厚底软弹": true,
+            "静音防滑": true,
+            "清洗快干防臭": true,
+            "轻便场景": true,
+            "规格": true,
+            "选码": true
+          },
+          "coverage_rate": 1.0,
+          "natural_sentence_ratio": 1.0,
+          "duplicate_sentences": [],
+          "reference_5gram_overlap": 0.047,
+          "program_scores": {
+            "selling_point_coverage": 12.0,
+            "flow": 8.0,
+            "speakability": 10.0,
+            "length_fit": 4.88,
+            "fact_references": 5.0
+          },
+          "program_total": 39.88,
+          "invalid_references": false,
+          "app_issues": []
+        }
+      ],
+      "pair": [
+        {
+          "a": 1,
+          "b": 2,
+          "fivegram_jaccard": 0.173,
+          "shared_narrative_sentences": [],
+          "near_copy_ratio": 0.059,
+          "near_copies": [
+            {
+              "a": "它还强调一冲即净，如果你不想花太多时间刷拖鞋，用水冲一冲就省事很多。",
+              "b": "它还强调一冲即净，如果你不想花太多时间蹲着刷拖鞋，用水冲一冲就省事很多。",
+              "similarity": 0.971
+            }
+          ],
+          "opening_similarity": 0.527
+        }
+      ]
+    },
+    "completed_versions": 2,
+    "prompt_sha256": "79767ab0dbd70ce9ea344f6025278b62a26a47043ab482c03044644ea3bfb5ac"
+  },
+  {
+    "run": "r8_balanced",
+    "case": "slippers",
+    "requested_versions": 2,
+    "scorecard": {
+      "run": "r8_balanced",
+      "versions": [
+        {
+          "version": 1,
+          "program": 39.01,
+          "semantic": 53.0,
+          "total": 92.01,
+          "hard_gate": true,
+          "rule_issues": [],
+          "serious_claims": 0,
+          "cross_version_copy_pass": true,
+          "pass": true,
+          "gaps": [
+            "“全新上架”属于品牌宣传，但商品资料未提供上架时间，需谨慎核对。",
+            "提到“耐磨”但商品资料有“轻便耐磨”，表述一致。",
+            "整体无明显实际缺点。"
+          ]
+        },
+        {
+          "version": 2,
+          "program": 38.93,
+          "semantic": 47.0,
+          "total": 85.93,
+          "hard_gate": false,
+          "rule_issues": [
+            "遗漏输入中明确的重要特点：耐磨",
+            "丰富商品展开过短，请把重要卖点放入具体生活场景展开，不靠重复参数凑字"
+          ],
+          "serious_claims": 0,
+          "cross_version_copy_pass": true,
+          "pass": false,
+          "gaps": [
+            "痛点引入较弱，开头未深入描述足部不适，直接进入商品介绍。",
+            "卖点展开的机械感稍强，描述略显书面化。",
+            "颜色和尺码列举占用篇幅较多，节奏略拖。"
+          ]
+        }
+      ],
+      "pair_diversity": {
+        "score": 4,
+        "reason": "两版卖点展开顺序、情境和节奏明显不同：版本1以旅行和夜间场景为主，结构较逐点；版本2以互动提问切入，按足弓支撑、静音、轻便等顺序展开，情境更生活化，节奏更流畅。两版均完整，差异鲜明。"
+      },
+      "rubric": "20261007.4-uniform-coverage-content-and-near-copy-checks"
+    },
+    "metrics": {
+      "versions": [
+        {
+          "han_characters": 734,
+          "sentences": 32,
+          "coverage_groups": {
+            "材质成型": true,
+            "足弓": true,
+            "厚底软弹": true,
+            "静音防滑": true,
+            "清洗快干防臭": true,
+            "轻便场景": true,
+            "规格": true,
+            "选码": true
+          },
+          "coverage_rate": 1.0,
+          "natural_sentence_ratio": 0.969,
+          "duplicate_sentences": [],
+          "reference_5gram_overlap": 0.068,
+          "program_scores": {
+            "selling_point_coverage": 12.0,
+            "flow": 8.0,
+            "speakability": 9.69,
+            "length_fit": 4.32,
+            "fact_references": 5.0
+          },
+          "program_total": 39.01,
+          "invalid_references": false,
+          "app_issues": []
+        },
+        {
+          "han_characters": 668,
+          "sentences": 24,
+          "coverage_groups": {
+            "材质成型": true,
+            "足弓": true,
+            "厚底软弹": true,
+            "静音防滑": true,
+            "清洗快干防臭": true,
+            "轻便场景": true,
+            "规格": true,
+            "选码": true
+          },
+          "coverage_rate": 1.0,
+          "natural_sentence_ratio": 1.0,
+          "duplicate_sentences": [],
+          "reference_5gram_overlap": 0.053,
+          "program_scores": {
+            "selling_point_coverage": 12.0,
+            "flow": 8.0,
+            "speakability": 10.0,
+            "length_fit": 3.93,
+            "fact_references": 5.0
+          },
+          "program_total": 38.93,
+          "invalid_references": false,
+          "app_issues": []
+        }
+      ],
+      "pair": [
+        {
+          "a": 1,
+          "b": 2,
+          "fivegram_jaccard": 0.138,
+          "shared_narrative_sentences": [],
+          "near_copy_ratio": 0.056,
+          "near_copies": [
+            {
+              "a": "根据自己喜欢的颜色和合适的尺码去选，合适再下单。",
+              "b": "姐妹可以根据自己喜欢的颜色和合适的尺码来选，觉得合适再下单。",
+              "similarity": 0.852
+            }
+          ],
+          "opening_similarity": 0.352
+        }
+      ]
+    },
+    "completed_versions": 2,
+    "prompt_sha256": "83debc0f9b279717e47d0686e1427a41947ea006554746449f90debfa81de738"
+  },
+  {
+    "run": "r8_repeat",
+    "case": "slippers",
+    "requested_versions": 2,
+    "scorecard": {
+      "run": "r8_repeat",
+      "versions": [
+        {
+          "version": 1,
+          "program": 38.96,
+          "semantic": 52.0,
+          "total": 90.96,
+          "hard_gate": false,
+          "rule_issues": [
+            "丰富商品展开过短，请把重要卖点放入具体生活场景展开，不靠重复参数凑字"
+          ],
+          "serious_claims": 0,
+          "cross_version_copy_pass": true,
+          "pass": false,
+          "gaps": [
+            "颜色介绍只列举‘粉色、黑色、蓝色、卡其色、白色，还有其他颜色可以选’，未说明具体还有哪些颜色，虽然未全部背诵不扣分，但信息不够清晰，可能让消费者无法全面了解可选颜色。",
+            "尺码报读同样用‘三十六码到三十七码’等，与资料数字区间一致但口语化易混淆。",
+            "‘脚背比较宽或者脚型偏肉的朋友，建议斟酌大一号’出现两次，属于同一卖点重复，影响听感。"
+          ]
+        },
+        {
+          "version": 2,
+          "program": 39.16,
+          "semantic": 53.0,
+          "total": 92.16,
+          "hard_gate": false,
+          "rule_issues": [
+            "遗漏输入中明确的重要特点：耐磨"
+          ],
+          "serious_claims": 0,
+          "cross_version_copy_pass": true,
+          "pass": false,
+          "gaps": [
+            "尺码报读用‘三十六码到三十七码’等口语化表达，与资料中的‘36-37’等尺码区间一致，但听觉上可能不够清晰，容易让消费者混淆为单码。",
+            "对‘厚底软弹’的展开较浅，仅一句带过，相比其他卖点显得单薄，未充分展现其情境和收益。",
+            "颜色介绍未全部报出，只说‘喜欢清爽可以看粉色、白色和蓝色；想耐看一点，卡其和黑色也好搭配’，资料中十个颜色只提及五个，信息不全但不扣分；若追求完整可补充其他颜色，但资料未要求必须全部列举。"
+          ]
+        }
+      ],
+      "pair_diversity": {
+        "score": 3,
+        "reason": "两版开场不同：版本1以旅行、住酒店、海边等场景切入，版本2以在家脚底累、拖鞋发硬痛点切入；重点展开顺序不同，版本1把轻便旅行放前，版本2把足弓支撑和软弹放前。但整体卖点覆盖和逐点模板相似，颜色尺码价格表述高度雷同，未达到4分要求的展开情境、节奏至少两项明显不同且均完整。"
+      },
+      "rubric": "20261007.4-uniform-coverage-content-and-near-copy-checks"
+    },
+    "metrics": {
+      "versions": [
+        {
+          "han_characters": 673,
+          "sentences": 24,
+          "coverage_groups": {
+            "材质成型": true,
+            "足弓": true,
+            "厚底软弹": true,
+            "静音防滑": true,
+            "清洗快干防臭": true,
+            "轻便场景": true,
+            "规格": true,
+            "选码": true
+          },
+          "coverage_rate": 1.0,
+          "natural_sentence_ratio": 1.0,
+          "duplicate_sentences": [],
+          "reference_5gram_overlap": 0.057,
+          "program_scores": {
+            "selling_point_coverage": 12.0,
+            "flow": 8.0,
+            "speakability": 10.0,
+            "length_fit": 3.96,
+            "fact_references": 5.0
+          },
+          "program_total": 38.96,
+          "invalid_references": false,
+          "app_issues": []
+        },
+        {
+          "han_characters": 707,
+          "sentences": 27,
+          "coverage_groups": {
+            "材质成型": true,
+            "足弓": true,
+            "厚底软弹": true,
+            "静音防滑": true,
+            "清洗快干防臭": true,
+            "轻便场景": true,
+            "规格": true,
+            "选码": true
+          },
+          "coverage_rate": 1.0,
+          "natural_sentence_ratio": 1.0,
+          "duplicate_sentences": [],
+          "reference_5gram_overlap": 0.06,
+          "program_scores": {
+            "selling_point_coverage": 12.0,
+            "flow": 8.0,
+            "speakability": 10.0,
+            "length_fit": 4.16,
+            "fact_references": 5.0
+          },
+          "program_total": 39.16,
+          "invalid_references": false,
+          "app_issues": []
+        }
+      ],
+      "pair": [
+        {
+          "a": 1,
+          "b": 2,
+          "fivegram_jaccard": 0.204,
+          "shared_narrative_sentences": [
+            "鞋底有静音和防滑特性，在家里走动时能减少对家人的打扰。"
+          ],
+          "near_copy_ratio": 0.067,
+          "near_copies": [
+            {
+              "a": "鞋底有静音和防滑特性，在家里走动时能减少对家人的打扰。",
+              "b": "鞋底有静音和防滑特性，在家里走动时能减少对家人的打扰。",
+              "similarity": 1.0
+            }
+          ],
+          "opening_similarity": 0.177
+        }
+      ]
+    },
+    "completed_versions": 2,
+    "prompt_sha256": "83debc0f9b279717e47d0686e1427a41947ea006554746449f90debfa81de738"
+  },
+  {
+    "run": "regression_bag_r6",
+    "case": "bag",
+    "requested_versions": 2,
+    "scorecard": {
+      "run": "regression_bag_r6",
+      "versions": [
+        {
+          "version": 1,
+          "program": 39.93,
+          "semantic": 53.0,
+          "total": 92.93,
+          "hard_gate": false,
+          "rule_issues": [
+            "促销输入没有明确限时，不能把普通活动价说成限时价"
+          ],
+          "serious_claims": 0,
+          "cross_version_copy_pass": true,
+          "pass": false,
+          "gaps": [
+            "未提及包体具体重量，轻便性缺乏量化支撑。",
+            "促销活动细节不足，仅给出活动价，无优惠券、赠品等信息。",
+            "缺少对目标人群的具体建议，如通勤距离、常用物品类型。"
+          ]
+        },
+        {
+          "version": 2,
+          "program": 39.91,
+          "semantic": 47.0,
+          "total": 86.91,
+          "hard_gate": false,
+          "rule_issues": [
+            "促销输入没有明确限时，不能把普通活动价说成限时价"
+          ],
+          "serious_claims": 0,
+          "cross_version_copy_pass": true,
+          "pass": false,
+          "gaps": [
+            "未提及包体具体重量，轻便性缺乏量化支撑。",
+            "促销活动细节不足，仅给出活动价，无优惠券、赠品等信息。",
+            "购买渠道和售后服务未涉及，影响购买决策。"
+          ]
+        }
+      ],
+      "pair_diversity": {
+        "score": 3,
+        "reason": "两版开场方式不同（第一版从出门习惯切入，第二版以提问互动开始），痛点表述和部分卖点展开顺序有差异（如第二版先讲拉链开合，第一版先讲可折叠），但整体结构相似，均为痛点-卖点-价格-收口模式，属于开场和重点展开有效不同。"
+      },
+      "rubric": "20261007.4-uniform-coverage-content-and-near-copy-checks"
+    },
+    "metrics": {
+      "versions": [
+        {
+          "han_characters": 913,
+          "sentences": 34,
+          "coverage_groups": {
+            "材质": true,
+            "折叠": true,
+            "尺寸": true,
+            "拉链": true,
+            "口袋": true,
+            "携带": true,
+            "颜色": true,
+            "场景": true
+          },
+          "coverage_rate": 1.0,
+          "natural_sentence_ratio": 1.0,
+          "duplicate_sentences": [],
+          "reference_5gram_overlap": 0.002,
+          "program_scores": {
+            "selling_point_coverage": 12.0,
+            "flow": 8.0,
+            "speakability": 10.0,
+            "length_fit": 4.93,
+            "fact_references": 5.0
+          },
+          "program_total": 39.93,
+          "invalid_references": false,
+          "app_issues": []
+        },
+        {
+          "han_characters": 916,
+          "sentences": 32,
+          "coverage_groups": {
+            "材质": true,
+            "折叠": true,
+            "尺寸": true,
+            "拉链": true,
+            "口袋": true,
+            "携带": true,
+            "颜色": true,
+            "场景": true
+          },
+          "coverage_rate": 1.0,
+          "natural_sentence_ratio": 1.0,
+          "duplicate_sentences": [],
+          "reference_5gram_overlap": 0.0,
+          "program_scores": {
+            "selling_point_coverage": 12.0,
+            "flow": 8.0,
+            "speakability": 10.0,
+            "length_fit": 4.91,
+            "fact_references": 5.0
+          },
+          "program_total": 39.91,
+          "invalid_references": false,
+          "app_issues": []
+        }
+      ],
+      "pair": [
+        {
+          "a": 1,
+          "b": 2,
+          "fivegram_jaccard": 0.097,
+          "shared_narrative_sentences": [],
+          "near_copy_ratio": 0.045,
+          "near_copies": [
+            {
+              "a": "到了公司或者回家，拉开拉链拿东西，也不用来回拨开一堆杂物。",
+              "b": "到了公司或者回家，拉开拉链拿东西，也不用来回拨开包口。",
+              "similarity": 0.893
+            }
+          ],
+          "opening_similarity": 0.308
+        }
+      ]
+    },
+    "completed_versions": 2,
+    "prompt_sha256": "a2aa188e6072320c8962ec0c017fa076e5ecf36030988ef6fe5885e07f885f32"
+  },
+  {
+    "run": "regression_bag_r8",
+    "case": "bag",
+    "requested_versions": 2,
+    "scorecard": {
+      "run": "regression_bag_r8",
+      "versions": [
+        {
+          "version": 1,
+          "program": 40.0,
+          "semantic": 48.0,
+          "total": 88.0,
+          "hard_gate": false,
+          "rule_issues": [
+            "促销输入没有明确限时，不能把普通活动价说成限时价"
+          ],
+          "serious_claims": 0,
+          "cross_version_copy_pass": true,
+          "pass": false,
+          "gaps": [
+            "未提及内部小口袋适合放置日常小物这一卖点",
+            "未明确涤纶面料的轻便性",
+            "尺寸数字重复出现，略显冗余"
+          ]
+        },
+        {
+          "version": 2,
+          "program": 40.0,
+          "semantic": 48.0,
+          "total": 88.0,
+          "hard_gate": false,
+          "rule_issues": [
+            "促销输入没有明确限时，不能把普通活动价说成限时价"
+          ],
+          "serious_claims": 0,
+          "cross_version_copy_pass": true,
+          "pass": false,
+          "gaps": [
+            "未提及内部小口袋适合放置日常小物这一卖点",
+            "颜色仅简单带过搭配建议，未结合场景展开",
+            "活动限时表述正确但缺少具体截止时间，虽不是错但可更明确"
+          ]
+        }
+      ],
+      "pair_diversity": {
+        "score": 3,
+        "reason": "两版开场痛点角度不同（通勤换包 vs 大小包纠结），卖点展开情境和顺序有明显差异（版1酒店场景与拉链先后不同，版2早高峰与超市场景），节奏略有不同，但均完整覆盖相同卖点，整体结构相似，属有效不同。"
+      },
+      "rubric": "20261007.4-uniform-coverage-content-and-near-copy-checks"
+    },
+    "metrics": {
+      "versions": [
+        {
+          "han_characters": 546,
+          "sentences": 24,
+          "coverage_groups": {
+            "材质": true,
+            "折叠": true,
+            "尺寸": true,
+            "拉链": true,
+            "口袋": true,
+            "携带": true,
+            "颜色": true,
+            "场景": true
+          },
+          "coverage_rate": 1.0,
+          "natural_sentence_ratio": 1.0,
+          "duplicate_sentences": [],
+          "reference_5gram_overlap": 0.002,
+          "program_scores": {
+            "selling_point_coverage": 12.0,
+            "flow": 8.0,
+            "speakability": 10.0,
+            "length_fit": 5,
+            "fact_references": 5.0
+          },
+          "program_total": 40.0,
+          "invalid_references": false,
+          "app_issues": []
+        },
+        {
+          "han_characters": 588,
+          "sentences": 24,
+          "coverage_groups": {
+            "材质": true,
+            "折叠": true,
+            "尺寸": true,
+            "拉链": true,
+            "口袋": true,
+            "携带": true,
+            "颜色": true,
+            "场景": true
+          },
+          "coverage_rate": 1.0,
+          "natural_sentence_ratio": 1.0,
+          "duplicate_sentences": [],
+          "reference_5gram_overlap": 0.0,
+          "program_scores": {
+            "selling_point_coverage": 12.0,
+            "flow": 8.0,
+            "speakability": 10.0,
+            "length_fit": 5,
+            "fact_references": 5.0
+          },
+          "program_total": 40.0,
+          "invalid_references": false,
+          "app_issues": []
+        }
+      ],
+      "pair": [
+        {
+          "a": 1,
+          "b": 2,
+          "fivegram_jaccard": 0.09,
+          "shared_narrative_sentences": [],
+          "near_copy_ratio": 0.0,
+          "near_copies": [],
+          "opening_similarity": 0.322
+        }
+      ]
+    },
+    "completed_versions": 2,
+    "prompt_sha256": "83debc0f9b279717e47d0686e1427a41947ea006554746449f90debfa81de738"
+  },
+  {
+    "run": "regression_mug_r6",
+    "case": "mug",
+    "requested_versions": 2,
+    "scorecard": {
+      "run": "regression_mug_r6",
+      "versions": [
+        {
+          "version": 1,
+          "program": 39.53,
+          "semantic": 49.0,
+          "total": 88.53,
+          "hard_gate": true,
+          "rule_issues": [],
+          "serious_claims": 0,
+          "cross_version_copy_pass": true,
+          "pass": true,
+          "gaps": [
+            "米白色在颜色段和总结中重复提及，可再精简。",
+            "陶瓷材质的展开偏概括，可增加一个更具体的生活画面。",
+            "容量三百五十毫升的说明较基础，未进一步区分家用和办公的不同倒水习惯。"
+          ]
+        },
+        {
+          "version": 2,
+          "program": 38.2,
+          "semantic": 48.0,
+          "total": 86.2,
+          "hard_gate": true,
+          "rule_issues": [],
+          "serious_claims": 0,
+          "cross_version_copy_pass": true,
+          "pass": true,
+          "gaps": [
+            "米白色卖点在开头和总结前重复出现，略显冗余。",
+            "容量三百五十毫升的展开较常规，未进一步细化不同使用场景的差异。",
+            "结尾总结与前面内容重复度较高，收口不够新鲜。"
+          ]
+        }
+      ],
+      "pair_diversity": {
+        "score": 3,
+        "reason": "两版开场痛点不同，版本1以挑选杯子的关注点切入，版本2以出门端水场景切入，卖点展开顺序也不同；但整体逐点结构相似，均按把手、陶瓷、容量、颜色推进，未达到4分要求的至少两项明显不同且均完整。"
+      },
+      "rubric": "20261007.4-uniform-coverage-content-and-near-copy-checks"
+    },
+    "metrics": {
+      "versions": [
+        {
+          "han_characters": 552,
+          "sentences": 23,
+          "coverage_groups": {
+            "材质": true,
+            "容量": true,
+            "把手": true,
+            "颜色": true,
+            "场景": true
+          },
+          "coverage_rate": 1.0,
+          "natural_sentence_ratio": 1.0,
+          "duplicate_sentences": [],
+          "reference_5gram_overlap": 0.002,
+          "program_scores": {
+            "selling_point_coverage": 12.0,
+            "flow": 8.0,
+            "speakability": 10.0,
+            "length_fit": 4.53,
+            "fact_references": 5.0
+          },
+          "program_total": 39.53,
+          "invalid_references": false,
+          "app_issues": []
+        },
+        {
+          "han_characters": 782,
+          "sentences": 29,
+          "coverage_groups": {
+            "材质": true,
+            "容量": true,
+            "把手": true,
+            "颜色": true,
+            "场景": true
+          },
+          "coverage_rate": 1.0,
+          "natural_sentence_ratio": 1.0,
+          "duplicate_sentences": [],
+          "reference_5gram_overlap": 0.0,
+          "program_scores": {
+            "selling_point_coverage": 12.0,
+            "flow": 8.0,
+            "speakability": 10.0,
+            "length_fit": 3.2,
+            "fact_references": 5.0
+          },
+          "program_total": 38.2,
+          "invalid_references": false,
+          "app_issues": []
+        }
+      ],
+      "pair": [
+        {
+          "a": 1,
+          "b": 2,
+          "fivegram_jaccard": 0.1,
+          "shared_narrative_sentences": [
+            "陶瓷杯配三餐，放在手边就是那种安安静静待着的感觉。"
+          ],
+          "near_copy_ratio": 0.095,
+          "near_copies": [
+            {
+              "a": "早上倒一杯牛奶、豆浆或者温水，差不多就是一顿早餐配着的量。",
+              "b": "早上倒一杯牛奶、豆浆或者温水，差不多就是一顿早餐里配着喝的量。",
+              "similarity": 0.967
+            },
+            {
+              "a": "陶瓷杯配三餐，放在手边就是那种安安静静待着的感觉。",
+              "b": "陶瓷杯配三餐，放在手边就是那种安安静静待着的感觉。",
+              "similarity": 1.0
+            }
+          ],
+          "opening_similarity": 0.329
+        }
+      ]
+    },
+    "completed_versions": 2,
+    "prompt_sha256": "a2aa188e6072320c8962ec0c017fa076e5ecf36030988ef6fe5885e07f885f32"
+  },
+  {
+    "run": "regression_mug_r8",
+    "case": "mug",
+    "requested_versions": 2,
+    "scorecard": {
+      "run": "regression_mug_r8",
+      "versions": [
+        {
+          "version": 1,
+          "program": 38.8,
+          "semantic": 56.0,
+          "total": 94.8,
+          "hard_gate": true,
+          "rule_issues": [],
+          "serious_claims": 0,
+          "cross_version_copy_pass": false,
+          "pass": false,
+          "gaps": [
+            "陶瓷材质的描述仍加入“声音沉沉的”等资料未提供的主观感受。",
+            "容量展开较好，但未提及颜色只有米白色这一种规格限制对选择的影响。",
+            "把手部分对“不是隔热手套”的说明可能暗示商品可装热水且不隔热，需避免无依据性能暗示。"
+          ]
+        },
+        {
+          "version": 2,
+          "program": 39.18,
+          "semantic": 52.0,
+          "total": 91.18,
+          "hard_gate": true,
+          "rule_issues": [],
+          "serious_claims": 0,
+          "cross_version_copy_pass": false,
+          "pass": false,
+          "gaps": [
+            "米白色的场景展开部分偏重“酒店桌面”等资料未支持的场景，可更聚焦家庭餐桌和办公室。",
+            "陶瓷材质带来的温润扎实感描述较多，但资料没有提供手感、声音等实测依据。",
+            "购买引导只提了使用场景，缺少对350毫升容量与日常饮水习惯是否匹配的更具体选择提示。"
+          ]
+        }
+      ],
+      "pair_diversity": {
+        "score": 4,
+        "reason": "两版开场明显不同：版1从出门带杯子和换场景切入，版2从拿杯习惯和端热饮痛点切入。卖点展开顺序也不同：版1先米白色外观再容量、把手、材质，版2先把手、材质、容量、颜色。情境和节奏有有效差异，且均较完整自然。"
+      },
+      "rubric": "20261007.4-uniform-coverage-content-and-near-copy-checks"
+    },
+    "metrics": {
+      "versions": [
+        {
+          "han_characters": 658,
+          "sentences": 23,
+          "coverage_groups": {
+            "材质": true,
+            "容量": true,
+            "把手": true,
+            "颜色": true,
+            "场景": true
+          },
+          "coverage_rate": 1.0,
+          "natural_sentence_ratio": 1.0,
+          "duplicate_sentences": [],
+          "reference_5gram_overlap": 0.0,
+          "program_scores": {
+            "selling_point_coverage": 12.0,
+            "flow": 8.0,
+            "speakability": 10.0,
+            "length_fit": 3.8,
+            "fact_references": 5.0
+          },
+          "program_total": 38.8,
+          "invalid_references": false,
+          "app_issues": []
+        },
+        {
+          "han_characters": 548,
+          "sentences": 26,
+          "coverage_groups": {
+            "材质": true,
+            "容量": true,
+            "把手": true,
+            "颜色": true,
+            "场景": true
+          },
+          "coverage_rate": 1.0,
+          "natural_sentence_ratio": 0.962,
+          "duplicate_sentences": [],
+          "reference_5gram_overlap": 0.0,
+          "program_scores": {
+            "selling_point_coverage": 12.0,
+            "flow": 8.0,
+            "speakability": 9.62,
+            "length_fit": 4.56,
+            "fact_references": 5.0
+          },
+          "program_total": 39.18,
+          "invalid_references": false,
+          "app_issues": []
+        }
+      ],
+      "pair": [
+        {
+          "a": 1,
+          "b": 2,
+          "fivegram_jaccard": 0.157,
+          "shared_narrative_sentences": [],
+          "near_copy_ratio": 0.154,
+          "near_copies": [
+            {
+              "a": "在办公室泡一杯茶，倒一次水能喝上一阵子，不用来回跑茶水间。",
+              "b": "在办公室泡一杯茶，倒一次水能喝上一阵子，不用总往茶水间跑。",
+              "similarity": 0.897
+            },
+            {
+              "a": "陶瓷表面看上去干干净净，日常用起来和玻璃杯、不锈钢杯是两种不同的感觉。",
+              "b": "陶瓷表面看上去干干净净，日常用起来和玻璃杯、不锈钢杯是两种手感。",
+              "similarity": 0.925
+            }
+          ],
+          "opening_similarity": 0.255
+        }
+      ]
+    },
+    "completed_versions": 2,
+    "prompt_sha256": "83debc0f9b279717e47d0686e1427a41947ea006554746449f90debfa81de738"
+  },
+  {
+    "run": "regression_notebook_r8",
+    "case": "notebook",
+    "requested_versions": 2,
+    "scorecard": {
+      "run": "regression_notebook_r8",
+      "versions": [
+        {
+          "version": 1,
+          "program": 40.0,
+          "semantic": 49.0,
+          "total": 89.0,
+          "hard_gate": false,
+          "rule_issues": [
+            "促销输入没有明确限时，不能把普通活动价说成限时价"
+          ],
+          "serious_claims": 0,
+          "cross_version_copy_pass": false,
+          "pass": false,
+          "gaps": [
+            "对80页的具体使用时长只有'够用一阵子'，不够具体。",
+            "颜色选择建议比较泛，'浅灰和浅绿都是比较耐看的颜色'重复。",
+            "没有充分利用'软封面'卖点进行场景展开。"
+          ]
+        },
+        {
+          "version": 2,
+          "program": 40.0,
+          "semantic": 45.0,
+          "total": 85.0,
+          "hard_gate": true,
+          "rule_issues": [],
+          "serious_claims": 0,
+          "cross_version_copy_pass": false,
+          "pass": false,
+          "gaps": [
+            "缺少对软封面带来的便携性、舒适感的细化展开，仅一笔带过。",
+            "颜色选择只说了'浅灰比较安静，浅绿带一点清新'，没有结合具体使用场景。",
+            "购买引导较弱，只说了'合适再下单'，没有强调优惠的适用条件或鼓励行动。"
+          ]
+        }
+      ],
+      "pair_diversity": {
+        "score": 3,
+        "reason": "两版开场不同（一个是直接聊记东西，一个是互动聊记录习惯），痛点引入和部分场景描述有差异，但整体结构仍遵循痛点-卖点-场景-价格，重点展开顺序类似，卖点情境重叠，差异不够鲜明。"
+      },
+      "rubric": "20261007.4-uniform-coverage-content-and-near-copy-checks"
+    },
+    "metrics": {
+      "versions": [
+        {
+          "han_characters": 775,
+          "sentences": 25,
+          "coverage_groups": {
+            "尺寸": true,
+            "页数": true,
+            "封面": true,
+            "内页": true,
+            "用途": true,
+            "颜色": true,
+            "优惠门槛": true,
+            "不可叠加": true
+          },
+          "coverage_rate": 1.0,
+          "natural_sentence_ratio": 1.0,
+          "duplicate_sentences": [],
+          "reference_5gram_overlap": 0.003,
+          "program_scores": {
+            "selling_point_coverage": 12.0,
+            "flow": 8.0,
+            "speakability": 10.0,
+            "length_fit": 5,
+            "fact_references": 5.0
+          },
+          "program_total": 40.0,
+          "invalid_references": false,
+          "app_issues": []
+        },
+        {
+          "han_characters": 526,
+          "sentences": 19,
+          "coverage_groups": {
+            "尺寸": true,
+            "页数": true,
+            "封面": true,
+            "内页": true,
+            "用途": true,
+            "颜色": true,
+            "优惠门槛": true,
+            "不可叠加": true
+          },
+          "coverage_rate": 1.0,
+          "natural_sentence_ratio": 1.0,
+          "duplicate_sentences": [],
+          "reference_5gram_overlap": 0.002,
+          "program_scores": {
+            "selling_point_coverage": 12.0,
+            "flow": 8.0,
+            "speakability": 10.0,
+            "length_fit": 5,
+            "fact_references": 5.0
+          },
+          "program_total": 40.0,
+          "invalid_references": false,
+          "app_issues": []
+        }
+      ],
+      "pair": [
+        {
+          "a": 1,
+          "b": 2,
+          "fivegram_jaccard": 0.189,
+          "shared_narrative_sentences": [],
+          "near_copy_ratio": 0.231,
+          "near_copies": [
+            {
+              "a": "出门去图书馆或者咖啡馆，往包里一塞就行，不像硬壳本那么占地方。",
+              "b": "出门去图书馆或者咖啡馆，往包里一塞就行，不像硬壳本那样支棱着占地方。",
+              "similarity": 0.923
+            },
+            {
+              "a": "因为内页是点阵的，所以它不限定你只能写字，也可以画点简单的小图、做个打卡表。",
+              "b": "因为内页是点阵的，所以它不限定你只能写字，也可以画点简单的小图或者做个打卡格子。",
+              "similarity": 0.923
+            },
+            {
+              "a": "封面是软面的，拿在手里比较柔软，放在包里也能稍微贴合包内空间。",
+              "b": "封面是软面的，拿在手里比较柔软，放在包里也能稍微弯一弯。",
+              "similarity": 0.847
+            }
+          ],
+          "opening_similarity": 0.19
+        }
+      ]
+    },
+    "completed_versions": 2,
+    "prompt_sha256": "83debc0f9b279717e47d0686e1427a41947ea006554746449f90debfa81de738"
+  },
+  {
+    "run": "release10_mug",
+    "case": "mug",
+    "requested_versions": 2,
+    "scorecard": {
+      "run": "release10_mug",
+      "versions": [
+        {
+          "version": 1,
+          "program": 38.39,
+          "semantic": 52.0,
+          "total": 90.39,
+          "hard_gate": true,
+          "rule_issues": [],
+          "serious_claims": 0,
+          "cross_version_copy_pass": true,
+          "pass": true,
+          "gaps": [
+            "未提及容量以外的其他规格选择，但资料未提供，不扣分。",
+            "未提及耐温、微波炉等适用性，资料未提供，正确不写。",
+            "全文未出现不实承诺或编造信息，但卖点展开的丰富度已足够。"
+          ]
+        },
+        {
+          "version": 2,
+          "program": 39.49,
+          "semantic": 52.0,
+          "total": 91.49,
+          "hard_gate": true,
+          "rule_issues": [],
+          "serious_claims": 0,
+          "cross_version_copy_pass": true,
+          "pass": true,
+          "gaps": [
+            "缺少颜色以外的其他规格说明（如是否只有一种容量），但资料未提供更多规格，不扣分。",
+            "未提及耐温范围、微波炉/洗碗机适用性和保温功能，但资料明确未提供，属于正确行为，不扣分。",
+            "价格部分已说明无活动价，但未提及是否有其他优惠条件，然而推广信息为空，不构成缺点。"
+          ]
+        }
+      ],
+      "pair_diversity": {
+        "score": 4,
+        "reason": "两版开场方式不同（版本1直接欢迎并切入痛点，版本2以互动问题开场），卖点展开顺序不同（版本1先颜色后容量再把手最后材质，版本2先材质后把手再容量最后颜色），生活情境也有差异（如版本2增加了“家里来客人”“周末看书”等场景），且两版均完整自然，差异明显，符合4分标准。"
+      },
+      "rubric": "20261007.4-uniform-coverage-content-and-near-copy-checks"
+    },
+    "metrics": {
+      "versions": [
+        {
+          "han_characters": 737,
+          "sentences": 26,
+          "coverage_groups": {
+            "材质": true,
+            "容量": true,
+            "把手": true,
+            "颜色": true,
+            "场景": true
+          },
+          "coverage_rate": 1.0,
+          "natural_sentence_ratio": 1.0,
+          "duplicate_sentences": [],
+          "reference_5gram_overlap": 0.0,
+          "program_scores": {
+            "selling_point_coverage": 12.0,
+            "flow": 8.0,
+            "speakability": 10.0,
+            "length_fit": 3.39,
+            "fact_references": 5.0
+          },
+          "program_total": 38.39,
+          "invalid_references": false,
+          "app_issues": []
+        },
+        {
+          "han_characters": 557,
+          "sentences": 21,
+          "coverage_groups": {
+            "材质": true,
+            "容量": true,
+            "把手": true,
+            "颜色": true,
+            "场景": true
+          },
+          "coverage_rate": 1.0,
+          "natural_sentence_ratio": 1.0,
+          "duplicate_sentences": [],
+          "reference_5gram_overlap": 0.0,
+          "program_scores": {
+            "selling_point_coverage": 12.0,
+            "flow": 8.0,
+            "speakability": 10.0,
+            "length_fit": 4.49,
+            "fact_references": 5.0
+          },
+          "program_total": 39.49,
+          "invalid_references": false,
+          "app_issues": []
+        }
+      ],
+      "pair": [
+        {
+          "a": 1,
+          "b": 2,
+          "fivegram_jaccard": 0.121,
+          "shared_narrative_sentences": [],
+          "near_copy_ratio": 0.143,
+          "near_copies": [
+            {
+              "a": "坐在电脑前想喝一口，握着把手抬起来就行，喝完放回桌面也顺手。",
+              "b": "坐在电脑前想喝一口，握住把手抬起来就行，喝完顺手放回桌边。",
+              "similarity": 0.847
+            },
+            {
+              "a": "杯身带了一个把手，端起杯子的时候手指有地方搭，不用整个手掌去包住杯身。",
+              "b": "杯身带了一个把手，端杯子的时候手指有地方搭，不用整个手掌去捧杯身。",
+              "similarity": 0.941
+            }
+          ],
+          "opening_similarity": 0.251
+        }
+      ]
+    },
+    "completed_versions": 2,
+    "prompt_sha256": "3ad1e983beb545e4492ae3f4c8fc78789c6188237ee9564ce077e8fd624e0a32"
+  },
+  {
+    "run": "release10_repeat",
+    "case": "slippers",
+    "requested_versions": 2,
+    "scorecard": {
+      "run": "release10_repeat",
+      "versions": [
+        {
+          "version": 1,
+          "program": 40.0,
+          "semantic": 52.0,
+          "total": 92.0,
+          "hard_gate": true,
+          "rule_issues": [],
+          "serious_claims": 0,
+          "cross_version_copy_pass": true,
+          "pass": true,
+          "gaps": [
+            "对'快干'特性仅一句话带过，未说明在浴室或海边使用后的实际方便程度。",
+            "颜色推荐虽然较丰富，但缺乏对每种颜色与场景搭配的具体建议。",
+            "尺码部分虽提标准码和偏肉选大，但未说明若选错如何处理。"
+          ]
+        },
+        {
+          "version": 2,
+          "program": 39.76,
+          "semantic": 51.0,
+          "total": 90.76,
+          "hard_gate": false,
+          "rule_issues": [
+            "当前输入没有提供已开通的下单入口，不得说直播间就能拍或指定购物车位置；改为按需要选择、合适再下单"
+          ],
+          "serious_claims": 0,
+          "cross_version_copy_pass": true,
+          "pass": false,
+          "gaps": [
+            "知识库未提供的'快干易清洗、防臭'展开略显空泛，缺乏具体生活场景。",
+            "对'足弓支撑'的体验描述较笼统，未结合不同脚型说明。",
+            "颜色描述较简略，仅按色系分类，未逐一说明适合风格。"
+          ]
+        }
+      ],
+      "pair_diversity": {
+        "score": 4,
+        "reason": "两版开场完全不同（旅行 vs 居家痛点），卖点展开顺序不同（版1侧重旅行与户外，版2侧重居家），情境选择（酒店、海边 vs 厨房、卧室）和节奏有明显差异，均完整连贯，给4分。"
+      },
+      "rubric": "20261007.4-uniform-coverage-content-and-near-copy-checks"
+    },
+    "metrics": {
+      "versions": [
+        {
+          "han_characters": 861,
+          "sentences": 27,
+          "coverage_groups": {
+            "材质成型": true,
+            "足弓": true,
+            "厚底软弹": true,
+            "静音防滑": true,
+            "清洗快干防臭": true,
+            "轻便场景": true,
+            "规格": true,
+            "选码": true
+          },
+          "coverage_rate": 1.0,
+          "natural_sentence_ratio": 1.0,
+          "duplicate_sentences": [],
+          "reference_5gram_overlap": 0.056,
+          "program_scores": {
+            "selling_point_coverage": 12.0,
+            "flow": 8.0,
+            "speakability": 10.0,
+            "length_fit": 5,
+            "fact_references": 5.0
+          },
+          "program_total": 40.0,
+          "invalid_references": false,
+          "app_issues": []
+        },
+        {
+          "han_characters": 810,
+          "sentences": 23,
+          "coverage_groups": {
+            "材质成型": true,
+            "足弓": true,
+            "厚底软弹": true,
+            "静音防滑": true,
+            "清洗快干防臭": true,
+            "轻便场景": true,
+            "规格": true,
+            "选码": true
+          },
+          "coverage_rate": 1.0,
+          "natural_sentence_ratio": 1.0,
+          "duplicate_sentences": [],
+          "reference_5gram_overlap": 0.056,
+          "program_scores": {
+            "selling_point_coverage": 12.0,
+            "flow": 8.0,
+            "speakability": 10.0,
+            "length_fit": 4.76,
+            "fact_references": 5.0
+          },
+          "program_total": 39.76,
+          "invalid_references": false,
+          "app_issues": []
+        }
+      ],
+      "pair": [
+        {
+          "a": 1,
+          "b": 2,
+          "fivegram_jaccard": 0.172,
+          "shared_narrative_sentences": [],
+          "near_copy_ratio": 0.062,
+          "near_copies": [
+            {
+              "a": "防滑特性在浴室或室内走动时能多一分踏实，不过湿地面大家还是要放慢脚步，小心行走。",
+              "b": "防滑特性在浴室或室内走动时多一分踏实，不过湿地面还是要放慢脚步、小心行走。",
+              "similarity": 0.935
+            }
+          ],
+          "opening_similarity": 0.216
+        }
+      ]
+    },
+    "completed_versions": 2,
+    "prompt_sha256": "3ad1e983beb545e4492ae3f4c8fc78789c6188237ee9564ce077e8fd624e0a32"
+  },
+  {
+    "run": "release10_slippers",
+    "case": "slippers",
+    "requested_versions": 2,
+    "scorecard": {
+      "run": "release10_slippers",
+      "versions": [
+        {
+          "version": 1,
+          "program": 39.74,
+          "semantic": 52.0,
+          "total": 91.74,
+          "hard_gate": true,
+          "rule_issues": [],
+          "serious_claims": 0,
+          "cross_version_copy_pass": true,
+          "pass": true,
+          "gaps": [
+            "部分描述如“拿在手里能感觉到”带有模拟实测感。",
+            "卖点重复出现次数略多。",
+            "整体信息密度高但个别句子偏长，直播节奏可再优化。"
+          ]
+        },
+        {
+          "version": 2,
+          "program": 40.0,
+          "semantic": 51.0,
+          "total": 91.0,
+          "hard_gate": false,
+          "rule_issues": [
+            "一体成型或软弹不能推导出不磨脚；删除未提供的不磨脚性能承诺"
+          ],
+          "serious_claims": 0,
+          "cross_version_copy_pass": true,
+          "pass": false,
+          "gaps": [
+            "部分书面化表达削弱直播口语感。",
+            "“不磨脚”属于无资料支持的附加好处。",
+            "颜色尺码信息较罗列，与场景卖点结合不够紧密。"
+          ]
+        }
+      ],
+      "pair_diversity": {
+        "score": 3,
+        "reason": "两版开场痛点不同（旅行/居家 vs 厨房/浴室），但后续卖点展开顺序和结构高度相似，均按足弓支撑、静音防滑、材质轻便、打理、颜色尺码、价格收口推进；情境略有差异但模板化明显，属于换开场但同样逐点模板，未达到两项以上明显不同且均完整。"
+      },
+      "rubric": "20261007.4-uniform-coverage-content-and-near-copy-checks"
+    },
+    "metrics": {
+      "versions": [
+        {
+          "han_characters": 1005,
+          "sentences": 39,
+          "coverage_groups": {
+            "材质成型": true,
+            "足弓": true,
+            "厚底软弹": true,
+            "静音防滑": true,
+            "清洗快干防臭": true,
+            "轻便场景": true,
+            "规格": true,
+            "选码": true
+          },
+          "coverage_rate": 1.0,
+          "natural_sentence_ratio": 0.974,
+          "duplicate_sentences": [],
+          "reference_5gram_overlap": 0.047,
+          "program_scores": {
+            "selling_point_coverage": 12.0,
+            "flow": 8.0,
+            "speakability": 9.74,
+            "length_fit": 5,
+            "fact_references": 5.0
+          },
+          "program_total": 39.74,
+          "invalid_references": false,
+          "app_issues": []
+        },
+        {
+          "han_characters": 919,
+          "sentences": 28,
+          "coverage_groups": {
+            "材质成型": true,
+            "足弓": true,
+            "厚底软弹": true,
+            "静音防滑": true,
+            "清洗快干防臭": true,
+            "轻便场景": true,
+            "规格": true,
+            "选码": true
+          },
+          "coverage_rate": 1.0,
+          "natural_sentence_ratio": 1.0,
+          "duplicate_sentences": [],
+          "reference_5gram_overlap": 0.031,
+          "program_scores": {
+            "selling_point_coverage": 12.0,
+            "flow": 8.0,
+            "speakability": 10.0,
+            "length_fit": 5,
+            "fact_references": 5.0
+          },
+          "program_total": 40.0,
+          "invalid_references": false,
+          "app_issues": []
+        }
+      ],
+      "pair": [
+        {
+          "a": 1,
+          "b": 2,
+          "fivegram_jaccard": 0.108,
+          "shared_narrative_sentences": [],
+          "near_copy_ratio": 0.0,
+          "near_copies": [],
+          "opening_similarity": 0.268
+        }
+      ]
+    },
+    "completed_versions": 2,
+    "prompt_sha256": "3ad1e983beb545e4492ae3f4c8fc78789c6188237ee9564ce077e8fd624e0a32"
+  },
+  {
+    "run": "release11_repeat",
+    "case": "slippers",
+    "requested_versions": 2,
+    "scorecard": {
+      "run": "release11_repeat",
+      "versions": [
+        {
+          "version": 1,
+          "program": 39.71,
+          "semantic": 53.0,
+          "total": 92.71,
+          "hard_gate": true,
+          "rule_issues": [],
+          "serious_claims": 0,
+          "cross_version_copy_pass": true,
+          "pass": true,
+          "gaps": [
+            "价格部分未提及原价与活动价的对比细节，仅陈述价格。",
+            "颜色列举用‘等等’带过，可能遗漏部分颜色信息。",
+            "整体语速可能较快，部分场景切换稍显急促。"
+          ]
+        },
+        {
+          "version": 2,
+          "program": 40.0,
+          "semantic": 50.0,
+          "total": 90.0,
+          "hard_gate": true,
+          "rule_issues": [],
+          "serious_claims": 0,
+          "cross_version_copy_pass": true,
+          "pass": true,
+          "gaps": [
+            "部分卖点如‘轻便耐磨’在口播中一笔带过，未充分展开使用情境和收益。",
+            "颜色选择建议中遗漏了红色，虽不影响核心信息，但列举不全。",
+            "整体节奏在颜色和尺码部分略显拖沓，可更紧凑。"
+          ]
+        }
+      ],
+      "pair_diversity": {
+        "score": 4,
+        "reason": "两版卖点展开顺序和情境节奏明显不同：版1以旅行和颜色开场，后聚焦居家舒适；版2以姐妹对话和厨房痛点切入，再展开卖点。两版均自然完整，差异鲜明。"
+      },
+      "rubric": "20261007.4-uniform-coverage-content-and-near-copy-checks"
+    },
+    "metrics": {
+      "versions": [
+        {
+          "han_characters": 800,
+          "sentences": 31,
+          "coverage_groups": {
+            "材质成型": true,
+            "足弓": true,
+            "厚底软弹": true,
+            "静音防滑": true,
+            "清洗快干防臭": true,
+            "轻便场景": true,
+            "规格": true,
+            "选码": true
+          },
+          "coverage_rate": 1.0,
+          "natural_sentence_ratio": 1.0,
+          "duplicate_sentences": [],
+          "reference_5gram_overlap": 0.052,
+          "program_scores": {
+            "selling_point_coverage": 12.0,
+            "flow": 8.0,
+            "speakability": 10.0,
+            "length_fit": 4.71,
+            "fact_references": 5.0
+          },
+          "program_total": 39.71,
+          "invalid_references": false,
+          "app_issues": []
+        },
+        {
+          "han_characters": 1003,
+          "sentences": 32,
+          "coverage_groups": {
+            "材质成型": true,
+            "足弓": true,
+            "厚底软弹": true,
+            "静音防滑": true,
+            "清洗快干防臭": true,
+            "轻便场景": true,
+            "规格": true,
+            "选码": true
+          },
+          "coverage_rate": 1.0,
+          "natural_sentence_ratio": 1.0,
+          "duplicate_sentences": [],
+          "reference_5gram_overlap": 0.048,
+          "program_scores": {
+            "selling_point_coverage": 12.0,
+            "flow": 8.0,
+            "speakability": 10.0,
+            "length_fit": 5,
+            "fact_references": 5.0
+          },
+          "program_total": 40.0,
+          "invalid_references": false,
+          "app_issues": []
+        }
+      ],
+      "pair": [
+        {
+          "a": 1,
+          "b": 2,
+          "fivegram_jaccard": 0.119,
+          "shared_narrative_sentences": [
+            "材质是优选EVA环保材质，一体成型工艺。"
+          ],
+          "near_copy_ratio": 0.125,
+          "near_copies": [
+            {
+              "a": "一体成型意味着拼接少，结构简单，不容易藏污纳垢。",
+              "b": "一体成型意味着拼接少，结构简单，鞋面不容易藏污纳垢，打理起来省事。",
+              "similarity": 0.842
+            },
+            {
+              "a": "晚上家人都睡了，你去浴室洗漱、回房间，鞋底和地面碰触的声音小，减少打扰。",
+              "b": "晚上家人都睡了，你去浴室洗漱、回房间，鞋底和地面摩擦的声音比较小，能减少打扰家人。",
+              "similarity": 0.883
+            },
+            {
+              "a": "材质是优选EVA环保材质，一体成型工艺。",
+              "b": "材质是优选EVA环保材质，一体成型工艺。",
+              "similarity": 1.0
+            }
+          ],
+          "opening_similarity": 0.258
+        }
+      ]
+    },
+    "completed_versions": 2,
+    "prompt_sha256": "29d1aa48d10b26e6040e68112f4514e408cfab195222c0747aa68d47fa041a0e"
+  },
+  {
+    "run": "release11_slippers",
+    "case": "slippers",
+    "requested_versions": 2,
+    "scorecard": {
+      "run": "release11_slippers",
+      "versions": [
+        {
+          "version": 1,
+          "program": 39.79,
+          "semantic": 49.0,
+          "total": 88.79,
+          "hard_gate": true,
+          "rule_issues": [],
+          "serious_claims": 0,
+          "cross_version_copy_pass": true,
+          "pass": true,
+          "gaps": [
+            "部分展开较泛，如'脚底有支撑和没支撑，感受差别挺明显'，不够具体。",
+            "颜色列举时用'等等'，不如第一版完整，但资料有十色，不背诵全部不扣分，但直播中可能影响信息完整度。",
+            "整体卖点展开的生动性略弱于第一版，如厨房场景与第一版重复。"
+          ]
+        },
+        {
+          "version": 2,
+          "program": 40.0,
+          "semantic": 51.0,
+          "total": 91.0,
+          "hard_gate": true,
+          "rule_issues": [],
+          "serious_claims": 0,
+          "cross_version_copy_pass": true,
+          "pass": true,
+          "gaps": [
+            "部分句子偏说明书式，如'鞋底具备静音特性。'，影响口语自然度。",
+            "对足弓支撑的描写'脚掌内侧那条弧线能被托住一点'缺乏资料支持，可能引发误解。",
+            "颜色列举了十个但未说明所有颜色是否有货，可能让消费者产生选择困惑（但非严重问题）。"
+          ]
+        }
+      ],
+      "pair_diversity": {
+        "score": 3,
+        "reason": "两版开场不同（第一版互动问句，第二版扣1互动），痛点引入不同（第一版夜间噪音，第二版久站劳累），卖点展开顺序不同（第一版先静音后足弓，第二版先足弓后静音），情境有差异但部分重叠（厨房场景），整体结构相似，差异不够鲜明，给3分。"
+      },
+      "rubric": "20261007.4-uniform-coverage-content-and-near-copy-checks"
+    },
+    "metrics": {
+      "versions": [
+        {
+          "han_characters": 814,
+          "sentences": 29,
+          "coverage_groups": {
+            "材质成型": true,
+            "足弓": true,
+            "厚底软弹": true,
+            "静音防滑": true,
+            "清洗快干防臭": true,
+            "轻便场景": true,
+            "规格": true,
+            "选码": true
+          },
+          "coverage_rate": 1.0,
+          "natural_sentence_ratio": 1.0,
+          "duplicate_sentences": [],
+          "reference_5gram_overlap": 0.045,
+          "program_scores": {
+            "selling_point_coverage": 12.0,
+            "flow": 8.0,
+            "speakability": 10.0,
+            "length_fit": 4.79,
+            "fact_references": 5.0
+          },
+          "program_total": 39.79,
+          "invalid_references": false,
+          "app_issues": []
+        },
+        {
+          "han_characters": 897,
+          "sentences": 30,
+          "coverage_groups": {
+            "材质成型": true,
+            "足弓": true,
+            "厚底软弹": true,
+            "静音防滑": true,
+            "清洗快干防臭": true,
+            "轻便场景": true,
+            "规格": true,
+            "选码": true
+          },
+          "coverage_rate": 1.0,
+          "natural_sentence_ratio": 1.0,
+          "duplicate_sentences": [],
+          "reference_5gram_overlap": 0.047,
+          "program_scores": {
+            "selling_point_coverage": 12.0,
+            "flow": 8.0,
+            "speakability": 10.0,
+            "length_fit": 5,
+            "fact_references": 5.0
+          },
+          "program_total": 40.0,
+          "invalid_references": false,
+          "app_issues": []
+        }
+      ],
+      "pair": [
+        {
+          "a": 1,
+          "b": 2,
+          "fivegram_jaccard": 0.135,
+          "shared_narrative_sentences": [],
+          "near_copy_ratio": 0.0,
+          "near_copies": [],
+          "opening_similarity": 0.234
+        }
+      ]
+    },
+    "completed_versions": 2,
+    "prompt_sha256": "29d1aa48d10b26e6040e68112f4514e408cfab195222c0747aa68d47fa041a0e"
+  },
+  {
+    "run": "release81_bag",
+    "case": "bag",
+    "requested_versions": 2,
+    "scorecard": {
+      "run": "release81_bag",
+      "versions": [
+        {
+          "version": 1,
+          "program": 40.0,
+          "semantic": 48.0,
+          "total": 88.0,
+          "hard_gate": true,
+          "rule_issues": [],
+          "serious_claims": 0,
+          "cross_version_copy_pass": true,
+          "pass": false,
+          "gaps": []
+        },
+        {
+          "version": 2,
+          "program": 40.0,
+          "semantic": 53.0,
+          "total": 93.0,
+          "hard_gate": true,
+          "rule_issues": [],
+          "serious_claims": 0,
+          "cross_version_copy_pass": true,
+          "pass": false,
+          "gaps": []
+        }
+      ],
+      "pair_diversity": {
+        "score": 1,
+        "reason": "两版仅换开场和少量排序，卖点展开几乎逐点对应，如折叠、长肩带、拉链主袋、小口袋的场景描述高度相似，属于换词级别，缺乏有效差异。"
+      },
+      "rubric": "20261007.4-uniform-coverage-content-and-near-copy-checks"
+    },
+    "metrics": {
+      "versions": [
+        {
+          "han_characters": 507,
+          "sentences": 22,
+          "coverage_groups": {
+            "材质": true,
+            "折叠": true,
+            "尺寸": true,
+            "拉链": true,
+            "口袋": true,
+            "携带": true,
+            "颜色": true,
+            "场景": true
+          },
+          "coverage_rate": 1.0,
+          "natural_sentence_ratio": 1.0,
+          "duplicate_sentences": [],
+          "reference_5gram_overlap": 0.0,
+          "program_scores": {
+            "selling_point_coverage": 12.0,
+            "flow": 8.0,
+            "speakability": 10.0,
+            "length_fit": 5,
+            "fact_references": 5.0
+          },
+          "program_total": 40.0,
+          "invalid_references": false,
+          "app_issues": []
+        },
+        {
+          "han_characters": 698,
+          "sentences": 24,
+          "coverage_groups": {
+            "材质": true,
+            "折叠": true,
+            "尺寸": true,
+            "拉链": true,
+            "口袋": true,
+            "携带": true,
+            "颜色": true,
+            "场景": true
+          },
+          "coverage_rate": 1.0,
+          "natural_sentence_ratio": 1.0,
+          "duplicate_sentences": [],
+          "reference_5gram_overlap": 0.003,
+          "program_scores": {
+            "selling_point_coverage": 12.0,
+            "flow": 8.0,
+            "speakability": 10.0,
+            "length_fit": 5,
+            "fact_references": 5.0
+          },
+          "program_total": 40.0,
+          "invalid_references": false,
+          "app_issues": []
+        }
+      ],
+      "pair": [
+        {
+          "a": 1,
+          "b": 2,
+          "fivegram_jaccard": 0.123,
+          "shared_narrative_sentences": [],
+          "near_copy_ratio": 0.0,
+          "near_copies": [],
+          "opening_similarity": 0.207
+        }
+      ]
+    },
+    "completed_versions": 2,
+    "prompt_sha256": "9b51f128ace0ee3f7cd28962623153680741c51d3ede74f9762c9fd320c5ad32"
+  },
+  {
+    "run": "release81_slippers",
+    "case": "slippers",
+    "requested_versions": 2,
+    "failure": {
+      "version": 1,
+      "error_type": "RuntimeError",
+      "message": "话术自动重写一次后仍未通过检查：遗漏输入中明确的重要特点：耐磨；已有话术未改动，请重试。"
+    },
+    "prompt_sha256": "9b51f128ace0ee3f7cd28962623153680741c51d3ede74f9762c9fd320c5ad32"
+  },
+  {
+    "run": "release82_slippers",
+    "case": "slippers",
+    "requested_versions": 2,
+    "failure": {
+      "version": 2,
+      "error_type": "RuntimeError",
+      "message": "话术自动重写一次后仍未通过检查：丰富商品展开过短，请把重要卖点放入具体生活场景展开，不靠重复参数凑字；已有话术未改动，请重试。"
+    },
+    "completed_versions": 1,
+    "prompt_sha256": "1c74d3403f6ecbbb00bf7a540a582852c40485b39bb7be8a72b2b21cf44d05a3"
+  },
+  {
+    "run": "release9_bag",
+    "case": "bag",
+    "requested_versions": 2,
+    "scorecard": {
+      "run": "release9_bag",
+      "versions": [
+        {
+          "version": 1,
+          "program": 40.0,
+          "semantic": 50.0,
+          "total": 90.0,
+          "hard_gate": true,
+          "rule_issues": [],
+          "serious_claims": 0,
+          "cross_version_copy_pass": true,
+          "pass": true,
+          "gaps": [
+            "'长肩带设计，让手提和单肩背都行得通'前后几乎原句重复。",
+            "尺寸描述'比较从容'过于模糊，未像版本1那样连接到具体日常物品。",
+            "颜色部分两色描述较泛，缺少与常见穿搭场景的进一步联系。"
+          ]
+        },
+        {
+          "version": 2,
+          "program": 40.0,
+          "semantic": 53.0,
+          "total": 93.0,
+          "hard_gate": true,
+          "rule_issues": [],
+          "serious_claims": 0,
+          "cross_version_copy_pass": true,
+          "pass": true,
+          "gaps": [
+            "部分句子偏说明书式，如直接念尺寸数字，缺少口语化转译。",
+            "结尾收口稍长，把前面卖点又罗列一遍，可更简洁。",
+            "颜色选择只停留在搭配建议，未进一步联系场景帮助决策。"
+          ]
+        }
+      ],
+      "pair_diversity": {
+        "score": 3,
+        "reason": "两版开场痛点不同，版本1从周末/出差临时用包切入，版本2从换包麻烦切入；卖点展开顺序有差异（版本1先可折叠再面料，版本2先拉链再折叠），且两版均完整覆盖核心事实。但整体逐点结构和收口方式仍较相似，未达到'卖点展开顺序/情境/节奏至少两项明显不同且均完整'的4分标准。"
+      },
+      "rubric": "20261007.4-uniform-coverage-content-and-near-copy-checks"
+    },
+    "metrics": {
+      "versions": [
+        {
+          "han_characters": 709,
+          "sentences": 24,
+          "coverage_groups": {
+            "材质": true,
+            "折叠": true,
+            "尺寸": true,
+            "拉链": true,
+            "口袋": true,
+            "携带": true,
+            "颜色": true,
+            "场景": true
+          },
+          "coverage_rate": 1.0,
+          "natural_sentence_ratio": 1.0,
+          "duplicate_sentences": [],
+          "reference_5gram_overlap": 0.001,
+          "program_scores": {
+            "selling_point_coverage": 12.0,
+            "flow": 8.0,
+            "speakability": 10.0,
+            "length_fit": 5,
+            "fact_references": 5.0
+          },
+          "program_total": 40.0,
+          "invalid_references": false,
+          "app_issues": []
+        },
+        {
+          "han_characters": 692,
+          "sentences": 20,
+          "coverage_groups": {
+            "材质": true,
+            "折叠": true,
+            "尺寸": true,
+            "拉链": true,
+            "口袋": true,
+            "携带": true,
+            "颜色": true,
+            "场景": true
+          },
+          "coverage_rate": 1.0,
+          "natural_sentence_ratio": 1.0,
+          "duplicate_sentences": [],
+          "reference_5gram_overlap": 0.007,
+          "program_scores": {
+            "selling_point_coverage": 12.0,
+            "flow": 8.0,
+            "speakability": 10.0,
+            "length_fit": 5,
+            "fact_references": 5.0
+          },
+          "program_total": 40.0,
+          "invalid_references": false,
+          "app_issues": []
+        }
+      ],
+      "pair": [
+        {
+          "a": 1,
+          "b": 2,
+          "fivegram_jaccard": 0.119,
+          "shared_narrative_sentences": [],
+          "near_copy_ratio": 0.077,
+          "near_copies": [
+            {
+              "a": "里面还有一个小口袋，钥匙、耳机、门禁卡这些小东西可以单独放，找的时候不用在大袋子里翻来翻去。",
+              "b": "内部还做一个小口袋，钥匙、耳机、门禁卡这些小东西可以单独放进去，找的时候不用在大包里翻来翻去。",
+              "similarity": 0.882
+            }
+          ],
+          "opening_similarity": 0.199
+        }
+      ]
+    },
+    "completed_versions": 2,
+    "prompt_sha256": "0532e981b59ee41635a70d6932fd8cae673e61faae1da2889e31e34815021cc8"
+  },
+  {
+    "run": "release9_mug",
+    "case": "mug",
+    "requested_versions": 2,
+    "metrics": {
+      "versions": [
+        {
+          "han_characters": 527,
+          "sentences": 20,
+          "coverage_groups": {
+            "材质": true,
+            "容量": true,
+            "把手": true,
+            "颜色": true,
+            "场景": true
+          },
+          "coverage_rate": 1.0,
+          "natural_sentence_ratio": 1.0,
+          "duplicate_sentences": [],
+          "reference_5gram_overlap": 0.002,
+          "program_scores": {
+            "selling_point_coverage": 12.0,
+            "flow": 8.0,
+            "speakability": 10.0,
+            "length_fit": 4.74,
+            "fact_references": 5.0
+          },
+          "program_total": 39.74,
+          "invalid_references": false,
+          "app_issues": []
+        },
+        {
+          "han_characters": 696,
+          "sentences": 26,
+          "coverage_groups": {
+            "材质": true,
+            "容量": true,
+            "把手": true,
+            "颜色": true,
+            "场景": true
+          },
+          "coverage_rate": 1.0,
+          "natural_sentence_ratio": 1.0,
+          "duplicate_sentences": [],
+          "reference_5gram_overlap": 0.001,
+          "program_scores": {
+            "selling_point_coverage": 12.0,
+            "flow": 8.0,
+            "speakability": 10.0,
+            "length_fit": 3.59,
+            "fact_references": 5.0
+          },
+          "program_total": 38.59,
+          "invalid_references": false,
+          "app_issues": []
+        }
+      ],
+      "pair": [
+        {
+          "a": 1,
+          "b": 2,
+          "fivegram_jaccard": 0.046,
+          "shared_narrative_sentences": [],
+          "near_copy_ratio": 0.053,
+          "near_copies": [
+            {
+              "a": "如果你正好缺一只日常用的杯子，可以看看这只米白色陶瓷马克杯。",
+              "b": "如果你正好缺一只日常喝水喝茶的杯子，可以看看这只米白色的陶瓷马克杯。",
+              "similarity": 0.906
+            }
+          ],
+          "opening_similarity": 0.249
+        }
+      ]
+    },
+    "judge_failure": {
+      "error_type": "JSONDecodeError",
+      "message": "评审JSON解析失败，不使用该次评分；保留旧评审及原响应。"
+    },
+    "completed_versions": 2,
+    "prompt_sha256": "0532e981b59ee41635a70d6932fd8cae673e61faae1da2889e31e34815021cc8"
+  },
+  {
+    "run": "release9_notebook",
+    "case": "notebook",
+    "requested_versions": 2,
+    "scorecard": {
+      "run": "release9_notebook",
+      "versions": [
+        {
+          "version": 1,
+          "program": 40.0,
+          "semantic": 52.0,
+          "total": 92.0,
+          "hard_gate": true,
+          "rule_issues": [],
+          "serious_claims": 0,
+          "cross_version_copy_pass": true,
+          "pass": true,
+          "gaps": [
+            "A5尺寸的具体大小对比未展开，如与A4或口袋本的差异，使卖点略显模糊。",
+            "颜色部分仅描述色调，缺乏与使用场景的深入关联，如浅灰适合办公、浅绿适合手账等。",
+            "购买引导中‘不着急的话也可以先看看’与第一版相似，未提供更细化的选择建议。"
+          ]
+        },
+        {
+          "version": 2,
+          "program": 40.0,
+          "semantic": 52.0,
+          "total": 92.0,
+          "hard_gate": true,
+          "rule_issues": [],
+          "serious_claims": 0,
+          "cross_version_copy_pass": true,
+          "pass": true,
+          "gaps": [
+            "对点阵内页的书写体验描述较笼统，如‘字可以顺着点来对齐’，未展开具体使用例子（如画图表、时间轴等），场景深度有限。",
+            "颜色部分仅说明浅灰低调、浅绿清爽，未进一步联系具体使用场景或人群偏好，拓展略少。",
+            "收尾‘不着急的话也可以先想想平时用它来记什么’虽自然，但购买决策引导可以更具体，例如区分学生党或手账爱好者。"
+          ]
+        }
+      ],
+      "pair_diversity": {
+        "score": 3,
+        "reason": "两版开场不同（1版直接问没纸没本，2版互动公屏并聊感受），但核心卖点展开顺序和模板结构仍相似，如都从痛点、商品介绍、规格、价格到收口，且点阵内页、软封面、A5尺寸、80页的展开角度和情境差异不大，未达到至少两项明显不同且均完整。"
+      },
+      "rubric": "20261007.4-uniform-coverage-content-and-near-copy-checks"
+    },
+    "metrics": {
+      "versions": [
+        {
+          "han_characters": 621,
+          "sentences": 22,
+          "coverage_groups": {
+            "尺寸": true,
+            "页数": true,
+            "封面": true,
+            "内页": true,
+            "用途": true,
+            "颜色": true,
+            "优惠门槛": true,
+            "不可叠加": true
+          },
+          "coverage_rate": 1.0,
+          "natural_sentence_ratio": 1.0,
+          "duplicate_sentences": [],
+          "reference_5gram_overlap": 0.003,
+          "program_scores": {
+            "selling_point_coverage": 12.0,
+            "flow": 8.0,
+            "speakability": 10.0,
+            "length_fit": 5,
+            "fact_references": 5.0
+          },
+          "program_total": 40.0,
+          "invalid_references": false,
+          "app_issues": []
+        },
+        {
+          "han_characters": 690,
+          "sentences": 28,
+          "coverage_groups": {
+            "尺寸": true,
+            "页数": true,
+            "封面": true,
+            "内页": true,
+            "用途": true,
+            "颜色": true,
+            "优惠门槛": true,
+            "不可叠加": true
+          },
+          "coverage_rate": 1.0,
+          "natural_sentence_ratio": 1.0,
+          "duplicate_sentences": [],
+          "reference_5gram_overlap": 0.0,
+          "program_scores": {
+            "selling_point_coverage": 12.0,
+            "flow": 8.0,
+            "speakability": 10.0,
+            "length_fit": 5,
+            "fact_references": 5.0
+          },
+          "program_total": 40.0,
+          "invalid_references": false,
+          "app_issues": []
+        }
+      ],
+      "pair": [
+        {
+          "a": 1,
+          "b": 2,
+          "fivegram_jaccard": 0.1,
+          "shared_narrative_sentences": [],
+          "near_copy_ratio": 0.0,
+          "near_copies": [],
+          "opening_similarity": 0.253
+        }
+      ]
+    },
+    "completed_versions": 2,
+    "prompt_sha256": "0532e981b59ee41635a70d6932fd8cae673e61faae1da2889e31e34815021cc8"
+  },
+  {
+    "run": "release9_repeat",
+    "case": "slippers",
+    "requested_versions": 2,
+    "scorecard": {
+      "run": "release9_repeat",
+      "versions": [
+        {
+          "version": 1,
+          "program": 40.0,
+          "semantic": 49.0,
+          "total": 89.0,
+          "hard_gate": true,
+          "rule_issues": [],
+          "serious_claims": 0,
+          "cross_version_copy_pass": true,
+          "pass": true,
+          "gaps": [
+            "材质耐磨的展开较笼统，未结合具体使用频率或地面情境；",
+            "快干易清洗只简单带过“用水冲一冲就干净很多”，缺少晾干速度的具体场景；",
+            "颜色引导“粉色、烟熏紫、葡萄紫都挺好看”较主观，但属合理搭配建议。"
+          ]
+        },
+        {
+          "version": 2,
+          "program": 40.0,
+          "semantic": 48.0,
+          "total": 88.0,
+          "hard_gate": true,
+          "rule_issues": [],
+          "serious_claims": 0,
+          "cross_version_copy_pass": true,
+          "pass": true,
+          "gaps": [
+            "轻便卖点缺少具体重量或对比，展开主要靠场景联想，稍显单薄；",
+            "防臭快干仅简单带过，缺少与洗澡、夏天穿着等场景的更具体结合；",
+            "静音防滑对湿地面防滑的表述“可以帮助走得稳一些”偏保守，但未编造性能，可接受。"
+          ]
+        }
+      ],
+      "pair_diversity": {
+        "score": 4,
+        "reason": "两版开场痛点不同（旅行收纳 vs 厨房站立），卖点展开顺序和情境侧重明显不同：版1侧重旅行、防滑、EVA一体成型，版2侧重居家站立、软弹、耐磨快干；节奏接近但均完整自然，差异鲜明。"
+      },
+      "rubric": "20261007.4-uniform-coverage-content-and-near-copy-checks"
+    },
+    "metrics": {
+      "versions": [
+        {
+          "han_characters": 966,
+          "sentences": 35,
+          "coverage_groups": {
+            "材质成型": true,
+            "足弓": true,
+            "厚底软弹": true,
+            "静音防滑": true,
+            "清洗快干防臭": true,
+            "轻便场景": true,
+            "规格": true,
+            "选码": true
+          },
+          "coverage_rate": 1.0,
+          "natural_sentence_ratio": 1.0,
+          "duplicate_sentences": [],
+          "reference_5gram_overlap": 0.039,
+          "program_scores": {
+            "selling_point_coverage": 12.0,
+            "flow": 8.0,
+            "speakability": 10.0,
+            "length_fit": 5,
+            "fact_references": 5.0
+          },
+          "program_total": 40.0,
+          "invalid_references": false,
+          "app_issues": []
+        },
+        {
+          "han_characters": 980,
+          "sentences": 32,
+          "coverage_groups": {
+            "材质成型": true,
+            "足弓": true,
+            "厚底软弹": true,
+            "静音防滑": true,
+            "清洗快干防臭": true,
+            "轻便场景": true,
+            "规格": true,
+            "选码": true
+          },
+          "coverage_rate": 1.0,
+          "natural_sentence_ratio": 1.0,
+          "duplicate_sentences": [],
+          "reference_5gram_overlap": 0.043,
+          "program_scores": {
+            "selling_point_coverage": 12.0,
+            "flow": 8.0,
+            "speakability": 10.0,
+            "length_fit": 5,
+            "fact_references": 5.0
+          },
+          "program_total": 40.0,
+          "invalid_references": false,
+          "app_issues": []
+        }
+      ],
+      "pair": [
+        {
+          "a": 1,
+          "b": 2,
+          "fivegram_jaccard": 0.12,
+          "shared_narrative_sentences": [],
+          "near_copy_ratio": 0.043,
+          "near_copies": [
+            {
+              "a": "配合小蛮腰厚底，踩下去是软弹缓震的感觉，不是硬邦邦地硌脚。",
+              "b": "再配合小蛮腰厚底，踩下去是软弹缓震的感觉，不是硬邦邦的平板。",
+              "similarity": 0.881
+            }
+          ],
+          "opening_similarity": 0.267
+        }
+      ]
+    },
+    "completed_versions": 2,
+    "prompt_sha256": "0532e981b59ee41635a70d6932fd8cae673e61faae1da2889e31e34815021cc8"
+  },
+  {
+    "run": "release9_slippers",
+    "case": "slippers",
+    "requested_versions": 2,
+    "scorecard": {
+      "run": "release9_slippers",
+      "versions": [
+        {
+          "version": 1,
+          "program": 40.0,
+          "semantic": 54.0,
+          "total": 94.0,
+          "hard_gate": false,
+          "rule_issues": [
+            "输入没有与普通商品的对比结果，不得说比普通拖鞋更稳或多一层抓地；只介绍本商品明确的防滑特性"
+          ],
+          "serious_claims": 0,
+          "cross_version_copy_pass": true,
+          "pass": false,
+          "gaps": [
+            "‘缓解久站带来的足部疲劳感’在商品资料中仅写‘缓解久站带来的足部压力’，疲劳感属于轻度延伸，未做医疗承诺，但边界略模糊。",
+            "对‘快干’的具体时间没有量化，符合资料未提供量化信息，不扣分。",
+            "颜色数量及尺码区间复述准确，但‘葡萄紫’和‘烟熏紫’区分未展开，不算缺失。"
+          ]
+        },
+        {
+          "version": 2,
+          "program": 39.55,
+          "semantic": 54.0,
+          "total": 93.55,
+          "hard_gate": false,
+          "rule_issues": [
+            "输入没有与普通商品的对比结果，不得说比普通拖鞋更稳或多一层抓地；只介绍本商品明确的防滑特性"
+          ],
+          "serious_claims": 0,
+          "cross_version_copy_pass": true,
+          "pass": false,
+          "gaps": [
+            "未提及鞋底防滑在湿地面仍需留心之外的风险，但已做安全提醒，不算大缺点。",
+            "卖点中‘软弹缓震’展开为“走在稍微硬一点的地面上，脚感会比较柔和”属于合理场景，但未进一步区分地面类型。",
+            "对‘小蛮腰’视觉修饰的展开较简略，仅说“搭居家服或者简单的外出衣服都很自然”。"
+          ]
+        }
+      ],
+      "pair_diversity": {
+        "score": 4,
+        "reason": "两版开场痛点不同：版1从旅行打包和居家选拖鞋切入，版2从厨房久站和临时下楼切入；卖点展开顺序和情境也不同，版1先轻便旅行再厚底静音，版2先久站足弓再厚底防滑；颜色引导语和收口节奏均有明显差异，且都完整自然。"
+      },
+      "rubric": "20261007.4-uniform-coverage-content-and-near-copy-checks"
+    },
+    "metrics": {
+      "versions": [
+        {
+          "han_characters": 903,
+          "sentences": 27,
+          "coverage_groups": {
+            "材质成型": true,
+            "足弓": true,
+            "厚底软弹": true,
+            "静音防滑": true,
+            "清洗快干防臭": true,
+            "轻便场景": true,
+            "规格": true,
+            "选码": true
+          },
+          "coverage_rate": 1.0,
+          "natural_sentence_ratio": 1.0,
+          "duplicate_sentences": [],
+          "reference_5gram_overlap": 0.056,
+          "program_scores": {
+            "selling_point_coverage": 12.0,
+            "flow": 8.0,
+            "speakability": 10.0,
+            "length_fit": 5,
+            "fact_references": 5.0
+          },
+          "program_total": 40.0,
+          "invalid_references": false,
+          "app_issues": []
+        },
+        {
+          "han_characters": 773,
+          "sentences": 26,
+          "coverage_groups": {
+            "材质成型": true,
+            "足弓": true,
+            "厚底软弹": true,
+            "静音防滑": true,
+            "清洗快干防臭": true,
+            "轻便场景": true,
+            "规格": true,
+            "选码": true
+          },
+          "coverage_rate": 1.0,
+          "natural_sentence_ratio": 1.0,
+          "duplicate_sentences": [],
+          "reference_5gram_overlap": 0.051,
+          "program_scores": {
+            "selling_point_coverage": 12.0,
+            "flow": 8.0,
+            "speakability": 10.0,
+            "length_fit": 4.55,
+            "fact_references": 5.0
+          },
+          "program_total": 39.55,
+          "invalid_references": false,
+          "app_issues": []
+        }
+      ],
+      "pair": [
+        {
+          "a": 1,
+          "b": 2,
+          "fivegram_jaccard": 0.184,
+          "shared_narrative_sentences": [],
+          "near_copy_ratio": 0.111,
+          "near_copies": [
+            {
+              "a": "厚底本身有软弹缓震的效果，走在稍微硬一点的地面上，脚感会柔和一些。",
+              "b": "厚底本身有软弹缓震的效果，走在稍微硬一点的地面上，脚感会比较柔和。",
+              "similarity": 0.939
+            },
+            {
+              "a": "鞋底做了静音处理，晚上在家里走动，声音会比较轻，不容易打扰到家人休息。",
+              "b": "鞋底做了静音处理，晚上在家里走动，声音会比较轻，不容易打扰到家人。",
+              "similarity": 0.971
+            }
+          ],
+          "opening_similarity": 0.233
+        }
+      ]
+    },
+    "completed_versions": 2,
+    "prompt_sha256": "0532e981b59ee41635a70d6932fd8cae673e61faae1da2889e31e34815021cc8"
+  },
+  {
+    "run": "release_bag",
+    "case": "bag",
+    "requested_versions": 2,
+    "scorecard": {
+      "run": "release_bag",
+      "versions": [
+        {
+          "version": 1,
+          "program": 40.0,
+          "semantic": 50.0,
+          "total": 90.0,
+          "hard_gate": false,
+          "rule_issues": [
+            "促销输入没有明确限时，不能把普通活动价说成限时价",
+            "稿件混入其他商品的浴室场景，请仅使用本商品适用场景"
+          ],
+          "serious_claims": 0,
+          "cross_version_copy_pass": true,
+          "pass": false,
+          "gaps": [
+            "末尾无关句“浴室走动还是要留意地面”与商品无关，影响收口连贯。",
+            "活动价性质（是否为限时）未获资料支持，但稿中称“限时活动价”，属于轻微添加。",
+            "未提尺寸38×30×12厘米，遗漏规格信息，但非必须，仍算可补充点。"
+          ]
+        },
+        {
+          "version": 2,
+          "program": 40.0,
+          "semantic": 53.0,
+          "total": 93.0,
+          "hard_gate": false,
+          "rule_issues": [
+            "促销输入没有明确限时，不能把普通活动价说成限时价"
+          ],
+          "serious_claims": 0,
+          "cross_version_copy_pass": true,
+          "pass": false,
+          "gaps": [
+            "活动价性质（是否为限时）未获资料支持，但稿中称“限时活动”，属于轻微添加。",
+            "可折叠卖点的场景展开较充分，但未提折叠后体积或收纳形态，不过资料本身未提供，不扣分。",
+            "尺寸单位厘米播报正确，但未进一步解释与日常物品的适配，资料未提供具体适配，不扣分。"
+          ]
+        }
+      ],
+      "pair_diversity": {
+        "score": 4,
+        "reason": "两版开场痛点不同（版1纠结背大包小袋，版2问拎还是挂），卖点顺序和重点展开不同（版1先讲折叠后讲拉链小口袋，版2先讲肩带拉链后讲折叠），且各有独立场景，均完整自然，差异鲜明。但版2末尾无关句略微影响整体体验，故给4分。"
+      },
+      "rubric": "20261007.4-uniform-coverage-content-and-near-copy-checks"
+    },
+    "metrics": {
+      "versions": [
+        {
+          "han_characters": 601,
+          "sentences": 26,
+          "coverage_groups": {
+            "材质": true,
+            "折叠": true,
+            "尺寸": true,
+            "拉链": true,
+            "口袋": true,
+            "携带": true,
+            "颜色": true,
+            "场景": true
+          },
+          "coverage_rate": 1.0,
+          "natural_sentence_ratio": 1.0,
+          "duplicate_sentences": [],
+          "reference_5gram_overlap": 0.0,
+          "program_scores": {
+            "selling_point_coverage": 12.0,
+            "flow": 8.0,
+            "speakability": 10.0,
+            "length_fit": 5,
+            "fact_references": 5.0
+          },
+          "program_total": 40.0,
+          "invalid_references": false,
+          "app_issues": []
+        },
+        {
+          "han_characters": 668,
+          "sentences": 26,
+          "coverage_groups": {
+            "材质": true,
+            "折叠": true,
+            "尺寸": true,
+            "拉链": true,
+            "口袋": true,
+            "携带": true,
+            "颜色": true,
+            "场景": true
+          },
+          "coverage_rate": 1.0,
+          "natural_sentence_ratio": 1.0,
+          "duplicate_sentences": [],
+          "reference_5gram_overlap": 0.0,
+          "program_scores": {
+            "selling_point_coverage": 12.0,
+            "flow": 8.0,
+            "speakability": 10.0,
+            "length_fit": 5,
+            "fact_references": 5.0
+          },
+          "program_total": 40.0,
+          "invalid_references": false,
+          "app_issues": []
+        }
+      ],
+      "pair": [
+        {
+          "a": 1,
+          "b": 2,
+          "fivegram_jaccard": 0.105,
+          "shared_narrative_sentences": [],
+          "near_copy_ratio": 0.0,
+          "near_copies": [],
+          "opening_similarity": 0.268
+        }
+      ]
+    },
+    "completed_versions": 2,
+    "prompt_sha256": "83debc0f9b279717e47d0686e1427a41947ea006554746449f90debfa81de738"
+  },
+  {
+    "run": "release_mug",
+    "case": "mug",
+    "requested_versions": 2,
+    "scorecard": {
+      "run": "release_mug",
+      "versions": [
+        {
+          "version": 1,
+          "program": 39.33,
+          "semantic": 43.0,
+          "total": 82.33,
+          "hard_gate": true,
+          "rule_issues": [],
+          "serious_claims": 0,
+          "cross_version_copy_pass": true,
+          "pass": false,
+          "gaps": [
+            "陶瓷材质仅描述触感，未结合更多使用情境展开。",
+            "容量价值虽结合办公和家庭场景，但表述较简略，收益感不足。",
+            "颜色卖点对搭配和视觉心理的描述重复前版类似思路，新鲜感不足。"
+          ]
+        },
+        {
+          "version": 2,
+          "program": 38.8,
+          "semantic": 44.0,
+          "total": 82.8,
+          "hard_gate": true,
+          "rule_issues": [],
+          "serious_claims": 0,
+          "cross_version_copy_pass": true,
+          "pass": false,
+          "gaps": [
+            "陶瓷材质卖点展开不足，仅描述触感，未进一步结合生活场景放大价值。",
+            "把手卖点虽提到稳当，但对使用便利性的展开不够深入。",
+            "颜色卖点停留在搭配描述，对使用者心理收益挖掘较少。"
+          ]
+        }
+      ],
+      "pair_diversity": {
+        "score": 1,
+        "reason": "两版话术结构高度相似，均按痛点-卖点-价格顺序展开，卖点选择和展开顺序几乎一致，仅替换开场和个别措辞，未形成有效差异，故评1分。"
+      },
+      "rubric": "20261007.4-uniform-coverage-content-and-near-copy-checks"
+    },
+    "metrics": {
+      "versions": [
+        {
+          "han_characters": 526,
+          "sentences": 24,
+          "coverage_groups": {
+            "材质": true,
+            "容量": true,
+            "把手": true,
+            "颜色": true,
+            "场景": true
+          },
+          "coverage_rate": 1.0,
+          "natural_sentence_ratio": 0.958,
+          "duplicate_sentences": [],
+          "reference_5gram_overlap": 0.0,
+          "program_scores": {
+            "selling_point_coverage": 12.0,
+            "flow": 8.0,
+            "speakability": 9.58,
+            "length_fit": 4.75,
+            "fact_references": 5.0
+          },
+          "program_total": 39.33,
+          "invalid_references": false,
+          "app_issues": []
+        },
+        {
+          "han_characters": 658,
+          "sentences": 26,
+          "coverage_groups": {
+            "材质": true,
+            "容量": true,
+            "把手": true,
+            "颜色": true,
+            "场景": true
+          },
+          "coverage_rate": 1.0,
+          "natural_sentence_ratio": 1.0,
+          "duplicate_sentences": [],
+          "reference_5gram_overlap": 0.002,
+          "program_scores": {
+            "selling_point_coverage": 12.0,
+            "flow": 8.0,
+            "speakability": 10.0,
+            "length_fit": 3.8,
+            "fact_references": 5.0
+          },
+          "program_total": 38.8,
+          "invalid_references": false,
+          "app_issues": []
+        }
+      ],
+      "pair": [
+        {
+          "a": 1,
+          "b": 2,
+          "fivegram_jaccard": 0.102,
+          "shared_narrative_sentences": [],
+          "near_copy_ratio": 0.056,
+          "near_copies": [
+            {
+              "a": "配原木色的餐桌、浅色的办公桌，或者深色的托盘，都能搭到一起。",
+              "b": "配原木色的餐桌、浅色的办公桌，或者深色的托盘，都比较协调。",
+              "similarity": 0.847
+            }
+          ],
+          "opening_similarity": 0.307
+        }
+      ]
+    },
+    "completed_versions": 2,
+    "prompt_sha256": "83debc0f9b279717e47d0686e1427a41947ea006554746449f90debfa81de738"
+  },
+  {
+    "run": "release_notebook",
+    "case": "notebook",
+    "requested_versions": 2,
+    "scorecard": {
+      "run": "release_notebook",
+      "versions": [
+        {
+          "version": 1,
+          "program": 40.0,
+          "semantic": 52.0,
+          "total": 92.0,
+          "hard_gate": true,
+          "rule_issues": [],
+          "serious_claims": 0,
+          "cross_version_copy_pass": true,
+          "pass": true,
+          "gaps": [
+            "颜色部分“看着心情也轻快些”略带主观，但未越界。",
+            "点阵卖点举例（小图、表格）合理，但缺少手账贴纸等更具体场景。",
+            "软封面“卷一下塞进帆布袋侧袋”合理联想，但未强调容量。"
+          ]
+        },
+        {
+          "version": 2,
+          "program": 39.23,
+          "semantic": 49.0,
+          "total": 88.23,
+          "hard_gate": true,
+          "rule_issues": [],
+          "serious_claims": 0,
+          "cross_version_copy_pass": true,
+          "pass": true,
+          "gaps": [
+            "颜色描述仅简单区分，未充分利用浅灰和浅绿的场景联想。",
+            "点阵格式的卖点举例（写整齐笔记、画表格）合理，但缺少更具体的日常使用场景。",
+            "软封面的卖点展开较简略，可增加如“卷起塞包”等情境。"
+          ]
+        }
+      ],
+      "pair_diversity": {
+        "score": 3,
+        "reason": "两版开场和痛点引入明显不同，重点展开顺序有差异（第一版先A5再80页，第二版先点阵），但卖点展开情境和节奏相似度较高，均完整自然。"
+      },
+      "rubric": "20261007.4-uniform-coverage-content-and-near-copy-checks"
+    },
+    "metrics": {
+      "versions": [
+        {
+          "han_characters": 645,
+          "sentences": 27,
+          "coverage_groups": {
+            "尺寸": true,
+            "页数": true,
+            "封面": true,
+            "内页": true,
+            "用途": true,
+            "颜色": true,
+            "优惠门槛": true,
+            "不可叠加": true
+          },
+          "coverage_rate": 1.0,
+          "natural_sentence_ratio": 1.0,
+          "duplicate_sentences": [],
+          "reference_5gram_overlap": 0.002,
+          "program_scores": {
+            "selling_point_coverage": 12.0,
+            "flow": 8.0,
+            "speakability": 10.0,
+            "length_fit": 5,
+            "fact_references": 5.0
+          },
+          "program_total": 40.0,
+          "invalid_references": false,
+          "app_issues": []
+        },
+        {
+          "han_characters": 589,
+          "sentences": 26,
+          "coverage_groups": {
+            "尺寸": true,
+            "页数": true,
+            "封面": true,
+            "内页": true,
+            "用途": true,
+            "颜色": true,
+            "优惠门槛": true,
+            "不可叠加": true
+          },
+          "coverage_rate": 1.0,
+          "natural_sentence_ratio": 0.923,
+          "duplicate_sentences": [],
+          "reference_5gram_overlap": 0.0,
+          "program_scores": {
+            "selling_point_coverage": 12.0,
+            "flow": 8.0,
+            "speakability": 9.23,
+            "length_fit": 5,
+            "fact_references": 5.0
+          },
+          "program_total": 39.23,
+          "invalid_references": false,
+          "app_issues": []
+        }
+      ],
+      "pair": [
+        {
+          "a": 1,
+          "b": 2,
+          "fivegram_jaccard": 0.052,
+          "shared_narrative_sentences": [],
+          "near_copy_ratio": 0.0,
+          "near_copies": [],
+          "opening_similarity": 0.25
+        }
+      ]
+    },
+    "completed_versions": 2,
+    "prompt_sha256": "83debc0f9b279717e47d0686e1427a41947ea006554746449f90debfa81de738"
+  },
+  {
+    "run": "release_slippers",
+    "case": "slippers",
+    "requested_versions": 2,
+    "scorecard": {
+      "run": "release_slippers",
+      "versions": [
+        {
+          "version": 1,
+          "program": 39.4,
+          "semantic": 53.0,
+          "total": 92.4,
+          "hard_gate": true,
+          "rule_issues": [],
+          "serious_claims": 0,
+          "cross_version_copy_pass": true,
+          "pass": true,
+          "gaps": [
+            "未提及材质为EVA一体成型？实际已提。",
+            "未提及备注中脚背较宽建议大一号？实际已提。",
+            "无重大遗漏。"
+          ]
+        },
+        {
+          "version": 2,
+          "program": 39.12,
+          "semantic": 52.0,
+          "total": 91.12,
+          "hard_gate": true,
+          "rule_issues": [],
+          "serious_claims": 0,
+          "cross_version_copy_pass": true,
+          "pass": true,
+          "gaps": [
+            "未提及标准码及脚型建议？实际已提，此处留空。",
+            "颜色和尺码虽然列出，但颜色未全部列举完整（只举部分），但这不是核心缺点。",
+            "整体信息完整，无明显重大遗漏。"
+          ]
+        }
+      ],
+      "pair_diversity": {
+        "score": 3,
+        "reason": "两版开场痛点不同（旅行带拖鞋 vs 站久脚酸），重点展开顺序有差异，且情境描述不同，但整体结构和卖点覆盖高度相似，属于有效不同但未达4分标准。"
+      },
+      "rubric": "20261007.4-uniform-coverage-content-and-near-copy-checks"
+    },
+    "metrics": {
+      "versions": [
+        {
+          "han_characters": 748,
+          "sentences": 25,
+          "coverage_groups": {
+            "材质成型": true,
+            "足弓": true,
+            "厚底软弹": true,
+            "静音防滑": true,
+            "清洗快干防臭": true,
+            "轻便场景": true,
+            "规格": true,
+            "选码": true
+          },
+          "coverage_rate": 1.0,
+          "natural_sentence_ratio": 1.0,
+          "duplicate_sentences": [],
+          "reference_5gram_overlap": 0.058,
+          "program_scores": {
+            "selling_point_coverage": 12.0,
+            "flow": 8.0,
+            "speakability": 10.0,
+            "length_fit": 4.4,
+            "fact_references": 5.0
+          },
+          "program_total": 39.4,
+          "invalid_references": false,
+          "app_issues": []
+        },
+        {
+          "han_characters": 700,
+          "sentences": 26,
+          "coverage_groups": {
+            "材质成型": true,
+            "足弓": true,
+            "厚底软弹": true,
+            "静音防滑": true,
+            "清洗快干防臭": true,
+            "轻便场景": true,
+            "规格": true,
+            "选码": true
+          },
+          "coverage_rate": 1.0,
+          "natural_sentence_ratio": 1.0,
+          "duplicate_sentences": [],
+          "reference_5gram_overlap": 0.073,
+          "program_scores": {
+            "selling_point_coverage": 12.0,
+            "flow": 8.0,
+            "speakability": 10.0,
+            "length_fit": 4.12,
+            "fact_references": 5.0
+          },
+          "program_total": 39.12,
+          "invalid_references": false,
+          "app_issues": []
+        }
+      ],
+      "pair": [
+        {
+          "a": 1,
+          "b": 2,
+          "fivegram_jaccard": 0.176,
+          "shared_narrative_sentences": [
+            "脚底足弓的位置有承托，站久一点，脚心没那么空落落。"
+          ],
+          "near_copy_ratio": 0.067,
+          "near_copies": [
+            {
+              "a": "脚底足弓的位置有承托，站久一点，脚心没那么空落落。",
+              "b": "脚底足弓的位置有承托，站久一点，脚心没那么空落落。",
+              "similarity": 1.0
+            }
+          ],
+          "opening_similarity": 0.329
+        }
+      ]
+    },
+    "completed_versions": 2,
+    "prompt_sha256": "83debc0f9b279717e47d0686e1427a41947ea006554746449f90debfa81de738"
+  },
+  {
+    "run": "release_slippers_repeat",
+    "case": "slippers",
+    "requested_versions": 2,
+    "scorecard": {
+      "run": "release_slippers_repeat",
+      "versions": [
+        {
+          "version": 1,
+          "program": 40.0,
+          "semantic": 58.0,
+          "total": 98.0,
+          "hard_gate": true,
+          "rule_issues": [],
+          "serious_claims": 0,
+          "cross_version_copy_pass": true,
+          "pass": true,
+          "gaps": [
+            "对‘防滑’特性仅提醒‘自己踩稳最重要’，未展开具体防滑场景中的收益，描述较保守。",
+            "‘小蛮腰厚底’的修饰脚型效果用‘修饰脚型’一句带过，未像其他卖点那样给出视觉或搭配上的具体例子。",
+            "‘轻便耐磨’中‘耐磨’只在‘出门带着没负担’提及，缺乏独立场景展开。"
+          ]
+        },
+        {
+          "version": 2,
+          "program": 39.23,
+          "semantic": 53.0,
+          "total": 92.23,
+          "hard_gate": true,
+          "rule_issues": [],
+          "serious_claims": 0,
+          "cross_version_copy_pass": true,
+          "pass": true,
+          "gaps": [
+            "整体节奏偏快，部分卖点如‘轻便耐磨’只一笔带过，未充分展开使用场景。",
+            "‘高级简约’作为风格描述出现在口播中，但未与具体设计或穿搭实例结合，略显空泛。",
+            "对‘防臭快干’仅单独提了一句‘洗完澡冲一冲’，没有像其他卖点那样融入生活场景深化。"
+          ]
+        }
+      ],
+      "pair_diversity": {
+        "score": 4,
+        "reason": "两版开场切入明显不同，版本1从出门收纳和旅行痛点切入，版本2从居家走动和久站脚酸切入；卖点展开顺序不同，版本1先轻便再外观再足弓支撑，版本2先足弓支撑再外观再静音；情境和节奏差异明显，均完整自然，符合4分标准。"
+      },
+      "rubric": "20261007.4-uniform-coverage-content-and-near-copy-checks"
+    },
+    "metrics": {
+      "versions": [
+        {
+          "han_characters": 928,
+          "sentences": 31,
+          "coverage_groups": {
+            "材质成型": true,
+            "足弓": true,
+            "厚底软弹": true,
+            "静音防滑": true,
+            "清洗快干防臭": true,
+            "轻便场景": true,
+            "规格": true,
+            "选码": true
+          },
+          "coverage_rate": 1.0,
+          "natural_sentence_ratio": 1.0,
+          "duplicate_sentences": [],
+          "reference_5gram_overlap": 0.054,
+          "program_scores": {
+            "selling_point_coverage": 12.0,
+            "flow": 8.0,
+            "speakability": 10.0,
+            "length_fit": 5,
+            "fact_references": 5.0
+          },
+          "program_total": 40.0,
+          "invalid_references": false,
+          "app_issues": []
+        },
+        {
+          "han_characters": 719,
+          "sentences": 27,
+          "coverage_groups": {
+            "材质成型": true,
+            "足弓": true,
+            "厚底软弹": true,
+            "静音防滑": true,
+            "清洗快干防臭": true,
+            "轻便场景": true,
+            "规格": true,
+            "选码": true
+          },
+          "coverage_rate": 1.0,
+          "natural_sentence_ratio": 1.0,
+          "duplicate_sentences": [],
+          "reference_5gram_overlap": 0.06,
+          "program_scores": {
+            "selling_point_coverage": 12.0,
+            "flow": 8.0,
+            "speakability": 10.0,
+            "length_fit": 4.23,
+            "fact_references": 5.0
+          },
+          "program_total": 39.23,
+          "invalid_references": false,
+          "app_issues": []
+        }
+      ],
+      "pair": [
+        {
+          "a": 1,
+          "b": 2,
+          "fivegram_jaccard": 0.077,
+          "shared_narrative_sentences": [],
+          "near_copy_ratio": 0.0,
+          "near_copies": [],
+          "opening_similarity": 0.217
+        }
+      ]
+    },
+    "completed_versions": 2,
+    "prompt_sha256": "83debc0f9b279717e47d0686e1427a41947ea006554746449f90debfa81de738"
+  }
+]

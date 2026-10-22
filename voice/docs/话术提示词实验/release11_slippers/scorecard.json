@@ -1,0 +1,42 @@
+{
+  "run": "release11_slippers",
+  "versions": [
+    {
+      "version": 1,
+      "program": 39.79,
+      "semantic": 49.0,
+      "total": 88.79,
+      "hard_gate": true,
+      "rule_issues": [],
+      "serious_claims": 0,
+      "cross_version_copy_pass": true,
+      "pass": true,
+      "gaps": [
+        "部分展开较泛，如'脚底有支撑和没支撑，感受差别挺明显'，不够具体。",
+        "颜色列举时用'等等'，不如第一版完整，但资料有十色，不背诵全部不扣分，但直播中可能影响信息完整度。",
+        "整体卖点展开的生动性略弱于第一版，如厨房场景与第一版重复。"
+      ]
+    },
+    {
+      "version": 2,
+      "program": 40.0,
+      "semantic": 51.0,
+      "total": 91.0,
+      "hard_gate": true,
+      "rule_issues": [],
+      "serious_claims": 0,
+      "cross_version_copy_pass": true,
+      "pass": true,
+      "gaps": [
+        "部分句子偏说明书式，如'鞋底具备静音特性。'，影响口语自然度。",
+        "对足弓支撑的描写'脚掌内侧那条弧线能被托住一点'缺乏资料支持，可能引发误解。",
+        "颜色列举了十个但未说明所有颜色是否有货，可能让消费者产生选择困惑（但非严重问题）。"
+      ]
+    }
+  ],
+  "pair_diversity": {
+    "score": 3,
+    "reason": "两版开场不同（第一版互动问句，第二版扣1互动），痛点引入不同（第一版夜间噪音，第二版久站劳累），卖点展开顺序不同（第一版先静音后足弓，第二版先足弓后静音），情境有差异但部分重叠（厨房场景），整体结构相似，差异不够鲜明，给3分。"
+  },
+  "rubric": "20261007.4-uniform-coverage-content-and-near-copy-checks"
+}

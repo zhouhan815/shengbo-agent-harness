@@ -1,0 +1,70 @@
+{
+  "versions": [
+    {
+      "index": 1,
+      "scores": {
+        "natural_live_speech": 14,
+        "benefit_scene_expansion": 17,
+        "coherent_flow": 9,
+        "non_repetition": 8,
+        "purchase_guidance": 5
+      },
+      "score_reasons": [
+        "natural_live_speech：'如果你平时在家做饭、收拾、洗澡进进出出，脚底那种累和闷，其实很影响一天的状态'自然口语；'E V A'同样拆字母念，略扣分。",
+        "benefit_scene_expansion：足弓支撑→'做饭、拖地、站着收拾台面时，脚弓有东西托着，久站带来的足部压力会缓一些'；静音→'晚上起夜、清晨倒水，不想吵醒家里人'；快干→'冲一冲就干净，快干也防臭'；轻便→'放进行李不占太多地方，到了酒店当拖鞋穿也合适'；软化表达'不是说穿了就不会累'也合理，给17分。",
+        "coherent_flow：从选拖鞋误区切入，到产品、场景、颜色、规格、价格、选购顺序收口，连贯；颜色部分连续三句按色系推荐，略微模板化。",
+        "non_repetition：没有空话凑字，但颜色部分连续三句'想要清爽一点''想要居家稳一点''喜欢活泼一点的'结构重复。",
+        "purchase_guidance：'原价一百七十八新台币，现在活动价一百零七新台币。这是限时下杀的活动，具体条件以页面显示为准'，价格币种正确，并给出'先看尺码，再看颜色'的自然选择引导。"
+      ],
+      "unsupported_claims": [],
+      "price_and_terms_correct": true,
+      "knowledge_leaks": [],
+      "main_gaps": [
+        "颜色推荐连续三句同一结构，略有填充感",
+        "'全新上架'来自商品资料，但作为口播卖点略空，可少提",
+        "开头先讲选鞋误区再进产品，节奏稍绕，进入产品慢"
+      ]
+    },
+    {
+      "index": 2,
+      "scores": {
+        "natural_live_speech": 14,
+        "benefit_scene_expansion": 17,
+        "coherent_flow": 9,
+        "non_repetition": 8,
+        "purchase_guidance": 5
+      },
+      "score_reasons": [
+        "natural_live_speech：开场'你最近有出游计划吗？收拾行李的时候，是不是总在纠结要不要多带一双鞋？'像真人聊天，不是字段播报；但'E V A'把字母拆开念显得刻意，略微扣分。",
+        "benefit_scene_expansion：足弓支撑→'做饭、拖地、站着收拾台面的时候，脚弓有东西托着，久站会舒服一些'；厚底软弹→'走起来有一点回弹感，不是硬邦邦地硌脚'；静音防滑→'晚上起夜、清晨倒水，不想吵醒家里人'；快干→'洗澡出来、海边走一圈，鞋面沾了水，冲一冲就干净'；轻便→'放进行李箱不占太多地方'，多个卖点有具体情境，给17分。",
+        "coherent_flow：从旅行收纳痛点切入，到产品、场景、颜色、规格、价格收口，结构自然；但颜色段用两句列举全部颜色，略有清单感。",
+        "non_repetition：整体没有空话凑字，但颜色部分两个句子主要在处理颜色枚举，信息密度偏低。",
+        "purchase_guidance：'原价一百七十八新台币，现在限时下杀一百零七新台币。这是限时优惠'，币种价格正确，'喜欢的话可以抓紧看看'引导自然。"
+      ],
+      "unsupported_claims": [],
+      "price_and_terms_correct": true,
+      "knowledge_leaks": [],
+      "main_gaps": [
+        "颜色十种全部播报，口播偏长，可精简为色系建议",
+        "开头旅行场景展开较长，真正进入产品略慢",
+        "静音效果只停在'脚步声会小一些'，没有进一步说明对家人的影响边界，可更自然收束"
+      ]
+    }
+  ],
+  "pair_diversity": {
+    "score": 4,
+    "reason": "两版开场切入点明显不同：第1版从旅行收纳纠结切入，第2版从居家选拖鞋只看软不软的误区切入；卖点展开顺序也不同，第1版先旅行便携再足弓支撑，第2版先足弓支撑再居家静音快干；颜色处理方式不同，第1版按夏浅色系概括，第2版按清爽/居家/活泼推荐；节奏和语言差异明显，且均保留足弓支撑、静音防滑、快干、尺码、价格等核心信息，给4分。"
+  },
+  "judge_model": "deepseek-flash",
+  "judge_protocol": "v2-core-facts-only-no-unsupported-reference-priming",
+  "usage": {
+    "prompt_tokens": 2491,
+    "completion_tokens": 1014,
+    "total_tokens": 3505,
+    "prompt_tokens_details": {
+      "cached_tokens": 1024
+    },
+    "prompt_cache_hit_tokens": 1024,
+    "prompt_cache_miss_tokens": 1467
+  }
+}

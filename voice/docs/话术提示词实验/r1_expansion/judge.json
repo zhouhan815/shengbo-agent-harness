@@ -1,0 +1,70 @@
+{
+  "versions": [
+    {
+      "index": 1,
+      "scores": {
+        "natural_live_speech": 13,
+        "benefit_scene_expansion": 15,
+        "coherent_flow": 8,
+        "non_repetition": 7,
+        "purchase_guidance": 4
+      },
+      "score_reasons": [
+        "natural_live_speech: 对话感强，如“先别急着划走”“帮你判断它是不是你需要的”，但规格列举稍显生硬。",
+        "benefit_scene_expansion: 对静音防滑、快干防臭、足弓支撑、小蛮腰厚底四个卖点展开，如“晚上起来喝水、早上赶着洗漱”对应静音，但轻便耐磨和材质环保展开不足。",
+        "coherent_flow: 从痛点引入到卖点再到价格，结构自然，但颜色部分列举略显机械。",
+        "non_repetition: 卖点描述各有侧重，但静音防滑处“多一分摩擦就多一分安心”重复强调，且“日常会多一层照顾”与后文类似。",
+        "purchase_guidance: 明确播报原价和促销价，并提及页面标示，引导选择，但优惠条件不够具体。"
+      ],
+      "unsupported_claims": [],
+      "price_and_terms_correct": true,
+      "knowledge_leaks": [],
+      "main_gaps": [
+        "对EVA环保材质的益处展开不够",
+        "旅行出游场景只简单提及，缺少具体画面",
+        "颜色部分列举后未给出有效选购建议"
+      ]
+    },
+    {
+      "index": 2,
+      "scores": {
+        "natural_live_speech": 13,
+        "benefit_scene_expansion": 15,
+        "coherent_flow": 8,
+        "non_repetition": 7,
+        "purchase_guidance": 4
+      },
+      "score_reasons": [
+        "natural_live_speech: 整体口语自然，如“欢迎来到直播间，今天想跟你聊一双上脚很轻便的凉拖鞋”等，但规格部分“尺码覆盖三十六到三十七、三十八到三十九……”稍显报数。",
+        "benefit_scene_expansion: 对足弓支撑、厚底、静音防滑、快干防臭四个卖点做了场景化展开，如“在家做饭、打扫、整理东西，需要站一会儿的时候”对应足弓支撑，但材质EVA、轻便耐磨展开较浅。",
+        "coherent_flow: 结构清晰，从痛点→材质→足弓→厚底→静音防滑→颜色尺码→价格→总结，连贯但颜色尺码部分略显机械。",
+        "non_repetition: 各卖点独立展开，无空话凑字，但静音防滑部分“多一分摩擦就多一分安心”稍显重复强调。",
+        "purchase_guidance: 准确播报原价、促销价并给出选择引导，但未提及结算优惠条件细节。"
+      ],
+      "unsupported_claims": [],
+      "price_and_terms_correct": true,
+      "knowledge_leaks": [],
+      "main_gaps": [
+        "未提及轻便耐磨的具体适用场景展开",
+        "浴室防滑场景只简单带过，缺少具体情境",
+        "颜色尺码部分以报数为主，缺少选购搭配建议"
+      ]
+    }
+  ],
+  "pair_diversity": {
+    "score": 3,
+    "reason": "两版开场痛点不同，版1侧重旅行和洗澡，版2侧重居家安静；卖点展开顺序不同（版1材质优先，版2静音防滑优先），价格话术有差异（版1直接报价，版2强调以页面为准）。但两版均完整覆盖核心卖点，差异明显，属于有效不同。"
+  },
+  "judge_model": "deepseek-flash",
+  "judge_protocol": "v2-core-facts-only-no-unsupported-reference-priming",
+  "usage": {
+    "prompt_tokens": 3012,
+    "completion_tokens": 867,
+    "total_tokens": 3879,
+    "prompt_tokens_details": {
+      "cached_tokens": 1024
+    },
+    "prompt_cache_hit_tokens": 1024,
+    "prompt_cache_miss_tokens": 1988
+  }
+}

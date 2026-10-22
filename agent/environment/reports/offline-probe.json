@@ -1,0 +1,85 @@
+{
+  "purpose": "Technical SDK compatibility probe; not a business Agent implementation",
+  "timestamp_utc": "2026-10-15T10:55:07.336078+00:00",
+  "interpreter": "D:\\Codex project\\shengbo-ops-agent\\.venv\\Scripts\\python.exe",
+  "python": "3.12.14 (main, Aug 25 2026, 14:01:42) [MSC v.1944 64 bit (AMD64)]",
+  "inherited_environment_discarded": true,
+  "tracing_disabled": true,
+  "hosted_model_clients_constructed": 0,
+  "checks": [
+    {
+      "name": "isolated_virtual_environment",
+      "passed": true,
+      "evidence": {
+        "prefix": "D:\\Codex project\\shengbo-ops-agent\\.venv",
+        "base_prefix": "C:\\Users\\lizhe\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python"
+      }
+    },
+    {
+      "name": "sdk_imports",
+      "passed": true,
+      "evidence": {
+        "deepagents": "0.7.25",
+        "langchain": "1.4.6",
+        "langgraph": "1.2.15",
+        "langchain-deepseek": "1.1.1",
+        "langchain-mcp-adapters": "0.3.2"
+      }
+    },
+    {
+      "name": "factory_api_signature",
+      "passed": true,
+      "evidence": "(model: str | langchain_core.language_models.chat_models.BaseChatModel | None = None, tools: collections.abc.Sequence[langchain_core.tools.base.BaseTool | collections.abc.Callable | dict[str, typing.Any]] | None = None, *, system_prompt: str | langchain_core.messages.system.SystemMessage | None = None, middleware: collections.abc.Sequence[langchain.agents.middleware.types.AgentMiddleware[+StateT_co, ~ContextT, typing.Any]] = (), subagents: collections.abc.Sequence[deepagents.middleware.subagents.SubAgent | deepagents.middleware.subagents.CompiledSubAgent | deepagents.middleware.async_subagents.AsyncSubAgent] | None = None, skills: list[str] | None = None, memory: list[str] | None = None, permissions: list[deepagents.middleware.filesystem.FilesystemPermission] | None = None, backend: deepagents.backends.protocol.BackendProtocol | None = None, interrupt_on: dict[str, bool | langchain.agents.middleware.human_in_the_loop.InterruptOnConfig] | None = None, response_format: Union[langchain.agents.structured_output.ToolStrategy[~ResponseT], langchain.agents.structured_output.ProviderStrategy[~ResponseT], langchain.agents.structured_output.AutoStrategy[~ResponseT], type[~ResponseT], dict[str, Any], NoneType] = None, state_schema: type[deepagents.graph.DeepAgentState] | None = None, context_schema: type[~ContextT] | None = None, checkpointer: None | bool | langgraph.checkpoint.base.BaseCheckpointSaver = None, store: langgraph.store.base.BaseStore | None = None, debug: bool = False, name: str | None = None, cache: langgraph.cache.base.BaseCache | None = None) -> langgraph.graph.state.CompiledStateGraph[langchain.agents.middleware.types.AgentState[~ResponseT], ~ContextT, langchain.agents.middleware.types.InputAgentState, langchain.agents.middleware.types.OutputAgentState[~ResponseT]]"
+    },
+    {
+      "name": "graph_compilation",
+      "passed": true,
+      "evidence": "CompiledStateGraph"
+    },
+    {
+      "name": "local_tool_execution",
+      "passed": true,
+      "evidence": [
+        {
+          "a": 17,
+          "b": 25
+        }
+      ]
+    },
+    {
+      "name": "graph_model_tool_round_trip",
+      "passed": true,
+      "evidence": {
+        "final_message": "SDK_OFFLINE_OK:42",
+        "stub_model_calls": 2,
+        "message_types": [
+          "human",
+          "ai",
+          "tool",
+          "ai"
+        ],
+        "bound_tool_count": 9
+      }
+    },
+    {
+      "name": "zero_sdk_network_attempts",
+      "passed": true,
+      "evidence": {
+        "sdk_network_attempts": 0
+      }
+    }
+  ],
+  "network_guard_self_test": "blocked as expected",
+  "versions": {
+    "deepagents": "0.7.25",
+    "langchain": "1.4.6",
+    "langgraph": "1.2.15",
+    "langchain-deepseek": "1.1.1",
+    "langchain-mcp-adapters": "0.3.2"
+  },
+  "status": "passed",
+  "passed_checks": 7,
+  "total_checks": 7,
+  "network_attempts": 0,
+  "blocked_network_operations": []
+}

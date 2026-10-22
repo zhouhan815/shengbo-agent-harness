@@ -1,0 +1,215 @@
+{
+  "schema_version": "LIVE-REVIEW-1.0",
+  "status": "proposed_metric_catalog_not_implemented",
+  "formula_owner": "deterministic metric service",
+  "platform_native_values_separate": true,
+  "metrics": [
+    {
+      "metric_id": "observed_time_ratio",
+      "label": "监控覆盖时间比例",
+      "unit": "ratio",
+      "formula": "有可靠健康证据的观测秒数/本场目标观测秒数",
+      "required_capability": "本场目标区间已知",
+      "interpretation_limit": "不等于所有事件召回率",
+      "definition_revision": "1"
+    },
+    {
+      "metric_id": "confirmed_play_seconds",
+      "label": "确认播放区间时长",
+      "unit": "seconds",
+      "formula": "同一时钟域下连续playing区间的并集秒数",
+      "required_capability": "结构化attempt/segment回执",
+      "interpretation_limit": "网页回执不证明平台观众听到",
+      "definition_revision": "1"
+    },
+    {
+      "metric_id": "observed_member_messages",
+      "label": "观测成员／进场消息",
+      "unit": "messages",
+      "formula": "去重后该方法消息数",
+      "required_capability": "本场归属及消息去重",
+      "interpretation_limit": "不等于全量进入UV",
+      "definition_revision": "1"
+    },
+    {
+      "metric_id": "like_messages",
+      "label": "观测点赞消息",
+      "unit": "messages",
+      "formula": "去重后点赞消息数",
+      "required_capability": "本场归属",
+      "interpretation_limit": "18条消息不等于18个赞",
+      "definition_revision": "1"
+    },
+    {
+      "metric_id": "verified_like_increments",
+      "label": "已核口径点赞增量",
+      "unit": "count",
+      "formula": "按已核增量／累计分段规则汇总",
+      "required_capability": "字段语义、重置和窗口核验",
+      "interpretation_limit": "未核口径时null",
+      "definition_revision": "1"
+    },
+    {
+      "metric_id": "online_time_weighted_mean",
+      "label": "观测在线时间加权均值",
+      "unit": "persons",
+      "formula": "可信快照值按有效观测区间积分/有效区间秒数",
+      "required_capability": "online口径已核、缺口不外推",
+      "interpretation_limit": "当前来源verified=false时不可作确定人数",
+      "definition_revision": "1"
+    },
+    {
+      "metric_id": "observed_online_person_minutes",
+      "label": "观测在线人分钟代理",
+      "unit": "person_minutes",
+      "formula": "有效可信在线快照积分/60",
+      "required_capability": "口径已核与采样区间限制",
+      "interpretation_limit": "不是商品真实曝光或完整留存",
+      "definition_revision": "1"
+    },
+    {
+      "metric_id": "official_average_watch_seconds",
+      "label": "官方人均观看时长",
+      "unit": "seconds",
+      "formula": "保留同场官方原报表值及其定义",
+      "required_capability": "授权报表与场次口径",
+      "interpretation_limit": "不能从公开消息自行还原",
+      "definition_revision": "1"
+    },
+    {
+      "metric_id": "relevant_question_count",
+      "label": "相关非垃圾问题数",
+      "unit": "messages",
+      "formula": "按版本化范围／去重规则对合格问题计数",
+      "required_capability": "可回读的分类标签及排除映射",
+      "interpretation_limit": "数字依分类判断，需显示歧义/排除量",
+      "definition_revision": "1"
+    },
+    {
+      "metric_id": "intent_observed_users",
+      "label": "表达购买意向的观测用户",
+      "unit": "persons",
+      "formula": "有购买意向标签的可识别会话化用户去重数",
+      "required_capability": "可识别用户键/标签，未知用户另列",
+      "interpretation_limit": "自述购买不等于支付",
+      "definition_revision": "1"
+    },
+    {
+      "metric_id": "questions_per_100_observed_person_minutes",
+      "label": "每百观测在线人分钟问题数",
+      "unit": "per_100_person_minutes",
+      "formula": "相关非垃圾问题数/匹配观测人分钟*100",
+      "required_capability": "同区间口径和完整分母",
+      "interpretation_limit": "过程代理，不是商品转化率或满意度",
+      "definition_revision": "1"
+    },
+    {
+      "metric_id": "product_click_uv_rate",
+      "label": "商品曝光到点击率",
+      "unit": "ratio",
+      "formula": "同场同商品同口径点击UV/曝光UV，或平台原生率",
+      "required_capability": "授权商品报表有同口径分子分母",
+      "interpretation_limit": "整场汇总不能拆到短模块",
+      "definition_revision": "1"
+    },
+    {
+      "metric_id": "viewer_to_buyer_rate",
+      "label": "看播到支付率",
+      "unit": "ratio",
+      "formula": "同一看播队列内支付买家/看播队列，或同定义官方率",
+      "required_capability": "可靠用户队列或官方定义",
+      "interpretation_limit": "不能把独立聚合UV或成员消息强行求交",
+      "definition_revision": "1"
+    },
+    {
+      "metric_id": "clicker_to_buyer_rate",
+      "label": "点击到支付率",
+      "unit": "ratio",
+      "formula": "同一点击队列内支付买家/点击队列，或同定义官方率",
+      "required_capability": "同商品同cohort及截止时点",
+      "interpretation_limit": "缺少跨域匹配则只列各自计数",
+      "definition_revision": "1"
+    },
+    {
+      "metric_id": "created_cohort_payment_rate",
+      "label": "同创建队列支付完成率",
+      "unit": "ratio",
+      "formula": "C内截至as_of已支付订单/C；C为固定创建区间的同粒度本场订单",
+      "required_capability": "创建、支付、粒度、归属、截止齐全",
+      "interpretation_limit": "本分钟3单支付/2单创建不能算150%",
+      "definition_revision": "1"
+    },
+    {
+      "metric_id": "paid_order_count",
+      "label": "支付订单数量",
+      "unit": "orders",
+      "formula": "本场已归属支付队列按order_grain指定父或SKU子单去重",
+      "required_capability": "稳定业务键/订单粒度/支付状态映射",
+      "interpretation_limit": "父子订单不相加",
+      "definition_revision": "1"
+    },
+    {
+      "metric_id": "paid_amount_minor",
+      "label": "支付金额",
+      "unit": "currency_minor",
+      "formula": "固定队列每订单同amount_basis的实际支付额之和",
+      "required_capability": "币种、分摊、优惠、运费口径明确",
+      "interpretation_limit": "GMV不等于利润或到账",
+      "definition_revision": "1"
+    },
+    {
+      "metric_id": "successful_refund_minor",
+      "label": "原支付队列成功退款额",
+      "unit": "currency_minor",
+      "formula": "P内订单截至as_of已成功退款的同口径金额",
+      "required_capability": "退款ID、原订单关联、状态、币种及as_of",
+      "interpretation_limit": "旧场订单今日退款不混入P",
+      "definition_revision": "1"
+    },
+    {
+      "metric_id": "refund_amount_rate",
+      "label": "原支付队列退款金额率",
+      "unit": "ratio",
+      "formula": "P内成功退款额/P原实付额",
+      "required_capability": "同P、同amount_basis及非零分母",
+      "interpretation_limit": "退款申请不计成功退款",
+      "definition_revision": "1"
+    },
+    {
+      "metric_id": "net_paid_asof_minor",
+      "label": "截止日分析净成交",
+      "unit": "currency_minor",
+      "formula": "P原实付-截至as_of属于P的成功退款",
+      "required_capability": "同P同口径，退款成熟度说明",
+      "interpretation_limit": "不是平台结算、到账或利润",
+      "definition_revision": "1"
+    },
+    {
+      "metric_id": "paid_amount_per_live_hour",
+      "label": "每直播小时支付金额",
+      "unit": "currency_minor_per_hour",
+      "formula": "与分子完全相同场次／窗口的支付额/直播小时",
+      "required_capability": "匹配收入和直播时间覆盖",
+      "interpretation_limit": "整场600元/60分钟不因漏采10分钟变成720元每小时",
+      "definition_revision": "1"
+    },
+    {
+      "metric_id": "net_amount_per_live_hour",
+      "label": "每直播小时净成交",
+      "unit": "currency_minor_per_hour",
+      "formula": "同队列截止净额/对应直播小时",
+      "required_capability": "同场范围及退款截止，窗口覆盖一致",
+      "interpretation_limit": "不能用采集在线时长替代整场直播时长",
+      "definition_revision": "1"
+    },
+    {
+      "metric_id": "paid_per_1000_viewers",
+      "label": "千次看播UV支付金额",
+      "unit": "currency_minor_per_1000persons",
+      "formula": "同场归属支付额/同定义看播UV*1000",
+      "required_capability": "真实看播UV及同场支付",
+      "interpretation_limit": "不用公开成员消息数充UV",
+      "definition_revision": "1"
+    }
+  ]
+}

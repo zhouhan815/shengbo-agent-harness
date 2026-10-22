@@ -1,0 +1,102 @@
+{
+  "versions": [
+    {
+      "han_characters": 772,
+      "sentences": 25,
+      "coverage_groups": {
+        "材质成型": true,
+        "足弓": true,
+        "厚底软弹": true,
+        "静音防滑": true,
+        "清洗快干防臭": true,
+        "轻便场景": true,
+        "规格": true,
+        "选码": true
+      },
+      "coverage_rate": 1.0,
+      "natural_sentence_ratio": 1.0,
+      "duplicate_sentences": [],
+      "reference_5gram_overlap": 0.055,
+      "program_scores": {
+        "selling_point_coverage": 12.0,
+        "flow": 8.0,
+        "speakability": 10.0,
+        "length_fit": 4.54,
+        "fact_references": 5.0
+      },
+      "program_total": 39.54,
+      "invalid_references": false,
+      "app_issues": []
+    },
+    {
+      "han_characters": 960,
+      "sentences": 28,
+      "coverage_groups": {
+        "材质成型": true,
+        "足弓": true,
+        "厚底软弹": true,
+        "静音防滑": true,
+        "清洗快干防臭": true,
+        "轻便场景": true,
+        "规格": true,
+        "选码": true
+      },
+      "coverage_rate": 1.0,
+      "natural_sentence_ratio": 1.0,
+      "duplicate_sentences": [],
+      "reference_5gram_overlap": 0.043,
+      "program_scores": {
+        "selling_point_coverage": 12.0,
+        "flow": 8.0,
+        "speakability": 10.0,
+        "length_fit": 5,
+        "fact_references": 5.0
+      },
+      "program_total": 40.0,
+      "invalid_references": false,
+      "app_issues": []
+    }
+  ],
+  "pair": [
+    {
+      "a": 1,
+      "b": 2,
+      "fivegram_jaccard": 0.311,
+      "shared_narrative_sentences": [],
+      "near_copy_ratio": 0.286,
+      "near_copies": [
+        {
+          "a": "你做饭、打扫卫生的时候，脚下多一个贴着足弓的支撑点，走起来会感觉更稳当，不用把力全压在脚掌上。",
+          "b": "你做饭、打扫卫生的时候，脚下多一个贴着足弓的承托点，走起来会感觉更稳当，不用把力全压在脚掌上。",
+          "similarity": 0.957
+        },
+        {
+          "a": "再看这个“小蛮腰”厚底，鞋底加厚不是硬邦邦的，而是带软弹缓震的脚感。",
+          "b": "再看小蛮腰厚底，鞋底加厚不是硬邦邦的，而是带软弹缓震的脚感。",
+          "similarity": 0.938
+        },
+        {
+          "a": "平时在厨房站一会儿、在阳台收衣服，脚底有这种回弹，就像踩在微微有弹性的垫子上，久站带来的压力能缓和一些。",
+          "b": "在厨房站一会儿、在阳台收衣服，脚底有这种回弹，就像踩在微微有弹性的垫子上，久站带来的压力能缓和一些。",
+          "similarity": 0.98
+        },
+        {
+          "a": "这双鞋比较适合想要足弓支撑、看重软弹脚感，又需要静音防滑和好打理的人。",
+          "b": "总结一下，这双鞋比较适合想要足弓支撑、看重软弹脚感，又需要静音防滑和好打理的人。",
+          "similarity": 0.933
+        },
+        {
+          "a": "另外它的材质防臭快干，一冲即净，洗澡后顺手冲一下，晾着就好打理。",
+          "b": "材质本身防臭快干，一冲即净，洗澡后顺手冲一下，晾着就好打理。",
+          "similarity": 0.903
+        },
+        {
+          "a": "防滑这个点在浴室和室内比较实用，地面有水的时候也能多一层抓地，但湿滑地面还是要小心，不能完全依赖鞋子。",
+          "b": "防滑这个特点在浴室和室内比较实用，地面有水的时候也能多一层抓地，但湿滑地面还是要小心，不能完全依赖鞋子。",
+          "similarity": 0.99
+        }
+      ],
+      "opening_similarity": 0.525
+    }
+  ]
+}

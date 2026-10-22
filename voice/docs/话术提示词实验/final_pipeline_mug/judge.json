@@ -1,0 +1,70 @@
+{
+  "versions": [
+    {
+      "index": 1,
+      "scores": {
+        "natural_live_speech": 14,
+        "benefit_scene_expansion": 17,
+        "coherent_flow": 9,
+        "non_repetition": 8,
+        "purchase_guidance": 5
+      },
+      "score_reasons": [
+        "natural_live_speech：口语感更强，如“你平时喝水，是习惯端起来就喝，还是先握着杯身暖一暖手？”“就是四十九元，大家看自己需不需要”，自然易懂。",
+        "benefit_scene_expansion：四个卖点均有具体情境和有限收益，如“放在办公桌上，它有一点点分量，你端起来的时候心里会觉得稳当，喝水也慢得下来”“手指穿过把手一勾，端起来就可以喝”“上班的时候倒一次水，不用频繁起身去茶水间”“放在原木色桌面或者浅色桌布上，看起来干净舒服”，达到17分档。",
+        "coherent_flow：从痛点身份到卖点、规格、价格、收口衔接顺畅，如“其实每天用的杯子，不用多复杂，握着顺手、放着省心，就挺影响喝水的心情”自然引出商品。",
+        "non_repetition：没有明显空话凑字，表述有变化，如对把手、容量、颜色的描述分散在不同情境中。",
+        "purchase_guidance：价格49元正确，引导自然：“如果你正好缺一只放在办公室或者家里餐桌的杯子，可以看看它”“觉得合适再下单，不着急也没关系”，不假设已挂购物车。"
+      ],
+      "unsupported_claims": [],
+      "price_and_terms_correct": true,
+      "knowledge_leaks": [],
+      "main_gaps": [
+        "对陶瓷材质的实际特性如易碎、清洗等未展开，仅停留于触感。",
+        "容量350ml的适用性描述较泛，未结合具体饮品种类细化。",
+        "米白色搭配场景重复提及桌面，缺乏更多生活场景变化。"
+      ]
+    },
+    {
+      "index": 2,
+      "scores": {
+        "natural_live_speech": 12,
+        "benefit_scene_expansion": 15,
+        "coherent_flow": 8,
+        "non_repetition": 7,
+        "purchase_guidance": 5
+      },
+      "score_reasons": [
+        "natural_live_speech：整体口语自然，如“欢迎来到直播间，今天想跟你聊一只平时放在手边的杯子”，但存在“规格就是三百五十毫升带把手，没有其他容量可选”这类偏说明书的表达。",
+        "benefit_scene_expansion：对米白色、350ml、把手、陶瓷材质四个卖点均有情境展开，如“放在原木色桌面或者浅色桌布上，看起来干净舒服”“泡一杯茶、冲一杯咖啡”“手指穿过把手就能端起来”“拿在手里是那种温润的触感”，但部分展开较浅，未达17分以上。",
+        "coherent_flow：从欢迎、痛点、卖点到价格和收口基本连贯，但“规格就是三百五十毫升带把手，没有其他容量可选”像机械贴标签，稍显生硬。",
+        "non_repetition：有部分重复，如“适合家庭餐桌和办公室使用”与后文场景重复，“米白色”多次描述，但整体不算严重。",
+        "purchase_guidance：价格49元表述正确，购买引导自然：“如果你正好缺一只日常用的杯子，可以看看”“根据自己桌面的颜色和使用习惯选，合适再下单就好”，不假设已挂购物车。"
+      ],
+      "unsupported_claims": [],
+      "price_and_terms_correct": true,
+      "knowledge_leaks": [],
+      "main_gaps": [
+        "场景展开虽有四个卖点，但部分情境较为泛化，缺少更具体的生活画面。",
+        "部分口语表达偏说明书化，如“规格就是三百五十毫升带把手，没有其他容量可选”。",
+        "对“陶瓷材质”和“带把手”的展开略显单薄，未充分体现使用差异。"
+      ]
+    }
+  ],
+  "pair_diversity": {
+    "score": 3,
+    "reason": "两版开场不同，版2以握杯暖手提问开场，版1以喝水偏好开场；卖点展开顺序和情境略有差异，如版1先颜色后容量，版2先材质后把手，但整体结构仍相似，均按痛点、卖点、价格收口，因此评3分。"
+  },
+  "judge_model": "deepseek-flash",
+  "judge_protocol": "v2-core-facts-only-no-unsupported-reference-priming",
+  "usage": {
+    "prompt_tokens": 2041,
+    "completion_tokens": 1015,
+    "total_tokens": 3056,
+    "prompt_tokens_details": {
+      "cached_tokens": 768
+    },
+    "prompt_cache_hit_tokens": 768,
+    "prompt_cache_miss_tokens": 1273
+  }
+}

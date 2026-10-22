@@ -1,0 +1,146 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="1360" viewBox="0 0 1800 1360" role="img"><title>播中播后综合Agent Harness总架构</title>
+<defs><marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#66758b"/></marker></defs>
+<rect width="100%" height="100%" fill="#f7f8f4"/>
+<style>text{font-family:Segoe UI,Microsoft YaHei,sans-serif;fill:#25334a} .line{fill:none;stroke:#758399;stroke-width:2;marker-end:url(#arr)} .dash{stroke-dasharray:7 5}</style>
+<text x="30" y="44" font-size="30" font-weight="700">播中只采集 · 播后自主分析 · 人工采纳后交给播前</text>
+<text x="30" y="76" font-size="17" font-weight="400">所有Review组件为待实施设计；复用现有8765／8791，不增加第三个服务。</text>
+<rect x="30" y="110" width="310" height="320" rx="16" fill="#fffdf3" stroke="#c7ceb9" stroke-width="2"/>
+<text x="48" y="143" font-size="20" font-weight="650">① Agent工作台</text>
+<rect x="50" y="175" width="270" height="90" rx="10" fill="#eef1ff" stroke="#aebad0" stroke-width="1.6"/>
+<text x="64" y="204" font-size="18" font-weight="650">右侧：对话与任务</text>
+<text x="64" y="230" font-size="15" font-weight="400">过程开关默认关闭</text>
+<text x="64" y="255" font-size="15" font-weight="400">展开安全参数／进度／耗时</text>
+<rect x="50" y="295" width="270" height="100" rx="10" fill="#eef1ff" stroke="#aebad0" stroke-width="1.6"/>
+<text x="64" y="324" font-size="18" font-weight="650">左侧：数据与报告</text>
+<text x="64" y="350" font-size="15" font-weight="400">来源／映射／四类评分</text>
+<text x="64" y="375" font-size="15" font-weight="400">筛选、微调、确认采纳</text>
+<rect x="380" y="110" width="320" height="320" rx="16" fill="#fffdf3" stroke="#c7ceb9" stroke-width="2"/>
+<text x="398" y="143" font-size="20" font-weight="650">② 既有服务入口</text>
+<rect x="400" y="175" width="280" height="90" rx="10" fill="#eef1ff" stroke="#aebad0" stroke-width="1.6"/>
+<text x="414" y="204" font-size="18" font-weight="650">声播8765同源桥</text>
+<text x="414" y="230" font-size="15" font-weight="400">身份／Origin／固定路径</text>
+<rect x="400" y="300" width="280" height="95" rx="10" fill="#eef1ff" stroke="#aebad0" stroke-width="1.6"/>
+<text x="414" y="329" font-size="18" font-weight="650">Agent8791 Review API</text>
+<text x="414" y="355" font-size="15" font-weight="400">run／job／workspace／SSE</text>
+<text x="414" y="380" font-size="15" font-weight="400">共享app，独立Review资源</text>
+<rect x="740" y="110" width="650" height="700" rx="16" fill="#fffdf3" stroke="#c7ceb9" stroke-width="2"/>
+<text x="758" y="143" font-size="20" font-weight="650">③ Deep Agents Harness</text>
+<rect x="760" y="175" width="610" height="90" rx="10" fill="#eef1ff" stroke="#aebad0" stroke-width="1.6"/>
+<text x="774" y="204" font-size="18" font-weight="650">ReviewRuntime + 可信Scope + 共享Provider账本</text>
+<text x="774" y="230" font-size="15" font-weight="400">租约／Goal／等待／恢复／取消；包住整个ainvoke</text>
+<rect x="760" y="300" width="610" height="125" rx="10" fill="#f0eaff" stroke="#aebad0" stroke-width="1.6"/>
+<text x="774" y="329" font-size="18" font-weight="650">四个业务中间件</text>
+<text x="774" y="355" font-size="15" font-weight="400">Scope：角色与引用权限；EvidenceContext：本轮证据投影</text>
+<text x="774" y="380" font-size="15" font-weight="400">TraceBudget：调用／耗时／预算；Completion：完成或等待门</text>
+<text x="774" y="405" font-size="15" font-weight="400">SDK另配置：TodoList、受控文件、Summary、受限SubAgent</text>
+<rect x="760" y="465" width="260" height="100" rx="10" fill="#eef1ff" stroke="#aebad0" stroke-width="1.6"/>
+<text x="774" y="494" font-size="18" font-weight="650">主复盘Agent</text>
+<text x="774" y="520" font-size="15" font-weight="400">自主选工具／追加调查</text>
+<text x="774" y="545" font-size="15" font-weight="400">不强制五段流程走一遍</text>
+<rect x="1080" y="455" width="290" height="80" rx="10" fill="#eef1ff" stroke="#aebad0" stroke-width="1.6"/>
+<text x="1094" y="484" font-size="18" font-weight="650">内容专题（按需）</text>
+<text x="1094" y="510" font-size="15" font-weight="400">原稿／顾虑／四项内容评级</text>
+<rect x="1080" y="570" width="290" height="80" rx="10" fill="#eef1ff" stroke="#aebad0" stroke-width="1.6"/>
+<text x="1094" y="599" font-size="18" font-weight="650">经营专题（按需）</text>
+<text x="1094" y="625" font-size="15" font-weight="400">漏斗／基线／退款／反例</text>
+<rect x="760" y="600" width="260" height="150" rx="10" fill="#e7f1ff" stroke="#aebad0" stroke-width="1.6"/>
+<text x="774" y="629" font-size="18" font-weight="650">四份按需Skill</text>
+<text x="774" y="655" font-size="15" font-weight="400">数据资格；经营诊断</text>
+<text x="774" y="680" font-size="15" font-weight="400">内容与顾客反馈</text>
+<text x="774" y="705" font-size="15" font-weight="400">下场实验与反馈</text>
+<text x="774" y="730" font-size="15" font-weight="400">按角色加载，不替代权限</text>
+<rect x="1050" y="700" width="320" height="75" rx="10" fill="#e5f4ee" stroke="#aebad0" stroke-width="1.6"/>
+<text x="1064" y="729" font-size="18" font-weight="650">K00–K13 + 五个F工具流</text>
+<text x="1064" y="755" font-size="15" font-weight="400">typed契约；内部机械步骤复用</text>
+<rect x="1430" y="110" width="340" height="320" rx="16" fill="#fffdf3" stroke="#c7ceb9" stroke-width="2"/>
+<text x="1448" y="143" font-size="20" font-weight="650">④ 既有模型来源</text>
+<rect x="1450" y="175" width="300" height="170" rx="10" fill="#f9e9df" stroke="#aebad0" stroke-width="1.6"/>
+<text x="1464" y="204" font-size="18" font-weight="650">chatgpt_plan / gpt-6.1-sol</text>
+<text x="1464" y="230" font-size="15" font-weight="400">沿用安全授权／自动续期</text>
+<text x="1464" y="255" font-size="15" font-weight="400">真实发送前核最终wire预算</text>
+<text x="1464" y="280" font-size="15" font-weight="400">主／子／摘要／分类共用账本</text>
+<text x="1464" y="305" font-size="15" font-weight="400">不输出令牌／隐藏思维链</text>
+<rect x="30" y="490" width="310" height="710" rx="16" fill="#fffdf3" stroke="#c7ceb9" stroke-width="2"/>
+<text x="48" y="523" font-size="20" font-weight="650">⑤ 播中与人工资料</text>
+<rect x="50" y="565" width="270" height="125" rx="10" fill="#e6f4ef" stroke="#aebad0" stroke-width="1.6"/>
+<text x="64" y="594" font-size="18" font-weight="650">唯一抖音采集源</text>
+<text x="64" y="620" font-size="15" font-weight="400">已知公开事件＋未知／健康</text>
+<text x="64" y="645" font-size="15" font-weight="400">原事件与outbox同事务</text>
+<text x="64" y="670" font-size="15" font-weight="400">Review仅持自己的订阅</text>
+<rect x="50" y="760" width="270" height="135" rx="10" fill="#e6f4ef" stroke="#aebad0" stroke-width="1.6"/>
+<text x="64" y="789" font-size="18" font-weight="650">真实播放journal</text>
+<text x="64" y="815" font-size="15" font-weight="400">句子／模块／商品／版本</text>
+<text x="64" y="840" font-size="15" font-weight="400">owner／epoch／attempt</text>
+<text x="64" y="865" font-size="15" font-weight="400">暂停切段，取声等级分开</text>
+<rect x="50" y="970" width="270" height="145" rx="10" fill="#e6f4ef" stroke="#aebad0" stroke-width="1.6"/>
+<text x="64" y="999" font-size="18" font-weight="650">授权经营报表</text>
+<text x="64" y="1025" font-size="15" font-weight="400">CSV／XLSX预览与映射</text>
+<text x="64" y="1050" font-size="15" font-weight="400">人工只确认关键歧义</text>
+<text x="64" y="1075" font-size="15" font-weight="400">订单／金额／退款cohort</text>
+<rect x="380" y="860" width="1010" height="340" rx="16" fill="#fffdf3" stroke="#c7ceb9" stroke-width="2"/>
+<text x="398" y="893" font-size="20" font-weight="650">⑥ 业务后端：数据、计算、正式产物</text>
+<rect x="400" y="935" width="285" height="210" rx="10" fill="#e5f4ee" stroke="#aebad0" stroke-width="1.6"/>
+<text x="414" y="964" font-size="18" font-weight="650">Review独立持久层</text>
+<text x="414" y="990" font-size="15" font-weight="400">review.sqlite + artifacts</text>
+<text x="414" y="1015" font-size="15" font-weight="400">双层去重／冻结场次</text>
+<text x="414" y="1040" font-size="15" font-weight="400">producer fence／归档修订</text>
+<text x="414" y="1065" font-size="15" font-weight="400">不可变证据／原行可回读</text>
+<text x="414" y="1090" font-size="15" font-weight="400">checkpoint另库</text>
+<rect x="725" y="935" width="290" height="210" rx="10" fill="#e5f4ee" stroke="#aebad0" stroke-width="1.6"/>
+<text x="739" y="964" font-size="18" font-weight="650">确定性指标与四类评分</text>
+<text x="739" y="990" font-size="15" font-weight="400">同口径分子／分母／as_of</text>
+<text x="739" y="1015" font-size="15" font-weight="400">目标／历史／内容／覆盖分</text>
+<text x="739" y="1040" font-size="15" font-weight="400">资格不足保留null和原因</text>
+<text x="739" y="1065" font-size="15" font-weight="400">固定基线，禁伪造因果</text>
+<text x="739" y="1090" font-size="15" font-weight="400">统一定义／cache／receipt</text>
+<rect x="1055" y="935" width="315" height="210" rx="10" fill="#e5f4ee" stroke="#aebad0" stroke-width="1.6"/>
+<text x="1069" y="964" font-size="18" font-weight="650">正式报告与安全Trace</text>
+<text x="1069" y="990" font-size="15" font-weight="400">Goal绑定DeliveryReceipt</text>
+<text x="1069" y="1015" font-size="15" font-weight="400">新算／复用有执行证明</text>
+<text x="1069" y="1040" font-size="15" font-weight="400">用量先落账再校内容</text>
+<text x="1069" y="1065" font-size="15" font-weight="400">模型／工具／阶段精细计时</text>
+<text x="1069" y="1090" font-size="15" font-weight="400">关闭UI开关仍持续记录</text>
+<rect x="1430" y="490" width="340" height="710" rx="16" fill="#fffdf3" stroke="#c7ceb9" stroke-width="2"/>
+<text x="1448" y="523" font-size="20" font-weight="650">⑦ 人工采纳闭环</text>
+<rect x="1450" y="565" width="300" height="130" rx="10" fill="#f9eef2" stroke="#aebad0" stroke-width="1.6"/>
+<text x="1464" y="594" font-size="18" font-weight="650">用户选建议并确认</text>
+<text x="1464" y="620" font-size="15" font-weight="400">精确报告／下一场快照</text>
+<text x="1464" y="645" font-size="15" font-weight="400">预览变化与原有Recap</text>
+<text x="1464" y="670" font-size="15" font-weight="400">模型没有业务采纳工具</text>
+<rect x="1450" y="760" width="300" height="140" rx="10" fill="#f9eef2" stroke="#aebad0" stroke-width="1.6"/>
+<text x="1464" y="789" font-size="18" font-weight="650">Recap适配与对账</text>
+<text x="1464" y="815" font-size="15" font-weight="400">分阶段幂等子ID</text>
+<text x="1464" y="840" font-size="15" font-weight="400">全局finding命名空间</text>
+<text x="1464" y="865" font-size="15" font-weight="400">保留旧Refs＋冻结CAS版本</text>
+<rect x="1450" y="970" width="300" height="140" rx="10" fill="#f9eef2" stroke="#aebad0" stroke-width="1.6"/>
+<text x="1464" y="999" font-size="18" font-weight="650">既有播前Agent</text>
+<text x="1464" y="1025" font-size="15" font-weight="400">结合商品／顾客／本场配置</text>
+<text x="1464" y="1050" font-size="15" font-weight="400">形成下一次改稿计划</text>
+<text x="1464" y="1075" font-size="15" font-weight="400">继续使用原人工批准门</text>
+<polyline class="line" points="320,215 400,215"/>
+<text x="343" y="200" font-size="14" font-weight="550">同源API</text>
+<polyline class="line" points="540,265 540,300"/>
+<polyline class="line" points="680,345 720,345 720,220 760,220"/>
+<polyline class="line" points="1065,265 1065,300"/>
+<polyline class="line" points="890,425 890,465"/>
+<polyline class="line dash" points="1020,495 1080,495"/>
+<text x="1030" y="481" font-size="14" font-weight="550">按需</text>
+<polyline class="line dash" points="1020,525 1050,525 1050,610 1080,610"/>
+<polyline class="line" points="890,565 890,585 1035,585 1035,737 1050,737"/>
+<polyline class="line" points="1210,775 1210,845 870,845 870,935"/>
+<polyline class="line" points="1370,205 1410,205 1450,205"/>
+<text x="1370" y="188" font-size="14" font-weight="550">模型请求</text>
+<polyline class="line" points="320,620 357,620 357,985 400,985"/>
+<polyline class="line" points="320,820 345,820 345,1020 400,1020"/>
+<polyline class="line" points="320,1045 400,1045"/>
+<text x="330" y="1028" font-size="14" font-weight="550">确认导入</text>
+<polyline class="line" points="685,1040 725,1040"/>
+<polyline class="line" points="1015,1040 1055,1040"/>
+<polyline class="line" points="1370,1000 1410,1000 1410,630 1450,630"/>
+<text x="1378" y="941" font-size="14" font-weight="550">报告候选</text>
+<polyline class="line" points="1600,695 1600,760"/>
+<polyline class="line" points="1600,900 1600,970"/>
+<text x="38" y="1250" font-size="21" font-weight="650">模型自主规划：调查对象、取证路径、是否委派、如何解释与提出建议。</text>
+<text x="38" y="1287" font-size="20" font-weight="400">程序固定保证：同场归属、权限、统计口径、版本、幂等、人工确认和真实完成／等待状态。</text>
+<text x="38" y="1324" font-size="16" font-weight="400">图示是职责分层；SDK内部hook先后以固定版本探针和实际发送边界核验。</text>
+</svg>

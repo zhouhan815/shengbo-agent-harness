@@ -1,0 +1,84 @@
+{
+  "versions": [
+    {
+      "index": 1,
+      "scores": {
+        "natural_live_speech": 14,
+        "benefit_scene_expansion": 16,
+        "coherent_flow": 9,
+        "non_repetition": 8,
+        "purchase_guidance": 5
+      },
+      "score_reasons": [
+        "natural_live_speech：口语感更强，如“你有没有过这种感受：在厨房忙活半小时，脚底板又酸又胀，只想赶紧找地方坐一下。”但“专门针对女性足部曲线来设计”等偏文案腔。",
+        "benefit_scene_expansion：足弓支撑、静音防滑、轻便、易清洗、防臭等均有场景化展开，但“你拿在手里能感觉到分量不重”模拟了手感验证，资料仅给“轻便”。",
+        "coherent_flow：痛点、卖点、规格、价格过渡顺畅。",
+        "non_repetition：重复度稍高，“足弓支撑”“静音防滑”“防臭快干”等多次出现，但尚可接受。",
+        "purchase_guidance：价格币种正确，有自然选择引导“颜色和尺码你根据自己喜欢的来”。"
+      ],
+      "unsupported_claims": [
+        {
+          "quote": "你拿在手里能感觉到分量不重，穿在脚上没什么负担。",
+          "reason": "资料仅说“轻便”，此处以主播亲测语气描述拿在手里的分量，属于模拟体验。",
+          "severity": "minor"
+        }
+      ],
+      "price_and_terms_correct": true,
+      "knowledge leaks": [],
+      "main_gaps": [
+        "部分描述如“拿在手里能感觉到”带有模拟实测感。",
+        "卖点重复出现次数略多。",
+        "整体信息密度高但个别句子偏长，直播节奏可再优化。"
+      ],
+      "knowledge_leaks": []
+    },
+    {
+      "index": 2,
+      "scores": {
+        "natural_live_speech": 13,
+        "benefit_scene_expansion": 15,
+        "coherent_flow": 9,
+        "non_repetition": 9,
+        "purchase_guidance": 5
+      },
+      "score_reasons": [
+        "natural_live_speech：整体口语自然，如“姐妹们好，欢迎来到直播间，今天咱们不看别的，就聊一双出门愿意塞进包里、在家也愿意一直穿的凉拖鞋。”但部分表述偏书面，如“专为女性足部曲线量身打造”“整体走的是居家休闲、高级简约、夏日轻便、旅行便携的路子”。",
+        "benefit_scene_expansion：对足弓支撑、静音防滑、轻便快干、防臭、厚底软弹等卖点结合旅行、夜间走动、浴室、打理等场景做了展开；但“一体成型的好处就是没有太多拼接缝，日常穿起来不磨脚”中“不磨脚”是资料未支持的延伸。",
+        "coherent_flow：从痛点身份到规格价格收口，结构完整，但颜色和尺码部分略显罗列。",
+        "non_repetition：卖点展开较丰富，未大量重复空话，但“足弓支撑”“静音防滑”等有多次提及。",
+        "purchase_guidance：价格币种优惠条件正确且自然引导，“大家可以根据自己喜欢的颜色和合适的尺码来选，合适再下单。”"
+      ],
+      "unsupported_claims": [
+        {
+          "quote": "一体成型的好处就是没有太多拼接缝，日常穿起来不磨脚，清洁也少了很多死角。",
+          "reason": "资料仅提及一体成型，未支持“不磨脚”“清洁死角少”的具体结论。",
+          "severity": "minor"
+        }
+      ],
+      "price_and_terms_correct": true,
+      "knowledge leaks": [],
+      "main_gaps": [
+        "部分书面化表达削弱直播口语感。",
+        "“不磨脚”属于无资料支持的附加好处。",
+        "颜色尺码信息较罗列，与场景卖点结合不够紧密。"
+      ],
+      "knowledge_leaks": []
+    }
+  ],
+  "pair_diversity": {
+    "score": 3,
+    "reason": "两版开场痛点不同（旅行/居家 vs 厨房/浴室），但后续卖点展开顺序和结构高度相似，均按足弓支撑、静音防滑、材质轻便、打理、颜色尺码、价格收口推进；情境略有差异但模板化明显，属于换开场但同样逐点模板，未达到两项以上明显不同且均完整。"
+  },
+  "judge_model": "deepseek-flash",
+  "judge_protocol": "v2-core-facts-only-no-unsupported-reference-priming",
+  "usage": {
+    "prompt_tokens": 2910,
+    "completion_tokens": 1024,
+    "total_tokens": 3934,
+    "prompt_tokens_details": {
+      "cached_tokens": 1024
+    },
+    "prompt_cache_hit_tokens": 1024,
+    "prompt_cache_miss_tokens": 1886
+  }
+}

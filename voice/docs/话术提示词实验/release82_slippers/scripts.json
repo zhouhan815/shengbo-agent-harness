@@ -1,0 +1,428 @@
+[
+  {
+    "id": "script_1d5fe7366bc241cb",
+    "product_id": "lab_slippers",
+    "product_snapshot": {
+      "id": "lab_slippers",
+      "name": "足弓支撑静音防滑厚底凉拖鞋（小蛮腰女款）",
+      "currency": "TWD",
+      "price": 178,
+      "promo_price": 107,
+      "selling_points": "这款【Joy Share 生活选物】全新上架的足弓支撑凉拖鞋，专为女性足部曲线量身打造。采用优选 EVA 环保材质一体成型，独特的‘小蛮腰’厚底设计，不仅视觉上修饰脚型，更能有效缓解久站带来的足部压力，提供软弹缓震体验。鞋底具备静音与防滑特性，在浴室或室内走动减少打扰家人；材质防臭快干，一冲即净。轻便，适合居家、旅行出游、海边漫步。\n材质：优选EVA环保材质。风格：居家休闲、高级简约、夏日轻便、旅行便携。\n适用场景：居家室内、浴室洗澡、旅行出游、沙滩漫步、日常外穿（散步/倒垃圾）。\n功能特色：足弓支撑、小蛮腰厚底软弹、静音防滑、轻便耐磨、快干易清洗、防臭。\n适用人群：女性、追求足部舒适者、旅行爱好者、居家生活者。\n版型：厚底平底、一般版型。\n颜色：粉色、红色、绿色、蓝色、橙色、葡萄紫、烟熏紫、卡其、黑色、白色。\n尺码：36-37、38-39、40-41、42-43、44-45。\n备注：标准码，脚背较宽或脚型偏肉，建议斟酌大一号。",
+      "promotion": "原价178新台币，限时下杀107新台币。",
+      "knowledge": "本卖场较长备货（2至8个工作日寄出），预计配送9月21日至9月30日。\n4件9.9折、满额折10或15元，券规则待确认。\n新鞋气味可通风阴干。\n浴室地面遇水仍请小心行走。\n避免阳光曝晒与高温。\n颜色以实物为准。"
+    },
+    "revision": 1,
+    "label": "1",
+    "angle": "从站立支撑与厚底缓震体验切入，再讲静音防滑、打理便携与颜色选择",
+    "locale": "zh-CN",
+    "source": "DeepSeek",
+    "status": "draft",
+    "blocks": [
+      {
+        "id": "script_1d5fe7366bc241cb_b001",
+        "stage": "welcome",
+        "focus": "开场问候与轻互动",
+        "ordinal": 1
+      },
+      {
+        "id": "script_1d5fe7366bc241cb_b002",
+        "stage": "pain",
+        "focus": "久站与室内走动的困扰",
+        "ordinal": 2
+      },
+      {
+        "id": "script_1d5fe7366bc241cb_b003",
+        "stage": "identity",
+        "focus": "商品名称与整体定位",
+        "ordinal": 3
+      },
+      {
+        "id": "script_1d5fe7366bc241cb_b004",
+        "stage": "benefit",
+        "focus": "足弓支撑与厚底软弹体验",
+        "ordinal": 4
+      },
+      {
+        "id": "script_1d5fe7366bc241cb_b005",
+        "stage": "benefit",
+        "focus": "EVA一体成型与静音防滑",
+        "ordinal": 5
+      },
+      {
+        "id": "script_1d5fe7366bc241cb_b006",
+        "stage": "benefit",
+        "focus": "快干防臭与耐磨轻便",
+        "ordinal": 6
+      },
+      {
+        "id": "script_1d5fe7366bc241cb_b007",
+        "stage": "specification",
+        "focus": "颜色与尺码选择",
+        "ordinal": 7
+      },
+      {
+        "id": "script_1d5fe7366bc241cb_b008",
+        "stage": "price",
+        "focus": "价格说明",
+        "ordinal": 8
+      },
+      {
+        "id": "script_1d5fe7366bc241cb_b009",
+        "stage": "promotion",
+        "focus": "限时优惠条件",
+        "ordinal": 9
+      },
+      {
+        "id": "script_1d5fe7366bc241cb_b010",
+        "stage": "cta",
+        "focus": "总结与购买引导",
+        "ordinal": 10
+      }
+    ],
+    "sentences": [
+      {
+        "id": "script_1d5fe7366bc241cb_s001",
+        "block_id": "script_1d5fe7366bc241cb_b001",
+        "block_ordinal": 1,
+        "stage": "welcome",
+        "ordinal": 1,
+        "text": "欢迎来到直播间，今天咱们聊一双在家走动更舒服的凉拖鞋。",
+        "spoken_text": "欢迎来到直播间，今天咱们聊一双在家走动更舒服的凉拖鞋。",
+        "kind": "engagement",
+        "fact_ids": []
+      },
+      {
+        "id": "script_1d5fe7366bc241cb_s002",
+        "block_id": "script_1d5fe7366bc241cb_b001",
+        "block_ordinal": 1,
+        "stage": "welcome",
+        "ordinal": 2,
+        "text": "如果你也常觉得站久了脚底累，或者洗完澡想找一双顺脚的拖鞋，先别急着划走。",
+        "spoken_text": "如果你也常觉得站久了脚底累，或者洗完澡想找一双顺脚的拖鞋，先别急着划走。",
+        "kind": "engagement",
+        "fact_ids": []
+      },
+      {
+        "id": "script_1d5fe7366bc241cb_s003",
+        "block_id": "script_1d5fe7366bc241cb_b002",
+        "block_ordinal": 2,
+        "stage": "pain",
+        "ordinal": 3,
+        "text": "很多姐妹在家里忙来忙去，做饭、收拾、站着聊天，脚底没有支撑，走几步就想找地方靠一靠。",
+        "spoken_text": "很多姐妹在家里忙来忙去，做饭、收拾、站着聊天，脚底没有支撑，走几步就想找地方靠一靠。",
+        "kind": "engagement",
+        "fact_ids": []
+      },
+      {
+        "id": "script_1d5fe7366bc241cb_s004",
+        "block_id": "script_1d5fe7366bc241cb_b002",
+        "block_ordinal": 2,
+        "stage": "pain",
+        "ordinal": 4,
+        "text": "还有人晚上洗完澡，穿着普通拖鞋啪嗒啪嗒响，家里有人早睡，自己都觉得不好意思。",
+        "spoken_text": "还有人晚上洗完澡，穿着普通拖鞋啪嗒啪嗒响，家里有人早睡，自己都觉得不好意思。",
+        "kind": "engagement",
+        "fact_ids": []
+      },
+      {
+        "id": "script_1d5fe7366bc241cb_s005",
+        "block_id": "script_1d5fe7366bc241cb_b003",
+        "block_ordinal": 3,
+        "stage": "identity",
+        "ordinal": 5,
+        "text": "这就是今天要讲的足弓支撑静音防滑厚底凉拖鞋，小蛮腰女款。",
+        "spoken_text": "这就是今天要讲的足弓支撑静音防滑厚底凉拖鞋，小蛮腰女款。",
+        "kind": "product_claim",
+        "fact_ids": [
+          "NAME"
+        ]
+      },
+      {
+        "id": "script_1d5fe7366bc241cb_s006",
+        "block_id": "script_1d5fe7366bc241cb_b003",
+        "block_ordinal": 3,
+        "stage": "identity",
+        "ordinal": 6,
+        "text": "它来自 Joy Share 生活选物，全新上架，专为女性足部曲线做的设计。",
+        "spoken_text": "它来自 Joy Share 生活选物，全新上架，专为女性足部曲线做的设计。",
+        "kind": "product_claim",
+        "fact_ids": [
+          "SELLING"
+        ]
+      },
+      {
+        "id": "script_1d5fe7366bc241cb_s007",
+        "block_id": "script_1d5fe7366bc241cb_b004",
+        "block_ordinal": 4,
+        "stage": "benefit",
+        "ordinal": 7,
+        "text": "先看脚底这一块，它有足弓支撑，不是完全平铺的鞋床。",
+        "spoken_text": "先看脚底这一块，它有足弓支撑，不是完全平铺的鞋床。",
+        "kind": "product_claim",
+        "fact_ids": [
+          "SELLING",
+          "NAME"
+        ]
+      },
+      {
+        "id": "script_1d5fe7366bc241cb_s008",
+        "block_id": "script_1d5fe7366bc241cb_b004",
+        "block_ordinal": 4,
+        "stage": "benefit",
+        "ordinal": 8,
+        "text": "你在家站着切菜、叠衣服，脚心有一个承托的位置，久站带来的足部压力能得到缓解，走路也更愿意多走几步。",
+        "spoken_text": "你在家站着切菜、叠衣服，脚心有一个承托的位置，久站带来的足部压力能得到缓解，走路也更愿意多走几步。",
+        "kind": "product_claim",
+        "fact_ids": [
+          "SELLING"
+        ]
+      },
+      {
+        "id": "script_1d5fe7366bc241cb_s009",
+        "block_id": "script_1d5fe7366bc241cb_b004",
+        "block_ordinal": 4,
+        "stage": "benefit",
+        "ordinal": 9,
+        "text": "配合小蛮腰厚底和软弹缓震，踩下去有一点回弹感，从客厅走到阳台，脚感比较轻松。",
+        "spoken_text": "配合小蛮腰厚底和软弹缓震，踩下去有一点回弹感，从客厅走到阳台，脚感比较轻松。",
+        "kind": "product_claim",
+        "fact_ids": [
+          "SELLING"
+        ]
+      },
+      {
+        "id": "script_1d5fe7366bc241cb_s010",
+        "block_id": "script_1d5fe7366bc241cb_b004",
+        "block_ordinal": 4,
+        "stage": "benefit",
+        "ordinal": 10,
+        "text": "厚底平底、一般版型，视觉上还能修饰脚型，日常穿不挑衣服。",
+        "spoken_text": "厚底平底、一般版型，视觉上还能修饰脚型，日常穿不挑衣服。",
+        "kind": "product_claim",
+        "fact_ids": [
+          "SELLING"
+        ]
+      },
+      {
+        "id": "script_1d5fe7366bc241cb_s011",
+        "block_id": "script_1d5fe7366bc241cb_b005",
+        "block_ordinal": 5,
+        "stage": "benefit",
+        "ordinal": 11,
+        "text": "材质是优选 E V A 环保材质，一体成型，鞋身没有多余拼接，上脚轻便。",
+        "spoken_text": "材质是优选 E V A 环保材质，一体成型，鞋身没有多余拼接，上脚轻便。",
+        "kind": "product_claim",
+        "fact_ids": [
+          "SELLING"
+        ]
+      },
+      {
+        "id": "script_1d5fe7366bc241cb_s012",
+        "block_id": "script_1d5fe7366bc241cb_b005",
+        "block_ordinal": 5,
+        "stage": "benefit",
+        "ordinal": 12,
+        "text": "鞋底做了静音和防滑特性，晚上在浴室或室内走动，能减少打扰家人。",
+        "spoken_text": "鞋底做了静音和防滑特性，晚上在浴室或室内走动，能减少打扰家人。",
+        "kind": "product_claim",
+        "fact_ids": [
+          "SELLING"
+        ]
+      },
+      {
+        "id": "script_1d5fe7366bc241cb_s013",
+        "block_id": "script_1d5fe7366bc241cb_b005",
+        "block_ordinal": 5,
+        "stage": "benefit",
+        "ordinal": 13,
+        "text": "湿地面行走时自己多留神，但它在居家和浴室这些场景里，走起来比较稳当。",
+        "spoken_text": "湿地面行走时自己多留神，但它在居家和浴室这些场景里，走起来比较稳当。",
+        "kind": "product_claim",
+        "fact_ids": [
+          "SELLING"
+        ]
+      },
+      {
+        "id": "script_1d5fe7366bc241cb_s014",
+        "block_id": "script_1d5fe7366bc241cb_b006",
+        "block_ordinal": 6,
+        "stage": "benefit",
+        "ordinal": 14,
+        "text": "这双鞋还防臭快干，一冲即净。",
+        "spoken_text": "这双鞋还防臭快干，一冲即净。",
+        "kind": "product_claim",
+        "fact_ids": [
+          "SELLING"
+        ]
+      },
+      {
+        "id": "script_1d5fe7366bc241cb_s015",
+        "block_id": "script_1d5fe7366bc241cb_b006",
+        "block_ordinal": 6,
+        "stage": "benefit",
+        "ordinal": 15,
+        "text": "洗澡出来鞋面沾了水，冲一冲、晾一晾，下回穿也清爽，不用为打理费太多心思。",
+        "spoken_text": "洗澡出来鞋面沾了水，冲一冲、晾一晾，下回穿也清爽，不用为打理费太多心思。",
+        "kind": "product_claim",
+        "fact_ids": [
+          "SELLING"
+        ]
+      },
+      {
+        "id": "script_1d5fe7366bc241cb_s016",
+        "block_id": "script_1d5fe7366bc241cb_b006",
+        "block_ordinal": 6,
+        "stage": "benefit",
+        "ordinal": 16,
+        "text": "轻便耐磨，出门散步、倒垃圾、去海边漫步，塞进行李箱也不占太多地方。",
+        "spoken_text": "轻便耐磨，出门散步、倒垃圾、去海边漫步，塞进行李箱也不占太多地方。",
+        "kind": "product_claim",
+        "fact_ids": [
+          "SELLING"
+        ]
+      },
+      {
+        "id": "script_1d5fe7366bc241cb_s017",
+        "block_id": "script_1d5fe7366bc241cb_b007",
+        "block_ordinal": 7,
+        "stage": "specification",
+        "ordinal": 17,
+        "text": "颜色有粉色、红色、绿色、蓝色、橙色、葡萄紫、烟熏紫、卡其、黑色、白色，一共十个颜色。",
+        "spoken_text": "颜色有粉色、红色、绿色、蓝色、橙色、葡萄紫、烟熏紫、卡其、黑色、白色，一共十个颜色。",
+        "kind": "product_claim",
+        "fact_ids": [
+          "SELLING"
+        ]
+      },
+      {
+        "id": "script_1d5fe7366bc241cb_s018",
+        "block_id": "script_1d5fe7366bc241cb_b007",
+        "block_ordinal": 7,
+        "stage": "specification",
+        "ordinal": 18,
+        "text": "喜欢清爽搭家居服，可以看看粉色、白色或蓝色；想要稳一点、好配衣服，黑色、卡其和烟熏紫都合适。",
+        "spoken_text": "喜欢清爽搭家居服，可以看看粉色、白色或蓝色；想要稳一点、好配衣服，黑色、卡其和烟熏紫都合适。",
+        "kind": "product_claim",
+        "fact_ids": [
+          "SELLING"
+        ]
+      },
+      {
+        "id": "script_1d5fe7366bc241cb_s019",
+        "block_id": "script_1d5fe7366bc241cb_b007",
+        "block_ordinal": 7,
+        "stage": "specification",
+        "ordinal": 19,
+        "text": "尺码从三十六码到三十七码、三十八码到三十九码、四十码到四十一码、四十二码到四十三码，一直到四十四码到四十五码。",
+        "spoken_text": "尺码从三十六码到三十七码、三十八码到三十九码、四十码到四十一码、四十二码到四十三码，一直到四十四码到四十五码。",
+        "kind": "product_claim",
+        "fact_ids": [
+          "SELLING"
+        ]
+      },
+      {
+        "id": "script_1d5fe7366bc241cb_s020",
+        "block_id": "script_1d5fe7366bc241cb_b007",
+        "block_ordinal": 7,
+        "stage": "specification",
+        "ordinal": 20,
+        "text": "标准码，脚背较宽或脚型偏肉，建议斟酌大一号。",
+        "spoken_text": "标准码，脚背较宽或脚型偏肉，建议斟酌大一号。",
+        "kind": "product_claim",
+        "fact_ids": [
+          "SELLING"
+        ]
+      },
+      {
+        "id": "script_1d5fe7366bc241cb_s021",
+        "block_id": "script_1d5fe7366bc241cb_b008",
+        "block_ordinal": 8,
+        "stage": "price",
+        "ordinal": 21,
+        "text": "价格说清楚，原价一百七十八新台币，现在活动价一百零七新台币。",
+        "spoken_text": "价格说清楚，原价一百七十八新台币，现在活动价一百零七新台币。",
+        "kind": "product_claim",
+        "fact_ids": [
+          "PRICE"
+        ]
+      },
+      {
+        "id": "script_1d5fe7366bc241cb_s022",
+        "block_id": "script_1d5fe7366bc241cb_b009",
+        "block_ordinal": 9,
+        "stage": "promotion",
+        "ordinal": 22,
+        "text": "这是限时下杀，一百零七新台币就能带走。",
+        "spoken_text": "这是限时下杀，一百零七新台币就能带走。",
+        "kind": "product_claim",
+        "fact_ids": [
+          "PROMOTION"
+        ]
+      },
+      {
+        "id": "script_1d5fe7366bc241cb_s023",
+        "block_id": "script_1d5fe7366bc241cb_b010",
+        "block_ordinal": 10,
+        "stage": "cta",
+        "ordinal": 23,
+        "text": "最后帮大家收一下，这双鞋最值得关注的是足弓支撑和厚底软弹，还有静音防滑和快干防臭。",
+        "spoken_text": "最后帮大家收一下，这双鞋最值得关注的是足弓支撑和厚底软弹，还有静音防滑和快干防臭。",
+        "kind": "product_claim",
+        "fact_ids": [
+          "SELLING"
+        ]
+      },
+      {
+        "id": "script_1d5fe7366bc241cb_s024",
+        "block_id": "script_1d5fe7366bc241cb_b010",
+        "block_ordinal": 10,
+        "stage": "cta",
+        "ordinal": 24,
+        "text": "颜色和尺码按你平时的喜好来选，脚型偏宽记得斟酌大一号，合适再下单。",
+        "spoken_text": "颜色和尺码按你平时的喜好来选，脚型偏宽记得斟酌大一号，合适再下单。",
+        "kind": "product_claim",
+        "fact_ids": [
+          "SELLING"
+        ]
+      }
+    ],
+    "facts": [
+      {
+        "id": "NAME",
+        "text": "足弓支撑静音防滑厚底凉拖鞋（小蛮腰女款）"
+      },
+      {
+        "id": "PRICE",
+        "text": "原价 178 TWD；活动价 107 TWD"
+      },
+      {
+        "id": "SELLING",
+        "text": "这款【Joy Share 生活选物】全新上架的足弓支撑凉拖鞋，专为女性足部曲线量身打造。采用优选 EVA 环保材质一体成型，独特的‘小蛮腰’厚底设计，不仅视觉上修饰脚型，更能有效缓解久站带来的足部压力，提供软弹缓震体验。鞋底具备静音与防滑特性，在浴室或室内走动减少打扰家人；材质防臭快干，一冲即净。轻便，适合居家、旅行出游、海边漫步。\n材质：优选EVA环保材质。风格：居家休闲、高级简约、夏日轻便、旅行便携。\n适用场景：居家室内、浴室洗澡、旅行出游、沙滩漫步、日常外穿（散步/倒垃圾）。\n功能特色：足弓支撑、小蛮腰厚底软弹、静音防滑、轻便耐磨、快干易清洗、防臭。\n适用人群：女性、追求足部舒适者、旅行爱好者、居家生活者。\n版型：厚底平底、一般版型。\n颜色：粉色、红色、绿色、蓝色、橙色、葡萄紫、烟熏紫、卡其、黑色、白色。\n尺码：36-37、38-39、40-41、42-43、44-45。\n备注：标准码，脚背较宽或脚型偏肉，建议斟酌大一号。"
+      },
+      {
+        "id": "PROMOTION",
+        "text": "原价178新台币，限时下杀107新台币。"
+      }
+    ],
+    "issues": [],
+    "missing_information": [
+      "未提供是否包邮、退换售后政策、库存数量、优惠截止时间、下播后价格是否恢复等履约与活动条件。"
+    ],
+    "created_at": "2026-10-07T17:40:04+08:00",
+    "usage": {
+      "prompt_tokens": 2061,
+      "completion_tokens": 2468,
+      "total_tokens": 4529,
+      "prompt_tokens_details": {
+        "cached_tokens": 1920
+      },
+      "prompt_cache_hit_tokens": 1920,
+      "prompt_cache_miss_tokens": 141
+    },
+    "model": "deepseek-flash",
+    "prompt_revision": "1c74d3403f6e",
+    "quality_rewrite_attempts": 1,
+    "lab_elapsed_seconds": 16.88
+  }
+]

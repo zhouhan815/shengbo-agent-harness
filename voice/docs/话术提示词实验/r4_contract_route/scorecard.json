@@ -1,0 +1,46 @@
+{
+  "run": "r4_contract_route",
+  "versions": [
+    {
+      "version": 1,
+      "program": 39.54,
+      "semantic": 56.0,
+      "total": 95.54,
+      "hard_gate": false,
+      "rule_issues": [
+        "遗漏输入中明确的重要特点：耐磨"
+      ],
+      "serious_claims": 0,
+      "cross_version_copy_pass": false,
+      "pass": false,
+      "gaps": [
+        "颜色分类'耐脏百搭'黑色卡其，'耐脏'属于合理场景联想还是性能暗示？但未直接说产品耐脏，仅说颜色百搭，可接受。",
+        "未提及'耐磨'。",
+        "防臭快干场景与版本1类似，重复度高。"
+      ]
+    },
+    {
+      "version": 2,
+      "program": 40.0,
+      "semantic": 56.0,
+      "total": 96.0,
+      "hard_gate": false,
+      "rule_issues": [
+        "遗漏输入中明确的重要特点：耐磨"
+      ],
+      "serious_claims": 0,
+      "cross_version_copy_pass": false,
+      "pass": false,
+      "gaps": [
+        "未提及厚底平底的具体版型信息，但product name已含厚底，selling_points有版型，不算大问题；主要缺点可能是未强调'轻便耐磨'中的耐磨。",
+        "防臭快干、一冲即净场景重复，可更丰富。",
+        "颜色过多逐一列举稍显啰嗦，但不算事实问题。"
+      ]
+    }
+  ],
+  "pair_diversity": {
+    "score": 3,
+    "reason": "两版开场和卖点展开顺序有明显不同：版本1先从颜色携带切入，版本2先从足弓支撑切入；情境选择有差异，但整体结构仍是类似逐点模板，核心场景如做饭打扫、浴室防滑、快干等重复较多，故给3分。"
+  },
+  "rubric": "20261007.4-uniform-coverage-content-and-near-copy-checks"
+}

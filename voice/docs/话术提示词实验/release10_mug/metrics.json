@@ -1,0 +1,76 @@
+{
+  "versions": [
+    {
+      "han_characters": 737,
+      "sentences": 26,
+      "coverage_groups": {
+        "材质": true,
+        "容量": true,
+        "把手": true,
+        "颜色": true,
+        "场景": true
+      },
+      "coverage_rate": 1.0,
+      "natural_sentence_ratio": 1.0,
+      "duplicate_sentences": [],
+      "reference_5gram_overlap": 0.0,
+      "program_scores": {
+        "selling_point_coverage": 12.0,
+        "flow": 8.0,
+        "speakability": 10.0,
+        "length_fit": 3.39,
+        "fact_references": 5.0
+      },
+      "program_total": 38.39,
+      "invalid_references": false,
+      "app_issues": []
+    },
+    {
+      "han_characters": 557,
+      "sentences": 21,
+      "coverage_groups": {
+        "材质": true,
+        "容量": true,
+        "把手": true,
+        "颜色": true,
+        "场景": true
+      },
+      "coverage_rate": 1.0,
+      "natural_sentence_ratio": 1.0,
+      "duplicate_sentences": [],
+      "reference_5gram_overlap": 0.0,
+      "program_scores": {
+        "selling_point_coverage": 12.0,
+        "flow": 8.0,
+        "speakability": 10.0,
+        "length_fit": 4.49,
+        "fact_references": 5.0
+      },
+      "program_total": 39.49,
+      "invalid_references": false,
+      "app_issues": []
+    }
+  ],
+  "pair": [
+    {
+      "a": 1,
+      "b": 2,
+      "fivegram_jaccard": 0.121,
+      "shared_narrative_sentences": [],
+      "near_copy_ratio": 0.143,
+      "near_copies": [
+        {
+          "a": "坐在电脑前想喝一口，握着把手抬起来就行，喝完放回桌面也顺手。",
+          "b": "坐在电脑前想喝一口，握住把手抬起来就行，喝完顺手放回桌边。",
+          "similarity": 0.847
+        },
+        {
+          "a": "杯身带了一个把手，端起杯子的时候手指有地方搭，不用整个手掌去包住杯身。",
+          "b": "杯身带了一个把手，端杯子的时候手指有地方搭，不用整个手掌去捧杯身。",
+          "similarity": 0.941
+        }
+      ],
+      "opening_similarity": 0.251
+    }
+  ]
+}

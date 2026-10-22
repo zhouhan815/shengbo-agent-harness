@@ -1,0 +1,29 @@
+---
+name: prelive-audience-scenes
+description: 对固定商品维护可复用的目标顾客、使用场景、顾虑、卖点优先级和演示素材建议，先查历史再按必要差异补公开研究。
+---
+
+# 顾客与场景研究
+
+当主Agent分派“用户选择AI整理缺失卖点”时，交付可复用的顾客需求、场景、对应商品依据和建议表达，并按用户方向排序；基于已提供商品事实形成利益表达，不把研究假设或他品评价写成性能。无需另跑常驻卖点Agent。正式落库与卖点候选确认由主Agent的wf_selling_points负责，本分支不替用户确认。历史研究与商品事实未变时复用，不为更换措辞全量重新研究。
+
+1. 已有精确商品ID/ref时先读取产品与find_audience_research；全新商品尚无ID时直接读取被派发的来源，不能对空product_id调用历史查询。先检查商家已经提供的策略表、目标人群、场景和常见问题，再查适用历史，只补本次缺失或变化；不是每份资料都重新泛搜索。记录历史输入版本、市场/语言/渠道及现有结论，exact才可建议复用；requires_review必须解释差异。
+2. 当前资料可以与商品结构化、本场分析并行阅读；不需要等待一套已完成商品库。含图文档先overview及visual_workset，按本次商品/SKU检查相关场景图、参数截图和扫描页，再按image:N/page:N补读；细字不清按可用入口补原图/OCR。索引与成功视觉交付不是已理解，不能靠正文较多推定所有未读图无关；也无需逐张读完已明确无关图片。未读关键图不能用研究假设补出性能、价格或规格。最终结论由主Agent与完整商品资料汇合，发现矛盾标注而不横向改同伴。
+3. 用“哪类人—何种情境—要完成什么—遇到什么障碍—商品哪些证据能支持”组织研究。先区分商品已知适用范围、商家经营背景、本场优先人群：商家经营某类服务不等于商品只卖给已有服务客户，重点场景也不排除其他已确认适用人群。覆盖用户明确提出的各类顾客，在共同需求上提炼价值，再标出不同人群的场景差异和本场优先级；不为凑分类凭空增加适用人群。固定商品不等于每场要换品；重点在现有商品如何讲清价值。
+4. 必要时web_search/web_fetch补真实公开来源。保留URL、标题、时间可得性、支持片段和研究限制。搜索无结果如实记录，不编访谈、评分、订单或转化提升。
+5. fields可组织segments、scenes、concerns、benefit_priorities、context、history_disposition；insights写结论、依据和适用范围；hypotheses写待验证推断。对影响人群或利益表达的关键结论，在这些既有结构中说明属于“资料证实”“用户明确确认”还是“商业假设”，给出真实来源/用户原话定位；用户提出希望面向谁营销，不自动等于确认该人群适用。最新明确确认可修正旧的待确认记录，注明变化及旧结论如何处理，不沿用已被确认替代的疑问；若存在真实资料冲突则呈交主Agent，不默默选择。用户确认某类人可用，不可扩写为任意年龄、安全认证、训练效果或真实专业人士背书。事实与假设必须分离。准确保留商品、SKU、语言和渠道边界，不能把另一规格的能力借给本规格。内容长时证据集中一处索引，以精确ref和evidence_id复用，不在每个卖点重复抄整份材料。
+6. 结果必须能衔接“顾客需求→使用场景→商品已有依据→可支持的顾客利益→卖点表达方向→本场讲解重点”。两个用途分别是商品库有依据的卖点和本场文案选择。优先沿用原有benefit_priorities结构，在insights交付可供主Agent直接提炼卖点的对应关系：面向谁、在什么场景遇到什么问题、哪些具体事实支持、给顾客带来什么实际价值、哪些部分仍是假设。单列材质、颜色、套装等参数不是完成了价值分析；不把“信息清楚、方便核对参数”代替商品本身的购买理由，也不强求每个参数独占一条卖点。有依据的利益可以自然、具象地表达；依据与边界放独立说明，不把每条建议写成免责声明，真正影响适配的条件仍须保留。取得结构化事实观察时可提供material_assessment.benefit_mappings，以supported_observation_ids连接同商品已知fact。不得为满足结构编造观察或依据；并行时尚无另一支正式事实可用，先将依据留在evidence，主Agent汇合后再装配。不能由“用户偏好快充”推出商品支持快充，商家策略也不能证明商品性能。
+7. 给出asset_suggestions：演示目的、推荐上身/全景/细节/场景素材、需商家提供什么。首期只建议，不生成视频；不把缺失素材冒充可用证据。
+8. submit_audience_scenes_report提交完整研究；历史更新保留依赖ref与变更理由。PREPARED须主验收，不直接覆盖商品或话术。
+
+material_assessment是可选的严格协议，不是自由摘要字段。通常以原有fields、insights、hypotheses、evidence完整交付即可。只有确需提交该结构时，先read_file读取`/skills/audience_scenes/prelive-audience-scenes/references/material-assessment-schema.json`与`material-assessment-example.json`，按真实schema组织；不要自行添加identity、blocking_gaps、source_use等未经定义的键。无需重复产品事实分支的整套观察；不能引用它未交付给你的观察ID。省略该可选结构不表示缺项被证明消失，仍照实写入原报告。
+
+视觉判断可用material_assessment.visual_reviews记录逐来源/图页的商品候选范围、已读用途/事实或无关理由、未读/不可读原因及本报告evidence_ids。status=reviewed必须引用同图页的真实read_receipt_ids，历史回执加reuse_note；未报告区域保持unknown。关键未读来源影响本次具体动作时，用critical_for_actions和missing_info_ids关联对应必需补料；不能把缺演示视频当成所有研究/文案动作的门槛。程序验证定位与读取回执，不验证你对图片的理解。
+
+critical_for_actions和blocked_actions使用本次真实业务command/tool标识，不能以自然语言建议冒充可执行门禁。不同分支的读取回执即使属于同一run，复用也须填写reuse_note及适用依据；读到图片不等于已完成本商品的研究判断。
+
+## 精确而紧凑地交付
+
+完整已知商品字段放fields，原文证据集中在evidence并用evidence_id引用。不要在summary/insights/material_assessment里逐项重抄完整商品、整份来源或所有空默认字段。summary写关键结论、缺项和冲突即可。material_assessment是可选语义结构；使用时仅为需要区分的商品/SKU、资料用途、高风险数值/单位/否定条件及关键图建立必要观察，不把fields全部再镜像一遍；不能为缩短报告丢必要事实。content_groups.role只取源工具/严格schema给出的product_facts/existing_script/campaign/faq/presentation_instruction/audience_research/mixed/unknown，不能填mixed_or_unknown或stage_direction。full/overview是控制视图，事实证据必须用真实paragraph:N/image:N/text:1等返回locator。
+
+若submit报告返回report_correction.draft_ref，前次完整草案已安全保留但未正式提交。可先用correct_analysis_report(action=read,draft_ref)精确回读，再用correct_analysis_report(draft_ref,patches=[{path:明确JSONpointer,value:你判断后的正确值}])定向修字段，不必重写整份长报告；这不会放松原校验，也可选择原submit重交。工具不会替你猜类型或自动删事实。

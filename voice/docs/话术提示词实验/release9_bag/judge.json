@@ -1,0 +1,70 @@
+{
+  "versions": [
+    {
+      "index": 1,
+      "scores": {
+        "natural_live_speech": 14,
+        "benefit_scene_expansion": 16,
+        "coherent_flow": 8,
+        "non_repetition": 8,
+        "purchase_guidance": 4
+      },
+      "score_reasons": [
+        "natural_live_speech 14：'咱们今天看的是这只轻行可折叠通勤托特包'、'这一点对临时出门特别友好'等口语流畅，但'尺寸是三十八乘三十乘十二厘米'仍偏字段播报。",
+        "benefit_scene_expansion 16：可折叠、涤纶轻便、拉链主袋、内部小口袋、长肩带等有有效展开，如'把折好的包塞在随身袋子里，需要的时候展开就能用'；尺寸只给概括描述，颜色展开较弱，有效展开约5个。",
+        "coherent_flow 8：痛点开场和收口完整，但中间'主袋拉链'和'长肩带'连续出现两次，衔接略机械。",
+        "non_repetition 8：整体重复少，但'长肩带设计，让手提和单肩背都行得通'几乎原句重复，略有凑字感。",
+        "purchase_guidance 4：价格和购买引导正确，'原价九十九元，现在活动价七十九元'，并说明'没有其他附加条件'，但'可以考虑'引导略弱。"
+      ],
+      "unsupported_claims": [],
+      "price_and_terms_correct": true,
+      "knowledge_leaks": [],
+      "main_gaps": [
+        "'长肩带设计，让手提和单肩背都行得通'前后几乎原句重复。",
+        "尺寸描述'比较从容'过于模糊，未像版本1那样连接到具体日常物品。",
+        "颜色部分两色描述较泛，缺少与常见穿搭场景的进一步联系。"
+      ]
+    },
+    {
+      "index": 2,
+      "scores": {
+        "natural_live_speech": 14,
+        "benefit_scene_expansion": 17,
+        "coherent_flow": 9,
+        "non_repetition": 9,
+        "purchase_guidance": 4
+      },
+      "score_reasons": [
+        "natural_live_speech 14：'刚进来的朋友可以先停一停'、'你有没有遇到过这种小纠结'等口语自然，但 '尺寸是三十八乘三十乘十二厘米' 直接念数字偏说明书感。",
+        "benefit_scene_expansion 17：对可折叠、涤纶轻便、拉链主袋、内部小口袋、长肩带、尺寸颜色等都有'具体情境→有限度生活收益'展开，如'折起来收在衣柜角落或者行李箱夹层里'、'钥匙、耳机、门禁卡这些小东西可以单独放进去'，共6个卖点有效展开。",
+        "coherent_flow 9：从周末/出差痛点切入，依次讲折叠、面料、拉链、小口袋、肩带、尺寸、颜色、价格，最后收口，过渡自然。",
+        "non_repetition 9：围绕不同卖点展开，没有反复说'方便舒适'凑字，无空话。",
+        "purchase_guidance 4：给出明确价格组合'原价九十九元，现在活动价七十九元'，并提醒'截至时间没有提供，以实际页面为准'，颜色选择引导自然，不假设挂购物车。"
+      ],
+      "unsupported_claims": [],
+      "price_and_terms_correct": true,
+      "knowledge_leaks": [],
+      "main_gaps": [
+        "部分句子偏说明书式，如直接念尺寸数字，缺少口语化转译。",
+        "结尾收口稍长，把前面卖点又罗列一遍，可更简洁。",
+        "颜色选择只停留在搭配建议，未进一步联系场景帮助决策。"
+      ]
+    }
+  ],
+  "pair_diversity": {
+    "score": 3,
+    "reason": "两版开场痛点不同，版本1从周末/出差临时用包切入，版本2从换包麻烦切入；卖点展开顺序有差异（版本1先可折叠再面料，版本2先拉链再折叠），且两版均完整覆盖核心事实。但整体逐点结构和收口方式仍较相似，未达到'卖点展开顺序/情境/节奏至少两项明显不同且均完整'的4分标准。"
+  },
+  "judge_model": "deepseek-flash",
+  "judge_protocol": "v2-core-facts-only-no-unsupported-reference-priming",
+  "usage": {
+    "prompt_tokens": 2119,
+    "completion_tokens": 1015,
+    "total_tokens": 3134,
+    "prompt_tokens_details": {
+      "cached_tokens": 768
+    },
+    "prompt_cache_hit_tokens": 768,
+    "prompt_cache_miss_tokens": 1351
+  }
+}

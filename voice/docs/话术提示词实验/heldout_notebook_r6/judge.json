@@ -1,0 +1,69 @@
+{
+  "versions": [
+    {
+      "index": 1,
+      "scores": {
+        "natural_live_speech": 14,
+        "benefit_scene_expansion": 16,
+        "coherent_flow": 9,
+        "non_repetition": 8,
+        "purchase_guidance": 5
+      },
+      "score_reasons": [
+        "natural_live_speech 14：有“扣个一”“哪天需要”“挺日常”等口语表达，但部分句子偏书面，如“规格很明确”“它的内页是点阵格式，不是横线也不是空白”稍像说明文。",
+        "benefit_scene_expansion 16：对点阵、A5、八十页、软封面、颜色有展开，如“画个小格子、列个清单，点阵又能帮你把位置对齐”“八十页的容量，拿来做学习笔记或者日常记录，够用一阵子”“合上也不显笨重”“塞进帆布袋或者背包夹层，软封面会顺着包里的空间放”，但软封面场景展开比版本1略薄，未直接提到软封面可以摊平。",
+        "coherent_flow 9：从横线本痛点切入，再介绍点阵、尺寸页数、软封面、颜色、价格优惠和收口，衔接自然。",
+        "non_repetition 8：整体不靠空话凑字，但“点阵”段内“写整段文字”“画个小格子、列个清单”“贴贴纸、画箭头、框重点”与前面点阵好处有轻度重复。",
+        "purchase_guidance 5：明确人民币19元、三本九折不叠加、活动截止无说明，并引导“觉得合适再下单”。"
+      ],
+      "unsupported_claims": [],
+      "price_and_terms_correct": true,
+      "knowledge_leaks": [],
+      "main_gaps": [
+        "没有提及可用于日常记录之外，结合简单手账的更多具体例子略少。",
+        "软封面收益的展开不如版本1充分，未点出可摊平等合理场景。",
+        "活动截止时间未提供，稿中已说明没有说明，不算事实错误，但购买紧迫感自然弱。"
+      ]
+    },
+    {
+      "index": 2,
+      "scores": {
+        "natural_live_speech": 14,
+        "benefit_scene_expansion": 17,
+        "coherent_flow": 9,
+        "non_repetition": 8,
+        "purchase_guidance": 5
+      },
+      "score_reasons": [
+        "natural_live_speech 14：整体是面向直播观众的口语，比如“咱们来看一款”“帮你总结一下”；但个别表达偏书面化，如“针对这些日常小场景来的”“视觉上不太显眼”，不够口语。",
+        "benefit_scene_expansion 17：A5尺寸、软封面、点阵内页、八十页、颜色均有情境和收益展开，如“塞进帆布袋或者背包夹层，软封面会顺着包里的空间弯一弯”“放在桌面上写，它不会占掉太多地方”“想写整段文字的时候，点阵不会抢你的注意力”“八十页的容量，拿来做学习笔记、写待办清单或者简单手账，基本够用一阵子”“浅灰比较安静，放在办公桌或者会议室里，视觉上不太显眼”，超过4个卖点有效展开。",
+        "coherent_flow 9：按痛点场景、软封面、A5尺寸、八十页、点阵、颜色、价格优惠、总结收口展开，结构顺畅，标签痕迹少。",
+        "non_repetition 8：大多数内容不重复，但“不带活动价”和“十九元一本”等表达有相同信息出现，略有重复。",
+        "purchase_guidance 5：明确给出人民币19元、三本九折且不叠加、活动截止未说明，并自然引导“觉得合适的话，再下单就好”。"
+      ],
+      "unsupported_claims": [],
+      "price_and_terms_correct": true,
+      "knowledge_leaks": [],
+      "main_gaps": [
+        "未提及可作为简单手账用途，虽然资料允许。",
+        "没有提示购买多本作为拼单或备用，数量选择引导可更具体。",
+        "活动截止时间未提供，但稿中已说明没有说明，此处不算缺失；更主要的不足是缺少对点阵格式学习场景的更多具体示例。"
+      ]
+    }
+  ],
+  "pair_diversity": {
+    "score": 3,
+    "reason": "两版开场明显不同：版本1从‘出门带本子’的痛点切入，版本2从‘横线本限制’切入；核心卖点展开顺序也不同，版本1先软封面再尺寸页数，版本2先点阵再尺寸页数。但两版对多数卖点的具体情境和节奏差异还不够鲜明，属于开场和重点顺序有效不同但整体结构仍较接近。"
+  },
+  "judge_model": "deepseek-flash",
+  "usage": {
+    "prompt_tokens": 2039,
+    "completion_tokens": 1105,
+    "total_tokens": 3144,
+    "prompt_tokens_details": {
+      "cached_tokens": 384
+    },
+    "prompt_cache_hit_tokens": 384,
+    "prompt_cache_miss_tokens": 1655
+  }
+}

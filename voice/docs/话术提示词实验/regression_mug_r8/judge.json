@@ -1,0 +1,107 @@
+{
+  "versions": [
+    {
+      "index": 1,
+      "scores": {
+        "natural_live_speech": 15,
+        "benefit_scene_expansion": 17,
+        "coherent_flow": 10,
+        "non_repetition": 9,
+        "purchase_guidance": 5
+      },
+      "score_reasons": [
+        "natural_live_speech：非常口语化，如“你留意过自己拿杯子的习惯吗？”“手指穿过去一握，杯子就稳稳跟着手走”，互动感自然。",
+        "benefit_scene_expansion：对把手、陶瓷、容量、米白色四个卖点都有有效展开，如“早上从厨房端到餐桌”“给孩子倒牛奶、给自己冲麦片”“放在原木色桌面上……看起来比较柔和”“陶瓷表面看上去干干净净，日常用起来和玻璃杯、不锈钢杯是两种不同的感觉”，情境和生活收益较充分。",
+        "coherent_flow：从拿杯子习惯痛点，到把手、材质、容量、颜色、规格、价格、收口，层次清楚不机械。",
+        "non_repetition：内容具体，没有只重复方便舒适，仅关于把手和杯壁的表述前后略有相似。",
+        "purchase_guidance：明确“售价是四十九元，没有另外设置活动价”，并提示看颜色和容量再下单，币种正确。"
+      ],
+      "unsupported_claims": [
+        {
+          "quote": "特别是早上刚泡好茶或者冲好咖啡，手指头捏着杯沿，心里还惦记着别洒出来。",
+          "reason": "资料未提供防洒、防烫或耐热信息，这里用其他杯子的痛点铺垫可以，但未明示本商品是否避免该问题，属于场景联想，未构成严重断言。",
+          "severity": "minor"
+        },
+        {
+          "quote": "当然，杯子刚装热水的时候，端拿还是自己要留意一下，把手是帮我们拿得更顺手，不是隔热手套。",
+          "reason": "资料未提供是否可装热水，此处默认可装热水并提醒防烫，属于无依据的性能场景暗示。",
+          "severity": "minor"
+        },
+        {
+          "quote": "放在家里餐桌上，给孩子倒牛奶、给自己冲麦片，这个容量也够用，不会三口就见底。",
+          "reason": "350毫升容量是资料，但“不会三口就见底”是主观饮用量断言，缺少依据。",
+          "severity": "minor"
+        }
+      ],
+      "price_and_terms_correct": true,
+      "knowledge_leaks": [],
+      "main_gaps": [
+        "陶瓷材质的描述仍加入“声音沉沉的”等资料未提供的主观感受。",
+        "容量展开较好，但未提及颜色只有米白色这一种规格限制对选择的影响。",
+        "把手部分对“不是隔热手套”的说明可能暗示商品可装热水且不隔热，需避免无依据性能暗示。"
+      ]
+    },
+    {
+      "index": 2,
+      "scores": {
+        "natural_live_speech": 14,
+        "benefit_scene_expansion": 15,
+        "coherent_flow": 9,
+        "non_repetition": 9,
+        "purchase_guidance": 5
+      },
+      "score_reasons": [
+        "natural_live_speech：口语自然，如“先聊聊你们平时出门或者换地方的时候，杯子都怎么带”“你如果想跟桌面上的本子、键盘搭一搭，米白色基本不挑”，没有生硬字段播报。",
+        "benefit_scene_expansion：对米白色、350毫升、把手、陶瓷材质均有情境展开，如“放在酒店的浅色桌面上”“在办公室泡一杯茶，倒一次水能喝上一阵子”“早上从厨房端到餐桌”“拿在手里是那种温润扎实的感觉”；虽把米白色放在酒店桌面算合理场景联想，但有效卖点展开略少于4个。",
+        "coherent_flow：从日常换场痛点，到外观、容量、把手、材质、规格、价格、收口，整体顺畅。",
+        "non_repetition：没有空话凑字，不同卖点均有具体描述，仅“带把手端拿”略有回环。",
+        "purchase_guidance：明确“价格是四十九元”“没有另设活动价”“合适再下单”，币种和购买引导自然。"
+      ],
+      "unsupported_claims": [
+        {
+          "quote": "出差住酒店想换上自己的杯子，或者从家里带一只去办公室，很多人会纠结带哪只。",
+          "reason": "商品资料只说适合家庭餐桌和办公室使用，没有提到出差住酒店场景，属于合理场景外延但并非商品用途支持。",
+          "severity": "minor"
+        },
+        {
+          "quote": "放在酒店的浅色桌面上",
+          "reason": "商品资料未提及酒店使用场景，属于未支持的具体使用场景。",
+          "severity": "minor"
+        },
+        {
+          "quote": "倒一次水能喝上一阵子，不用总往茶水间跑。",
+          "reason": "容量350毫升是资料，但“喝上一阵子”“不用总往茶水间跑”是主观时长和便利推断，资料未支持。",
+          "severity": "minor"
+        },
+        {
+          "quote": "杯子刚装热水的时候，端拿还是自己要留意一下。",
+          "reason": "商品资料未提供耐温范围或防烫信息，此处用提醒形式暗示可装热水，属于无依据性能暗示。",
+          "severity": "minor"
+        }
+      ],
+      "price_and_terms_correct": true,
+      "knowledge_leaks": [],
+      "main_gaps": [
+        "米白色的场景展开部分偏重“酒店桌面”等资料未支持的场景，可更聚焦家庭餐桌和办公室。",
+        "陶瓷材质带来的温润扎实感描述较多，但资料没有提供手感、声音等实测依据。",
+        "购买引导只提了使用场景，缺少对350毫升容量与日常饮水习惯是否匹配的更具体选择提示。"
+      ]
+    }
+  ],
+  "pair_diversity": {
+    "score": 4,
+    "reason": "两版开场明显不同：版1从出门带杯子和换场景切入，版2从拿杯习惯和端热饮痛点切入。卖点展开顺序也不同：版1先米白色外观再容量、把手、材质，版2先把手、材质、容量、颜色。情境和节奏有有效差异，且均较完整自然。"
+  },
+  "judge_model": "deepseek-flash",
+  "judge_protocol": "v2-core-facts-only-no-unsupported-reference-priming",
+  "usage": {
+    "prompt_tokens": 1899,
+    "completion_tokens": 1241,
+    "total_tokens": 3140,
+    "prompt_tokens_details": {
+      "cached_tokens": 512
+    },
+    "prompt_cache_hit_tokens": 512,
+    "prompt_cache_miss_tokens": 1387
+  }
+}

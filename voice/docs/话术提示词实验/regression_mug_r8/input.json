@@ -1,0 +1,33 @@
+{
+  "case": "mug",
+  "product": {
+    "id": "lab_mug",
+    "name": "日常陶瓷马克杯",
+    "currency": "CNY",
+    "price": 49,
+    "promo_price": null,
+    "selling_points": "陶瓷材质，容量350毫升。带把手，米白色。适合家庭餐桌和办公室使用。未提供耐温范围、微波炉/洗碗机适用性和保温功能。",
+    "promotion": "",
+    "knowledge": "只用于问答的测试暗号：蓝鹭专享，九块九包邮，七天无理由。"
+  },
+  "generation_excludes_knowledge": true,
+  "version_count": 2,
+  "groups": {
+    "材质": [
+      "陶瓷"
+    ],
+    "容量": [
+      "350|三百五十"
+    ],
+    "把手": [
+      "把手"
+    ],
+    "颜色": [
+      "米白"
+    ],
+    "场景": [
+      "餐桌|家里|家庭",
+      "办公室|办公桌"
+    ]
+  }
+}

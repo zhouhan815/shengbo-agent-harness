@@ -1,0 +1,34 @@
+{
+  "schema_version": "live-review-design-verification.v1",
+  "verified_at": "2026-10-20T10:59:40.599023+08:00",
+  "design_static_validation_passed": true,
+  "implementation_status": "design_only",
+  "live_collection_executed": false,
+  "business_code_modified": false,
+  "runtime_tests_executed": false,
+  "new_model_calls_to_project_adapter": 0,
+  "new_tts_calls": 0,
+  "schema_meta_validation": "Draft202012Validator.check_schema passed",
+  "contract_examples": {
+    "unknown_ratio_keeps_null": true,
+    "unknown_as_zero_rejected": true,
+    "same_cohort_half_valid": true,
+    "ratio_over_one_rejected": true
+  },
+  "metric_definitions": 23,
+  "workflow_steps": 9,
+  "html_tables": 25,
+  "old_plan_hashes": {
+    "D:\\Codex project\\shengbo-ops-agent-plan\\00_整体方案与并行分工.md": "7921c2a7d33f9126d7d0bec06ff95eae65eaabfdda9fcbf1f0084b40b0dcf261",
+    "D:\\Codex project\\shengbo-ops-agent-plan\\01_统一数据与工具契约.md": "09b4781dba324995c83f10a21e743e85d2649c3d60b09f6336d5f01b8c6c0fb1",
+    "D:\\Codex project\\shengbo-ops-agent-plan\\04_播中运营Agent任务.md": "315705b3a6c34fcff01017b6a017c4b83f6ef67ca56e8e0aefc00fea3aa062ef",
+    "D:\\Codex project\\shengbo-ops-agent-plan\\05_播后复盘Agent任务.md": "46dc528f7ddbb0e2cfc3d098e217cb8b033e2fd68ffd0c172414e9a688b19156",
+    "D:\\Codex project\\shengbo-ops-agent-plan\\08_业务闭环与动态数据详细设计.md": "e105183fc53916df616c16cc87199722a02a7dc3d131005e08ac92f727ccf1ec"
+  },
+  "old_plans_unchanged_during_render": true,
+  "main_markdown_sha256": "1adefa192e983c0f8ecf2e5fd9ee11e46208ff0a81e91ad768c94cb7d1aca51d",
+  "limitations": [
+    "这是文档与契约设计校验，不证明采集、指标服务或Agent已实现或通过实播。",
+    "cohort归属、金额复算、证据有效性和语义不能仅靠JSON Schema判定。"
+  ]
+}

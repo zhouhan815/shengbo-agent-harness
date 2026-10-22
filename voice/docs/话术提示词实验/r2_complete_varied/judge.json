@@ -1,0 +1,68 @@
+{
+  "versions": [
+    {
+      "index": 1,
+      "scores": {
+        "natural_live_speech": 14,
+        "benefit_scene_expansion": 19,
+        "coherent_flow": 9,
+        "non_repetition": 9,
+        "purchase_guidance": 4
+      },
+      "score_reasons": [
+        "语言自然，像朋友聊天一样介绍产品，没有生硬字段播报。",
+        "卖点展开非常充分，足弓支撑、厚底软弹、静音防滑、EVA材质快干、轻便耐磨、修饰脚型等均有具体情境和收益描述，与资料匹配度高。",
+        "从居家痛点切入，依次讲脚感、鞋底、材质、其他场景、颜色尺码、价格，逻辑通顺。",
+        "内容不重复，每个卖点独立成段，表述有变化。",
+        "价格和促销信息准确，颜色尺码介绍清晰，购买引导自然，但缺少'限时下杀'等紧迫感表述。"
+      ],
+      "unsupported_claims": [],
+      "price_and_terms_correct": true,
+      "knowledge_leaks": [],
+      "main_gaps": [
+        "对'耐磨'性能未具体说明，但资料有'轻便耐磨'，属合理引用。"
+      ]
+    },
+    {
+      "index": 2,
+      "scores": {
+        "natural_live_speech": 14,
+        "benefit_scene_expansion": 18,
+        "coherent_flow": 9,
+        "non_repetition": 9,
+        "purchase_guidance": 4
+      },
+      "score_reasons": [
+        "自然口语，使用'大家'、'你'等称呼，句子流畅，没有说明书式播报。",
+        "有效展开了轻便、快干易洗、静音防滑、足弓支撑厚底软弹、修饰脚型等多个卖点，每个都结合了具体情境和生活收益，有据卖点几乎全覆盖。",
+        "从旅行痛点、浴室痛点切入，逐步介绍商品特点、颜色尺码、价格，最后收口，结构连贯，过渡自然。",
+        "重复内容少，卖点展开各有侧重，没有空话凑字。",
+        "正确播报了价格和促销信息，给出了颜色尺码选择建议，并提醒按需选大一号，购买引导自然但缺乏紧迫感。"
+      ],
+      "unsupported_claims": [],
+      "price_and_terms_correct": true,
+      "knowledge_leaks": [],
+      "main_gaps": [
+        "便携性场景（如'放进包里不占太多分量'）虽合理联想，但资料仅提'轻便'，无具体重量或体积数据支持，属于轻微夸大风险。",
+        "提到'视觉上也能修饰脚型'，但商品资料未明确提及修饰脚型效果，属于无依据的附加宣称。",
+        "整体虽贴合资料，但部分功能表述（如'防臭快干'）未具体说明快干程度或防臭原理，可能让消费者期待过高。"
+      ]
+    }
+  ],
+  "pair_diversity": {
+    "score": 4,
+    "reason": "两版开场痛点不同（一版从旅行和浴室切入，另一版从居家做饭打扫切入），卖点展开顺序有明显差异，情境描述各有侧重，节奏和重点变化，均自然完整，差异鲜明。"
+  },
+  "judge_model": "deepseek-flash",
+  "judge_protocol": "v2-core-facts-only-no-unsupported-reference-priming",
+  "usage": {
+    "prompt_tokens": 2734,
+    "completion_tokens": 758,
+    "total_tokens": 3492,
+    "prompt_tokens_details": {
+      "cached_tokens": 1024
+    },
+    "prompt_cache_hit_tokens": 1024,
+    "prompt_cache_miss_tokens": 1710
+  }
+}

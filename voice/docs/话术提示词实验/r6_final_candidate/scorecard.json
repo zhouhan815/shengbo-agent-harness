@@ -1,0 +1,44 @@
+{
+  "run": "r6_final_candidate",
+  "versions": [
+    {
+      "version": 1,
+      "program": 39.97,
+      "semantic": 53.0,
+      "total": 92.97,
+      "hard_gate": true,
+      "rule_issues": [],
+      "serious_claims": 0,
+      "cross_version_copy_pass": false,
+      "pass": false,
+      "gaps": [
+        "耐磨特性一笔带过“也做了耐磨处理”，未结合场景展开。",
+        "颜色仅部分列举，未说明全部颜色但资料有，不算事实错误。",
+        "鞋底防滑只在浴室和室内提及，未扩展至海边等场景。"
+      ]
+    },
+    {
+      "version": 2,
+      "program": 40.0,
+      "semantic": 55.0,
+      "total": 95.0,
+      "hard_gate": false,
+      "rule_issues": [
+        "遗漏输入中明确的重要特点：耐磨"
+      ],
+      "serious_claims": 0,
+      "cross_version_copy_pass": false,
+      "pass": false,
+      "gaps": [
+        "未提及鞋底耐磨特性，虽然稿中说了“轻便耐磨”但未展开，不过资料有体现，不算严重缺口。",
+        "颜色列举后只给部分颜色建议，未覆盖全部颜色属性，但颜色本身不需要全部展开。",
+        "尺码范围数字口语混用（三十六码到三十七码等），但未造成事实错误。"
+      ]
+    }
+  ],
+  "pair_diversity": {
+    "score": 3,
+    "reason": "两版开场不同，一版从旅行收拾行李切入，一版从居家站久脚底累切入，足弓支撑、静音防滑等卖点展开顺序和情境略有差异，但整体模板结构相似，均按痛点-卖点-规格-价格收口。"
+  },
+  "rubric": "20261007.4-uniform-coverage-content-and-near-copy-checks"
+}

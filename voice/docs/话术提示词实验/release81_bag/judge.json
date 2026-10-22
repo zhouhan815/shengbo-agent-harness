@@ -1,0 +1,62 @@
+{
+  "versions": [
+    {
+      "index": 1,
+      "scores": {
+        "natural_live_speech": 14,
+        "benefit_scene_expansion": 13,
+        "coherent_flow": 9,
+        "non_repetition": 8,
+        "purchase_guidance": 4
+      },
+      "score_reasons": [
+        "natural_live_speech: 14分，口语自然，如“每天出门前，是不是总在纠结背哪个包？”但部分表达与版1高度相似。",
+        "benefit_scene_expansion: 13分，主要围绕折叠、长肩带、拉链主袋、小口袋展开，但涤纶面料未做场景展开，且折叠场景与版1重复，深入度不足。",
+        "coherent_flow: 9分，结构完整，从痛点、特点、规格、颜色到价格收口，连贯。",
+        "non_repetition: 8分，整体不啰嗦，但多处表达与版1雷同，如“长肩带，可以手提，也能单肩背着”“主袋是拉链开合”等，重复感明显。",
+        "purchase_guidance: 4分，正确报价并引导“选好颜色和规格，觉得合适再下单”，无违规假设。"
+      ],
+      "unsupported_claims": [],
+      "price_and_terms_correct": true,
+      "knowledge_leaks": [],
+      "main_gaps": []
+    },
+    {
+      "index": 2,
+      "scores": {
+        "natural_live_speech": 14,
+        "benefit_scene_expansion": 17,
+        "coherent_flow": 9,
+        "non_repetition": 9,
+        "purchase_guidance": 4
+      },
+      "score_reasons": [
+        "natural_live_speech: 14分，全篇为自然口语，如“今天咱们不赶时间，慢慢看一款日常背的包。”符合直播开场，没有说明书式播报。",
+        "benefit_scene_expansion: 17分，针对折叠、长肩带、涤纶面料、拉链主袋+小口袋、颜色均做了具体情境展开，例如“周末短途出行…折起来放在行李里”“早晚高峰挤地铁或公交时，东西放在拉链主袋里，不用一路用手按着包口”，生活收益适度。",
+        "coherent_flow: 9分，从欢迎、痛点、特点展开、规格、颜色、价格到收口，顺序流畅，过渡自然。",
+        "non_repetition: 9分，内容充实，没有空话凑字，同一卖点从不同角度描述，重复度低。",
+        "purchase_guidance: 4分，明确报出原价99元、活动价79元，引导“看看黑色还是米色更合自己的日常搭配，觉得合适再下单”，自然且不假设已挂购物车。"
+      ],
+      "unsupported_claims": [],
+      "price_and_terms_correct": true,
+      "knowledge_leaks": [],
+      "main_gaps": []
+    }
+  ],
+  "pair_diversity": {
+    "score": 1,
+    "reason": "两版仅换开场和少量排序，卖点展开几乎逐点对应，如折叠、长肩带、拉链主袋、小口袋的场景描述高度相似，属于换词级别，缺乏有效差异。"
+  },
+  "judge_model": "deepseek-flash",
+  "judge_protocol": "v2-core-facts-only-no-unsupported-reference-priming",
+  "usage": {
+    "prompt_tokens": 2013,
+    "completion_tokens": 761,
+    "total_tokens": 2774,
+    "prompt_tokens_details": {
+      "cached_tokens": 768
+    },
+    "prompt_cache_hit_tokens": 768,
+    "prompt_cache_miss_tokens": 1245
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "run": "release9_repeat",
+  "versions": [
+    {
+      "version": 1,
+      "program": 40.0,
+      "semantic": 49.0,
+      "total": 89.0,
+      "hard_gate": true,
+      "rule_issues": [],
+      "serious_claims": 0,
+      "cross_version_copy_pass": true,
+      "pass": true,
+      "gaps": [
+        "材质耐磨的展开较笼统，未结合具体使用频率或地面情境；",
+        "快干易清洗只简单带过“用水冲一冲就干净很多”，缺少晾干速度的具体场景；",
+        "颜色引导“粉色、烟熏紫、葡萄紫都挺好看”较主观，但属合理搭配建议。"
+      ]
+    },
+    {
+      "version": 2,
+      "program": 40.0,
+      "semantic": 48.0,
+      "total": 88.0,
+      "hard_gate": true,
+      "rule_issues": [],
+      "serious_claims": 0,
+      "cross_version_copy_pass": true,
+      "pass": true,
+      "gaps": [
+        "轻便卖点缺少具体重量或对比，展开主要靠场景联想，稍显单薄；",
+        "防臭快干仅简单带过，缺少与洗澡、夏天穿着等场景的更具体结合；",
+        "静音防滑对湿地面防滑的表述“可以帮助走得稳一些”偏保守，但未编造性能，可接受。"
+      ]
+    }
+  ],
+  "pair_diversity": {
+    "score": 4,
+    "reason": "两版开场痛点不同（旅行收纳 vs 厨房站立），卖点展开顺序和情境侧重明显不同：版1侧重旅行、防滑、EVA一体成型，版2侧重居家站立、软弹、耐磨快干；节奏接近但均完整自然，差异鲜明。"
+  },
+  "rubric": "20261007.4-uniform-coverage-content-and-near-copy-checks"
+}

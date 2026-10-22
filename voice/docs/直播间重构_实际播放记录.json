@@ -1,0 +1,1054 @@
+{
+  "room_id": "room_8fe7cf8272e1482e",
+  "session_id": "session_22b662cca6a44a4c",
+  "epoch": 28,
+  "status": "stopped",
+  "queue": [
+    {
+      "id": "script_b479137d97be44c9_s001",
+      "block_id": "script_b479137d97be44c9_b001",
+      "block_ordinal": 1,
+      "stage": "welcome",
+      "ordinal": 1,
+      "text": "欢迎来到声音直播测试。",
+      "spoken_text": "欢迎来到声音直播测试。",
+      "kind": "engagement",
+      "fact_ids": [],
+      "queue_id": "queued_901656db47944f9e",
+      "product_id": "product_slippers_001",
+      "product_name": "足弓支撑静音防滑厚底凉拖鞋（小蠻腰女款）",
+      "image": "",
+      "script_id": "script_b479137d97be44c9",
+      "version": "测试A",
+      "revision": 1,
+      "total_sentences": 6,
+      "source": "测试短稿（非模型生成）"
+    },
+    {
+      "id": "script_b479137d97be44c9_s002",
+      "block_id": "script_b479137d97be44c9_b002",
+      "block_ordinal": 2,
+      "stage": "identity",
+      "ordinal": 2,
+      "text": "接下来介绍这款足弓支撑静音防滑厚底凉拖鞋，小蛮腰女款。",
+      "spoken_text": "接下来介绍这款足弓支撑静音防滑厚底凉拖鞋，小蛮腰女款。",
+      "kind": "product_claim",
+      "fact_ids": [
+        "NAME"
+      ],
+      "queue_id": "queued_5187575b9b1c4299",
+      "product_id": "product_slippers_001",
+      "product_name": "足弓支撑静音防滑厚底凉拖鞋（小蠻腰女款）",
+      "image": "",
+      "script_id": "script_b479137d97be44c9",
+      "version": "测试A",
+      "revision": 1,
+      "total_sentences": 6,
+      "source": "测试短稿（非模型生成）"
+    },
+    {
+      "id": "script_b479137d97be44c9_s003",
+      "block_id": "script_b479137d97be44c9_b003",
+      "block_ordinal": 3,
+      "stage": "benefit",
+      "ordinal": 3,
+      "text": "这款凉拖鞋采用EVA材质一体成型，设计包含足弓支撑和厚底软弹。",
+      "spoken_text": "这款凉拖鞋采用EVA材质一体成型，设计包含足弓支撑和厚底软弹。",
+      "kind": "product_claim",
+      "fact_ids": [
+        "SELLING"
+      ],
+      "queue_id": "queued_394d181173df49d2",
+      "product_id": "product_slippers_001",
+      "product_name": "足弓支撑静音防滑厚底凉拖鞋（小蠻腰女款）",
+      "image": "",
+      "script_id": "script_b479137d97be44c9",
+      "version": "测试A",
+      "revision": 1,
+      "total_sentences": 6,
+      "source": "测试短稿（非模型生成）"
+    },
+    {
+      "id": "script_b479137d97be44c9_s004",
+      "block_id": "script_b479137d97be44c9_b004",
+      "block_ordinal": 4,
+      "stage": "care",
+      "ordinal": 4,
+      "text": "浴室地面有水时仍要小心行走，不要奔跑。",
+      "spoken_text": "浴室地面有水时仍要小心行走，不要奔跑。",
+      "kind": "product_claim",
+      "fact_ids": [
+        "KNOWLEDGE_1"
+      ],
+      "queue_id": "queued_a697024b9d5d44d4",
+      "product_id": "product_slippers_001",
+      "product_name": "足弓支撑静音防滑厚底凉拖鞋（小蠻腰女款）",
+      "image": "",
+      "script_id": "script_b479137d97be44c9",
+      "version": "测试A",
+      "revision": 1,
+      "total_sentences": 6,
+      "source": "测试短稿（非模型生成）"
+    },
+    {
+      "id": "script_b479137d97be44c9_s005",
+      "block_id": "script_b479137d97be44c9_b005",
+      "block_ordinal": 5,
+      "stage": "promotion",
+      "ordinal": 5,
+      "text": "资料中的原价为一百七十八新台币，活动价为一百零七新台币。",
+      "spoken_text": "资料中的原价为一百七十八新台币，活动价为一百零七新台币。",
+      "kind": "product_claim",
+      "fact_ids": [
+        "PRICE",
+        "PROMOTION"
+      ],
+      "queue_id": "queued_9c4905dddf6b472f",
+      "product_id": "product_slippers_001",
+      "product_name": "足弓支撑静音防滑厚底凉拖鞋（小蠻腰女款）",
+      "image": "",
+      "script_id": "script_b479137d97be44c9",
+      "version": "测试A",
+      "revision": 1,
+      "total_sentences": 6,
+      "source": "测试短稿（非模型生成）"
+    },
+    {
+      "id": "script_b479137d97be44c9_s006",
+      "block_id": "script_b479137d97be44c9_b006",
+      "block_ordinal": 6,
+      "stage": "cta",
+      "ordinal": 6,
+      "text": "你可以根据自己的需求了解颜色和尺码。",
+      "spoken_text": "你可以根据自己的需求了解颜色和尺码。",
+      "kind": "engagement",
+      "fact_ids": [],
+      "queue_id": "queued_b35750e967e94acb",
+      "product_id": "product_slippers_001",
+      "product_name": "足弓支撑静音防滑厚底凉拖鞋（小蠻腰女款）",
+      "image": "",
+      "script_id": "script_b479137d97be44c9",
+      "version": "测试A",
+      "revision": 1,
+      "total_sentences": 6,
+      "source": "测试短稿（非模型生成）"
+    },
+    {
+      "id": "script_02980439ac7643ab_s001",
+      "block_id": "script_02980439ac7643ab_b001",
+      "block_ordinal": 1,
+      "stage": "welcome",
+      "ordinal": 1,
+      "text": "接下来换一个角度，看看这款凉拖鞋的旅行使用场景。",
+      "spoken_text": "接下来换一个角度，看看这款凉拖鞋的旅行使用场景。",
+      "kind": "product_claim",
+      "fact_ids": [
+        "SELLING"
+      ],
+      "queue_id": "queued_5d7e48f068a4458a",
+      "product_id": "product_slippers_001",
+      "product_name": "足弓支撑静音防滑厚底凉拖鞋（小蠻腰女款）",
+      "image": "",
+      "script_id": "script_02980439ac7643ab",
+      "version": "测试B",
+      "revision": 1,
+      "total_sentences": 5,
+      "source": "测试短稿（非模型生成）"
+    },
+    {
+      "id": "script_02980439ac7643ab_s002",
+      "block_id": "script_02980439ac7643ab_b002",
+      "block_ordinal": 2,
+      "stage": "benefit",
+      "ordinal": 2,
+      "text": "轻便的设计，适合旅行携带，也可以用于日常居家。",
+      "spoken_text": "轻便的设计，适合旅行携带，也可以用于日常居家。",
+      "kind": "product_claim",
+      "fact_ids": [
+        "SELLING"
+      ],
+      "queue_id": "queued_386a9c93a61d4a56",
+      "product_id": "product_slippers_001",
+      "product_name": "足弓支撑静音防滑厚底凉拖鞋（小蠻腰女款）",
+      "image": "",
+      "script_id": "script_02980439ac7643ab",
+      "version": "测试B",
+      "revision": 1,
+      "total_sentences": 5,
+      "source": "测试短稿（非模型生成）"
+    },
+    {
+      "id": "script_02980439ac7643ab_s003",
+      "block_id": "script_02980439ac7643ab_b003",
+      "block_ordinal": 3,
+      "stage": "care",
+      "ordinal": 3,
+      "text": "鞋子清洁后可以通风阴干，避免长时间曝晒或高温。",
+      "spoken_text": "鞋子清洁后可以通风阴干，避免长时间曝晒或高温。",
+      "kind": "product_claim",
+      "fact_ids": [
+        "KNOWLEDGE_2",
+        "KNOWLEDGE_3"
+      ],
+      "queue_id": "queued_efbb8f90abd54b9f",
+      "product_id": "product_slippers_001",
+      "product_name": "足弓支撑静音防滑厚底凉拖鞋（小蠻腰女款）",
+      "image": "",
+      "script_id": "script_02980439ac7643ab",
+      "version": "测试B",
+      "revision": 1,
+      "total_sentences": 5,
+      "source": "测试短稿（非模型生成）"
+    },
+    {
+      "id": "script_02980439ac7643ab_s004",
+      "block_id": "script_02980439ac7643ab_b004",
+      "block_ordinal": 4,
+      "stage": "specification",
+      "ordinal": 4,
+      "text": "脚背宽或者脚型偏肉，可以结合实际情况斟酌大一号。",
+      "spoken_text": "脚背宽或者脚型偏肉，可以结合实际情况斟酌大一号。",
+      "kind": "product_claim",
+      "fact_ids": [
+        "KNOWLEDGE_5"
+      ],
+      "queue_id": "queued_3c8fda3decb34674",
+      "product_id": "product_slippers_001",
+      "product_name": "足弓支撑静音防滑厚底凉拖鞋（小蠻腰女款）",
+      "image": "",
+      "script_id": "script_02980439ac7643ab",
+      "version": "测试B",
+      "revision": 1,
+      "total_sentences": 5,
+      "source": "测试短稿（非模型生成）"
+    },
+    {
+      "id": "script_02980439ac7643ab_s005",
+      "block_id": "script_02980439ac7643ab_b005",
+      "block_ordinal": 5,
+      "stage": "promotion",
+      "ordinal": 5,
+      "text": "本次资料列出的活动价是一百零七新台币，具体优惠条件以确认的信息为准。",
+      "spoken_text": "本次资料列出的活动价是一百零七新台币，具体优惠条件以确认的信息为准。",
+      "kind": "product_claim",
+      "fact_ids": [
+        "PRICE",
+        "PROMOTION"
+      ],
+      "queue_id": "queued_e783de0acf884651",
+      "product_id": "product_slippers_001",
+      "product_name": "足弓支撑静音防滑厚底凉拖鞋（小蠻腰女款）",
+      "image": "",
+      "script_id": "script_02980439ac7643ab",
+      "version": "测试B",
+      "revision": 1,
+      "total_sentences": 5,
+      "source": "测试短稿（非模型生成）"
+    }
+  ],
+  "index": 11,
+  "current": null,
+  "audio": null,
+  "position": 0,
+  "played": [
+    {
+      "sentence_id": "script_b479137d97be44c9_s001",
+      "attempt_id": "attempt_638a5edb6c0841a4",
+      "text": "欢迎来到声音直播测试。",
+      "time": "2026-10-07T10:25:55+08:00"
+    },
+    {
+      "sentence_id": "script_b479137d97be44c9_s002",
+      "attempt_id": "attempt_78d918951c3d4212",
+      "text": "接下来介绍这款足弓支撑静音防滑厚底凉拖鞋，小蛮腰女款。",
+      "time": "2026-10-07T10:26:01+08:00"
+    },
+    {
+      "sentence_id": "script_b479137d97be44c9_s003",
+      "attempt_id": "attempt_2d437e9ef5d447c3",
+      "text": "这款凉拖鞋采用EVA材质一体成型，设计包含足弓支撑和厚底软弹。",
+      "time": "2026-10-07T10:26:07+08:00"
+    },
+    {
+      "sentence_id": "script_b479137d97be44c9_s004",
+      "attempt_id": "attempt_7b6b7fbe57b041fc",
+      "text": "浴室地面有水时仍要小心行走，不要奔跑。",
+      "time": "2026-10-07T10:26:11+08:00"
+    },
+    {
+      "sentence_id": "script_b479137d97be44c9_s005",
+      "attempt_id": "attempt_d1c6a22a179c48da",
+      "text": "资料中的原价为一百七十八新台币，活动价为一百零七新台币。",
+      "time": "2026-10-07T10:26:17+08:00"
+    },
+    {
+      "sentence_id": "script_b479137d97be44c9_s006",
+      "attempt_id": "attempt_5571218890b14ac1",
+      "text": "你可以根据自己的需求了解颜色和尺码。",
+      "time": "2026-10-07T10:26:21+08:00"
+    },
+    {
+      "sentence_id": "script_02980439ac7643ab_s001",
+      "attempt_id": "attempt_81c1b14a6fe34abd",
+      "text": "接下来换一个角度，看看这款凉拖鞋的旅行使用场景。",
+      "time": "2026-10-07T10:26:26+08:00"
+    },
+    {
+      "sentence_id": "script_02980439ac7643ab_s002",
+      "attempt_id": "attempt_6e859ea9c6ce4f9c",
+      "text": "轻便的设计，适合旅行携带，也可以用于日常居家。",
+      "time": "2026-10-07T10:26:31+08:00"
+    },
+    {
+      "sentence_id": "script_02980439ac7643ab_s003",
+      "attempt_id": "attempt_bb12e53972ae417d",
+      "text": "鞋子清洁后可以通风阴干，避免长时间曝晒或高温。",
+      "time": "2026-10-07T10:26:36+08:00"
+    },
+    {
+      "sentence_id": "script_02980439ac7643ab_s004",
+      "attempt_id": "attempt_3781492beaf3496a",
+      "text": "脚背宽或者脚型偏肉，可以结合实际情况斟酌大一号。",
+      "time": "2026-10-07T10:26:41+08:00"
+    },
+    {
+      "sentence_id": "script_02980439ac7643ab_s005",
+      "attempt_id": "attempt_bc8799c86a5a4145",
+      "text": "本次资料列出的活动价是一百零七新台币，具体优惠条件以确认的信息为准。",
+      "time": "2026-10-07T10:26:48+08:00"
+    }
+  ],
+  "insertion": null,
+  "loop": false,
+  "connected_player": false,
+  "logs": [
+    {
+      "time": "2026-10-07T10:21:55+08:00",
+      "event": "audio_ready",
+      "detail": "59d4229c16f659f97b2e0895208b00acf39cba442084a45df64073fca6915327",
+      "epoch": 4
+    },
+    {
+      "time": "2026-10-07T10:21:55+08:00",
+      "event": "client_waiting",
+      "detail": "script_b479137d97be44c9_s004",
+      "epoch": 4
+    },
+    {
+      "time": "2026-10-07T10:21:55+08:00",
+      "event": "client_playing",
+      "detail": "script_b479137d97be44c9_s004",
+      "epoch": 4
+    },
+    {
+      "time": "2026-10-07T10:21:57+08:00",
+      "event": "control_accepted",
+      "detail": "pause",
+      "epoch": 4
+    },
+    {
+      "time": "2026-10-07T10:22:26+08:00",
+      "event": "prepare_requested",
+      "detail": "这是一条现场插播测试，浴室有水时请小心行走。",
+      "epoch": 5
+    },
+    {
+      "time": "2026-10-07T10:22:26+08:00",
+      "event": "control_accepted",
+      "detail": "insert",
+      "epoch": 5
+    },
+    {
+      "time": "2026-10-07T10:22:28+08:00",
+      "event": "audio_ready",
+      "detail": "713dd35704da765bc33f6ca4a62af84356ce4c6ef6bc107e3b8630b0a2d0e82c",
+      "epoch": 5
+    },
+    {
+      "time": "2026-10-07T10:22:28+08:00",
+      "event": "client_waiting",
+      "detail": "insert_6b799f2d5bfc4640",
+      "epoch": 5
+    },
+    {
+      "time": "2026-10-07T10:22:28+08:00",
+      "event": "client_playing",
+      "detail": "insert_6b799f2d5bfc4640",
+      "epoch": 5
+    },
+    {
+      "time": "2026-10-07T10:22:33+08:00",
+      "event": "client_ended",
+      "detail": "insert_6b799f2d5bfc4640",
+      "epoch": 5
+    },
+    {
+      "time": "2026-10-07T10:22:33+08:00",
+      "event": "prepare_requested",
+      "detail": "浴室地面有水时仍要小心行走，不要奔跑。",
+      "epoch": 6
+    },
+    {
+      "time": "2026-10-07T10:22:33+08:00",
+      "event": "audio_ready",
+      "detail": "59d4229c16f659f97b2e0895208b00acf39cba442084a45df64073fca6915327",
+      "epoch": 6
+    },
+    {
+      "time": "2026-10-07T10:22:33+08:00",
+      "event": "client_waiting",
+      "detail": "script_b479137d97be44c9_s004",
+      "epoch": 6
+    },
+    {
+      "time": "2026-10-07T10:22:33+08:00",
+      "event": "client_playing",
+      "detail": "script_b479137d97be44c9_s004",
+      "epoch": 6
+    },
+    {
+      "time": "2026-10-07T10:22:38+08:00",
+      "event": "client_ended",
+      "detail": "script_b479137d97be44c9_s004",
+      "epoch": 6
+    },
+    {
+      "time": "2026-10-07T10:22:38+08:00",
+      "event": "prepare_requested",
+      "detail": "资料中的原价为一百七十八新台币，活动价为一百零七新台币。",
+      "epoch": 7
+    },
+    {
+      "time": "2026-10-07T10:22:38+08:00",
+      "event": "audio_ready",
+      "detail": "35ef514886892f50e44856f82375b452491dc17ac580b50552f7c2c3b2beee42",
+      "epoch": 7
+    },
+    {
+      "time": "2026-10-07T10:22:38+08:00",
+      "event": "client_waiting",
+      "detail": "script_b479137d97be44c9_s005",
+      "epoch": 7
+    },
+    {
+      "time": "2026-10-07T10:22:38+08:00",
+      "event": "client_playing",
+      "detail": "script_b479137d97be44c9_s005",
+      "epoch": 7
+    },
+    {
+      "time": "2026-10-07T10:22:43+08:00",
+      "event": "client_ended",
+      "detail": "script_b479137d97be44c9_s005",
+      "epoch": 7
+    },
+    {
+      "time": "2026-10-07T10:22:43+08:00",
+      "event": "prepare_requested",
+      "detail": "你可以根据自己的需求了解颜色和尺码。",
+      "epoch": 8
+    },
+    {
+      "time": "2026-10-07T10:22:43+08:00",
+      "event": "audio_ready",
+      "detail": "ea0bab0fdd2f5ade2958c20e7396215872a97ce937e66620ef5ef947f4ed4bcc",
+      "epoch": 8
+    },
+    {
+      "time": "2026-10-07T10:22:43+08:00",
+      "event": "client_waiting",
+      "detail": "script_b479137d97be44c9_s006",
+      "epoch": 8
+    },
+    {
+      "time": "2026-10-07T10:22:43+08:00",
+      "event": "client_playing",
+      "detail": "script_b479137d97be44c9_s006",
+      "epoch": 8
+    },
+    {
+      "time": "2026-10-07T10:22:47+08:00",
+      "event": "client_ended",
+      "detail": "script_b479137d97be44c9_s006",
+      "epoch": 8
+    },
+    {
+      "time": "2026-10-07T10:22:47+08:00",
+      "event": "prepare_requested",
+      "detail": "接下来换一个角度，看看这款凉拖鞋的旅行使用场景。",
+      "epoch": 9
+    },
+    {
+      "time": "2026-10-07T10:22:47+08:00",
+      "event": "audio_ready",
+      "detail": "10185ebe8ea45640df291eff46af4c8198fe9408dc3ea6d11a98e799f71df296",
+      "epoch": 9
+    },
+    {
+      "time": "2026-10-07T10:22:47+08:00",
+      "event": "client_waiting",
+      "detail": "script_02980439ac7643ab_s001",
+      "epoch": 9
+    },
+    {
+      "time": "2026-10-07T10:22:47+08:00",
+      "event": "client_playing",
+      "detail": "script_02980439ac7643ab_s001",
+      "epoch": 9
+    },
+    {
+      "time": "2026-10-07T10:22:52+08:00",
+      "event": "client_ended",
+      "detail": "script_02980439ac7643ab_s001",
+      "epoch": 9
+    },
+    {
+      "time": "2026-10-07T10:22:52+08:00",
+      "event": "prepare_requested",
+      "detail": "轻便的设计，适合旅行携带，也可以用于日常居家。",
+      "epoch": 10
+    },
+    {
+      "time": "2026-10-07T10:22:52+08:00",
+      "event": "audio_ready",
+      "detail": "a7562678918f045e93fcd7b7d652e0f4dd4c8ac32529f20867e8e62e05de0b53",
+      "epoch": 10
+    },
+    {
+      "time": "2026-10-07T10:22:52+08:00",
+      "event": "client_waiting",
+      "detail": "script_02980439ac7643ab_s002",
+      "epoch": 10
+    },
+    {
+      "time": "2026-10-07T10:22:52+08:00",
+      "event": "client_playing",
+      "detail": "script_02980439ac7643ab_s002",
+      "epoch": 10
+    },
+    {
+      "time": "2026-10-07T10:22:57+08:00",
+      "event": "client_ended",
+      "detail": "script_02980439ac7643ab_s002",
+      "epoch": 10
+    },
+    {
+      "time": "2026-10-07T10:22:57+08:00",
+      "event": "prepare_requested",
+      "detail": "鞋子清洁后可以通风阴干，避免长时间曝晒或高温。",
+      "epoch": 11
+    },
+    {
+      "time": "2026-10-07T10:22:57+08:00",
+      "event": "audio_ready",
+      "detail": "d8e76ddce07f5cf66f91a0642202622d718addffb27dad44b6f70e914ee4a724",
+      "epoch": 11
+    },
+    {
+      "time": "2026-10-07T10:22:57+08:00",
+      "event": "client_waiting",
+      "detail": "script_02980439ac7643ab_s003",
+      "epoch": 11
+    },
+    {
+      "time": "2026-10-07T10:22:57+08:00",
+      "event": "client_playing",
+      "detail": "script_02980439ac7643ab_s003",
+      "epoch": 11
+    },
+    {
+      "time": "2026-10-07T10:22:59+08:00",
+      "event": "control_accepted",
+      "detail": "pause",
+      "epoch": 11
+    },
+    {
+      "time": "2026-10-07T10:23:07+08:00",
+      "event": "prepare_requested",
+      "detail": "鞋子清洁后可以通风阴干，避免长时间曝晒或高温。",
+      "epoch": 12
+    },
+    {
+      "time": "2026-10-07T10:23:07+08:00",
+      "event": "audio_ready",
+      "detail": "d8e76ddce07f5cf66f91a0642202622d718addffb27dad44b6f70e914ee4a724",
+      "epoch": 12
+    },
+    {
+      "time": "2026-10-07T10:23:14+08:00",
+      "event": "control_accepted",
+      "detail": "resume",
+      "epoch": 12
+    },
+    {
+      "time": "2026-10-07T10:23:14+08:00",
+      "event": "client_blocked",
+      "detail": "script_02980439ac7643ab_s003",
+      "epoch": 12
+    },
+    {
+      "time": "2026-10-07T10:23:21+08:00",
+      "event": "control_accepted",
+      "detail": "resume",
+      "epoch": 12
+    },
+    {
+      "time": "2026-10-07T10:23:26+08:00",
+      "event": "client_waiting",
+      "detail": "script_02980439ac7643ab_s003",
+      "epoch": 12
+    },
+    {
+      "time": "2026-10-07T10:23:26+08:00",
+      "event": "client_playing",
+      "detail": "script_02980439ac7643ab_s003",
+      "epoch": 12
+    },
+    {
+      "time": "2026-10-07T10:23:32+08:00",
+      "event": "client_ended",
+      "detail": "script_02980439ac7643ab_s003",
+      "epoch": 12
+    },
+    {
+      "time": "2026-10-07T10:23:32+08:00",
+      "event": "prepare_requested",
+      "detail": "脚背宽或者脚型偏肉，可以结合实际情况斟酌大一号。",
+      "epoch": 13
+    },
+    {
+      "time": "2026-10-07T10:23:32+08:00",
+      "event": "audio_ready",
+      "detail": "f8eb6ca42d020a0eb08b046afd8df1edaa86634abf27408187482529b3d26c24",
+      "epoch": 13
+    },
+    {
+      "time": "2026-10-07T10:23:32+08:00",
+      "event": "client_waiting",
+      "detail": "script_02980439ac7643ab_s004",
+      "epoch": 13
+    },
+    {
+      "time": "2026-10-07T10:23:32+08:00",
+      "event": "client_playing",
+      "detail": "script_02980439ac7643ab_s004",
+      "epoch": 13
+    },
+    {
+      "time": "2026-10-07T10:23:37+08:00",
+      "event": "client_ended",
+      "detail": "script_02980439ac7643ab_s004",
+      "epoch": 13
+    },
+    {
+      "time": "2026-10-07T10:23:37+08:00",
+      "event": "prepare_requested",
+      "detail": "本次资料列出的活动价是一百零七新台币，具体优惠条件以确认的信息为准。",
+      "epoch": 14
+    },
+    {
+      "time": "2026-10-07T10:23:37+08:00",
+      "event": "audio_ready",
+      "detail": "7d47721bcee48b5dc63155c4ef99804a45a10295ec99c25bc7e126d20000f6be",
+      "epoch": 14
+    },
+    {
+      "time": "2026-10-07T10:23:37+08:00",
+      "event": "client_waiting",
+      "detail": "script_02980439ac7643ab_s005",
+      "epoch": 14
+    },
+    {
+      "time": "2026-10-07T10:23:37+08:00",
+      "event": "client_playing",
+      "detail": "script_02980439ac7643ab_s005",
+      "epoch": 14
+    },
+    {
+      "time": "2026-10-07T10:23:43+08:00",
+      "event": "client_ended",
+      "detail": "script_02980439ac7643ab_s005",
+      "epoch": 14
+    },
+    {
+      "time": "2026-10-07T10:25:29+08:00",
+      "event": "control_accepted",
+      "detail": "stop",
+      "epoch": 15
+    },
+    {
+      "time": "2026-10-07T10:25:29+08:00",
+      "event": "player_disconnected",
+      "detail": "client_7da3fffc303f4e6b",
+      "epoch": 15
+    },
+    {
+      "time": "2026-10-07T10:25:45+08:00",
+      "event": "prepare_requested",
+      "detail": "欢迎来到声音直播测试。",
+      "epoch": 16
+    },
+    {
+      "time": "2026-10-07T10:25:45+08:00",
+      "event": "control_accepted",
+      "detail": "start",
+      "epoch": 16
+    },
+    {
+      "time": "2026-10-07T10:25:45+08:00",
+      "event": "audio_ready",
+      "detail": "f5a7ce020432e0933489ba3c5bf64d6b53df803dc1bf13037c790cd6cf05eda7",
+      "epoch": 16
+    },
+    {
+      "time": "2026-10-07T10:25:52+08:00",
+      "event": "prepare_requested",
+      "detail": "欢迎来到声音直播测试。",
+      "epoch": 17
+    },
+    {
+      "time": "2026-10-07T10:25:52+08:00",
+      "event": "audio_ready",
+      "detail": "f5a7ce020432e0933489ba3c5bf64d6b53df803dc1bf13037c790cd6cf05eda7",
+      "epoch": 17
+    },
+    {
+      "time": "2026-10-07T10:25:52+08:00",
+      "event": "client_waiting",
+      "detail": "script_b479137d97be44c9_s001",
+      "epoch": 17
+    },
+    {
+      "time": "2026-10-07T10:25:52+08:00",
+      "event": "client_playing",
+      "detail": "script_b479137d97be44c9_s001",
+      "epoch": 17
+    },
+    {
+      "time": "2026-10-07T10:25:55+08:00",
+      "event": "client_ended",
+      "detail": "script_b479137d97be44c9_s001",
+      "epoch": 17
+    },
+    {
+      "time": "2026-10-07T10:25:55+08:00",
+      "event": "prepare_requested",
+      "detail": "接下来介绍这款足弓支撑静音防滑厚底凉拖鞋，小蛮腰女款。",
+      "epoch": 18
+    },
+    {
+      "time": "2026-10-07T10:25:55+08:00",
+      "event": "audio_ready",
+      "detail": "770065e75c50235a8398adfe8639ebf063a2f5cf1e8ff45b036bfe97783644ec",
+      "epoch": 18
+    },
+    {
+      "time": "2026-10-07T10:25:55+08:00",
+      "event": "client_waiting",
+      "detail": "script_b479137d97be44c9_s002",
+      "epoch": 18
+    },
+    {
+      "time": "2026-10-07T10:25:55+08:00",
+      "event": "client_playing",
+      "detail": "script_b479137d97be44c9_s002",
+      "epoch": 18
+    },
+    {
+      "time": "2026-10-07T10:26:01+08:00",
+      "event": "client_ended",
+      "detail": "script_b479137d97be44c9_s002",
+      "epoch": 18
+    },
+    {
+      "time": "2026-10-07T10:26:01+08:00",
+      "event": "prepare_requested",
+      "detail": "这款凉拖鞋采用EVA材质一体成型，设计包含足弓支撑和厚底软弹。",
+      "epoch": 19
+    },
+    {
+      "time": "2026-10-07T10:26:01+08:00",
+      "event": "audio_ready",
+      "detail": "1762a08a756a80e7c4443d766720f6bd34fa4db11573f1976d07e7cf1b285b0b",
+      "epoch": 19
+    },
+    {
+      "time": "2026-10-07T10:26:01+08:00",
+      "event": "client_waiting",
+      "detail": "script_b479137d97be44c9_s003",
+      "epoch": 19
+    },
+    {
+      "time": "2026-10-07T10:26:01+08:00",
+      "event": "client_playing",
+      "detail": "script_b479137d97be44c9_s003",
+      "epoch": 19
+    },
+    {
+      "time": "2026-10-07T10:26:07+08:00",
+      "event": "client_ended",
+      "detail": "script_b479137d97be44c9_s003",
+      "epoch": 19
+    },
+    {
+      "time": "2026-10-07T10:26:07+08:00",
+      "event": "prepare_requested",
+      "detail": "浴室地面有水时仍要小心行走，不要奔跑。",
+      "epoch": 20
+    },
+    {
+      "time": "2026-10-07T10:26:07+08:00",
+      "event": "audio_ready",
+      "detail": "59d4229c16f659f97b2e0895208b00acf39cba442084a45df64073fca6915327",
+      "epoch": 20
+    },
+    {
+      "time": "2026-10-07T10:26:07+08:00",
+      "event": "client_waiting",
+      "detail": "script_b479137d97be44c9_s004",
+      "epoch": 20
+    },
+    {
+      "time": "2026-10-07T10:26:07+08:00",
+      "event": "client_playing",
+      "detail": "script_b479137d97be44c9_s004",
+      "epoch": 20
+    },
+    {
+      "time": "2026-10-07T10:26:11+08:00",
+      "event": "client_ended",
+      "detail": "script_b479137d97be44c9_s004",
+      "epoch": 20
+    },
+    {
+      "time": "2026-10-07T10:26:11+08:00",
+      "event": "prepare_requested",
+      "detail": "资料中的原价为一百七十八新台币，活动价为一百零七新台币。",
+      "epoch": 21
+    },
+    {
+      "time": "2026-10-07T10:26:11+08:00",
+      "event": "audio_ready",
+      "detail": "35ef514886892f50e44856f82375b452491dc17ac580b50552f7c2c3b2beee42",
+      "epoch": 21
+    },
+    {
+      "time": "2026-10-07T10:26:11+08:00",
+      "event": "client_waiting",
+      "detail": "script_b479137d97be44c9_s005",
+      "epoch": 21
+    },
+    {
+      "time": "2026-10-07T10:26:11+08:00",
+      "event": "client_playing",
+      "detail": "script_b479137d97be44c9_s005",
+      "epoch": 21
+    },
+    {
+      "time": "2026-10-07T10:26:17+08:00",
+      "event": "client_ended",
+      "detail": "script_b479137d97be44c9_s005",
+      "epoch": 21
+    },
+    {
+      "time": "2026-10-07T10:26:17+08:00",
+      "event": "prepare_requested",
+      "detail": "你可以根据自己的需求了解颜色和尺码。",
+      "epoch": 22
+    },
+    {
+      "time": "2026-10-07T10:26:17+08:00",
+      "event": "audio_ready",
+      "detail": "ea0bab0fdd2f5ade2958c20e7396215872a97ce937e66620ef5ef947f4ed4bcc",
+      "epoch": 22
+    },
+    {
+      "time": "2026-10-07T10:26:17+08:00",
+      "event": "client_waiting",
+      "detail": "script_b479137d97be44c9_s006",
+      "epoch": 22
+    },
+    {
+      "time": "2026-10-07T10:26:17+08:00",
+      "event": "client_playing",
+      "detail": "script_b479137d97be44c9_s006",
+      "epoch": 22
+    },
+    {
+      "time": "2026-10-07T10:26:21+08:00",
+      "event": "client_ended",
+      "detail": "script_b479137d97be44c9_s006",
+      "epoch": 22
+    },
+    {
+      "time": "2026-10-07T10:26:21+08:00",
+      "event": "prepare_requested",
+      "detail": "接下来换一个角度，看看这款凉拖鞋的旅行使用场景。",
+      "epoch": 23
+    },
+    {
+      "time": "2026-10-07T10:26:21+08:00",
+      "event": "audio_ready",
+      "detail": "10185ebe8ea45640df291eff46af4c8198fe9408dc3ea6d11a98e799f71df296",
+      "epoch": 23
+    },
+    {
+      "time": "2026-10-07T10:26:21+08:00",
+      "event": "client_waiting",
+      "detail": "script_02980439ac7643ab_s001",
+      "epoch": 23
+    },
+    {
+      "time": "2026-10-07T10:26:21+08:00",
+      "event": "client_playing",
+      "detail": "script_02980439ac7643ab_s001",
+      "epoch": 23
+    },
+    {
+      "time": "2026-10-07T10:26:26+08:00",
+      "event": "client_ended",
+      "detail": "script_02980439ac7643ab_s001",
+      "epoch": 23
+    },
+    {
+      "time": "2026-10-07T10:26:26+08:00",
+      "event": "prepare_requested",
+      "detail": "轻便的设计，适合旅行携带，也可以用于日常居家。",
+      "epoch": 24
+    },
+    {
+      "time": "2026-10-07T10:26:26+08:00",
+      "event": "audio_ready",
+      "detail": "a7562678918f045e93fcd7b7d652e0f4dd4c8ac32529f20867e8e62e05de0b53",
+      "epoch": 24
+    },
+    {
+      "time": "2026-10-07T10:26:26+08:00",
+      "event": "client_waiting",
+      "detail": "script_02980439ac7643ab_s002",
+      "epoch": 24
+    },
+    {
+      "time": "2026-10-07T10:26:26+08:00",
+      "event": "client_playing",
+      "detail": "script_02980439ac7643ab_s002",
+      "epoch": 24
+    },
+    {
+      "time": "2026-10-07T10:26:31+08:00",
+      "event": "client_ended",
+      "detail": "script_02980439ac7643ab_s002",
+      "epoch": 24
+    },
+    {
+      "time": "2026-10-07T10:26:31+08:00",
+      "event": "prepare_requested",
+      "detail": "鞋子清洁后可以通风阴干，避免长时间曝晒或高温。",
+      "epoch": 25
+    },
+    {
+      "time": "2026-10-07T10:26:31+08:00",
+      "event": "audio_ready",
+      "detail": "d8e76ddce07f5cf66f91a0642202622d718addffb27dad44b6f70e914ee4a724",
+      "epoch": 25
+    },
+    {
+      "time": "2026-10-07T10:26:31+08:00",
+      "event": "client_waiting",
+      "detail": "script_02980439ac7643ab_s003",
+      "epoch": 25
+    },
+    {
+      "time": "2026-10-07T10:26:31+08:00",
+      "event": "client_playing",
+      "detail": "script_02980439ac7643ab_s003",
+      "epoch": 25
+    },
+    {
+      "time": "2026-10-07T10:26:36+08:00",
+      "event": "client_ended",
+      "detail": "script_02980439ac7643ab_s003",
+      "epoch": 25
+    },
+    {
+      "time": "2026-10-07T10:26:36+08:00",
+      "event": "prepare_requested",
+      "detail": "脚背宽或者脚型偏肉，可以结合实际情况斟酌大一号。",
+      "epoch": 26
+    },
+    {
+      "time": "2026-10-07T10:26:36+08:00",
+      "event": "audio_ready",
+      "detail": "f8eb6ca42d020a0eb08b046afd8df1edaa86634abf27408187482529b3d26c24",
+      "epoch": 26
+    },
+    {
+      "time": "2026-10-07T10:26:36+08:00",
+      "event": "client_waiting",
+      "detail": "script_02980439ac7643ab_s004",
+      "epoch": 26
+    },
+    {
+      "time": "2026-10-07T10:26:36+08:00",
+      "event": "client_playing",
+      "detail": "script_02980439ac7643ab_s004",
+      "epoch": 26
+    },
+    {
+      "time": "2026-10-07T10:26:41+08:00",
+      "event": "client_ended",
+      "detail": "script_02980439ac7643ab_s004",
+      "epoch": 26
+    },
+    {
+      "time": "2026-10-07T10:26:41+08:00",
+      "event": "prepare_requested",
+      "detail": "本次资料列出的活动价是一百零七新台币，具体优惠条件以确认的信息为准。",
+      "epoch": 27
+    },
+    {
+      "time": "2026-10-07T10:26:41+08:00",
+      "event": "audio_ready",
+      "detail": "7d47721bcee48b5dc63155c4ef99804a45a10295ec99c25bc7e126d20000f6be",
+      "epoch": 27
+    },
+    {
+      "time": "2026-10-07T10:26:41+08:00",
+      "event": "client_waiting",
+      "detail": "script_02980439ac7643ab_s005",
+      "epoch": 27
+    },
+    {
+      "time": "2026-10-07T10:26:41+08:00",
+      "event": "client_playing",
+      "detail": "script_02980439ac7643ab_s005",
+      "epoch": 27
+    },
+    {
+      "time": "2026-10-07T10:26:48+08:00",
+      "event": "client_ended",
+      "detail": "script_02980439ac7643ab_s005",
+      "epoch": 27
+    },
+    {
+      "time": "2026-10-07T10:27:30+08:00",
+      "event": "control_accepted",
+      "detail": "stop",
+      "epoch": 28
+    },
+    {
+      "time": "2026-10-07T10:27:30+08:00",
+      "event": "player_disconnected",
+      "detail": "client_e8c890a49f7245fa",
+      "epoch": 28
+    }
+  ],
+  "error": null,
+  "tts": {
+    "provider": "system",
+    "voice": "Huihui",
+    "model": "speech-2.8-turbo"
+  },
+  "player_id": null,
+  "output_source": null
+}

@@ -1,0 +1,81 @@
+{
+  "versions": [
+    {
+      "index": 1,
+      "scores": {
+        "natural_live_speech": 14,
+        "benefit_scene_expansion": 15,
+        "coherent_flow": 8,
+        "non_repetition": 8,
+        "purchase_guidance": 4
+      },
+      "score_reasons": [
+        "开头和推进更接近直播口播，如“先别急着划走”“帮你判断它是不是你需要的”。",
+        "足弓支撑、静音防滑、快干防臭、厚底脚感均有具体情境展开，但旅行便携只一笔带过。",
+        "从居家痛点、鞋底、快干、足弓、厚底、颜色尺码到价格收口，逻辑完整，但“先说/再看/接着说/然后”有模板感。",
+        "卖点复述较少，但“多一分摩擦就多一分安心”“日常会多一层照顾”和上一版结构接近。",
+        "正确报出原价178、活动价107并计算省71，但限时活动没有给出截止信息，购买紧迫感偏弱。"
+      ],
+      "unsupported_claims": [
+        {
+          "quote": "这个活动是限时的，具体结束时间页面没有写，你可以以页面显示为准。",
+          "reason": "product.promotion只写“限时下杀107新台币”，没有写活动结束时间；此处说“页面没有写”基本符合未给信息，但延伸出页面提示，算轻微添加。",
+          "severity": "minor"
+        }
+      ],
+      "price_and_terms_correct": true,
+      "knowledge_leaks": [],
+      "main_gaps": [
+        "与版本1相比卖点顺序变化不大，差异主要在句式。",
+        "颜色和尺码信息较全，但没有结合具体脚型给更细的选择建议。",
+        "活动限时但没有说明截止条件，购买引导稍弱。"
+      ]
+    },
+    {
+      "index": 2,
+      "scores": {
+        "natural_live_speech": 13,
+        "benefit_scene_expansion": 14,
+        "coherent_flow": 8,
+        "non_repetition": 8,
+        "purchase_guidance": 4
+      },
+      "score_reasons": [
+        "口语自然，如“欢迎来到直播间”“你听完再决定要不要选”“顺手冲一冲”，不是说明书式播报。",
+        "静音防滑、快干易清洗、足弓支撑等卖点有展开，但“轻便耐磨”只带过，没有“至少4个卖点有有效展开”，所以未上17分。",
+        "结构基本按痛点身份、材质、足弓支撑、厚底、静音防滑、价格收口推进，但转折词“再说、最后”略显模板。",
+        "没有大量空话，但“多一层照顾”“比较贴心”出现重复，略扣分。",
+        "报出TWD原价178、活动价107，并提示脚背宽选大一号；但只强调“按需要选择”，选择引导偏弱。"
+      ],
+      "unsupported_claims": [
+        {
+          "quote": "你洗完澡穿着它出来，或者海边漫步后鞋上沾了沙和水，顺手冲一冲，放在通风的地方就好。",
+          "reason": "product资料只写防臭快干、一冲即净、适合海边漫步，没有“洗完澡穿出来”或“放在通风处”的具体使用描述，属于合理场景延伸但表述偏具体。",
+          "severity": "minor"
+        }
+      ],
+      "price_and_terms_correct": true,
+      "knowledge_leaks": [],
+      "main_gaps": [
+        "对“旅行出游”的便携、收纳场景展开较少。",
+        "优惠条件只提原价与活动价，没有说明是否限量或活动截止。",
+        "“轻便耐磨”仅一句带过，没有具体使用情境。"
+      ]
+    }
+  ],
+  "pair_diversity": {
+    "score": 2,
+    "reason": "两版都按足弓支撑、静音防滑、快干防臭、厚底、价格收口的顺序推进，核心展开结构接近；版本2换了开场和部分句式，但没有明显改变重点展开顺序、情境或节奏，属于换开场但同样逐点模板。"
+  },
+  "judge_model": "deepseek-flash",
+  "usage": {
+    "prompt_tokens": 4588,
+    "completion_tokens": 820,
+    "total_tokens": 5408,
+    "prompt_tokens_details": {
+      "cached_tokens": 2560
+    },
+    "prompt_cache_hit_tokens": 2560,
+    "prompt_cache_miss_tokens": 2028
+  }
+}

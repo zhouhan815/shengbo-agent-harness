@@ -1,0 +1,233 @@
+{
+  "kind": "engineering_design_static_validation",
+  "status": "pass",
+  "scope": "document structure, local links, selected contract markers only",
+  "not_executed": [
+    "business implementation",
+    "SDK integration",
+    "provider calls",
+    "HTTP/database recovery",
+    "OBS playback"
+  ],
+  "documents": {
+    "00_后端工程设计.md": {
+      "lines": 310,
+      "bytes": 28317,
+      "tables": 6,
+      "local_links": 27
+    },
+    "01_类型与持久化.md": {
+      "lines": 492,
+      "bytes": 38800,
+      "tables": 6,
+      "local_links": 1
+    },
+    "02_运行时与中间件.md": {
+      "lines": 1079,
+      "bytes": 79399,
+      "tables": 10,
+      "local_links": 3
+    },
+    "03_声播业务服务与事务.md": {
+      "lines": 1046,
+      "bytes": 99234,
+      "tables": 21,
+      "local_links": 0
+    },
+    "04_业务执行与上下文.md": {
+      "lines": 358,
+      "bytes": 37793,
+      "tables": 7,
+      "local_links": 1
+    },
+    "05_实施顺序与验收.md": {
+      "lines": 378,
+      "bytes": 44318,
+      "tables": 17,
+      "local_links": 2
+    },
+    "06_前端对接合同.md": {
+      "lines": 272,
+      "bytes": 26478,
+      "tables": 8,
+      "local_links": 2
+    },
+    "08_架构图与中间件Skill挂载说明.md": {
+      "lines": 272,
+      "bytes": 21019,
+      "tables": 8,
+      "local_links": 10
+    },
+    "09_复盘输入与话术闭环设计.md": {
+      "lines": 323,
+      "bytes": 25195,
+      "tables": 8,
+      "local_links": 0
+    },
+    "10_人工确认与语音门槛设计.md": {
+      "lines": 400,
+      "bytes": 35742,
+      "tables": 8,
+      "local_links": 1
+    },
+    "11_原始运行记录与调试台设计.md": {
+      "lines": 376,
+      "bytes": 33584,
+      "tables": 9,
+      "local_links": 0
+    },
+    "12_用户编排与重排设计.md": {
+      "lines": 296,
+      "bytes": 25790,
+      "tables": 7,
+      "local_links": 5
+    },
+    "13_任务识别与历史上下文设计.md": {
+      "lines": 510,
+      "bytes": 50513,
+      "tables": 19,
+      "local_links": 0
+    },
+    "14_任务验收与素材准备设计.md": {
+      "lines": 388,
+      "bytes": 34007,
+      "tables": 12,
+      "local_links": 3
+    },
+    "15_可复用工具流与Agent协调边界.md": {
+      "lines": 117,
+      "bytes": 14531,
+      "tables": 6,
+      "local_links": 3
+    },
+    "16_最终复查修订与待讨论事项.md": {
+      "lines": 195,
+      "bytes": 19228,
+      "tables": 3,
+      "local_links": 2
+    },
+    "17_ChatGPT授权模型来源与后续接入记录.md": {
+      "lines": 88,
+      "bytes": 9058,
+      "tables": 5,
+      "local_links": 1
+    }
+  },
+  "registry": {
+    "commands": [
+      "import_blob",
+      "import_recap",
+      "save_asset_checklist",
+      "link_recap_to_preparation",
+      "approve_text_for_audio",
+      "revoke_text_approval",
+      "create_room",
+      "create_preparation",
+      "save_product",
+      "update_preparation_products",
+      "refresh_product_reference",
+      "record_product_revision_choice",
+      "save_session_draft",
+      "accept_analysis_report",
+      "save_context_bundle",
+      "save_script_plan",
+      "submit_script_change",
+      "patch_script",
+      "save_playlist",
+      "compile_playback_plan",
+      "prepare_required_audio",
+      "preview_audio",
+      "retry_failed_items",
+      "cancel_job",
+      "publish_preparation",
+      "adopt_snapshot",
+      "start_prepared_room",
+      "undo_mutation",
+      "issue_grant",
+      "revoke_grant"
+    ],
+    "queries": [
+      "read_capabilities",
+      "get_business_schema",
+      "search_products",
+      "read_product",
+      "read_preparation",
+      "read_room",
+      "read_analysis_report",
+      "preview_playlist_reorder",
+      "find_audience_research",
+      "read_session_history",
+      "inspect_change_impact",
+      "read_asset_checklist",
+      "read_recap",
+      "create_text_review",
+      "read_text_approval",
+      "read_context",
+      "read_script",
+      "read_script_usage",
+      "voice_options",
+      "validate_product_assembly",
+      "get_workspace_snapshot",
+      "read_completion_observation",
+      "read_job",
+      "create_review",
+      "read_operation_receipt",
+      "read_events",
+      "read_blob"
+    ],
+    "main_business_tools": [
+      "read_capabilities",
+      "read_business_schema",
+      "read_source",
+      "search_catalog",
+      "read_product",
+      "read_preparation",
+      "read_room",
+      "read_voice_options",
+      "read_context",
+      "read_script",
+      "read_script_usage",
+      "read_job",
+      "read_run_history",
+      "read_analysis_batch",
+      "dispatch_analysis_batch",
+      "accept_analysis_reports",
+      "request_user_decision",
+      "validate_product_assembly",
+      "save_product",
+      "save_session_draft",
+      "build_context_bundle",
+      "save_script_change_plan",
+      "execute_script_plan",
+      "save_playlist",
+      "compile_playback_plan",
+      "prepare_required_audio",
+      "publish_preparation",
+      "finish_turn",
+      "import_recap",
+      "link_recap_to_preparation",
+      "read_recap",
+      "read_text_review",
+      "preview_playlist_reorder",
+      "find_audience_research",
+      "read_session_history",
+      "inspect_change_impact",
+      "save_task_assessment",
+      "read_asset_checklist",
+      "save_asset_checklist"
+    ]
+  },
+  "fixture": {
+    "kind": "synthetic_testpack_structure_not_runtime_test",
+    "findings": 8,
+    "dispositions": 8,
+    "source_quotes": 8,
+    "source_hash_verified": true
+  },
+  "errors": [],
+  "playlist_design_probe": {
+    "distributions": 2681,
+    "status": "passed",
+    "scope": "independent finite design model; no application execution"
+  }
+}

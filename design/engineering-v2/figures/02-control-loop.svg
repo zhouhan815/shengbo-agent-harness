@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1700" height="1720" viewBox="0 0 1700 1720">
+<defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 Z" fill="#617889"/></marker></defs>
+<rect width="1700" height="1720" fill="white"/>
+<text x="45.0" y="70" font-family="Microsoft YaHei,sans-serif" font-size="40" fill="#193447">主从并行、复盘汇合与人工门槛</text>
+<text x="45.0" y="108" font-family="Microsoft YaHei,sans-serif" font-size="24" fill="#193447">箭头代表依赖与控制位置；运行时按目标选择所需能力，单次修改不必全流程重跑。</text>
+<rect x="620" y="150" width="460" height="95" rx="9" fill="#E6EDFF" stroke="#A7B7C3" stroke-width="2"/>
+<text x="668.0" y="208.5" font-family="Microsoft YaHei,sans-serif" font-size="28" fill="#193447">用户目标 / 原资料 / 明确对象</text>
+<rect x="620" y="300" width="460" height="100" rx="9" fill="#E6EDFF" stroke="#A7B7C3" stroke-width="2"/>
+<text x="668.0" y="341.0" font-family="Microsoft YaHei,sans-serif" font-size="29" fill="#193447">同主 Agent 识别 / 按需执行</text>
+<text x="664.0" y="382.0" font-family="Microsoft YaHei,sans-serif" font-size="29" fill="#193447">先只读，后按冻结 Goal 行动</text>
+<rect x="1170" y="285" width="450" height="150" rx="9" fill="#F0F4F6" stroke="#A7B7C3" stroke-width="2"/>
+<text x="1276.0" y="332.5" font-family="Microsoft YaHei,sans-serif" font-size="25" fill="#193447">主图 WAITING_JOBS</text>
+<text x="1223.5" y="369.5" font-family="Microsoft YaHei,sans-serif" font-size="25" fill="#193447">释放 invoke 租约，保留任务槽</text>
+<text x="1270.0" y="406.5" font-family="Microsoft YaHei,sans-serif" font-size="25" fill="#193447">每个子任务自己持租约</text>
+<rect x="75" y="150" width="460" height="240" rx="9" fill="#F1E7FB" stroke="#A7B7C3" stroke-width="2"/>
+<text x="162.0" y="204.0" font-family="Microsoft YaHei,sans-serif" font-size="26" fill="#193447">上场复盘：原文完整保存</text>
+<text x="175.0" y="242.0" font-family="Microsoft YaHei,sans-serif" font-size="26" fill="#193447">先导入，显式关联本场</text>
+<text x="187.5" y="280.0" font-family="Microsoft YaHei,sans-serif" font-size="26" fill="#193447">模拟 / 真实明确标记</text>
+<text x="162.0" y="318.0" font-family="Microsoft YaHei,sans-serif" font-size="26" fill="#193447">不自动改价格或商品顺序</text>
+<text x="155.5" y="356.0" font-family="Microsoft YaHei,sans-serif" font-size="26" fill="#193447">与分析并行准备，4B 汇合</text>
+<rect x="620" y="455" width="460" height="80" rx="9" fill="#F0F4F6" stroke="#A7B7C3" stroke-width="2"/>
+<text x="656.0" y="506.0" font-family="Microsoft YaHei,sans-serif" font-size="28" fill="#193447">持久 batch → Supervisor 领取</text>
+<rect x="100" y="610" width="460" height="125" rx="9" fill="#E3F3E8" stroke="#A7B7C3" stroke-width="2"/>
+<text x="227.5" y="663.5" font-family="Microsoft YaHei,sans-serif" font-size="27" fill="#193447">2A 商品事实分析</text>
+<text x="165.5" y="702.5" font-family="Microsoft YaHei,sans-serif" font-size="27" fill="#193447">独立上下文 / thread / 报告</text>
+<rect x="620" y="610" width="460" height="125" rx="9" fill="#E3F3E8" stroke="#A7B7C3" stroke-width="2"/>
+<text x="748.5" y="663.5" font-family="Microsoft YaHei,sans-serif" font-size="27" fill="#193447">2B 本场配置分析</text>
+<text x="685.5" y="702.5" font-family="Microsoft YaHei,sans-serif" font-size="27" fill="#193447">独立上下文 / thread / 报告</text>
+<rect x="1140" y="610" width="460" height="125" rx="9" fill="#E3F3E8" stroke="#A7B7C3" stroke-width="2"/>
+<text x="1277.0" y="663.5" font-family="Microsoft YaHei,sans-serif" font-size="27" fill="#193447">3 顾客场景研究</text>
+<text x="1205.5" y="702.5" font-family="Microsoft YaHei,sans-serif" font-size="27" fill="#193447">独立上下文 / thread / 报告</text>
+<rect x="320" y="820" width="1060" height="100" rx="9" fill="#E3F3E8" stroke="#A7B7C3" stroke-width="2"/>
+<text x="544.5" y="861.0" font-family="Microsoft YaHei,sans-serif" font-size="26" fill="#193447">完成事件 → inbox 唤醒主 Agent → 逐份校验 / 接受</text>
+<text x="455.5" y="899.0" font-family="Microsoft YaHei,sans-serif" font-size="26" fill="#193447">事实 + 研究形成全字段商品；独立有效报告不因另一分支失败而重做</text>
+<rect x="320" y="980" width="1060" height="120" rx="9" fill="#E6EDFF" stroke="#A7B7C3" stroke-width="2"/>
+<text x="550.5" y="1012.5" font-family="Microsoft YaHei,sans-serif" font-size="25" fill="#193447">4B：完整商品 + 本场 + 研究 + 旧稿/用户决定 + 复盘</text>
+<text x="533.5" y="1049.5" font-family="Microsoft YaHei,sans-serif" font-size="25" fill="#193447">每条复盘：采纳 / 部分采纳 / 拒绝 / 推迟 / 已覆盖 + 理由</text>
+<text x="625.0" y="1086.5" font-family="Microsoft YaHei,sans-serif" font-size="25" fill="#193447">形成各模块生成 / 修改 / 复用 / 禁用计划</text>
+<rect x="320" y="1160" width="1060" height="100" rx="9" fill="#E6EDFF" stroke="#A7B7C3" stroke-width="2"/>
+<text x="495.5" y="1201.0" font-family="Microsoft YaHei,sans-serif" font-size="26" fill="#193447">执行话术计划 → 用户选稿 / 拖拽或重排 → 编译所需长短开场</text>
+<text x="486.0" y="1239.0" font-family="Microsoft YaHei,sans-serif" font-size="26" fill="#193447">未改模块保留；只排已选项；预览不失效，实际应用才更新编排</text>
+<rect x="320" y="1320" width="1060" height="100" rx="9" fill="#FFF0DA" stroke="#A7B7C3" stroke-width="2"/>
+<text x="537.5" y="1361.0" font-family="Microsoft YaHei,sans-serif" font-size="27" fill="#193447">6R 人工审核精确整包文案 / 顺序 / voice / 费用范围</text>
+<text x="483.0" y="1400.0" font-family="Microsoft YaHei,sans-serif" font-size="27" fill="#193447">声播生成批准回执；Agent 不能自行批准；改稿后旧批准失效</text>
+<rect x="320" y="1480" width="1060" height="100" rx="9" fill="#E6EDFF" stroke="#A7B7C3" stroke-width="2"/>
+<text x="480.5" y="1521.0" font-family="Microsoft YaHei,sans-serif" font-size="27" fill="#193447">必需 TTS → 音频检查 → 未采用候选 → 人工采用 → 人工开播</text>
+<text x="538.5" y="1560.0" font-family="Microsoft YaHei,sans-serif" font-size="27" fill="#193447">提交 / 领取 / 绑定验证批准；同文本音频缓存可复用</text>
+<polyline points="850,245 850,300" fill="none" stroke="#617889" stroke-width="3" marker-end="url(#a)"/>
+<polyline points="850,400 850,455" fill="none" stroke="#617889" stroke-width="3" marker-end="url(#a)"/>
+<polyline points="1080,350 1170,350" fill="none" stroke="#617889" stroke-width="3" stroke-dasharray="10 8" marker-end="url(#a)"/>
+<polyline points="850,535 850,570 330,570 330,610" fill="none" stroke="#617889" stroke-width="3" marker-end="url(#a)"/>
+<polyline points="330,735 330,775 850,775 850,820" fill="none" stroke="#617889" stroke-width="3" marker-end="url(#a)"/>
+<polyline points="850,535 850,570 850,570 850,610" fill="none" stroke="#617889" stroke-width="3" marker-end="url(#a)"/>
+<polyline points="850,735 850,775 850,775 850,820" fill="none" stroke="#617889" stroke-width="3" marker-end="url(#a)"/>
+<polyline points="850,535 850,570 1370,570 1370,610" fill="none" stroke="#617889" stroke-width="3" marker-end="url(#a)"/>
+<polyline points="1370,735 1370,775 850,775 850,820" fill="none" stroke="#617889" stroke-width="3" marker-end="url(#a)"/>
+<polyline points="850,920 850,980" fill="none" stroke="#617889" stroke-width="3" marker-end="url(#a)"/>
+<polyline points="850,1100 850,1160" fill="none" stroke="#617889" stroke-width="3" marker-end="url(#a)"/>
+<polyline points="850,1260 850,1320" fill="none" stroke="#617889" stroke-width="3" marker-end="url(#a)"/>
+<polyline points="850,1420 850,1480" fill="none" stroke="#617889" stroke-width="3" marker-end="url(#a)"/>
+<polyline points="75,270 45,270 45,1040 320,1040" fill="none" stroke="#617889" stroke-width="3" stroke-dasharray="10 8" marker-end="url(#a)"/>
+<polyline points="1380,1370 1640,1370 1640,1040 1380,1040" fill="none" stroke="#617889" stroke-width="3" stroke-dasharray="10 8" marker-end="url(#a)"/>
+<text x="1405.0" y="1209" font-family="Microsoft YaHei,sans-serif" font-size="24" fill="#193447">编辑后重新</text>
+<text x="1405.0" y="1245" font-family="Microsoft YaHei,sans-serif" font-size="24" fill="#193447">计划 / 审核</text>
+<text x="90.0" y="1657" font-family="Microsoft YaHei,sans-serif" font-size="27" fill="#193447">全程：M9 + SDK callbacks + 程序检查 / 业务任务埋点 → 原始记录 → 执行树 / 时间线 / diff</text>
+</svg>

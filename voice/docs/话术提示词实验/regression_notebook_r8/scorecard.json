@@ -1,0 +1,44 @@
+{
+  "run": "regression_notebook_r8",
+  "versions": [
+    {
+      "version": 1,
+      "program": 40.0,
+      "semantic": 49.0,
+      "total": 89.0,
+      "hard_gate": false,
+      "rule_issues": [
+        "促销输入没有明确限时，不能把普通活动价说成限时价"
+      ],
+      "serious_claims": 0,
+      "cross_version_copy_pass": false,
+      "pass": false,
+      "gaps": [
+        "对80页的具体使用时长只有'够用一阵子'，不够具体。",
+        "颜色选择建议比较泛，'浅灰和浅绿都是比较耐看的颜色'重复。",
+        "没有充分利用'软封面'卖点进行场景展开。"
+      ]
+    },
+    {
+      "version": 2,
+      "program": 40.0,
+      "semantic": 45.0,
+      "total": 85.0,
+      "hard_gate": true,
+      "rule_issues": [],
+      "serious_claims": 0,
+      "cross_version_copy_pass": false,
+      "pass": false,
+      "gaps": [
+        "缺少对软封面带来的便携性、舒适感的细化展开，仅一笔带过。",
+        "颜色选择只说了'浅灰比较安静，浅绿带一点清新'，没有结合具体使用场景。",
+        "购买引导较弱，只说了'合适再下单'，没有强调优惠的适用条件或鼓励行动。"
+      ]
+    }
+  ],
+  "pair_diversity": {
+    "score": 3,
+    "reason": "两版开场不同（一个是直接聊记东西，一个是互动聊记录习惯），痛点引入和部分场景描述有差异，但整体结构仍遵循痛点-卖点-场景-价格，重点展开顺序类似，卖点情境重叠，差异不够鲜明。"
+  },
+  "rubric": "20261007.4-uniform-coverage-content-and-near-copy-checks"
+}

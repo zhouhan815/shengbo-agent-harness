@@ -1,0 +1,42 @@
+{
+  "run": "release_mug",
+  "versions": [
+    {
+      "version": 1,
+      "program": 39.33,
+      "semantic": 43.0,
+      "total": 82.33,
+      "hard_gate": true,
+      "rule_issues": [],
+      "serious_claims": 0,
+      "cross_version_copy_pass": true,
+      "pass": false,
+      "gaps": [
+        "陶瓷材质仅描述触感，未结合更多使用情境展开。",
+        "容量价值虽结合办公和家庭场景，但表述较简略，收益感不足。",
+        "颜色卖点对搭配和视觉心理的描述重复前版类似思路，新鲜感不足。"
+      ]
+    },
+    {
+      "version": 2,
+      "program": 38.8,
+      "semantic": 44.0,
+      "total": 82.8,
+      "hard_gate": true,
+      "rule_issues": [],
+      "serious_claims": 0,
+      "cross_version_copy_pass": true,
+      "pass": false,
+      "gaps": [
+        "陶瓷材质卖点展开不足，仅描述触感，未进一步结合生活场景放大价值。",
+        "把手卖点虽提到稳当，但对使用便利性的展开不够深入。",
+        "颜色卖点停留在搭配描述，对使用者心理收益挖掘较少。"
+      ]
+    }
+  ],
+  "pair_diversity": {
+    "score": 1,
+    "reason": "两版话术结构高度相似，均按痛点-卖点-价格顺序展开，卖点选择和展开顺序几乎一致，仅替换开场和个别措辞，未形成有效差异，故评1分。"
+  },
+  "rubric": "20261007.4-uniform-coverage-content-and-near-copy-checks"
+}

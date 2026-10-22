@@ -1,0 +1,42 @@
+{
+  "run": "r7_expanded_clean",
+  "versions": [
+    {
+      "version": 1,
+      "program": 40.0,
+      "semantic": 47.0,
+      "total": 87.0,
+      "hard_gate": true,
+      "rule_issues": [],
+      "serious_claims": 0,
+      "cross_version_copy_pass": true,
+      "pass": true,
+      "gaps": [
+        "价格部分只是陈述原价和活动价，缺乏购买理由强化。",
+        "颜色和尺码只是罗列，没有结合场景做选择建议。",
+        "总结段落重复前文特点，收口力度不足。"
+      ]
+    },
+    {
+      "version": 2,
+      "program": 39.88,
+      "semantic": 46.0,
+      "total": 85.88,
+      "hard_gate": true,
+      "rule_issues": [],
+      "serious_claims": 0,
+      "cross_version_copy_pass": true,
+      "pass": true,
+      "gaps": [
+        "价格引导不够自然，仅罗列价格，未强化下单动力或选购逻辑。",
+        "颜色和尺码的展开较机械，缺少针对不同人群的推荐。",
+        "收口部分重复卖点，缺乏有力收尾。"
+      ]
+    }
+  ],
+  "pair_diversity": {
+    "score": 3,
+    "reason": "两版开场不同（“今天咱们看” vs “今天想跟你聊”），但卖点展开顺序和结构基本一致，均为逐一介绍功能，情境描述有部分差异（如版1强调装行李箱，版2强调日常出门），但整体差异不够鲜明，属于换开场但同样逐点模板。"
+  },
+  "rubric": "20261007.4-uniform-coverage-content-and-near-copy-checks"
+}

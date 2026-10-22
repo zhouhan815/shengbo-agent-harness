@@ -1,0 +1,45 @@
+{
+  "run": "r0_baseline",
+  "versions": [
+    {
+      "version": 1,
+      "program": 38.47,
+      "semantic": 31.0,
+      "total": 69.47,
+      "hard_gate": false,
+      "rule_issues": [
+        "遗漏输入中明确的重要特点：耐磨",
+        "丰富商品展开过短，请把重要卖点放入具体生活场景展开，不靠重复参数凑字"
+      ],
+      "serious_claims": 2,
+      "cross_version_copy_pass": true,
+      "pass": false,
+      "gaps": [
+        "卖点展开不够充分，核心特点如足弓支撑、静音防滑、快干防臭等大多一句带过，缺少具体情境和收益。",
+        "规格、适用人群、颜色仍是逐项罗列，节奏偏字段播报，削弱自然口播感。",
+        "购买引导中再次出现未经资料支持的优惠券和折扣信息，且作为主推条件之一，影响价格条款准确性。"
+      ]
+    },
+    {
+      "version": 2,
+      "program": 40.0,
+      "semantic": 26.0,
+      "total": 66.0,
+      "hard_gate": false,
+      "rule_issues": [],
+      "serious_claims": 3,
+      "cross_version_copy_pass": true,
+      "pass": false,
+      "gaps": [
+        "功能点展开偏浅，如足弓支撑、静音防滑等大多停留在复述标签，缺少生动画面和有限度生活收益。",
+        "颜色和尺码几乎逐项播报，影响直播自然语感，也拉长篇幅。",
+        "购买引导中夹杂未经商品资料支持的优惠券和折扣条件，且规则待确认，削弱可信度。"
+      ]
+    }
+  ],
+  "pair_diversity": {
+    "score": 2,
+    "reason": "两版开场不同，第一版从出门宅家切入，第二版从浴室厨房久站切入；但后续都是先介绍商品名、材质、功能，再规格、颜色、尺码、价格，结构骨架相同，属于换开场但同样逐点模板。"
+  },
+  "rubric": "20261007.4-uniform-coverage-content-and-near-copy-checks"
+}

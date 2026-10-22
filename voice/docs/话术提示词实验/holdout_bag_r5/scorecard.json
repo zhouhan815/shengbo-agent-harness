@@ -1,0 +1,46 @@
+{
+  "run": "holdout_bag_r5",
+  "versions": [
+    {
+      "version": 1,
+      "program": 40.0,
+      "semantic": 50.0,
+      "total": 90.0,
+      "hard_gate": false,
+      "rule_issues": [
+        "促销输入没有明确限时，不能把普通活动价说成限时价"
+      ],
+      "serious_claims": 0,
+      "cross_version_copy_pass": true,
+      "pass": false,
+      "gaps": [
+        "部分过渡词较模板化，如'先看面料和包身结构'、'接着看开合和收纳设计'。",
+        "短途出行举例'装几样替换衣物'未在资料中明确，但属于合理场景延伸，风险较低。",
+        "对通勤、购物、短途出行的场景描述仍可更具体。"
+      ]
+    },
+    {
+      "version": 2,
+      "program": 40.0,
+      "semantic": 50.0,
+      "total": 90.0,
+      "hard_gate": false,
+      "rule_issues": [
+        "促销输入没有明确限时，不能把普通活动价说成限时价"
+      ],
+      "serious_claims": 0,
+      "cross_version_copy_pass": true,
+      "pass": false,
+      "gaps": [
+        "尺寸和颜色在规格部分重复播报，稍显冗余。",
+        "可折叠收纳的展开情境描述较泛，如'柜子角落'，对实际折叠后体积无具体参照。",
+        "对通勤场景的描述缺少更具体的收纳示例，如日常随身物品清单。"
+      ]
+    }
+  ],
+  "pair_diversity": {
+    "score": 4,
+    "reason": "两版开场痛点不同（柜子占地vs小包大包切换），卖点展开顺序不同（版1先折叠再尺寸颜色开合，版2先面料折叠再开合肩带场景颜色），情境举例和节奏有明显差异，且均完整，符合4分标准。"
+  },
+  "rubric": "20261007.4-uniform-coverage-content-and-near-copy-checks"
+}

@@ -1,0 +1,42 @@
+{
+  "run": "holdout_bag_r3",
+  "versions": [
+    {
+      "version": 1,
+      "program": 40.0,
+      "semantic": 53.0,
+      "total": 93.0,
+      "hard_gate": true,
+      "rule_issues": [],
+      "serious_claims": 0,
+      "cross_version_copy_pass": false,
+      "pass": false,
+      "gaps": [
+        "活动截止时间未提供，口播未作提示。",
+        "未说明资料未覆盖的电脑适配尺寸、承重、防水、防盗等边界。",
+        "购买引导停留在“先选色再考虑”，缺少对活动价当前性的自然提醒。"
+      ]
+    },
+    {
+      "version": 2,
+      "program": 40.0,
+      "semantic": 48.0,
+      "total": 88.0,
+      "hard_gate": true,
+      "rule_issues": [],
+      "serious_claims": 0,
+      "cross_version_copy_pass": false,
+      "pass": false,
+      "gaps": [
+        "活动截止时间未提供，原稿未提示可能变化。",
+        "未说明具体不适合的边界，如资料未提供电脑适配尺寸、承重、防水、防盗。",
+        "颜色选择引导较笼统，未按黑色、米色给出更多日常搭配场景。"
+      ]
+    }
+  ],
+  "pair_diversity": {
+    "score": 4,
+    "reason": "两版开场不同，第一版从“带的东西不少、不想拎好几个袋子”切入，第二版从“纠结背哪个包、包身占地方”切入；卖点展开顺序也不同，第一版先讲内部分区再讲背法，第二版先讲可折叠再讲内部分区和背法；情境和节奏有明显差异，均较完整。"
+  },
+  "rubric": "20261007.4-uniform-coverage-content-and-near-copy-checks"
+}

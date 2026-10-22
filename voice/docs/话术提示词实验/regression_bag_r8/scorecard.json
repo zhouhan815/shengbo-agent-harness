@@ -1,0 +1,46 @@
+{
+  "run": "regression_bag_r8",
+  "versions": [
+    {
+      "version": 1,
+      "program": 40.0,
+      "semantic": 48.0,
+      "total": 88.0,
+      "hard_gate": false,
+      "rule_issues": [
+        "促销输入没有明确限时，不能把普通活动价说成限时价"
+      ],
+      "serious_claims": 0,
+      "cross_version_copy_pass": true,
+      "pass": false,
+      "gaps": [
+        "未提及内部小口袋适合放置日常小物这一卖点",
+        "未明确涤纶面料的轻便性",
+        "尺寸数字重复出现，略显冗余"
+      ]
+    },
+    {
+      "version": 2,
+      "program": 40.0,
+      "semantic": 48.0,
+      "total": 88.0,
+      "hard_gate": false,
+      "rule_issues": [
+        "促销输入没有明确限时，不能把普通活动价说成限时价"
+      ],
+      "serious_claims": 0,
+      "cross_version_copy_pass": true,
+      "pass": false,
+      "gaps": [
+        "未提及内部小口袋适合放置日常小物这一卖点",
+        "颜色仅简单带过搭配建议，未结合场景展开",
+        "活动限时表述正确但缺少具体截止时间，虽不是错但可更明确"
+      ]
+    }
+  ],
+  "pair_diversity": {
+    "score": 3,
+    "reason": "两版开场痛点角度不同（通勤换包 vs 大小包纠结），卖点展开情境和顺序有明显差异（版1酒店场景与拉链先后不同，版2早高峰与超市场景），节奏略有不同，但均完整覆盖相同卖点，整体结构相似，属有效不同。"
+  },
+  "rubric": "20261007.4-uniform-coverage-content-and-near-copy-checks"
+}

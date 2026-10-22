@@ -1,0 +1,77 @@
+{
+  "versions": [
+    {
+      "han_characters": 711,
+      "sentences": 29,
+      "coverage_groups": {
+        "材质成型": true,
+        "足弓": true,
+        "厚底软弹": true,
+        "静音防滑": true,
+        "清洗快干防臭": true,
+        "轻便场景": true,
+        "规格": true,
+        "选码": true
+      },
+      "coverage_rate": 1.0,
+      "natural_sentence_ratio": 1.0,
+      "duplicate_sentences": [],
+      "reference_5gram_overlap": 0.04,
+      "program_scores": {
+        "selling_point_coverage": 12.0,
+        "flow": 8.0,
+        "speakability": 10.0,
+        "length_fit": 4.18,
+        "fact_references": 5.0
+      },
+      "program_total": 39.18,
+      "invalid_references": false,
+      "app_issues": []
+    },
+    {
+      "han_characters": 805,
+      "sentences": 30,
+      "coverage_groups": {
+        "材质成型": true,
+        "足弓": true,
+        "厚底软弹": true,
+        "静音防滑": true,
+        "清洗快干防臭": true,
+        "轻便场景": true,
+        "规格": true,
+        "选码": true
+      },
+      "coverage_rate": 1.0,
+      "natural_sentence_ratio": 1.0,
+      "duplicate_sentences": [],
+      "reference_5gram_overlap": 0.052,
+      "program_scores": {
+        "selling_point_coverage": 12.0,
+        "flow": 8.0,
+        "speakability": 10.0,
+        "length_fit": 4.74,
+        "fact_references": 5.0
+      },
+      "program_total": 39.74,
+      "invalid_references": false,
+      "app_issues": []
+    }
+  ],
+  "pair": [
+    {
+      "a": 1,
+      "b": 2,
+      "fivegram_jaccard": 0.137,
+      "shared_narrative_sentences": [],
+      "near_copy_ratio": 0.053,
+      "near_copies": [
+        {
+          "a": "足弓位置做了支撑设计，搭配小蛮腰厚底，踩下去有软弹缓震的感觉。",
+          "b": "足弓位置做了支撑设计，搭配小蛮腰厚底，踩下去有软弹缓震的体验。",
+          "similarity": 0.935
+        }
+      ],
+      "opening_similarity": 0.319
+    }
+  ]
+}

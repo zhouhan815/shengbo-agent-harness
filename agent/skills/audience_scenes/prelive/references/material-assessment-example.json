@@ -1,0 +1,70 @@
+{
+  "schema_version": "material-assessment.v1",
+  "product_candidates": [
+    {
+      "candidate_id": "example-slipper",
+      "name": "示例凉拖（仅协议示例）",
+      "identity_status": "new",
+      "sku_keys": [
+        "black-38-39"
+      ],
+      "evidence_ids": [
+        "e-material"
+      ]
+    }
+  ],
+  "content_groups": [
+    {
+      "group_id": "facts-1",
+      "role": "product_facts",
+      "product_candidate_ids": [
+        "example-slipper"
+      ],
+      "language": "zh-CN",
+      "evidence_ids": [
+        "e-material"
+      ]
+    }
+  ],
+  "field_observations": [
+    {
+      "observation_id": "material-1",
+      "product_candidate_id": "example-slipper",
+      "sku_key": "black-38-39",
+      "field_path": "material",
+      "value": "EVA",
+      "scope": "catalog",
+      "claim_kind": "fact",
+      "knowledge": "known",
+      "evidence_ids": [
+        "e-material"
+      ]
+    }
+  ],
+  "missing_info": [
+    {
+      "item_id": "price-currency",
+      "product_candidate_id": "example-slipper",
+      "field_path": "currency",
+      "level": "conditional",
+      "why": "具体报价需要币种",
+      "question": "如果本次要报具体价格，请补充币种；也可本版暂不报价。",
+      "applicable_purposes": [
+        "script_generation"
+      ],
+      "blocked_actions": [
+        "include_price"
+      ],
+      "condition": "本次口播包含具体报价",
+      "condition_active": false,
+      "can_skip": true,
+      "alternatives": [
+        "本版不报具体价格"
+      ],
+      "status": "unresolved"
+    }
+  ],
+  "notes": [
+    "这是数据形状示例。e-material需在实际AnalysisReport.evidence定义并引用本次授权来源；不能复制本例事实。"
+  ]
+}

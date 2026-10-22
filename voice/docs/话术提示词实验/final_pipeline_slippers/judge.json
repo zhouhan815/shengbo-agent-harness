@@ -1,0 +1,92 @@
+{
+  "versions": [
+    {
+      "index": 1,
+      "scores": {
+        "natural_live_speech": 14,
+        "benefit_scene_expansion": 15,
+        "coherent_flow": 9,
+        "non_repetition": 7,
+        "purchase_guidance": 5
+      },
+      "score_reasons": [
+        "natural_live_speech: 14/15，口语化程度高，如‘咱们聊点实在的’‘你有没有过这种时候’等，自然流畅，交互感强，非说明书式播报。",
+        "benefit_scene_expansion: 15/20，对足弓支撑、静音防滑、防臭快干、轻便耐磨四个卖点均有展开，每个卖点结合具体情境（厨房、浴室、旅行）并说明有限收益，有效展开卖点达4个，但部分展开仍较浅，如‘耐磨’仅提‘很耐磨’未深入场景。",
+        "coherent_flow: 9/10，结构清晰，痛点引入自然，依次展开核心卖点、辅助卖点、颜色尺码、价格、总结，逻辑连贯，过渡平滑，稍显模板化但整体流畅。",
+        "non_repetition: 7/10，整体无明显空话凑字，但对‘静音防滑’‘足弓支撑’等卖点重复强调，且颜色列举较多但描述重复用词，略显冗长。",
+        "purchase_guidance: 5/5，明确给出原价、促销价、币种，并引导根据颜色和尺码选择，‘合适再下单’自然不强迫。"
+      ],
+      "unsupported_claims": [
+        {
+          "quote": "穿上之后脚心那个位置能感觉到托着。",
+          "reason": "资料仅提及‘足弓支撑’，未描述穿着时脚心具体有托举感，属于添加未提供的体验性断言，可能被视为亲身体验。",
+          "severity": "minor"
+        },
+        {
+          "quote": "有支撑的鞋底会让脚底压力分散一些，不会全压在脚掌上。",
+          "reason": "‘压力分散’‘不会全压在脚掌上’是功效断言，资料仅说‘缓解久站带来的足部压力’，未明确压力分散机制，属擅自添加性能保证。",
+          "severity": "minor"
+        }
+      ],
+      "price_and_terms_correct": true,
+      "knowledge_leaks": [],
+      "main_gaps": [
+        "对‘耐磨’卖点仅简单提及‘很耐磨’，未结合具体使用场景或有限收益进行展开，影响卖点充分性。",
+        "颜色描述虽丰富但偏向主观推荐，如‘温柔一点可以看粉色’，未基于商品客观特点，可能造成选择引导不够客观。",
+        "整体播报结构虽完整但稍显冗长，部分卖点展开重复，节奏可进一步优化。"
+      ]
+    },
+    {
+      "index": 2,
+      "scores": {
+        "natural_live_speech": 12,
+        "benefit_scene_expansion": 11,
+        "coherent_flow": 8,
+        "non_repetition": 8,
+        "purchase_guidance": 5
+      },
+      "score_reasons": [
+        "natural_live_speech: 12/15，整体口语自然，有‘咱们聊’‘姐妹’等直播用语，但部分句子如‘这双是足弓支撑静音防滑厚底凉拖鞋，小蛮腰女款，来自 Joy Share 生活选物’偏产品字段播报，流畅度尚可。",
+        "benefit_scene_expansion: 11/20，对足弓支撑、静音防滑、防臭快干、轻便等卖点有展开，但展开深度不足，缺少对每个卖点的具体情境和有限生活收益的充分描述，卖点覆盖较广但有效展开约3个。",
+        "coherent_flow: 8/10，从旅行痛点引入，到材质、设计、功能、场景、规格、价格，结构完整且过渡自然，但开头痛点稍短，后段规格价格收口略快。",
+        "non_repetition: 8/10，基本无空话凑字，但对足弓支撑、静音防滑等重复提及，部分描述如‘专为女性足部曲线设计’出现两次，略显重复。",
+        "purchase_guidance: 5/5，明确给出原价、促销价、币种，并引导‘根据自己的颜色喜好和尺码来选，合适再下单’，真实且自然。"
+      ],
+      "unsupported_claims": [
+        {
+          "quote": "住酒店时想换上自己的拖鞋，又怕箱子被占地方、鞋子闷出味道。",
+          "reason": "将酒店场景中的担忧具体化为‘鞋子闷出味道’，但商品资料未提及鞋子闷味问题，属于添加未提供的负面效果担忧，可能暗示产品需要解决此问题但资料未支持。",
+          "severity": "minor"
+        },
+        {
+          "quote": "它不是那种平平的鞋底，上脚之后整体线条更利落。",
+          "reason": "‘整体线条更利落’属于额外效果断言，资料仅提‘视觉上修饰脚型’，未支持线条更利落的说法，属擅自添加量级效果。",
+          "severity": "minor"
+        }
+      ],
+      "price_and_terms_correct": true,
+      "knowledge_leaks": [],
+      "main_gaps": [
+        "痛点引入较浅，仅简单提及旅行带拖鞋纠结和酒店换鞋担忧，未深入展开，导致后续卖点说服力减弱。",
+        "卖点展开不够充分，多个卖点（如旅行出游、沙滩漫步）仅一笔带过，缺乏具体情境和有限生活收益的细化描述。",
+        "规格描述较简略，仅列举颜色种类和尺码区间，未根据颜色或尺码特点提供选择建议，购买引导稍显泛泛。"
+      ]
+    }
+  ],
+  "pair_diversity": {
+    "score": 3,
+    "reason": "两版开场和生活痛点展开明显不同：版本1以旅行带拖鞋纠结引入，版本2以厨房久站和浴室静音场景引入，重点展开有效不同；但版本2后续卖点展开顺序仍沿袭模板化结构，情境和节奏有差异但未达两项明显不同且均完整，故评为3分。"
+  },
+  "judge_model": "deepseek-flash",
+  "judge_protocol": "v2-core-facts-only-no-unsupported-reference-priming",
+  "usage": {
+    "prompt_tokens": 2436,
+    "completion_tokens": 1427,
+    "total_tokens": 3863,
+    "prompt_tokens_details": {
+      "cached_tokens": 1024
+    },
+    "prompt_cache_hit_tokens": 1024,
+    "prompt_cache_miss_tokens": 1412
+  }
+}

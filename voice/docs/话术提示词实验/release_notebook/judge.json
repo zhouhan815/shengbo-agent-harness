@@ -1,0 +1,70 @@
+{
+  "versions": [
+    {
+      "index": 1,
+      "scores": {
+        "natural_live_speech": 14,
+        "benefit_scene_expansion": 16,
+        "coherent_flow": 8,
+        "non_repetition": 9,
+        "purchase_guidance": 5
+      },
+      "score_reasons": [
+        "口语流畅，如“你有没有那种时刻”“翻开就用”，自然亲切。",
+        "卖点展开具体：点阵→对齐和画图；A5→桌面和携带；80页→记录容量；软封面→手感；颜色→场合选择。均有效。",
+        "结构清晰，痛点→商品→卖点→价格→收口，逻辑顺畅。",
+        "表达多变，无重复凑字，但“点阵”相关描述与第一版有相似性。",
+        "引导购买自然，“可以按照喜欢的颜色来选”“合适再下单”，且说明优惠适合备货。"
+      ],
+      "unsupported_claims": [],
+      "price_and_terms_correct": true,
+      "knowledge_leaks": [],
+      "main_gaps": [
+        "颜色部分“看着心情也轻快些”略带主观，但未越界。",
+        "点阵卖点举例（小图、表格）合理，但缺少手账贴纸等更具体场景。",
+        "软封面“卷一下塞进帆布袋侧袋”合理联想，但未强调容量。"
+      ]
+    },
+    {
+      "index": 2,
+      "scores": {
+        "natural_live_speech": 13,
+        "benefit_scene_expansion": 16,
+        "coherent_flow": 8,
+        "non_repetition": 8,
+        "purchase_guidance": 4
+      },
+      "score_reasons": [
+        "口语自然，对话感强，如“来了的朋友先别急着走”“我懂这种感觉”。",
+        "卖点展开充分：A5尺寸→出门放包；80页→记录容量；软封面→手感；点阵格式→对齐画图；颜色→选择；均有情境和收益。",
+        "结构连贯，从痛点引入到商品介绍、规格、价格、收口，过渡自然。",
+        "表达丰富，无空话凑字，但“比临时找纸踏实”“手感比较随和”略有重复感。",
+        "真实价格19元、优惠条件清晰，自然引导“合适再下单”，但未明确引导购买动作。"
+      ],
+      "unsupported_claims": [],
+      "price_and_terms_correct": true,
+      "knowledge_leaks": [],
+      "main_gaps": [
+        "颜色描述仅简单区分，未充分利用浅灰和浅绿的场景联想。",
+        "点阵格式的卖点举例（写整齐笔记、画表格）合理，但缺少更具体的日常使用场景。",
+        "软封面的卖点展开较简略，可增加如“卷起塞包”等情境。"
+      ]
+    }
+  ],
+  "pair_diversity": {
+    "score": 3,
+    "reason": "两版开场和痛点引入明显不同，重点展开顺序有差异（第一版先A5再80页，第二版先点阵），但卖点展开情境和节奏相似度较高，均完整自然。"
+  },
+  "judge_model": "deepseek-flash",
+  "judge_protocol": "v2-core-facts-only-no-unsupported-reference-priming",
+  "usage": {
+    "prompt_tokens": 2018,
+    "completion_tokens": 729,
+    "total_tokens": 2747,
+    "prompt_tokens_details": {
+      "cached_tokens": 768
+    },
+    "prompt_cache_hit_tokens": 768,
+    "prompt_cache_miss_tokens": 1250
+  }
+}

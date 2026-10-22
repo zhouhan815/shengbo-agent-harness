@@ -1,0 +1,45 @@
+{
+  "schema_version": "playlist-design-probe-v1",
+  "status": "passed",
+  "validation_kind": "independent_design_algorithm_model",
+  "business_application_imported": false,
+  "algorithm_version": "reorder-v1",
+  "design_document": "12_用户编排与重排设计.md",
+  "distribution_cases": 2681,
+  "case_counts_by_product_groups": {
+    "1": 6,
+    "2": 36,
+    "3": 196,
+    "4": 721,
+    "5": 1722
+  },
+  "input_bounds": {
+    "product_groups_min": 1,
+    "product_groups_max": 5,
+    "occurrences_per_group_min": 1,
+    "occurrences_per_group_max": 6,
+    "total_occurrences_max": 14
+  },
+  "distribution_checks": [
+    "exact_occurrence_permutation",
+    "within_product_relative_order",
+    "minimum_linear_same_product_adjacency",
+    "determinism"
+  ],
+  "ancillary_checks": [
+    "grouped_preserves_requested_product_order",
+    "full_shuffle_permutation_and_seed_repeatability",
+    "duplicate_script_occurrences_not_deduplicated",
+    "empty_list",
+    "single_item",
+    "linear_optimum_may_repeat_at_loop_boundary"
+  ],
+  "case_results_sha256": "6001f0418c61c14c635973950899c912a26d45b329be7947970cc12e92a9cb14",
+  "probe_source_sha256": "8624f24d342f6319b22e3547541b04adbadc0bc8389198663f481c0059ed95e2",
+  "limitations": [
+    "Finite enumerated inputs; not a proof for arbitrary input size.",
+    "Models a proposed algorithm, not implemented business functions.",
+    "No API, UI, CAS, approval invalidation, TTS or OBS integration test.",
+    "Linear adjacency checked; circular optimum is not claimed."
+  ]
+}

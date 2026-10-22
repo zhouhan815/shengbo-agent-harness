@@ -1,0 +1,46 @@
+{
+  "run": "regression_bag_r6",
+  "versions": [
+    {
+      "version": 1,
+      "program": 39.93,
+      "semantic": 53.0,
+      "total": 92.93,
+      "hard_gate": false,
+      "rule_issues": [
+        "促销输入没有明确限时，不能把普通活动价说成限时价"
+      ],
+      "serious_claims": 0,
+      "cross_version_copy_pass": true,
+      "pass": false,
+      "gaps": [
+        "未提及包体具体重量，轻便性缺乏量化支撑。",
+        "促销活动细节不足，仅给出活动价，无优惠券、赠品等信息。",
+        "缺少对目标人群的具体建议，如通勤距离、常用物品类型。"
+      ]
+    },
+    {
+      "version": 2,
+      "program": 39.91,
+      "semantic": 47.0,
+      "total": 86.91,
+      "hard_gate": false,
+      "rule_issues": [
+        "促销输入没有明确限时，不能把普通活动价说成限时价"
+      ],
+      "serious_claims": 0,
+      "cross_version_copy_pass": true,
+      "pass": false,
+      "gaps": [
+        "未提及包体具体重量，轻便性缺乏量化支撑。",
+        "促销活动细节不足，仅给出活动价，无优惠券、赠品等信息。",
+        "购买渠道和售后服务未涉及，影响购买决策。"
+      ]
+    }
+  ],
+  "pair_diversity": {
+    "score": 3,
+    "reason": "两版开场方式不同（第一版从出门习惯切入，第二版以提问互动开始），痛点表述和部分卖点展开顺序有差异（如第二版先讲拉链开合，第一版先讲可折叠），但整体结构相似，均为痛点-卖点-价格-收口模式，属于开场和重点展开有效不同。"
+  },
+  "rubric": "20261007.4-uniform-coverage-content-and-near-copy-checks"
+}

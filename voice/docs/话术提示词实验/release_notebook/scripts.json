@@ -1,0 +1,907 @@
+[
+  {
+    "id": "script_dc72a5c769ad4ef5",
+    "product_id": "lab_notebook",
+    "product_snapshot": {
+      "id": "lab_notebook",
+      "name": "轻记A5点阵笔记本",
+      "currency": "CNY",
+      "price": 19,
+      "promo_price": null,
+      "selling_points": "A5尺寸，80页，软封面。内页为点阵格式，可用于日常记录、简单手账、学习笔记。封面有浅灰、浅绿两种颜色。仅提供这些规格，没有纸张克重、钢笔适用性、环保认证和防水资料。",
+      "promotion": "购买3本可享9折，不与其他优惠叠加；活动截止时间未提供。",
+      "knowledge": "仅供问答的测试暗号：赤狐赠品，送三支钢笔，包邮到家。"
+    },
+    "revision": 1,
+    "label": "1",
+    "angle": "从使用体验与支撑结构切入，再讲打理与携带",
+    "locale": "zh-CN",
+    "source": "DeepSeek",
+    "status": "draft",
+    "blocks": [
+      {
+        "id": "script_dc72a5c769ad4ef5_b001",
+        "stage": "welcome",
+        "focus": "开场问候",
+        "ordinal": 1
+      },
+      {
+        "id": "script_dc72a5c769ad4ef5_b002",
+        "stage": "pain",
+        "focus": "日常记录缺纸的困扰",
+        "ordinal": 2
+      },
+      {
+        "id": "script_dc72a5c769ad4ef5_b003",
+        "stage": "identity",
+        "focus": "商品身份与核心用途",
+        "ordinal": 3
+      },
+      {
+        "id": "script_dc72a5c769ad4ef5_b004",
+        "stage": "benefit",
+        "focus": "点阵内页的使用体验",
+        "ordinal": 4
+      },
+      {
+        "id": "script_dc72a5c769ad4ef5_b005",
+        "stage": "benefit",
+        "focus": "A5尺寸与80页的容量",
+        "ordinal": 5
+      },
+      {
+        "id": "script_dc72a5c769ad4ef5_b006",
+        "stage": "benefit",
+        "focus": "软封面带来的携带手感",
+        "ordinal": 6
+      },
+      {
+        "id": "script_dc72a5c769ad4ef5_b007",
+        "stage": "specification",
+        "focus": "颜色选择与搭配建议",
+        "ordinal": 7
+      },
+      {
+        "id": "script_dc72a5c769ad4ef5_b008",
+        "stage": "price",
+        "focus": "价格与优惠条件",
+        "ordinal": 8
+      },
+      {
+        "id": "script_dc72a5c769ad4ef5_b009",
+        "stage": "cta",
+        "focus": "自然购买引导",
+        "ordinal": 9
+      }
+    ],
+    "sentences": [
+      {
+        "id": "script_dc72a5c769ad4ef5_s001",
+        "block_id": "script_dc72a5c769ad4ef5_b001",
+        "block_ordinal": 1,
+        "stage": "welcome",
+        "ordinal": 1,
+        "text": "欢迎来到直播间，今天咱们来看一款很顺手的小本子。",
+        "spoken_text": "欢迎来到直播间，今天咱们来看一款很顺手的小本子。",
+        "kind": "engagement",
+        "fact_ids": []
+      },
+      {
+        "id": "script_dc72a5c769ad4ef5_s002",
+        "block_id": "script_dc72a5c769ad4ef5_b001",
+        "block_ordinal": 1,
+        "stage": "welcome",
+        "ordinal": 2,
+        "text": "你有没有那种时刻，想随手记点东西，手边却没合适的纸？",
+        "spoken_text": "你有没有那种时刻，想随手记点东西，手边却没合适的纸？",
+        "kind": "engagement",
+        "fact_ids": []
+      },
+      {
+        "id": "script_dc72a5c769ad4ef5_s003",
+        "block_id": "script_dc72a5c769ad4ef5_b002",
+        "block_ordinal": 2,
+        "stage": "pain",
+        "ordinal": 3,
+        "text": "比如开会时突然要做笔记，翻开手机备忘录又觉得戳屏幕不够快。",
+        "spoken_text": "比如开会时突然要做笔记，翻开手机备忘录又觉得戳屏幕不够快。",
+        "kind": "engagement",
+        "fact_ids": []
+      },
+      {
+        "id": "script_dc72a5c769ad4ef5_s004",
+        "block_id": "script_dc72a5c769ad4ef5_b002",
+        "block_ordinal": 2,
+        "stage": "pain",
+        "ordinal": 4,
+        "text": "或者坐在桌前想理一理今天要做的事，写下来比在脑子里转更清楚。",
+        "spoken_text": "或者坐在桌前想理一理今天要做的事，写下来比在脑子里转更清楚。",
+        "kind": "engagement",
+        "fact_ids": []
+      },
+      {
+        "id": "script_dc72a5c769ad4ef5_s005",
+        "block_id": "script_dc72a5c769ad4ef5_b002",
+        "block_ordinal": 2,
+        "stage": "pain",
+        "ordinal": 5,
+        "text": "这种时候，如果手边有一本大小合适、翻开就能写的本子，节奏就顺很多。",
+        "spoken_text": "这种时候，如果手边有一本大小合适、翻开就能写的本子，节奏就顺很多。",
+        "kind": "engagement",
+        "fact_ids": []
+      },
+      {
+        "id": "script_dc72a5c769ad4ef5_s006",
+        "block_id": "script_dc72a5c769ad4ef5_b003",
+        "block_ordinal": 3,
+        "stage": "identity",
+        "ordinal": 6,
+        "text": "今天介绍的是轻记A5点阵笔记本。",
+        "spoken_text": "今天介绍的是轻记A5点阵笔记本。",
+        "kind": "product_claim",
+        "fact_ids": [
+          "NAME"
+        ]
+      },
+      {
+        "id": "script_dc72a5c769ad4ef5_s007",
+        "block_id": "script_dc72a5c769ad4ef5_b003",
+        "block_ordinal": 3,
+        "stage": "identity",
+        "ordinal": 7,
+        "text": "它内页是点阵格式，日常记录、简单手账、学习笔记都可以用。",
+        "spoken_text": "它内页是点阵格式，日常记录、简单手账、学习笔记都可以用。",
+        "kind": "product_claim",
+        "fact_ids": [
+          "SELLING"
+        ]
+      },
+      {
+        "id": "script_dc72a5c769ad4ef5_s008",
+        "block_id": "script_dc72a5c769ad4ef5_b004",
+        "block_ordinal": 4,
+        "stage": "benefit",
+        "ordinal": 8,
+        "text": "点阵内页和横线本不一样，它没有一条条横线框住你。",
+        "spoken_text": "点阵内页和横线本不一样，它没有一条条横线框住你。",
+        "kind": "product_claim",
+        "fact_ids": [
+          "SELLING"
+        ]
+      },
+      {
+        "id": "script_dc72a5c769ad4ef5_s009",
+        "block_id": "script_dc72a5c769ad4ef5_b004",
+        "block_ordinal": 4,
+        "stage": "benefit",
+        "ordinal": 9,
+        "text": "你想写整齐的笔记，就顺着点来对齐；想画个小图或拉个表格，也比纯白纸更容易找位置。",
+        "spoken_text": "你想写整齐的笔记，就顺着点来对齐；想画个小图或拉个表格，也比纯白纸更容易找位置。",
+        "kind": "product_claim",
+        "fact_ids": [
+          "SELLING"
+        ]
+      },
+      {
+        "id": "script_dc72a5c769ad4ef5_s010",
+        "block_id": "script_dc72a5c769ad4ef5_b004",
+        "block_ordinal": 4,
+        "stage": "benefit",
+        "ordinal": 10,
+        "text": "这种自由度很适合那些写笔记时偶尔想配个小示意、写手账时想贴点小记录的人。",
+        "spoken_text": "这种自由度很适合那些写笔记时偶尔想配个小示意、写手账时想贴点小记录的人。",
+        "kind": "product_claim",
+        "fact_ids": [
+          "SELLING"
+        ]
+      },
+      {
+        "id": "script_dc72a5c769ad4ef5_s011",
+        "block_id": "script_dc72a5c769ad4ef5_b005",
+        "block_ordinal": 5,
+        "stage": "benefit",
+        "ordinal": 11,
+        "text": "它是A5大小，放在桌面上不占太多地方，拿在手里也稳当。",
+        "spoken_text": "它是A5大小，放在桌面上不占太多地方，拿在手里也稳当。",
+        "kind": "product_claim",
+        "fact_ids": [
+          "SELLING"
+        ]
+      },
+      {
+        "id": "script_dc72a5c769ad4ef5_s012",
+        "block_id": "script_dc72a5c769ad4ef5_b005",
+        "block_ordinal": 5,
+        "stage": "benefit",
+        "ordinal": 12,
+        "text": "80页的容量，用来写一段时间的日常记录或者一门课的笔记，心里有个底。",
+        "spoken_text": "80页的容量，用来写一段时间的日常记录或者一门课的笔记，心里有个底。",
+        "kind": "product_claim",
+        "fact_ids": [
+          "SELLING"
+        ]
+      },
+      {
+        "id": "script_dc72a5c769ad4ef5_s013",
+        "block_id": "script_dc72a5c769ad4ef5_b005",
+        "block_ordinal": 5,
+        "stage": "benefit",
+        "ordinal": 13,
+        "text": "去图书馆或者咖啡店，包里塞一本，想写的时候翻开就用。",
+        "spoken_text": "去图书馆或者咖啡店，包里塞一本，想写的时候翻开就用。",
+        "kind": "product_claim",
+        "fact_ids": [
+          "SELLING"
+        ]
+      },
+      {
+        "id": "script_dc72a5c769ad4ef5_s014",
+        "block_id": "script_dc72a5c769ad4ef5_b006",
+        "block_ordinal": 6,
+        "stage": "benefit",
+        "ordinal": 14,
+        "text": "封面是软面的，拿在手里不会硬邦邦的。",
+        "spoken_text": "封面是软面的，拿在手里不会硬邦邦的。",
+        "kind": "product_claim",
+        "fact_ids": [
+          "SELLING"
+        ]
+      },
+      {
+        "id": "script_dc72a5c769ad4ef5_s015",
+        "block_id": "script_dc72a5c769ad4ef5_b006",
+        "block_ordinal": 6,
+        "stage": "benefit",
+        "ordinal": 15,
+        "text": "平时从桌上拿起来翻，或者卷一下塞进帆布袋侧袋，都比较随和。",
+        "spoken_text": "平时从桌上拿起来翻，或者卷一下塞进帆布袋侧袋，都比较随和。",
+        "kind": "product_claim",
+        "fact_ids": [
+          "SELLING"
+        ]
+      },
+      {
+        "id": "script_dc72a5c769ad4ef5_s016",
+        "block_id": "script_dc72a5c769ad4ef5_b006",
+        "block_ordinal": 6,
+        "stage": "benefit",
+        "ordinal": 16,
+        "text": "放在床头或者办公桌角落，软封面也不容易显得太正式，随手翻开压力小。",
+        "spoken_text": "放在床头或者办公桌角落，软封面也不容易显得太正式，随手翻开压力小。",
+        "kind": "product_claim",
+        "fact_ids": [
+          "SELLING"
+        ]
+      },
+      {
+        "id": "script_dc72a5c769ad4ef5_s017",
+        "block_id": "script_dc72a5c769ad4ef5_b007",
+        "block_ordinal": 7,
+        "stage": "specification",
+        "ordinal": 17,
+        "text": "封面颜色有浅灰和浅绿两种。",
+        "spoken_text": "封面颜色有浅灰和浅绿两种。",
+        "kind": "product_claim",
+        "fact_ids": [
+          "SELLING"
+        ]
+      },
+      {
+        "id": "script_dc72a5c769ad4ef5_s018",
+        "block_id": "script_dc72a5c769ad4ef5_b007",
+        "block_ordinal": 7,
+        "stage": "specification",
+        "ordinal": 18,
+        "text": "浅灰比较低调，放在办公桌上或者带出门都不太挑环境。",
+        "spoken_text": "浅灰比较低调，放在办公桌上或者带出门都不太挑环境。",
+        "kind": "product_claim",
+        "fact_ids": [
+          "SELLING"
+        ]
+      },
+      {
+        "id": "script_dc72a5c769ad4ef5_s019",
+        "block_id": "script_dc72a5c769ad4ef5_b007",
+        "block_ordinal": 7,
+        "stage": "specification",
+        "ordinal": 19,
+        "text": "浅绿多了一点清亮的感觉，写给自己的日常记录或者手账，看着心情也轻快些。",
+        "spoken_text": "浅绿多了一点清亮的感觉，写给自己的日常记录或者手账，看着心情也轻快些。",
+        "kind": "product_claim",
+        "fact_ids": [
+          "SELLING"
+        ]
+      },
+      {
+        "id": "script_dc72a5c769ad4ef5_s020",
+        "block_id": "script_dc72a5c769ad4ef5_b007",
+        "block_ordinal": 7,
+        "stage": "specification",
+        "ordinal": 20,
+        "text": "你可以根据平时用本子的场合来选，两个颜色都只有这一种规格，不用纠结型号。",
+        "spoken_text": "你可以根据平时用本子的场合来选，两个颜色都只有这一种规格，不用纠结型号。",
+        "kind": "product_claim",
+        "fact_ids": [
+          "SELLING"
+        ]
+      },
+      {
+        "id": "script_dc72a5c769ad4ef5_s021",
+        "block_id": "script_dc72a5c769ad4ef5_b008",
+        "block_ordinal": 8,
+        "stage": "price",
+        "ordinal": 21,
+        "text": "这本轻记A5点阵笔记本售价是19元。",
+        "spoken_text": "这本轻记A5点阵笔记本售价是十九元。",
+        "kind": "product_claim",
+        "fact_ids": [
+          "PRICE"
+        ]
+      },
+      {
+        "id": "script_dc72a5c769ad4ef5_s022",
+        "block_id": "script_dc72a5c769ad4ef5_b008",
+        "block_ordinal": 8,
+        "stage": "price",
+        "ordinal": 22,
+        "text": "没有另外的活动价，页面价格就是十九元。",
+        "spoken_text": "没有另外的活动价，页面价格就是十九元。",
+        "kind": "product_claim",
+        "fact_ids": [
+          "PRICE"
+        ]
+      },
+      {
+        "id": "script_dc72a5c769ad4ef5_s023",
+        "block_id": "script_dc72a5c769ad4ef5_b008",
+        "block_ordinal": 8,
+        "stage": "price",
+        "ordinal": 23,
+        "text": "另外有一项优惠：购买3本可以享9折，不与其他优惠叠加。",
+        "spoken_text": "另外有一项优惠：购买三本可以享九折，不与其他优惠叠加。",
+        "kind": "product_claim",
+        "fact_ids": [
+          "PROMOTION"
+        ]
+      },
+      {
+        "id": "script_dc72a5c769ad4ef5_s024",
+        "block_id": "script_dc72a5c769ad4ef5_b008",
+        "block_ordinal": 8,
+        "stage": "price",
+        "ordinal": 24,
+        "text": "活动截止时间资料里没有提供，以页面显示为准。",
+        "spoken_text": "活动截止时间资料里没有提供，以页面显示为准。",
+        "kind": "product_claim",
+        "fact_ids": [
+          "PROMOTION"
+        ]
+      },
+      {
+        "id": "script_dc72a5c769ad4ef5_s025",
+        "block_id": "script_dc72a5c769ad4ef5_b009",
+        "block_ordinal": 9,
+        "stage": "cta",
+        "ordinal": 25,
+        "text": "如果你正好缺一本随手写写画画的小本子，可以按照喜欢的颜色来选。",
+        "spoken_text": "如果你正好缺一本随手写写画画的小本子，可以按照喜欢的颜色来选。",
+        "kind": "engagement",
+        "fact_ids": []
+      },
+      {
+        "id": "script_dc72a5c769ad4ef5_s026",
+        "block_id": "script_dc72a5c769ad4ef5_b009",
+        "block_ordinal": 9,
+        "stage": "cta",
+        "ordinal": 26,
+        "text": "买三本享九折这个条件，适合想给自己备一本、再送朋友一本的情况。",
+        "spoken_text": "买三本享九折这个条件，适合想给自己备一本、再送朋友一本的情况。",
+        "kind": "product_claim",
+        "fact_ids": [
+          "PROMOTION"
+        ]
+      },
+      {
+        "id": "script_dc72a5c769ad4ef5_s027",
+        "block_id": "script_dc72a5c769ad4ef5_b009",
+        "block_ordinal": 9,
+        "stage": "cta",
+        "ordinal": 27,
+        "text": "合适再下单，不着急也没关系。",
+        "spoken_text": "合适再下单，不着急也没关系。",
+        "kind": "engagement",
+        "fact_ids": []
+      }
+    ],
+    "facts": [
+      {
+        "id": "NAME",
+        "text": "轻记A5点阵笔记本"
+      },
+      {
+        "id": "PRICE",
+        "text": "售价 19 CNY；没有另设活动价"
+      },
+      {
+        "id": "SELLING",
+        "text": "A5尺寸，80页，软封面。内页为点阵格式，可用于日常记录、简单手账、学习笔记。封面有浅灰、浅绿两种颜色。仅提供这些规格，没有纸张克重、钢笔适用性、环保认证和防水资料。"
+      },
+      {
+        "id": "PROMOTION",
+        "text": "购买3本可享9折，不与其他优惠叠加；活动截止时间未提供。"
+      }
+    ],
+    "issues": [],
+    "missing_information": [
+      "纸张克重",
+      "钢笔适用性",
+      "环保认证",
+      "防水资料",
+      "活动截止时间",
+      "包邮与退换售后条件"
+    ],
+    "created_at": "2026-10-07T17:32:55+08:00",
+    "usage": {
+      "prompt_tokens": 1602,
+      "completion_tokens": 2282,
+      "total_tokens": 3884,
+      "prompt_tokens_details": {
+        "cached_tokens": 1408
+      },
+      "prompt_cache_hit_tokens": 1408,
+      "prompt_cache_miss_tokens": 194
+    },
+    "model": "deepseek-flash",
+    "prompt_revision": "83debc0f9b27",
+    "quality_rewrite_attempts": 0,
+    "lab_elapsed_seconds": 7.73
+  },
+  {
+    "id": "script_eed461eeee984fb4",
+    "product_id": "lab_notebook",
+    "product_snapshot": {
+      "id": "lab_notebook",
+      "name": "轻记A5点阵笔记本",
+      "currency": "CNY",
+      "price": 19,
+      "promo_price": null,
+      "selling_points": "A5尺寸，80页，软封面。内页为点阵格式，可用于日常记录、简单手账、学习笔记。封面有浅灰、浅绿两种颜色。仅提供这些规格，没有纸张克重、钢笔适用性、环保认证和防水资料。",
+      "promotion": "购买3本可享9折，不与其他优惠叠加；活动截止时间未提供。",
+      "knowledge": "仅供问答的测试暗号：赤狐赠品，送三支钢笔，包邮到家。"
+    },
+    "revision": 1,
+    "label": "1",
+    "angle": "从旅行携带与外观选择切入，先讲规格颜色，再回到点阵内页与软封面体验",
+    "locale": "zh-CN",
+    "source": "DeepSeek",
+    "status": "draft",
+    "blocks": [
+      {
+        "id": "script_eed461eeee984fb4_b001",
+        "stage": "welcome",
+        "focus": "开场问候与轻互动",
+        "ordinal": 1
+      },
+      {
+        "id": "script_eed461eeee984fb4_b002",
+        "stage": "pain",
+        "focus": "临时想记录却没合适载体的困扰",
+        "ordinal": 2
+      },
+      {
+        "id": "script_eed461eeee984fb4_b003",
+        "stage": "identity",
+        "focus": "商品身份",
+        "ordinal": 3
+      },
+      {
+        "id": "script_eed461eeee984fb4_b004",
+        "stage": "benefit",
+        "focus": "A5尺寸与携带摆放",
+        "ordinal": 4
+      },
+      {
+        "id": "script_eed461eeee984fb4_b005",
+        "stage": "benefit",
+        "focus": "80页容量与软封面",
+        "ordinal": 5
+      },
+      {
+        "id": "script_eed461eeee984fb4_b006",
+        "stage": "benefit",
+        "focus": "点阵内页的使用方式",
+        "ordinal": 6
+      },
+      {
+        "id": "script_eed461eeee984fb4_b007",
+        "stage": "benefit",
+        "focus": "点阵格式的实际场景",
+        "ordinal": 7
+      },
+      {
+        "id": "script_eed461eeee984fb4_b008",
+        "stage": "specification",
+        "focus": "颜色选择建议",
+        "ordinal": 8
+      },
+      {
+        "id": "script_eed461eeee984fb4_b009",
+        "stage": "price",
+        "focus": "准确价格",
+        "ordinal": 9
+      },
+      {
+        "id": "script_eed461eeee984fb4_b010",
+        "stage": "promotion",
+        "focus": "多本优惠条件",
+        "ordinal": 10
+      },
+      {
+        "id": "script_eed461eeee984fb4_b011",
+        "stage": "cta",
+        "focus": "购买引导与结尾关注点",
+        "ordinal": 11
+      }
+    ],
+    "sentences": [
+      {
+        "id": "script_eed461eeee984fb4_s001",
+        "block_id": "script_eed461eeee984fb4_b001",
+        "block_ordinal": 1,
+        "stage": "welcome",
+        "ordinal": 1,
+        "text": "来了的朋友先别急着走，今天咱们看一本能随手带着的小本子。",
+        "spoken_text": "来了的朋友先别急着走，今天咱们看一本能随手带着的小本子。",
+        "kind": "engagement",
+        "fact_ids": []
+      },
+      {
+        "id": "script_eed461eeee984fb4_s002",
+        "block_id": "script_eed461eeee984fb4_b001",
+        "block_ordinal": 1,
+        "stage": "welcome",
+        "ordinal": 2,
+        "text": "你平时想记点东西的时候，是随手抓张纸，还是专门找本子？",
+        "spoken_text": "你平时想记点东西的时候，是随手抓张纸，还是专门找本子？",
+        "kind": "engagement",
+        "fact_ids": []
+      },
+      {
+        "id": "script_eed461eeee984fb4_s003",
+        "block_id": "script_eed461eeee984fb4_b002",
+        "block_ordinal": 2,
+        "stage": "pain",
+        "ordinal": 3,
+        "text": "有时候出门前就是突然想记两句话，翻包发现全是零散便签纸，回头找又不知道塞哪儿了。",
+        "spoken_text": "有时候出门前就是突然想记两句话，翻包发现全是零散便签纸，回头找又不知道塞哪儿了。",
+        "kind": "engagement",
+        "fact_ids": []
+      },
+      {
+        "id": "script_eed461eeee984fb4_s004",
+        "block_id": "script_eed461eeee984fb4_b002",
+        "block_ordinal": 2,
+        "stage": "pain",
+        "ordinal": 4,
+        "text": "我懂这种感觉，随便撕的纸容易丢，正经太厚的本子又不想背。",
+        "spoken_text": "我懂这种感觉，随便撕的纸容易丢，正经太厚的本子又不想背。",
+        "kind": "engagement",
+        "fact_ids": []
+      },
+      {
+        "id": "script_eed461eeee984fb4_s005",
+        "block_id": "script_eed461eeee984fb4_b003",
+        "block_ordinal": 3,
+        "stage": "identity",
+        "ordinal": 5,
+        "text": "今天说的就是这本轻记A5点阵笔记本。",
+        "spoken_text": "今天说的就是这本轻记A5点阵笔记本。",
+        "kind": "product_claim",
+        "fact_ids": [
+          "NAME"
+        ]
+      },
+      {
+        "id": "script_eed461eeee984fb4_s006",
+        "block_id": "script_eed461eeee984fb4_b004",
+        "block_ordinal": 4,
+        "stage": "benefit",
+        "ordinal": 6,
+        "text": "它是A5大小的本子。",
+        "spoken_text": "它是A5大小的本子。",
+        "kind": "product_claim",
+        "fact_ids": [
+          "SELLING"
+        ]
+      },
+      {
+        "id": "script_eed461eeee984fb4_s007",
+        "block_id": "script_eed461eeee984fb4_b004",
+        "block_ordinal": 4,
+        "stage": "benefit",
+        "ordinal": 7,
+        "text": "出门放在帆布袋侧兜、背包夹层里，或者上课往桌上一放，不会占太多地方。",
+        "spoken_text": "出门放在帆布袋侧兜、背包夹层里，或者上课往桌上一放，不会占太多地方。",
+        "kind": "product_claim",
+        "fact_ids": [
+          "SELLING"
+        ]
+      },
+      {
+        "id": "script_eed461eeee984fb4_s008",
+        "block_id": "script_eed461eeee984fb4_b004",
+        "block_ordinal": 4,
+        "stage": "benefit",
+        "ordinal": 8,
+        "text": "你要是去图书馆、咖啡馆写点东西，包里有这么一本，想翻开就翻开，比临时找纸踏实。",
+        "spoken_text": "你要是去图书馆、咖啡馆写点东西，包里有这么一本，想翻开就翻开，比临时找纸踏实。",
+        "kind": "product_claim",
+        "fact_ids": [
+          "SELLING"
+        ]
+      },
+      {
+        "id": "script_eed461eeee984fb4_s009",
+        "block_id": "script_eed461eeee984fb4_b005",
+        "block_ordinal": 5,
+        "stage": "benefit",
+        "ordinal": 9,
+        "text": "这本是八十页，用来记一段时间的日常、写写学习笔记，可以慢慢往里填。",
+        "spoken_text": "这本是八十页，用来记一段时间的日常、写写学习笔记，可以慢慢往里填。",
+        "kind": "product_claim",
+        "fact_ids": [
+          "SELLING"
+        ]
+      },
+      {
+        "id": "script_eed461eeee984fb4_s010",
+        "block_id": "script_eed461eeee984fb4_b005",
+        "block_ordinal": 5,
+        "stage": "benefit",
+        "ordinal": 10,
+        "text": "封面是软的，拿在手里不硬邦邦。",
+        "spoken_text": "封面是软的，拿在手里不硬邦邦。",
+        "kind": "product_claim",
+        "fact_ids": [
+          "SELLING"
+        ]
+      },
+      {
+        "id": "script_eed461eeee984fb4_s011",
+        "block_id": "script_eed461eeee984fb4_b005",
+        "block_ordinal": 5,
+        "stage": "benefit",
+        "ordinal": 11,
+        "text": "从桌上拿起来翻，或者顺手夹进书里，手感比较随和。",
+        "spoken_text": "从桌上拿起来翻，或者顺手夹进书里，手感比较随和。",
+        "kind": "product_claim",
+        "fact_ids": [
+          "SELLING"
+        ]
+      },
+      {
+        "id": "script_eed461eeee984fb4_s012",
+        "block_id": "script_eed461eeee984fb4_b006",
+        "block_ordinal": 6,
+        "stage": "benefit",
+        "ordinal": 12,
+        "text": "它里面是点阵格式，不是一条条横线。",
+        "spoken_text": "它里面是点阵格式，不是一条条横线。",
+        "kind": "product_claim",
+        "fact_ids": [
+          "SELLING"
+        ]
+      },
+      {
+        "id": "script_eed461eeee984fb4_s013",
+        "block_id": "script_eed461eeee984fb4_b006",
+        "block_ordinal": 6,
+        "stage": "benefit",
+        "ordinal": 13,
+        "text": "你想写整齐的笔记，可以顺着点来对齐；想画个小格子或者拉个简单表格，也有个参照，不会被横线限制住。",
+        "spoken_text": "你想写整齐的笔记，可以顺着点来对齐；想画个小格子或者拉个简单表格，也有个参照，不会被横线限制住。",
+        "kind": "product_claim",
+        "fact_ids": [
+          "SELLING"
+        ]
+      },
+      {
+        "id": "script_eed461eeee984fb4_s014",
+        "block_id": "script_eed461eeee984fb4_b006",
+        "block_ordinal": 6,
+        "stage": "benefit",
+        "ordinal": 14,
+        "text": "日常记录、简单手账、学习笔记，都能用得上。",
+        "spoken_text": "日常记录、简单手账、学习笔记，都能用得上。",
+        "kind": "product_claim",
+        "fact_ids": [
+          "SELLING"
+        ]
+      },
+      {
+        "id": "script_eed461eeee984fb4_s015",
+        "block_id": "script_eed461eeee984fb4_b007",
+        "block_ordinal": 7,
+        "stage": "benefit",
+        "ordinal": 15,
+        "text": "比如你复习的时候想在笔记旁边补一个小示意图，点阵本就不会让你觉得画上去跟横线打架。",
+        "spoken_text": "比如你复习的时候想在笔记旁边补一个小示意图，点阵本就不会让你觉得画上去跟横线打架。",
+        "kind": "product_claim",
+        "fact_ids": [
+          "SELLING"
+        ]
+      },
+      {
+        "id": "script_eed461eeee984fb4_s016",
+        "block_id": "script_eed461eeee984fb4_b007",
+        "block_ordinal": 7,
+        "stage": "benefit",
+        "ordinal": 16,
+        "text": "写购物清单、记待办、随手画个路线，这种本子也比较合适。",
+        "spoken_text": "写购物清单、记待办、随手画个路线，这种本子也比较合适。",
+        "kind": "product_claim",
+        "fact_ids": [
+          "SELLING"
+        ]
+      },
+      {
+        "id": "script_eed461eeee984fb4_s017",
+        "block_id": "script_eed461eeee984fb4_b008",
+        "block_ordinal": 8,
+        "stage": "specification",
+        "ordinal": 17,
+        "text": "封面有浅灰和浅绿两种颜色。",
+        "spoken_text": "封面有浅灰和浅绿两种颜色。",
+        "kind": "product_claim",
+        "fact_ids": [
+          "SELLING"
+        ]
+      },
+      {
+        "id": "script_eed461eeee984fb4_s018",
+        "block_id": "script_eed461eeee984fb4_b008",
+        "block_ordinal": 8,
+        "stage": "specification",
+        "ordinal": 18,
+        "text": "浅灰比较安静，放在办公桌上不抢眼；浅绿带一点清爽感，放在书堆里好认。",
+        "spoken_text": "浅灰比较安静，放在办公桌上不抢眼；浅绿带一点清爽感，放在书堆里好认。",
+        "kind": "product_claim",
+        "fact_ids": [
+          "SELLING"
+        ]
+      },
+      {
+        "id": "script_eed461eeee984fb4_s019",
+        "block_id": "script_eed461eeee984fb4_b008",
+        "block_ordinal": 8,
+        "stage": "specification",
+        "ordinal": 19,
+        "text": "你看自己平时喜欢低调一点还是亮一点，选喜欢的就好。",
+        "spoken_text": "你看自己平时喜欢低调一点还是亮一点，选喜欢的就好。",
+        "kind": "engagement",
+        "fact_ids": []
+      },
+      {
+        "id": "script_eed461eeee984fb4_s020",
+        "block_id": "script_eed461eeee984fb4_b009",
+        "block_ordinal": 9,
+        "stage": "price",
+        "ordinal": 20,
+        "text": "价格是十九元。",
+        "spoken_text": "价格是十九元。",
+        "kind": "product_claim",
+        "fact_ids": [
+          "PRICE"
+        ]
+      },
+      {
+        "id": "script_eed461eeee984fb4_s021",
+        "block_id": "script_eed461eeee984fb4_b009",
+        "block_ordinal": 9,
+        "stage": "price",
+        "ordinal": 21,
+        "text": "没有另设活动价，就是这个售价。",
+        "spoken_text": "没有另设活动价，就是这个售价。",
+        "kind": "product_claim",
+        "fact_ids": [
+          "PRICE"
+        ]
+      },
+      {
+        "id": "script_eed461eeee984fb4_s022",
+        "block_id": "script_eed461eeee984fb4_b010",
+        "block_ordinal": 10,
+        "stage": "promotion",
+        "ordinal": 22,
+        "text": "如果你打算买三本，可以享九折，这个优惠不和其他优惠叠加。",
+        "spoken_text": "如果你打算买三本，可以享九折，这个优惠不和其他优惠叠加。",
+        "kind": "product_claim",
+        "fact_ids": [
+          "PROMOTION"
+        ]
+      },
+      {
+        "id": "script_eed461eeee984fb4_s023",
+        "block_id": "script_eed461eeee984fb4_b010",
+        "block_ordinal": 10,
+        "stage": "promotion",
+        "ordinal": 23,
+        "text": "活动截止时间这边没有提供，有需要就按页面显示来。",
+        "spoken_text": "活动截止时间这边没有提供，有需要就按页面显示来。",
+        "kind": "engagement",
+        "fact_ids": []
+      },
+      {
+        "id": "script_eed461eeee984fb4_s024",
+        "block_id": "script_eed461eeee984fb4_b011",
+        "block_ordinal": 11,
+        "stage": "cta",
+        "ordinal": 24,
+        "text": "总结一下，值得关注的是A5尺寸加八十页的容量、点阵内页写画都方便，还有软封面拿取顺手。",
+        "spoken_text": "总结一下，值得关注的是E A 5尺寸加八十页的容量、点阵内页写画都方便，还有软封面拿取顺手。",
+        "kind": "product_claim",
+        "fact_ids": [
+          "NAME",
+          "SELLING"
+        ]
+      },
+      {
+        "id": "script_eed461eeee984fb4_s025",
+        "block_id": "script_eed461eeee984fb4_b011",
+        "block_ordinal": 11,
+        "stage": "cta",
+        "ordinal": 25,
+        "text": "颜色有浅灰和浅绿，你按自己的习惯挑一本。",
+        "spoken_text": "颜色有浅灰和浅绿，你按自己的习惯挑一本。",
+        "kind": "engagement",
+        "fact_ids": []
+      },
+      {
+        "id": "script_eed461eeee984fb4_s026",
+        "block_id": "script_eed461eeee984fb4_b011",
+        "block_ordinal": 11,
+        "stage": "cta",
+        "ordinal": 26,
+        "text": "合适再下单。",
+        "spoken_text": "合适再下单。",
+        "kind": "engagement",
+        "fact_ids": []
+      }
+    ],
+    "facts": [
+      {
+        "id": "NAME",
+        "text": "轻记A5点阵笔记本"
+      },
+      {
+        "id": "PRICE",
+        "text": "售价 19 CNY；没有另设活动价"
+      },
+      {
+        "id": "SELLING",
+        "text": "A5尺寸，80页，软封面。内页为点阵格式，可用于日常记录、简单手账、学习笔记。封面有浅灰、浅绿两种颜色。仅提供这些规格，没有纸张克重、钢笔适用性、环保认证和防水资料。"
+      },
+      {
+        "id": "PROMOTION",
+        "text": "购买3本可享9折，不与其他优惠叠加；活动截止时间未提供。"
+      }
+    ],
+    "issues": [],
+    "missing_information": [],
+    "created_at": "2026-10-07T17:33:01+08:00",
+    "usage": {
+      "prompt_tokens": 1883,
+      "completion_tokens": 1631,
+      "total_tokens": 3514,
+      "prompt_tokens_details": {
+        "cached_tokens": 1536
+      },
+      "prompt_cache_hit_tokens": 1536,
+      "prompt_cache_miss_tokens": 347
+    },
+    "model": "deepseek-flash",
+    "prompt_revision": "83debc0f9b27",
+    "quality_rewrite_attempts": 0,
+    "lab_elapsed_seconds": 6.86
+  }
+]

@@ -1,0 +1,76 @@
+{
+  "versions": [
+    {
+      "index": 1,
+      "scores": {
+        "natural_live_speech": 14,
+        "benefit_scene_expansion": 12,
+        "coherent_flow": 8,
+        "non_repetition": 7,
+        "purchase_guidance": 5
+      },
+      "score_reasons": [
+        "natural_live_speech=14：语言通俗自然，如“如果你在家走动一会儿就觉得脚底发紧，这双可以看一看”，但整体节奏较快，部分句子略短，接近逐点播报。",
+        "benefit_scene_expansion=12：足弓支撑、静音防滑有展开，如“站着切菜、晾衣服的时候，足弓有承托，脚底压力会分散一些”“晚上家人休息了，你起来倒杯水，脚步声轻一些”，但轻便仅说“居家穿、出门散步、倒垃圾都能应付”，没有具体情境；快干、防臭展开较弱，颜色尺码仍偏列表式，整体有效展开不足4个卖点。",
+        "coherent_flow=8：从居家脚底发紧痛点切入，到足弓支撑、静音防滑、材质、颜色尺码、价格，结构基本完整，但部分卖点如“轻便耐磨”插入较突兀，转场不如版本1自然。",
+        "non_repetition=7：整体无大段重复，但“足弓支撑”“静音防滑”“轻便”等核心词多次出现，缺少更丰富的不同角度表达，部分句子信息密度较低。",
+        "purchase_guidance=5：价格币种条件正确，且有“挑一个喜欢的颜色和合适的尺码，合适再下单”的自然引导。"
+      ],
+      "unsupported_claims": [],
+      "price_and_terms_correct": true,
+      "knowledge_leaks": [],
+      "main_gaps": [
+        "轻便卖点展开不足，仅说“轻便好带”，未像版本1那样放入旅行装箱、减少行李重量等具体情境。",
+        "颜色建议较泛，只说“清爽看白色或粉色，稳一点选卡其或黑色”，缺少更贴合使用场景的搭配说明。",
+        "防臭快干只提“一冲即净，打理省事”，没有充分说明“防臭快干”带来的实际生活便利。"
+      ]
+    },
+    {
+      "index": 2,
+      "scores": {
+        "natural_live_speech": 14,
+        "benefit_scene_expansion": 16,
+        "coherent_flow": 9,
+        "non_repetition": 9,
+        "purchase_guidance": 5
+      },
+      "score_reasons": [
+        "natural_live_speech=14：整体口播自然，如“有没有朋友跟我一样，出门玩几天，行李箱里塞不下一双又重又占地方的拖鞋？”有直播互动感，但“E V A”逐字母念法稍显生硬，接近读词。",
+        "benefit_scene_expansion=16：多个卖点有效展开，如足弓支撑→“在家站着切菜、晾衣服，或者等水烧开的时候，足弓位置有承托，脚底压力能缓解一些”，静音防滑→“晚上家人休息了，你起来倒杯水、去趟洗手间，脚步声轻一些”，轻便→“出门玩几天，行李箱里塞不下一双又重又占地方的拖鞋？”，快干易清洗→“冲洗的时候一冲即净，打理起来省事”，但资料少，颜色尺码部分偏陈列，未展开到17分以上。",
+        "coherent_flow=9：从旅行痛点、居家外穿需求，到商品介绍、卖点、颜色尺码、价格收口，结构完整且过渡自然，如“先从出门带它说起”“再说它的样子”“回到穿着的核心”。",
+        "non_repetition=9：没有明显空话凑字，卖点按不同角度展开，如轻便、修饰脚型、足弓支撑、静音防滑、快干分别用不同情境说明。",
+        "purchase_guidance=5：价格币种条件正确，且给出自然选择引导，如“颜色和尺码大家按自己的喜好和脚型来选，合适再下单”。"
+      ],
+      "unsupported_claims": [
+        {
+          "quote": "它也有耐磨特性，日常穿不用太娇气。",
+          "reason": "商品资料卖点字段中未明确列出“耐磨”特性，该销售断言缺少支持。",
+          "severity": "minor"
+        }
+      ],
+      "price_and_terms_correct": true,
+      "knowledge_leaks": [],
+      "main_gaps": [
+        "对“小蛮腰”厚底的视觉修饰脚型说明较好，但可更具体地关联到日常穿搭场景，如“配阔腿裤或家居短裤时从侧面看更利落”。",
+        "颜色分段建议较泛，若能结合风格或肤色给更具体的搭配示例会更实用。",
+        "防臭快干的展开偏短，可补充诸如“洗完澡脚上带水直接穿也不易闷出味道”的合理场景。"
+      ]
+    }
+  ],
+  "pair_diversity": {
+    "score": 4,
+    "reason": "两版开场痛点不同：版本1从旅行装拖鞋和居家外穿切换切入，版本2从居家久站脚底发紧切入；卖点展开顺序不同，版本1先轻便旅行、再小蛮腰外观、再足弓支撑、静音防滑，版本2先足弓支撑、再静音防滑、再轻便旅行；情境细节也有差异，如版本1有海边、出差、倒垃圾，版本2有做饭、收拾屋子、倒杯水。两版均完整且自然，差异鲜明。"
+  },
+  "judge_model": "deepseek-flash",
+  "judge_protocol": "v2-core-facts-only-no-unsupported-reference-priming",
+  "usage": {
+    "prompt_tokens": 2582,
+    "completion_tokens": 1292,
+    "total_tokens": 3874,
+    "prompt_tokens_details": {
+      "cached_tokens": 1024
+    },
+    "prompt_cache_hit_tokens": 1024,
+    "prompt_cache_miss_tokens": 1558
+  }
+}

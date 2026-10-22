@@ -1,0 +1,76 @@
+{
+  "versions": [
+    {
+      "index": 1,
+      "scores": {
+        "natural_live_speech": 14,
+        "benefit_scene_expansion": 16,
+        "coherent_flow": 9,
+        "non_repetition": 9,
+        "purchase_guidance": 5
+      },
+      "score_reasons": [
+        "口语自然，如“今天先别急着划走。”但部分句式与第一版相似。",
+        "足弓支撑、小蛮腰厚底、静音防滑、快干防臭均有展开，但轻便旅行场景较简略，只有“出门旅行时塞进行李箱不占太多地方”，展开不够充分，故评16分。",
+        "从痛点身份到规格价格收口，结构连贯。",
+        "没有重复填充，卖点表达有变化。",
+        "价格币种优惠条件正确，有自然选择引导。"
+      ],
+      "unsupported_claims": [],
+      "price_and_terms_correct": true,
+      "knowledge_leaks": [],
+      "main_gaps": [
+        "耐磨特性一笔带过“也做了耐磨处理”，未结合场景展开。",
+        "颜色仅部分列举，未说明全部颜色但资料有，不算事实错误。",
+        "鞋底防滑只在浴室和室内提及，未扩展至海边等场景。"
+      ]
+    },
+    {
+      "index": 2,
+      "scores": {
+        "natural_live_speech": 14,
+        "benefit_scene_expansion": 18,
+        "coherent_flow": 9,
+        "non_repetition": 9,
+        "purchase_guidance": 5
+      },
+      "score_reasons": [
+        "语言自然口语，如“如果你正在收拾行李，或者想给家里换一双好看又好穿的拖鞋，可以先留下来看一看。”没有说明书感。",
+        "至少4个卖点有有效展开：轻便旅行（“收拾行李的时候，把它塞进行李箱角落……”）、小蛮腰厚底（“厚底腰部有一个收窄的弧度，视觉上会修饰脚型线条”）、足弓支撑（“足弓支撑就是在脚底中间多一个承托，穿上以后脚底不是空落落的，对久站带来的足部压力有一定缓解作用”）、静音防滑（“晚上家人都休息了，你去浴室洗漱或者到厨房倒水，鞋底静音一点，走动时对家人的打扰就少一些”），均给出情境和有限收益。",
+        "流畅通顺，从痛点身份到规格价格收口，不机械贴标签。",
+        "没有空话凑字，各卖点表述有变化，非简单重复方便舒适。",
+        "价格币种正确，优惠条件交代清楚，有自然选择引导如“合适再下单”。"
+      ],
+      "unsupported_claims": [
+        {
+          "quote": "酒店里一般有一次性拖鞋",
+          "reason": "商品资料未提及酒店是否提供一次性拖鞋，此断言与商品无关且无依据。",
+          "severity": "minor"
+        }
+      ],
+      "price_and_terms_correct": true,
+      "knowledge_leaks": [],
+      "main_gaps": [
+        "未提及鞋底耐磨特性，虽然稿中说了“轻便耐磨”但未展开，不过资料有体现，不算严重缺口。",
+        "颜色列举后只给部分颜色建议，未覆盖全部颜色属性，但颜色本身不需要全部展开。",
+        "尺码范围数字口语混用（三十六码到三十七码等），但未造成事实错误。"
+      ]
+    }
+  ],
+  "pair_diversity": {
+    "score": 3,
+    "reason": "两版开场不同，一版从旅行收拾行李切入，一版从居家站久脚底累切入，足弓支撑、静音防滑等卖点展开顺序和情境略有差异，但整体模板结构相似，均按痛点-卖点-规格-价格收口。"
+  },
+  "judge_model": "deepseek-flash",
+  "judge_protocol": "v2-core-facts-only-no-unsupported-reference-priming",
+  "usage": {
+    "prompt_tokens": 2779,
+    "completion_tokens": 876,
+    "total_tokens": 3655,
+    "prompt_tokens_details": {
+      "cached_tokens": 1024
+    },
+    "prompt_cache_hit_tokens": 1024,
+    "prompt_cache_miss_tokens": 1755
+  }
+}

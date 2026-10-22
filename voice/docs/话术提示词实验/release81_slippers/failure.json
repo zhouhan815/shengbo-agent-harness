@@ -1,0 +1,5 @@
+{
+  "version": 1,
+  "error_type": "RuntimeError",
+  "message": "话术自动重写一次后仍未通过检查：遗漏输入中明确的重要特点：耐磨；已有话术未改动，请重试。"
+}

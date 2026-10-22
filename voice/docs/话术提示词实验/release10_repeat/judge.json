@@ -1,0 +1,70 @@
+{
+  "versions": [
+    {
+      "index": 1,
+      "scores": {
+        "natural_live_speech": 14,
+        "benefit_scene_expansion": 17,
+        "coherent_flow": 9,
+        "non_repetition": 8,
+        "purchase_guidance": 4
+      },
+      "score_reasons": [
+        "natural_live_speech：'姐妹平时在家忙前忙后'等语句高度口语化，易懂；'整双鞋用的是优选 E V A 环保材质，一体成型'稍显生硬，扣1分。",
+        "benefit_scene_expansion：至少4个卖点有有效展开：足弓支撑（脚心位置被稳稳托住）、厚底软弹（厨房切菜、阳台晾衣）、静音（晚上起来倒水、去洗手间）、防滑（浴室）、轻便（倒垃圾、散步拿快递）、快干防臭（洗完澡冲一冲），场景具体，给17分。",
+        "coherent_flow：从居家痛点引入，按功能到颜色尺码价格收口，逻辑连贯；但'防滑特性'与'静音'分述略有跳跃，扣1分。",
+        "non_repetition：'防滑特性在浴室或室内走动时能多一分踏实，不过湿地面大家还是要放慢脚步，小心行走'与静音描述略有重复感，扣2分。",
+        "purchase_guidance：'喜欢的话别犹豫太久，趁活动把颜色和尺码选好'有引导，但未强调按脚型选码，扣1分。"
+      ],
+      "unsupported_claims": [],
+      "price_and_terms_correct": true,
+      "knowledge_leaks": [],
+      "main_gaps": [
+        "对'快干'特性仅一句话带过，未说明在浴室或海边使用后的实际方便程度。",
+        "颜色推荐虽然较丰富，但缺乏对每种颜色与场景搭配的具体建议。",
+        "尺码部分虽提标准码和偏肉选大，但未说明若选错如何处理。"
+      ]
+    },
+    {
+      "index": 2,
+      "scores": {
+        "natural_live_speech": 13,
+        "benefit_scene_expansion": 16,
+        "coherent_flow": 9,
+        "non_repetition": 9,
+        "purchase_guidance": 4
+      },
+      "score_reasons": [
+        "natural_live_speech：整体口语自然，'咱们聊一双能陪你从家里走到海边的凉拖鞋'亲切；'该主播'表述如'这双就是'顺；但'优选 E V A 环保材质，一体成型'稍显产品说明，因此扣2分。",
+        "benefit_scene_expansion：脚心位置有东西托着，在厨房站着切菜、在阳台晾衣服，久站之后脚底没那么大压力。'晚上起来倒水、去洗手间，走动声音小'场景有效；但'防臭'部分展开浅，未达4个卖点充分展开，给16分。",
+        "coherent_flow：从旅行痛点切入，到材质、功能、颜色、尺码、价格，流程顺畅；但中间功能堆叠略多，扣1分。",
+        "non_repetition：无空话凑字，各卖点有独立场景；但'防滑特性在浴室或室内走动时多一分踏实，不过湿地面还是要放慢脚步、小心行走'稍显重复表述，扣1分。",
+        "purchase_guidance：'合适再下单，咱们直播间就能拍'引导自然，但未强调尺码选择细节，扣1分。"
+      ],
+      "unsupported_claims": [],
+      "price_and_terms_correct": true,
+      "knowledge_leaks": [],
+      "main_gaps": [
+        "知识库未提供的'快干易清洗、防臭'展开略显空泛，缺乏具体生活场景。",
+        "对'足弓支撑'的体验描述较笼统，未结合不同脚型说明。",
+        "颜色描述较简略，仅按色系分类，未逐一说明适合风格。"
+      ]
+    }
+  ],
+  "pair_diversity": {
+    "score": 4,
+    "reason": "两版开场完全不同（旅行 vs 居家痛点），卖点展开顺序不同（版1侧重旅行与户外，版2侧重居家），情境选择（酒店、海边 vs 厨房、卧室）和节奏有明显差异，均完整连贯，给4分。"
+  },
+  "judge_model": "deepseek-flash",
+  "judge_protocol": "v2-core-facts-only-no-unsupported-reference-priming",
+  "usage": {
+    "prompt_tokens": 2711,
+    "completion_tokens": 1006,
+    "total_tokens": 3717,
+    "prompt_tokens_details": {
+      "cached_tokens": 1024
+    },
+    "prompt_cache_hit_tokens": 1024,
+    "prompt_cache_miss_tokens": 1687
+  }
+}

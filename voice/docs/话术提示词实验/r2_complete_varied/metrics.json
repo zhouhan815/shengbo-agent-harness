@@ -1,0 +1,96 @@
+{
+  "versions": [
+    {
+      "han_characters": 834,
+      "sentences": 26,
+      "coverage_groups": {
+        "材质成型": true,
+        "足弓": true,
+        "厚底软弹": true,
+        "静音防滑": true,
+        "清洗快干防臭": true,
+        "轻便场景": true,
+        "规格": true,
+        "选码": true
+      },
+      "coverage_rate": 1.0,
+      "natural_sentence_ratio": 0.962,
+      "duplicate_sentences": [],
+      "reference_5gram_overlap": 0.056,
+      "program_scores": {
+        "selling_point_coverage": 12.0,
+        "flow": 8.0,
+        "speakability": 9.62,
+        "length_fit": 4.91,
+        "fact_references": 5.0
+      },
+      "program_total": 39.53,
+      "invalid_references": false,
+      "app_issues": []
+    },
+    {
+      "han_characters": 948,
+      "sentences": 35,
+      "coverage_groups": {
+        "材质成型": true,
+        "足弓": true,
+        "厚底软弹": true,
+        "静音防滑": true,
+        "清洗快干防臭": true,
+        "轻便场景": true,
+        "规格": true,
+        "选码": true
+      },
+      "coverage_rate": 1.0,
+      "natural_sentence_ratio": 0.971,
+      "duplicate_sentences": [],
+      "reference_5gram_overlap": 0.04,
+      "program_scores": {
+        "selling_point_coverage": 12.0,
+        "flow": 8.0,
+        "speakability": 9.71,
+        "length_fit": 5,
+        "fact_references": 5.0
+      },
+      "program_total": 39.71,
+      "invalid_references": false,
+      "app_issues": []
+    }
+  ],
+  "pair": [
+    {
+      "a": 1,
+      "b": 2,
+      "fivegram_jaccard": 0.218,
+      "shared_narrative_sentences": [
+        "比如你晚上起来倒水、家里有人已经休息了，脚步轻一点，声音小一点，自己走动也自在。",
+        "这双鞋底做了静音和防滑的特性，在浴室或者室内走动的时候，可以减少打扰家人。",
+        "这款拖鞋有足弓支撑，配合小蛮腰厚底设计，上脚是软弹缓震的体验。"
+      ],
+      "near_copy_ratio": 0.211,
+      "near_copies": [
+        {
+          "a": "再看这个厚底造型，它不只是穿着舒服，视觉上也能修饰脚型，日常在家穿或者出门走两步，看起来都利落。",
+          "b": "再看这个厚底造型，它不只是穿着舒服，视觉上也能修饰脚型，日常在家穿或者出门散步、倒垃圾，看起来都利落。",
+          "similarity": 0.929
+        },
+        {
+          "a": "比如你晚上起来倒水、家里有人已经休息了，脚步轻一点，声音小一点，自己走动也自在。",
+          "b": "比如你晚上起来倒水、家里有人已经休息了，脚步轻一点，声音小一点，自己走动也自在。",
+          "similarity": 1.0
+        },
+        {
+          "a": "这双鞋底做了静音和防滑的特性，在浴室或者室内走动的时候，可以减少打扰家人。",
+          "b": "这双鞋底做了静音和防滑的特性，在浴室或者室内走动的时候，可以减少打扰家人。",
+          "similarity": 1.0
+        },
+        {
+          "a": "这款拖鞋有足弓支撑，配合小蛮腰厚底设计，上脚是软弹缓震的体验。",
+          "b": "这款拖鞋有足弓支撑，配合小蛮腰厚底设计，上脚是软弹缓震的体验。",
+          "similarity": 1.0
+        }
+      ],
+      "opening_similarity": 0.357
+    }
+  ]
+}

@@ -1,0 +1,47 @@
+{
+  "run": "release_bag",
+  "versions": [
+    {
+      "version": 1,
+      "program": 40.0,
+      "semantic": 50.0,
+      "total": 90.0,
+      "hard_gate": false,
+      "rule_issues": [
+        "促销输入没有明确限时，不能把普通活动价说成限时价",
+        "稿件混入其他商品的浴室场景，请仅使用本商品适用场景"
+      ],
+      "serious_claims": 0,
+      "cross_version_copy_pass": true,
+      "pass": false,
+      "gaps": [
+        "末尾无关句“浴室走动还是要留意地面”与商品无关，影响收口连贯。",
+        "活动价性质（是否为限时）未获资料支持，但稿中称“限时活动价”，属于轻微添加。",
+        "未提尺寸38×30×12厘米，遗漏规格信息，但非必须，仍算可补充点。"
+      ]
+    },
+    {
+      "version": 2,
+      "program": 40.0,
+      "semantic": 53.0,
+      "total": 93.0,
+      "hard_gate": false,
+      "rule_issues": [
+        "促销输入没有明确限时，不能把普通活动价说成限时价"
+      ],
+      "serious_claims": 0,
+      "cross_version_copy_pass": true,
+      "pass": false,
+      "gaps": [
+        "活动价性质（是否为限时）未获资料支持，但稿中称“限时活动”，属于轻微添加。",
+        "可折叠卖点的场景展开较充分，但未提折叠后体积或收纳形态，不过资料本身未提供，不扣分。",
+        "尺寸单位厘米播报正确，但未进一步解释与日常物品的适配，资料未提供具体适配，不扣分。"
+      ]
+    }
+  ],
+  "pair_diversity": {
+    "score": 4,
+    "reason": "两版开场痛点不同（版1纠结背大包小袋，版2问拎还是挂），卖点顺序和重点展开不同（版1先讲折叠后讲拉链小口袋，版2先讲肩带拉链后讲折叠），且各有独立场景，均完整自然，差异鲜明。但版2末尾无关句略微影响整体体验，故给4分。"
+  },
+  "rubric": "20261007.4-uniform-coverage-content-and-near-copy-checks"
+}

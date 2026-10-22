@@ -1,0 +1,42 @@
+{
+  "run": "release10_mug",
+  "versions": [
+    {
+      "version": 1,
+      "program": 38.39,
+      "semantic": 52.0,
+      "total": 90.39,
+      "hard_gate": true,
+      "rule_issues": [],
+      "serious_claims": 0,
+      "cross_version_copy_pass": true,
+      "pass": true,
+      "gaps": [
+        "未提及容量以外的其他规格选择，但资料未提供，不扣分。",
+        "未提及耐温、微波炉等适用性，资料未提供，正确不写。",
+        "全文未出现不实承诺或编造信息，但卖点展开的丰富度已足够。"
+      ]
+    },
+    {
+      "version": 2,
+      "program": 39.49,
+      "semantic": 52.0,
+      "total": 91.49,
+      "hard_gate": true,
+      "rule_issues": [],
+      "serious_claims": 0,
+      "cross_version_copy_pass": true,
+      "pass": true,
+      "gaps": [
+        "缺少颜色以外的其他规格说明（如是否只有一种容量），但资料未提供更多规格，不扣分。",
+        "未提及耐温范围、微波炉/洗碗机适用性和保温功能，但资料明确未提供，属于正确行为，不扣分。",
+        "价格部分已说明无活动价，但未提及是否有其他优惠条件，然而推广信息为空，不构成缺点。"
+      ]
+    }
+  ],
+  "pair_diversity": {
+    "score": 4,
+    "reason": "两版开场方式不同（版本1直接欢迎并切入痛点，版本2以互动问题开场），卖点展开顺序不同（版本1先颜色后容量再把手最后材质，版本2先材质后把手再容量最后颜色），生活情境也有差异（如版本2增加了“家里来客人”“周末看书”等场景），且两版均完整自然，差异明显，符合4分标准。"
+  },
+  "rubric": "20261007.4-uniform-coverage-content-and-near-copy-checks"
+}

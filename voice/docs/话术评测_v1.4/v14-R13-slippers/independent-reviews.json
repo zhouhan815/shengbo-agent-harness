@@ -1,0 +1,95 @@
+{
+  "schema_version": "1.0",
+  "review_type": "independent_ai_text_review",
+  "reviewer": "独立子Agent；未查看本轮scorecard或其他评审，只核对原输入及候选正文",
+  "review_date": "2026-10-07",
+  "inputs_used": ["docs/话术提示词实验/v14-R13-slippers/input.json中的product核心字段，排除knowledge", "同目录scripts.json的blocks与sentences"],
+  "limits": ["本文件是一名AI进行独立文本复核，不是三位真人或三次独立AI角色评分。", "未收听合成音频，不能声称声音感染力或语气验收通过。", "原输入明确写出的快干、一冲即净、轻便、软弹缓震、防臭、缓解久站压力可以合理转述，不额外要求实测。", "不使用候选自身issues或模型自评作为事实依据。", "只报告建议量表的语义70分，不伪造程序30分或与v1.3总分混比。"],
+  "candidate_mapping": {"A": "script_6e34cf3fbf1d4bba", "B": "script_08c0f887d4904f7e"},
+  "source_facts": {
+    "material": "采用优选 EVA 环保材质一体成型",
+    "support": "专为女性足部曲线量身打造；足弓支撑；小蛮腰厚底软弹；更能有效缓解久站带来的足部压力，提供软弹缓震体验",
+    "quiet_grip": "鞋底具备静音与防滑特性，在浴室或室内走动减少打扰家人",
+    "care": "材质防臭快干，一冲即净；快干易清洗、防臭",
+    "light_durable": "轻便耐磨；旅行便携；适合居家、旅行出游、海边漫步",
+    "style": "小蛮腰厚底设计，视觉上修饰脚型；居家休闲、高级简约、夏日轻便、旅行便携；厚底平底、一般版型",
+    "size": "36-37、38-39、40-41、42-43、44-45；标准码；脚背较宽或脚型偏肉，建议斟酌大一号",
+    "colors": "粉色、红色、绿色、蓝色、橙色、葡萄紫、烟熏紫、卡其、黑色、白色",
+    "promotion": "原价178新台币，限时下杀107新台币。",
+    "unknown": ["本品与其他拖鞋的比较试验", "用户已有拖鞋的重量", "收纳体积/行李角落尺寸", "具体干燥时间", "运费及总到手费用", "消费者穿后必然感受", "具体压力分布机制"]
+  },
+  "supported_paraphrases_not_errors": [
+    {"candidate": "A", "sentence": 5, "quote": "整双鞋用优选E V A环保材质，一体成型，少了拼接的缝隙，整体更利落。", "source": "material、style", "decision": "一体成型的结构化转述和简约外观描述，接受；未编造不磨脚或制造工艺。"},
+    {"candidate": "A", "sentence": 12, "quote": "它还带防臭特性，一冲即净，日常好冲洗，穿久了也不容易留味道。", "source": "care", "decision": "防臭与一冲即净已有依据，‘不容易留味道’是有限度防臭转述，不等同保证永久无异味；不判硬错。"},
+    {"candidate": "A", "sentence": 13, "quote": "整双鞋轻便耐磨，上脚没什么重量感，出门倒垃圾、下楼拿快递，或者旅行时带着走，都挺省力。", "source": "light_durable", "decision": "轻便在日常外穿/旅行情境的表达，未写重量数字或耐磨工艺；可以接受，但‘更轻便好带’比‘没什么重量感’更稳妥。"},
+    {"candidate": "B", "sentence": 11, "quote": "它不是那种硬邦邦的厚底，走起来脚感是软弹的，还带一点缓震。", "source": "support", "decision": "软弹缓震原输入直接支持；没有指明其他商品比较结论，不判无依据性能。"},
+    {"candidate": "B", "sentence": 13, "quote": "搭配小蛮腰厚底，做饭、收拾房间站得久一点，脚底有缓冲，也兼顾支撑，能缓解久站带来的足部压力。", "source": "support", "decision": "缓解久站足部压力和软弹缓震均原文提供，未升级治疗效果或固定站立时长，不要求额外实测。"},
+    {"candidate": "B", "sentence": 17, "quote": "这个材质快干，洗完澡冲一冲，挂在通风的地方，干得比较快。", "source": "care", "decision": "快干已有来源，未给具体分钟数；通风是合理使用情境。"},
+    {"candidate": "B", "sentence": 18, "quote": "它还带防臭特性，平时好冲洗，穿久了也不容易有异味。", "source": "care", "decision": "有限度防臭转述，接受；不能因为没有实测就判未支持。"},
+    {"candidate": "B", "sentence": 27, "quote": "这次限时下杀，活动价是一百零七新台币。", "source": "promotion", "decision": "价格、币种、限时事实均与输入一致，未编造结束时间。"}
+  ],
+  "candidates": [
+    {
+      "candidate_id": "A",
+      "gate_status": "reject_comparative_claim_before_release",
+      "must_fix_fact_issues": [
+        {"severity": "major", "sentence": 7, "quote": "搭配小蛮腰厚底，站久了脚底有缓冲，走路时带一点软弹回馈，比薄薄一片的拖鞋要踏实。", "source": "support", "reason": "前半缓冲/软弹可转述；后半把本品与‘薄薄一片的拖鞋’作踏实程度比较，没有其他商品性能或比较依据。不能由厚底软弹自动推导更踏实。", "replacement": "搭配小蛮腰厚底，脚底有缓冲，走路时也有软弹的脚感。想在支撑之外兼顾软弹，可以把这两点一起看。"}
+      ],
+      "recommended_changes": [
+        {"severity": "moderate", "sentence": 1, "quote": "欢迎来到直播间，今天咱们聊一双穿上就不想脱的凉拖鞋。", "source": "support", "reason": "行为期待式夸饰，原文没有消费者试穿体验。不是价格/规格硬错，但作为无人声音主播开场不够可信，应换商品可核实关注点。", "replacement": "欢迎来到直播间，想找足弓有支撑、脚感又软弹的凉拖，今天这双可以认真看看。"},
+        {"severity": "moderate", "sentence": 8, "quote": "晚饭后在客厅来回走几圈，或者站在厨房切菜备料，这种软弹厚底能让脚底压力分散一些，没那么容易觉得硌。", "source": "support", "reason": "已有缓震和缓解压力可以表达，但‘压力分散’补入机制，‘不容易硌’补具体脚底感受。建议用原有缓冲/支撑/缓解压力，不必扩生理机制。", "replacement": "在厨房切菜备料、站着收拾东西，这种厚底软弹和足弓支撑，就对应了久站时对缓冲、承托的关注。"},
+        {"severity": "moderate", "sentence": 11, "quote": "E V A材质本身快干，洗完澡冲一冲，挂在通风处，干得快，不用一直穿着湿鞋来回走。", "source": "care", "reason": "快干支持干得快，但结尾暗示保证无需湿鞋行走，没有干燥时间/使用频次依据。避免将已有卖点推成必然使用结果。", "replacement": "它有快干的特点，洗完澡顺手冲洗，放在通风处晾干，日常打理方便。"},
+        {"severity": "moderate", "sentence": 14, "quote": "住酒店的时候想换上自己的拖鞋，又不想带太占地方的东西，这双轻便，塞进行李角落就能带走。", "source": "light_durable", "reason": "相较R12的‘不占地方’有所收敛，但仍先提空间顾虑再以轻便/塞角落作解决，暗示体积优势。轻便不是体积证据。", "replacement": "住酒店想换上自己的拖鞋，可以在收行李时把它带上。这双主打轻便，旅行带自己的凉拖，也是一种选择。"},
+        {"severity": "minor", "sentence": 23, "quote": "这次是限时下杀，一百零七新台币就能拿到手，想找足弓支撑又软弹的凉拖，现在看很合适。", "source": "promotion", "reason": "107商品活动价已有依据；‘拿到手’在口语中可能被理解成含运费总价，运费未知。无需判故意虚构包邮，但建议直接说活动价。", "replacement": "这次限时活动价是一百零七新台币。想找足弓支撑又软弹的凉拖，就按这两个特点认真选。"}
+      ],
+      "cta_review": {"improved_from_previous_candidate": true, "quote": "想选一双兼顾足弓支撑和软弹脚感的凉拖，先把喜欢的颜色选好，再核对自己的尺码，合适就下单。", "source": "support、colors、size", "assessment": "已去掉‘特点都讲清楚了’后台总结，回扣支撑/软弹，行动次序明确；比上一轮更有销售推进。没有虚构入口或胁迫，合适就下单可以保留。", "remaining": "文字层面改善不证明真实TTS能量已提高；需要听合成结果。"},
+      "paragraph_duties": {"assessment": "开场、引入、身份、卖点、场景、规格、价格、促销、CTA完整。A支撑/软弹是主线清楚；规格一段长念十种颜色与五个码段，仍拥挤。价格s021-023对107再次重复，促销和促单可更短。", "required_change": "改掉s007比较结论；其他职责基本可用。", "optional": "颜色举3至5种再说共10种；尺码分句。"},
+      "semantic_scores": [
+        {"dimension": "事实表达", "max": 10, "score": 5, "evidence": ["s007新增比较为明确硬问题", "s008/011/014有外推风险", "价格规格正确"]},
+        {"dimension": "文本听觉自然度", "max": 15, "score": 11, "evidence": ["s024自然直接收口", "s017-019长清单拥挤", "s001夸饰"]},
+        {"dimension": "特点场景价值", "max": 15, "score": 12, "evidence": ["支撑/厨房，静音/夜间，轻便/旅行具体", "部分收益为了强化而外推"]},
+        {"dimension": "销售推进", "max": 10, "score": 8, "evidence": ["s024价值回扣和行动清楚", "s023价格明确", "不靠库存倒计时"]},
+        {"dimension": "段落职责", "max": 10, "score": 8, "evidence": ["主线完整", "规格堆清单，价格重复"]},
+        {"dimension": "两版语义差异", "max": 10, "score": 7, "evidence": ["A支撑起手，B旅行轻便起手", "后半夜间静音/厨房缓冲/酒店海边情境仍接近"]}
+      ],
+      "semantic_total": 51,
+      "semantic_max": 70
+    },
+    {
+      "candidate_id": "B",
+      "gate_status": "no_unambiguous_hard_fact_error_identified_text_only",
+      "must_fix_fact_issues": [],
+      "recommended_changes": [
+        {"severity": "moderate", "sentence": 7, "quote": "假期收行李的时候，把平时穿的那双沉拖鞋换成它，箱子里就轻松一些。", "source": "light_durable", "reason": "用户原有拖鞋是否沉并未知。这是情境假定而非本品具体实测，但不应替观众假定已有物品重量。", "replacement": "假期收行李，想带一双自己的凉拖，这双主打轻便，可以放进旅行选品里考虑。"},
+        {"severity": "minor", "sentence": 6, "quote": "这双鞋上脚很轻便，走起路来没什么负担。", "source": "light_durable", "reason": "轻便支持重量负担较小，但‘没什么负担’略满。无固定时长或绝对不累，不列硬错；可收敛到重量层面。", "replacement": "这双鞋主打轻便，日常穿着和旅行带着，都可以关注这个特点。"},
+        {"severity": "minor", "sentence": 8, "quote": "到酒店换上自己的拖鞋，或者在沙滩上走一走，脚底都自在。", "source": "light_durable、support", "reason": "轻便/软弹支持舒适表达，但‘都自在’是个体必然感受的倾向；推荐改成情境，不必虚构观众感受。", "replacement": "到酒店想换自己的拖鞋，或者去海边漫步，都在它的适用场景里。"},
+        {"severity": "minor", "sentence": 19, "quote": "整双鞋轻便耐磨，出门倒垃圾、下楼取快递，随意穿穿也不心疼。", "source": "light_durable", "reason": "性能和场景已有依据，但‘不心疼’是消费情绪假定，较泛且和耐磨不是必然因果；作为口语卖点可再具体。", "replacement": "它还有耐磨的特点，日常下楼走动、出门取快递，也是这双凉拖可以考虑的场景。"}
+      ],
+      "cta_review": {"improved_from_previous_candidate": true, "quote": "想要一双从家里穿到海边都合适的凉拖，先把喜欢的颜色选好，再核对自己的尺码。看中的这双，就按需要下单。", "source": "light_durable、colors、size", "assessment": "已去除后台讲解完成句，有选色/核码/下单动作，推进比R12明确。结尾比较稳而非强激动，文本没有必要为了激动增加无据紧迫感。", "remaining": "A/B选色核码动作相同属于合理购物步骤；可改变B的价值回扣为轻便好打理以加强版本路线。不评价实际音频。"},
+      "paragraph_duties": {"assessment": "旅行轻便→外形厚底→足弓支撑→静音防滑→材质清洗→规格→价格优惠→行动，总体完整。引入仍有旅行/站立两个问题，比只留旅行主线略散。材质一体成型在身份及卖点重复；颜色和全部码段长念。", "required_change": "未发现明确必须阻断发布的价格/规格/功能硬错；仍建议去除沉拖鞋假定并缩短清单。", "optional": "旅行路线保留轻便和好打理为主要价值，不必把A的厨房和夜间场景原样再讲一遍。"},
+      "semantic_scores": [
+        {"dimension": "事实表达", "max": 10, "score": 8, "evidence": ["无明确新增工艺/抗污/无需轮换结论", "s007假定原鞋重量", "s006/008体验稍满"]},
+        {"dimension": "文本听觉自然度", "max": 15, "score": 11, "evidence": ["s029-030直接行动", "s022/024长清单", "s005/016重复材质"]},
+        {"dimension": "特点场景价值", "max": 15, "score": 12, "evidence": ["旅行/轻便主线具体", "厨房支撑/夜间静音合理", "部分情绪句泛化"]},
+        {"dimension": "销售推进", "max": 10, "score": 7, "evidence": ["s027优惠准确", "s029-030明确动作", "B收尾价值回扣可更聚焦轻便好打理"]},
+        {"dimension": "段落职责", "max": 10, "score": 8, "evidence": ["职责齐全且顺序合理", "双问题引入、材质重复、规格长"]},
+        {"dimension": "两版语义差异", "max": 10, "score": 7, "evidence": ["开头路线和前两组卖点不同", "后半情境与结尾动作近似"]}
+      ],
+      "semantic_total": 53,
+      "semantic_max": 70
+    }
+  ],
+  "release_summary": {
+    "A": "必须先改s007未提供的商品比较；建议同步收敛s001、s008、s011、s014等表达。",
+    "B": "本次独立文本复核未发现明确硬事实错误；建议去除用户已有沉拖鞋假定和偏满个体体验，仍需程序检查及音频测试。",
+    "cta": "两版较R12均改善，删后台总结、加价值回扣与具体动作。",
+    "audio": "未收听，不构成音频验收通过。"
+  },
+  "next_revision_positive_guidance": [
+    "把A s007的无依据比较直接替换为本品支撑与软弹，不删已有软弹缓震。",
+    "卖点有依据就直接讲，避免另添加工艺、比较对象、压力分布机制或必然使用结果。",
+    "保留R13的CTA动作结构；B回扣轻便和好打理来体现路线差异。",
+    "商品轻便只描述重量/携带，不用空间顾虑作为问题再暗示体积解决。",
+    "一段一个主旨，颜色举例、码段拆句；不为凑字数恢复长清单。"
+  ]
+}

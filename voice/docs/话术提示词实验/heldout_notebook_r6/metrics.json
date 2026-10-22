@@ -1,0 +1,82 @@
+{
+  "versions": [
+    {
+      "han_characters": 733,
+      "sentences": 28,
+      "coverage_groups": {
+        "尺寸": true,
+        "页数": true,
+        "封面": true,
+        "内页": true,
+        "用途": true,
+        "颜色": true,
+        "优惠门槛": true,
+        "不可叠加": true
+      },
+      "coverage_rate": 1.0,
+      "natural_sentence_ratio": 1.0,
+      "duplicate_sentences": [],
+      "reference_5gram_overlap": 0.003,
+      "program_scores": {
+        "selling_point_coverage": 12.0,
+        "flow": 8.0,
+        "speakability": 10.0,
+        "length_fit": 5,
+        "fact_references": 5.0
+      },
+      "program_total": 40.0,
+      "invalid_references": false,
+      "app_issues": []
+    },
+    {
+      "han_characters": 698,
+      "sentences": 29,
+      "coverage_groups": {
+        "尺寸": true,
+        "页数": true,
+        "封面": true,
+        "内页": true,
+        "用途": true,
+        "颜色": true,
+        "优惠门槛": true,
+        "不可叠加": true
+      },
+      "coverage_rate": 1.0,
+      "natural_sentence_ratio": 1.0,
+      "duplicate_sentences": [],
+      "reference_5gram_overlap": 0.001,
+      "program_scores": {
+        "selling_point_coverage": 12.0,
+        "flow": 8.0,
+        "speakability": 10.0,
+        "length_fit": 5,
+        "fact_references": 5.0
+      },
+      "program_total": 40.0,
+      "invalid_references": false,
+      "app_issues": []
+    }
+  ],
+  "pair": [
+    {
+      "a": 1,
+      "b": 2,
+      "fivegram_jaccard": 0.15,
+      "shared_narrative_sentences": [],
+      "near_copy_ratio": 0.143,
+      "near_copies": [
+        {
+          "a": "做简单手账的时候，贴贴纸、画箭头、框重点，点阵都能当成一个淡淡的底稿。",
+          "b": "做简单手账的时候，贴贴纸、画箭头、框重点，点阵都能当个淡淡的参考线。",
+          "similarity": 0.899
+        },
+        {
+          "a": "哪天需要画个小格子、列个清单，点阵又能帮你把位置对齐，不用专门去找尺子。",
+          "b": "哪天需要画个小格子、列个清单，点阵又能帮你把位置对齐。",
+          "similarity": 0.857
+        }
+      ],
+      "opening_similarity": 0.262
+    }
+  ]
+}

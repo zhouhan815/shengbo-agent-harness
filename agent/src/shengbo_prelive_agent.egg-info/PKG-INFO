@@ -1,0 +1,6 @@
+Metadata-Version: 2.4
+Name: shengbo-prelive-agent
+Version: 0.1.0
+Summary: 声播播前 Deep Agents Harness and shared wire contracts
+Requires-Python: >=3.12
+Requires-Dist: pydantic<3,>=2.10

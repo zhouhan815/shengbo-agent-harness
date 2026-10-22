@@ -1,0 +1,65 @@
+{
+  "versions": [
+    {
+      "han_characters": 740,
+      "sentences": 25,
+      "coverage_groups": {
+        "材质": true,
+        "容量": true,
+        "把手": true,
+        "颜色": true,
+        "场景": true
+      },
+      "coverage_rate": 1.0,
+      "natural_sentence_ratio": 1.0,
+      "duplicate_sentences": [],
+      "reference_5gram_overlap": 0.001,
+      "program_scores": {
+        "selling_point_coverage": 12.0,
+        "flow": 8.0,
+        "speakability": 10.0,
+        "length_fit": 3.38,
+        "fact_references": 5.0
+      },
+      "program_total": 38.38,
+      "invalid_references": false,
+      "app_issues": []
+    },
+    {
+      "han_characters": 793,
+      "sentences": 28,
+      "coverage_groups": {
+        "材质": true,
+        "容量": true,
+        "把手": true,
+        "颜色": true,
+        "场景": true
+      },
+      "coverage_rate": 1.0,
+      "natural_sentence_ratio": 1.0,
+      "duplicate_sentences": [],
+      "reference_5gram_overlap": 0.004,
+      "program_scores": {
+        "selling_point_coverage": 12.0,
+        "flow": 8.0,
+        "speakability": 10.0,
+        "length_fit": 3.15,
+        "fact_references": 5.0
+      },
+      "program_total": 38.15,
+      "invalid_references": false,
+      "app_issues": []
+    }
+  ],
+  "pair": [
+    {
+      "a": 1,
+      "b": 2,
+      "fivegram_jaccard": 0.06,
+      "shared_narrative_sentences": [],
+      "near_copy_ratio": 0.0,
+      "near_copies": [],
+      "opening_similarity": 0.318
+    }
+  ]
+}

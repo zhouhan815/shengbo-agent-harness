@@ -1,0 +1,77 @@
+{
+  "versions": [
+    {
+      "han_characters": 861,
+      "sentences": 27,
+      "coverage_groups": {
+        "材质成型": true,
+        "足弓": true,
+        "厚底软弹": true,
+        "静音防滑": true,
+        "清洗快干防臭": true,
+        "轻便场景": true,
+        "规格": true,
+        "选码": true
+      },
+      "coverage_rate": 1.0,
+      "natural_sentence_ratio": 1.0,
+      "duplicate_sentences": [],
+      "reference_5gram_overlap": 0.056,
+      "program_scores": {
+        "selling_point_coverage": 12.0,
+        "flow": 8.0,
+        "speakability": 10.0,
+        "length_fit": 5,
+        "fact_references": 5.0
+      },
+      "program_total": 40.0,
+      "invalid_references": false,
+      "app_issues": []
+    },
+    {
+      "han_characters": 810,
+      "sentences": 23,
+      "coverage_groups": {
+        "材质成型": true,
+        "足弓": true,
+        "厚底软弹": true,
+        "静音防滑": true,
+        "清洗快干防臭": true,
+        "轻便场景": true,
+        "规格": true,
+        "选码": true
+      },
+      "coverage_rate": 1.0,
+      "natural_sentence_ratio": 1.0,
+      "duplicate_sentences": [],
+      "reference_5gram_overlap": 0.056,
+      "program_scores": {
+        "selling_point_coverage": 12.0,
+        "flow": 8.0,
+        "speakability": 10.0,
+        "length_fit": 4.76,
+        "fact_references": 5.0
+      },
+      "program_total": 39.76,
+      "invalid_references": false,
+      "app_issues": []
+    }
+  ],
+  "pair": [
+    {
+      "a": 1,
+      "b": 2,
+      "fivegram_jaccard": 0.172,
+      "shared_narrative_sentences": [],
+      "near_copy_ratio": 0.062,
+      "near_copies": [
+        {
+          "a": "防滑特性在浴室或室内走动时能多一分踏实，不过湿地面大家还是要放慢脚步，小心行走。",
+          "b": "防滑特性在浴室或室内走动时多一分踏实，不过湿地面还是要放慢脚步、小心行走。",
+          "similarity": 0.935
+        }
+      ],
+      "opening_similarity": 0.216
+    }
+  ]
+}

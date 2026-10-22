@@ -1,0 +1,20 @@
+{
+  "passed": true,
+  "room": "room_10d061b2a9cd4e3a",
+  "sections": 3,
+  "audio_done": 3,
+  "text_confirmation_required": false,
+  "audio_samples": 6,
+  "checks": [
+    "分段详情接口",
+    "结构化编辑保留段落",
+    "真实本机语音后台生成",
+    "未确认文本语音完成即可开播",
+    "语音A/B文件可读取"
+  ],
+  "not_tested": [
+    "浏览器实际点击",
+    "实际扬声器听感",
+    "OBS接入或真实观众转化"
+  ]
+}

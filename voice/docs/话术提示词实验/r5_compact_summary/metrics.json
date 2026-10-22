@@ -1,0 +1,84 @@
+{
+  "versions": [
+    {
+      "han_characters": 749,
+      "sentences": 24,
+      "coverage_groups": {
+        "材质成型": true,
+        "足弓": true,
+        "厚底软弹": true,
+        "静音防滑": true,
+        "清洗快干防臭": true,
+        "轻便场景": true,
+        "规格": true,
+        "选码": true
+      },
+      "coverage_rate": 1.0,
+      "natural_sentence_ratio": 1.0,
+      "duplicate_sentences": [],
+      "reference_5gram_overlap": 0.056,
+      "program_scores": {
+        "selling_point_coverage": 12.0,
+        "flow": 8.0,
+        "speakability": 10.0,
+        "length_fit": 4.41,
+        "fact_references": 5.0
+      },
+      "program_total": 39.41,
+      "invalid_references": false,
+      "app_issues": [
+        "第12句有待核实的保证、体验或促销说法"
+      ]
+    },
+    {
+      "han_characters": 679,
+      "sentences": 26,
+      "coverage_groups": {
+        "材质成型": true,
+        "足弓": true,
+        "厚底软弹": true,
+        "静音防滑": true,
+        "清洗快干防臭": true,
+        "轻便场景": true,
+        "规格": true,
+        "选码": true
+      },
+      "coverage_rate": 1.0,
+      "natural_sentence_ratio": 1.0,
+      "duplicate_sentences": [],
+      "reference_5gram_overlap": 0.039,
+      "program_scores": {
+        "selling_point_coverage": 12.0,
+        "flow": 8.0,
+        "speakability": 10.0,
+        "length_fit": 3.99,
+        "fact_references": 5.0
+      },
+      "program_total": 38.99,
+      "invalid_references": false,
+      "app_issues": []
+    }
+  ],
+  "pair": [
+    {
+      "a": 1,
+      "b": 2,
+      "fivegram_jaccard": 0.197,
+      "shared_narrative_sentences": [],
+      "near_copy_ratio": 0.1,
+      "near_copies": [
+        {
+          "a": "晚上起夜、清晨倒水，不想吵醒家里人，这个细节就比较贴心。",
+          "b": "晚上起夜、清晨倒水，不想吵醒家里人，这个细节就挺贴心。",
+          "similarity": 0.945
+        },
+        {
+          "a": "鞋底做了静音和防滑特性，在浴室或室内走动，脚步声会小一些，减少打扰家人。",
+          "b": "鞋底具备静音与防滑特性，在浴室或室内走动，脚步声会小一些，减少打扰家人。",
+          "similarity": 0.917
+        }
+      ],
+      "opening_similarity": 0.159
+    }
+  ]
+}

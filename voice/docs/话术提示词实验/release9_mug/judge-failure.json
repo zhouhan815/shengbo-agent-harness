@@ -1,0 +1,4 @@
+{
+  "error_type": "JSONDecodeError",
+  "message": "评审JSON解析失败，不使用该次评分；保留旧评审及原响应。"
+}

@@ -1,0 +1,42 @@
+{
+  "run": "heldout_notebook_r6",
+  "versions": [
+    {
+      "version": 1,
+      "program": 40.0,
+      "semantic": 52.0,
+      "total": 92.0,
+      "hard_gate": true,
+      "rule_issues": [],
+      "serious_claims": 0,
+      "cross_version_copy_pass": true,
+      "pass": true,
+      "gaps": [
+        "没有提及可用于日常记录之外，结合简单手账的更多具体例子略少。",
+        "软封面收益的展开不如版本1充分，未点出可摊平等合理场景。",
+        "活动截止时间未提供，稿中已说明没有说明，不算事实错误，但购买紧迫感自然弱。"
+      ]
+    },
+    {
+      "version": 2,
+      "program": 40.0,
+      "semantic": 53.0,
+      "total": 93.0,
+      "hard_gate": true,
+      "rule_issues": [],
+      "serious_claims": 0,
+      "cross_version_copy_pass": true,
+      "pass": true,
+      "gaps": [
+        "未提及可作为简单手账用途，虽然资料允许。",
+        "没有提示购买多本作为拼单或备用，数量选择引导可更具体。",
+        "活动截止时间未提供，但稿中已说明没有说明，此处不算缺失；更主要的不足是缺少对点阵格式学习场景的更多具体示例。"
+      ]
+    }
+  ],
+  "pair_diversity": {
+    "score": 3,
+    "reason": "两版开场明显不同：版本1从‘出门带本子’的痛点切入，版本2从‘横线本限制’切入；核心卖点展开顺序也不同，版本1先软封面再尺寸页数，版本2先点阵再尺寸页数。但两版对多数卖点的具体情境和节奏差异还不够鲜明，属于开场和重点顺序有效不同但整体结构仍较接近。"
+  },
+  "rubric": "20261007.4-uniform-coverage-content-and-near-copy-checks"
+}

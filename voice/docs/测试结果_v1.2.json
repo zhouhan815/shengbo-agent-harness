@@ -1,0 +1,62 @@
+{
+  "date": "2026-10-07",
+  "backend_unittests": {
+    "passed": 60,
+    "failed": 0,
+    "isolation": "runtime/qa-unittest + per-test temporary databases"
+  },
+  "player_regressions": {
+    "passed": 5,
+    "failed": 0
+  },
+  "javascript_syntax": {
+    "control.js": "pass",
+    "preparation.js": "pass",
+    "player.js": "pass"
+  },
+  "browser_checks": [
+    "创建直播间后先显示声音设置",
+    "四个选项卡切换",
+    "生成版数提示",
+    "本场话术无复选框",
+    "确认文本",
+    "缺语音阻止开播",
+    "后台生成语音",
+    "关闭抽屉后继续操作",
+    "本机预生成语音完整播放",
+    "生成OBS链接",
+    "三类模拟事件",
+    "删除本场版本后刷新保留",
+    "真实DeepSeek单版生成"
+  ],
+  "not_run": [
+    "真实OBS软件采集与抖音推流",
+    "本次MiniMax真实付费合成（适配与音色失效逻辑通过模拟测试）"
+  ],
+  "deepseek_real_request": {
+    "status": "pass",
+    "requested_versions": 1,
+    "returned_versions": 1,
+    "sentences": 33
+  },
+  "audio_jobs": [
+    {
+      "status": "completed",
+      "done": 11,
+      "total": 11
+    }
+  ],
+  "real_system_audio": {
+    "valid_wav_files": 11,
+    "duration_seconds": 54.65
+  },
+  "real_player_acknowledgments": {
+    "playing": 11,
+    "ended": 11
+  },
+  "desktop_service": {
+    "port": 8765,
+    "new_job_and_audio_endpoints": "pass",
+    "rooms_retained": 2
+  }
+}
