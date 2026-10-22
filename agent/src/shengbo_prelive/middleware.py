@@ -276,11 +276,43 @@ class ToolPolicy(_Boundary):
     async def awrap_tool_call(self, request, handler):
         scope = _scope(request.runtime)
         name = request.tool_call.get("name", "")
-        if name not in self._allowed(scope):
+        allowed = self._allowed(scope)
+        if name not in allowed:
+            correction = await self._command_name_correction(scope, request, name, allowed)
+            if correction is not None:
+                return correction
             self._event(scope, "wrap_tool", "DENIED", tail=True, tool_name=name, reason_code="TOOL_SCOPE_DENIED")
             raise ContractError("TOOL_SCOPE_DENIED", "当前阶段或角色不能调用该工具", status=403, details={"tool": name})
         await self._assert(scope, "wrap_tool")
         return await handler(request)
+
+    async def _command_name_correction(self, scope, request, name, allowed):
+        """A business command ID called as a tool is returned once with its real tools.
+
+        2026-10-22: DeepSeek called save_script_plan (the command behind
+        save_script_change_plan). Nothing runs; forbidden or unknown names and
+        a second mistake keep the original hard denial.
+        """
+        if name in _FORBIDDEN:
+            return None
+        from .action_contracts import capability_manifest
+        entry = next((item for item in capability_manifest() if item["command"] == name), None)
+        tools = sorted(set((entry or {}).get("public_tools", []) + (entry or {}).get("workflows", [])) & allowed)
+        if not tools:
+            return None
+        run = self.engine.store.get("run", scope.run_id)
+        counters = dict(run.get("correctable_tool_errors") or {})
+        if counters.get("COMMAND_ID_AS_TOOL", 0) >= 1:
+            return None
+        counters["COMMAND_ID_AS_TOOL"] = 1
+        await _await(self.engine.store.update("run", scope.run_id, correctable_tool_errors=counters))
+        self._event(scope, "correctable_tool_input", "CORRECTING", reason_code="COMMAND_ID_AS_TOOL",
+                    tool_name=name, suggested_tools=tools, correction_count=1)
+        value = {"status": "error", "error": {"code": "COMMAND_ID_AS_TOOL", "tool": name, "use_tools": tools},
+                 "corrective_hint": f"{name}是业务命令ID，不是可调用的工具，本次没有执行任何动作。请改用use_tools中的工具并按其参数重新调用；不要扩大Goal。只有这一次修正机会。",
+                 "correction_count": 1, "correction_limit": 1}
+        return ToolMessage(content=json.dumps(value, ensure_ascii=False), status="error",
+                           tool_call_id=request.tool_call.get("id", ""), name=name)
 
 
 def _product_save_correction_details(engine, scope, request, error):
@@ -580,6 +612,8 @@ class Budget(_Boundary):
                 def extend():
                     now = loop.time()
                     state["streaming"] = True
+                    # Remember which bound is in force; timer resolution makes elapsed-time checks unreliable.
+                    state["capped"] = started + self.max_seconds <= now + self.idle_seconds
                     deadline.reschedule(min(started + self.max_seconds, now + self.idle_seconds))
 
                 def beat():
@@ -599,7 +633,7 @@ class Budget(_Boundary):
                     STREAM_ACTIVITY.reset(token)
         except TimeoutError:
             elapsed = loop.time() - started
-            kind = "idle" if state["streaming"] and elapsed < self.max_seconds else "total"
+            kind = "idle" if state["streaming"] and not state.get("capped") else "total"
             self._event(scope, "model_timeout", "FAILED", tail=True, reason_code="MODEL_TIMEOUT",
                         timeout_kind=kind, elapsed_seconds=round(elapsed, 1))
             raise ContractError("MODEL_TIMEOUT", "模型响应超时，已保留调用状态以供对账", retryable=True,

@@ -484,3 +484,22 @@ async def test_correctable_tool_inputs_are_bounded_but_security_and_unknown_stay
             raise ContractError(error_code, 'hard boundary')
         with pytest.raises(ContractError, match=code):
             await boundary.awrap_tool_call(tool_request('save_product'), denied)
+
+
+@pytest.mark.asyncio
+async def test_command_id_called_as_tool_is_returned_once_with_its_real_tool():
+    """Batch 3 A7: DeepSeek called save_script_plan (a business command ID) instead of save_script_change_plan."""
+    engine = FakeEngine()
+    engine.allowed_tool_names = lambda scope: {"read_product", "save_script_change_plan"}
+    policy = ToolPolicy(engine)
+    async def never(request):
+        raise AssertionError("a command ID must never execute")
+    result = await policy.awrap_tool_call(tool_request("save_script_plan"), never)
+    body = json.loads(result.content)
+    assert result.status == "error" and body["error"]["use_tools"] == ["save_script_change_plan"]
+    assert engine.store.get("run", "r1")["correctable_tool_errors"]["COMMAND_ID_AS_TOOL"] == 1
+    with pytest.raises(ContractError, match="TOOL_SCOPE_DENIED"):
+        await policy.awrap_tool_call(tool_request("save_script_plan"), never)
+    for name in ("bash", "made_up_tool"):
+        with pytest.raises(ContractError, match="TOOL_SCOPE_DENIED"):
+            await ToolPolicy(FakeEngine()).awrap_tool_call(tool_request(name), never)
