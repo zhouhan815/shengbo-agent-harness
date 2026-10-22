@@ -224,7 +224,8 @@ async def test_budget_cancels_a_silent_stream_and_caps_total_time():
             model_request(), _streaming(2, silent_after=0.1))
     assert engine.trace.events[-1]["data"]["timeout_kind"] == "idle"
     with pytest.raises(ContractError, match="MODEL_TIMEOUT"):
-        await Budget(engine, timeout_seconds=5, idle_seconds=0.2, max_seconds=0.4).awrap_model_call(
+        # Wide idle window so a busy test machine cannot turn the total-cap case into an idle one.
+        await Budget(engine, timeout_seconds=5, idle_seconds=1.0, max_seconds=0.4).awrap_model_call(
             model_request(), _streaming(2))
     assert engine.trace.events[-1]["data"]["timeout_kind"] == "total"
 
