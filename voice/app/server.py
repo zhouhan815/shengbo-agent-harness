@@ -28,7 +28,7 @@ from .speech import POOL, render
 from . import production, reply_lab, live_source, commerce_config as commerce
 from .welcome import WelcomeRuntime, build_product_templates
 from .like_thanks import LikeThanksRuntime
-from .prosody import sentence_style, profile_catalog
+from .prosody import sentence_style, profile_catalog, interaction_style
 from .copywriting_quality import check_versions, content_issues, required_features
 from .prelive.storage import Store as VersionedStore, BusinessError, canonical as canonical_record
 from .consumer_catalog import assert_consumer_product
@@ -477,20 +477,37 @@ class Room:
         with (RUNTIME / "events.jsonl").open("a", encoding="utf-8") as file:
             file.write(json.dumps(entry, ensure_ascii=False) + "\n")
 
-    def snapshot(self):
-        result = deepcopy(self.state)
+    def snapshot(self, *, include_queue=True):
+        result = deepcopy({k: v for k, v in self.state.items() if include_queue or k != "queue"})
         result["connected_player"] = self.owner is not None
         result["player_id"] = self.owner
         result["output_source"] = self.player_sources.get(self.owner)
         return result
 
     async def broadcast(self):
-        message = {"type": "state", "state": self.snapshot()}
+        # Full queue only on first delivery/change for upgraded clients. Legacy
+        # clients retain their old contract. Metadata is never a per-tick blob.
+        queue_key = tuple(item.get("queue_id") for item in self.state["queue"])
+        versions = getattr(self, "_sent_queue_versions", {})
+        self._sent_queue_versions = versions
+        full = small = None
         for identity, (socket, role) in list(self.clients.items()):
             try:
+                thin = socket.query_params.get("delta") == "1" if hasattr(socket, "query_params") else False
+                delta = thin and versions.get(identity) == queue_key
+                if delta:
+                    if small is None:
+                        small = {"type": "state_delta", "state": self.snapshot(include_queue=False)}
+                    message = small
+                else:
+                    if full is None:
+                        full = {"type": "state", "state": self.snapshot()}
+                    message = full
                 await socket.send_json(message)
+                versions[identity] = queue_key
             except Exception:
                 self.clients.pop(identity, None)
+                versions.pop(identity, None)
 
     def current_item(self):
         return self.state["queue"][self.state["index"]] if self.state["index"] < len(self.state["queue"]) else None
@@ -632,7 +649,7 @@ class Room:
             tts = deepcopy(self.state["tts"])
             # Live reactions must not queue behind the prerecorded-script worker.
             audio = await asyncio.to_thread(render, item.get("spoken_text") or item["text"], RUNTIME / "audio",
-                tts["voice"], tts["provider"], tts["model"], sentence_style(item, tts["provider"]))
+                tts["voice"], tts["provider"], tts["model"], interaction_style(item, tts["provider"]))
             async with self.lock:
                 if not self.pending_matches(session_id, item):
                     self.interaction_log("discarded", item, reason="superseded")
@@ -803,7 +820,7 @@ class Room:
             loop = asyncio.get_running_loop()
             tts = deepcopy(self.state["tts"])
             if item.get("is_insertion"):
-                audio = await loop.run_in_executor(POOL, render, item.get("spoken_text") or item["text"], RUNTIME / "audio", tts["voice"], tts["provider"], tts["model"], sentence_style(item, tts["provider"]))
+                audio = await loop.run_in_executor(POOL, render, item.get("spoken_text") or item["text"], RUNTIME / "audio", tts["voice"], tts["provider"], tts["model"], interaction_style(item, tts["provider"]))
             else:
                 product = get("product", item["product_id"])
                 if product.get("archived") or product.get("sale_status", "available") != "available":
@@ -1072,6 +1089,14 @@ class Room:
                 self.state["played"].append({"sentence_id": current["id"], "attempt_id": current["attempt_id"], "text": current["text"], "time": now()})
                 self.state["played"] = self.state["played"][-1000:]
                 insertion = self.state["insertion"]
+                # Continuous audio already crossed this boundary if no cut was
+                # scheduled. A newly ready interaction must wait another one.
+                if insertion and insertion.get("pending") and "boundary_choice" in data:
+                    pending = insertion["pending"]
+                    if data["boundary_choice"] != pending.get("queue_id"):
+                        await self.advance(preserve_pending=True)
+                        await self.broadcast()
+                        return
                 if insertion and insertion.get("pending"):
                     pending = insertion["pending"]
                     if pending.get("requires_ready"):
@@ -1750,6 +1775,13 @@ async def socket(ws: WebSocket):
                     await room.broadcast()
             elif data.get("type") == "ack" and role == "player":
                 await room.acknowledge(identity, data)
+            elif data.get("type") == "playback_diagnostic" and role == "player" and identity == room.owner:
+                allowed = {"continuous_source_started", "continuous_source_retained", "continuous_sentence_boundary", "continuous_interaction_scheduled", "continuous_play_failed"}
+                if data.get("event") in allowed and data.get("epoch") == room.state["epoch"]:
+                    offset = data.get("offset_seconds")
+                    import math
+                    if offset is None or (type(offset) in {int, float} and math.isfinite(offset) and 0 <= offset <= 1800):
+                        room.log("playback_" + data["event"], {"offset_seconds": offset, "sentence_id": (room.state.get("current") or {}).get("id")})
     except (WebSocketDisconnect, RuntimeError):
         pass
     finally:

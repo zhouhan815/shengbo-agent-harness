@@ -80,6 +80,9 @@ def _local_origin(request, *, required=False):
         raise BusinessError("ORIGIN_MISMATCH", "请求来源不匹配", status=403)
 
 
+_VERIFIED_AUDIO = {}
+
+
 def _audio_asset(server, room_id, asset):
     _id(room_id)
     identity = asset.get("audio_id")
@@ -89,8 +92,11 @@ def _audio_asset(server, room_id, asset):
     actual = Path(asset.get("path", "")).resolve()
     if actual != expected or not actual.is_relative_to(server.RUNTIME.resolve()) or not actual.is_file():
         raise BusinessError("INVALID_PRECOMPILED_AUDIO", "预生成语音文件不存在或不属于本直播间")
-    if asset.get("sha256_bytes") and "sha256:" + hashlib.sha256(actual.read_bytes()).hexdigest() != asset["sha256_bytes"]:
-        raise BusinessError("PRECOMPILED_AUDIO_CHANGED", "预生成语音文件发生变化")
+    stat = actual.stat()
+    file_key = (str(actual), stat.st_size, stat.st_mtime_ns, stat.st_ctime_ns, asset.get("sha256_bytes"))
+    if file_key not in _VERIFIED_AUDIO:
+        if asset.get("sha256_bytes") and "sha256:" + hashlib.sha256(actual.read_bytes()).hexdigest() != asset["sha256_bytes"]:
+            raise BusinessError("PRECOMPILED_AUDIO_CHANGED", "预生成语音文件发生变化")
     try:
         with wave.open(str(actual), "rb") as source:
             if source.getnframes() < 100 or source.getframerate() <= 0:
@@ -98,6 +104,17 @@ def _audio_asset(server, room_id, asset):
             duration = source.getnframes() / source.getframerate()
     except Exception:
         raise BusinessError("INVALID_PRECOMPILED_AUDIO", "预生成语音不是有效WAV文件") from None
+    _VERIFIED_AUDIO[file_key] = True
+    if len(_VERIFIED_AUDIO) > 512:
+        _VERIFIED_AUDIO.pop(next(iter(_VERIFIED_AUDIO)))
+    timing = asset.get("continuous_track")
+    if timing:
+        import math
+        begin, end = timing.get("start"), timing.get("end")
+        if (any(isinstance(v, bool) or not isinstance(v, (int, float)) or not math.isfinite(v) for v in (begin, end))
+                or not 0 <= begin < end <= duration + .001):
+            raise BusinessError("CONTINUOUS_RANGE_INVALID")
+        duration = end - begin
     return {**deepcopy(asset), "path": str(actual), "url": f"/room-audio/{room_id}/{identity}.wav", "duration": duration}
 
 
@@ -265,6 +282,8 @@ class ExistingVoiceAdapter:
             for entry in compiled_entries:
                 ref = entry["script_revision_ref"]
                 scripts[canonical_json(ref)] = self.service.store.exact(connection, ref)["body"]
+            from .continuous_audio import overlay
+            compiled_entries = [overlay(self.service, connection, publication["publication_ref"], entry) for entry in compiled_entries]
         queue = []
         for entry in compiled_entries:
             product = products.get(entry["product_id"])
@@ -389,6 +408,8 @@ def install(app, server_module):
     app.include_router(create_router(service, identity))
     from .prelive.human_workbench import install_human_workbench
     install_human_workbench(app, server_module, service, browser_identity)
+    from .continuous_audio import install as install_continuous_audio
+    install_continuous_audio(app, server_module, service, browser_identity)
 
     @app.get("/api/assistant/v2/session")
     async def session(request: Request):

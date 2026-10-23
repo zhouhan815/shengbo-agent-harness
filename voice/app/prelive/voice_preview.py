@@ -133,7 +133,7 @@ class VoicePreviewService:
             path = self.server.RUNTIME / "audio" / match.group(1) if match else None
             if not match or not isinstance(duration, (float, int)) or not math.isfinite(duration) or duration <= 0 or not path.is_file() or path.stat().st_size <= 0:
                 raise ValueError("Unverifiable audio output")
-            result = {key: raw[key] for key in ("audio_id", "url", "duration", "engine", "provider", "voice", "model", "style", "resolved_style", "cache_hit", "usage_characters", "trace_id") if key in raw}
+            result = {key: raw[key] for key in ("audio_id", "url", "duration", "engine", "provider", "voice", "model", "style", "resolved_style", "cache_hit", "usage_characters", "trace_id", "subtitle_status", "subtitle_file_hash") if key in raw}
             result.update(operation_id=value.operation_id, preview_state="succeeded")
             if command != "human.voice-preview":
                 import hashlib

@@ -109,6 +109,10 @@ def resolved_style(style, provider="minimax", model="speech-2.8-turbo"):
         if not isinstance(dictionary, dict) or not isinstance(dictionary.get("tone"), list) or not all(isinstance(x, str) for x in dictionary["tone"]):
             raise ValueError("发音字典必须是tone字符串列表")
         result["pronunciation_dict"] = {"tone": list(dictionary["tone"])}
+    if style.get("subtitle_enable") is True:
+        if provider != "minimax" or style.get("subtitle_type", "sentence") not in {"sentence", "word"}:
+            raise ValueError("连续音频时间轴参数无效")
+        result.update(subtitle_enable=True, subtitle_type=style.get("subtitle_type", "sentence"))
     return result
 
 
@@ -131,6 +135,8 @@ def minimax_request_body(text: str, voice: str, model: str, style=None) -> dict:
             body["voice_setting"]["emotion"] = profile["emotion"]
         if profile.get("pronunciation_dict"):
             body["pronunciation_dict"] = profile["pronunciation_dict"]
+        if profile.get("subtitle_enable"):
+            body.update(subtitle_enable=True, subtitle_type=profile["subtitle_type"])
     return body
 
 
@@ -306,6 +312,10 @@ def _render_minimax(text: str, directory: Path, voice: str, model: str, style=No
             safe = tts_diagnostics("audio_write", "outcome_unknown", response_received=True,
                 exception=error, http_status=http_status, provider_code=code, metadata=metadata)
             raise SpeechRenderError("MiniMax语音已返回但本地保存未完成，不能自动重复付费", safe) from None
+        if profile and profile.get("subtitle_enable"):
+            # Save audio first. Subtitle failures must never resend a paid TTS call.
+            from .audio_timeline import archive_provider_subtitles
+            archive_provider_subtitles(result.get("data", {}), directory, audio_id)
     with wave.open(str(target), "rb") as source:
         duration = source.getnframes() / source.getframerate()
     result = {"audio_id": audio_id, "url": f"/audio/{audio_id}.wav", "duration": duration,
@@ -315,6 +325,9 @@ def _render_minimax(text: str, directory: Path, voice: str, model: str, style=No
         result["style"] = profile
     if diagnostics is not None:
         result["response_diagnostics"] = diagnostics
+    if profile and profile.get("subtitle_enable"):
+        from .audio_timeline import subtitle_metadata
+        result.update(subtitle_metadata(directory, audio_id))
     return result
 
 

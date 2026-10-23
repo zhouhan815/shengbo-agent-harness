@@ -46,3 +46,21 @@ def sentence_style(sentence, provider="minimax") -> dict:
 
 def profile_catalog(provider="minimax") -> list:
     return [deepcopy(sentence_style({"stage": stage}, provider)) for stage in _PROFILES]
+
+
+def continuous_host_style():
+    """One explicit host across openings, benefits and calls to action.
+
+    No invented natural-language TTS prompt; only supported controls are sent.
+    This is opt-in and versioned: existing approved assets keep their profiles.
+    """
+    return {"profile_id": "continuous_host", "style_revision": "continuous-host-20261023.1",
+            "label": "连贯主播 · 明亮自然", "emotion": "happy", "speed": 1.0,
+            "pitch": 0, "vol": 1.0, "subtitle_enable": True, "subtitle_type": "word"}
+
+
+def interaction_style(item, provider):
+    asset = item.get("prelive_audio") or {}
+    if provider == "minimax" and asset.get("continuous_track") and asset.get("style", {}).get("profile_id") == "continuous_host":
+        return {k: v for k, v in asset["style"].items() if k not in {"subtitle_enable", "subtitle_type"}}
+    return sentence_style(item, provider)

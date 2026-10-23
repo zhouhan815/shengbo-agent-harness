@@ -383,7 +383,7 @@
         for(const item of result.items||[]){
           const url=safeUrl(item.url);if(!url||!item.playable)continue;
           const card=E('article',undefined,'wb-script-module-card wb-script-audio-preview');
-          card.append(E('h4','连续语音试听 · '+(item.module_keys||[]).map(key=>MODULES[key]||key).join('＋')));
+          card.append(E('h4',(item.resolved_style?.profile_id==='continuous_host'?'新版统一主播 · 完整连续音频':'连续语音试听')+' · '+(item.module_keys||[]).map(key=>MODULES[key]||key).join('＋')));
           const voice=item.tts_selection||{},style=item.resolved_style||item.style||{};
           card.append(E('p',(voice.provider||item.provider||'')+' / '+(voice.model||item.model||'')+' · '+(voice.voice||item.voice||'')+' · '+Math.floor(item.duration/60)+'分'+Math.round(item.duration%60)+'秒','wb-muted'));
           const audio=E('audio');audio.controls=true;audio.preload='metadata';audio.src=url;audio.style.width='100%';audio.setAttribute('aria-label','连续试听 '+(item.module_keys||[]).map(key=>MODULES[key]||key).join('和'));card.append(audio);

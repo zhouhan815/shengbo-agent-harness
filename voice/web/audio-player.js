@@ -19,6 +19,10 @@ class VoicePlayer {
       position_seconds:Number(this.audio.currentTime)||0,...extra};
     // No text, nickname, URL, authorization or unbounded result body is recorded.
     this.playbackDiagnostics.push(detail);if(this.playbackDiagnostics.length>300)this.playbackDiagnostics.shift();
+    if(event.startsWith('continuous_')&&this.ws?.readyState===1&&this.identity===this.state?.player_id){
+      this.ws.send(JSON.stringify({type:'playback_diagnostic',event,epoch:this.state.epoch,attempt_id:current?.attempt_id,
+        offset_seconds:extra.offset_seconds??extra.boundary_offset_seconds??null}));
+    }
     try { this.onPlaybackEvent({...detail}); } catch (_) { /* Diagnostics cannot interrupt playback. */ }
     try { if(typeof CustomEvent==='function'&&typeof this.audio.dispatchEvent==='function')this.audio.dispatchEvent(new CustomEvent('shengbo:playback',{detail:{...detail},bubbles:true})); } catch (_) {}
     return detail;
@@ -26,6 +30,7 @@ class VoicePlayer {
   getDiagnostics() { return this.playbackDiagnostics.map(item=>({...item})); }
   async unlock() {
     try {
+      if(this.continuousEngine){await this.continuousEngine.unlock();this.enabled=true;return;}
       await this.beforePlay();
       if(this.completedAttempt?.attempt===this.state?.current?.attempt_id&&this.completedAttempt?.epoch===this.state?.epoch&&this.audio.ended&&this.state?.status==='paused'){this.enabled=true;this.trace('unlock_completed_attempt_without_replay');return;}
       if (!this.welcomeMayPlay()) this.reset();
@@ -44,7 +49,7 @@ class VoicePlayer {
     if (this.ws?.readyState === WebSocket.OPEN && this.roomId === roomId) return Promise.resolve();
     this.disconnect(); this.closed = false; this.roomId = roomId; this.source = source;
     return new Promise((resolve, reject) => {
-      const ws = new WebSocket(`${location.protocol === 'https:' ? 'wss' : 'ws'}://${location.host}/ws?role=player&room=${encodeURIComponent(roomId)}&source=${source}`);
+      const ws = new WebSocket(`${location.protocol === 'https:' ? 'wss' : 'ws'}://${location.host}/ws?role=player&room=${encodeURIComponent(roomId)}&source=${source}&delta=1`);
       this.ws = ws;
       let settled=false;const settle=(error)=>{if(settled)return;settled=true;clearTimeout(timer);error?reject(error):resolve();};
       const timer = setTimeout(() => {this.trace('channel_timeout');settle(Error('声音通道连接超时，请重试'));}, 8000);
@@ -52,7 +57,7 @@ class VoicePlayer {
         if (this.ws !== ws) return;
         const m = JSON.parse(e.data);
         if (m.type === 'welcome') { this.identity = m.id;this.trace('channel_connected');settle(); }
-        if (m.type === 'state') { this.sync(m.state); if (this.onState) this.onState(m.state); }
+        if (m.type === 'state' || m.type === 'state_delta') { const state=m.type==='state_delta'?{...this.state,...m.state}:m.state;this.sync(state); if (this.onState) this.onState(state); }
       };
       ws.onerror = () => { this.trace('channel_error');settle(Error('声音通道连接失败')); };
       ws.onclose = () => {
@@ -67,6 +72,7 @@ class VoicePlayer {
     });
   }
   reset() {
+    if(this.continuousEngine){this.continuousEngine.dispose();this.continuousEngine=null;}
     this.generation++; this.starting = false; this.epoch = -1;this.ack=null;this.completedAttempt=null;this.readyObservedAt=null;this.playRequestedAt=null;
     const a = this.audio;
     a.onplaying = a.onended = a.onwaiting = a.onerror = a.ontimeupdate = a.onloadedmetadata = null;
@@ -91,6 +97,7 @@ class VoicePlayer {
     if (!response.ok) { const r = await response.json(); throw Error(r.detail || '恢复失败'); }
   }
   failOutput(message) {
+    this.continuousEngine?.pause();
     this.audio.pause();
     if (this.state?.current && this.identity === this.state.player_id) this.ack?.('failed');
     this.report(message);
@@ -110,9 +117,21 @@ class VoicePlayer {
     if(!previous||previous.epoch!==s.epoch||previous.status!==s.status||previous.session_id!==s.session_id||previous.player_id!==s.player_id)this.trace('state_received',{owns_playback:this.identity===s.player_id});
     if (s.player_id === this.identity && this.claimReady) this.claimReady();
     if (this.identity !== s.player_id || !s.current || ['stopped','completed','error'].includes(s.status)) {
+      if(this.continuousEngine)this.reset();
       if (this.audio.getAttribute('src') && this.audio.getAttribute('src') !== '/assets/unlock.wav') this.reset();
       return;
     }
+    if(s.audio?.continuous_track||(this.continuousEngine&&(s.current.is_insertion||!s.audio||s.status==='paused'))){
+      if(!this.continuousEngine){
+        this.reset();
+        try{this.continuousEngine=new ContinuousTrackPlayer(this.audio,this.beforePlay,(event,detail)=>this.trace(event,detail),error=>{this.trace('continuous_play_failed',{error_name:error.name||'Error'});this.ack?.(error.name==='NotAllowedError'?'blocked':'failed');this.report(error.message||'连续音频播放失败');});}
+        catch(error){this.report(error.message);return;}
+      }
+      this.epoch=s.epoch;const epoch=s.epoch,attempt=s.current.attempt_id;
+      this.ack=(event,extra={})=>{if(this.ws?.readyState!==1||this.state?.epoch!==epoch||this.identity!==this.state.player_id)return;this.ws.send(JSON.stringify({type:'ack',event,epoch,attempt_id:attempt,...extra}));if(event!=='progress')this.trace('ack_sent',{ack_event:event});};
+      this.continuousEngine.sync(s,this.ack);return;
+    }
+    if(this.continuousEngine)this.reset();
     if (this.epoch !== s.epoch) {
       this.reset(); this.epoch = s.epoch;
       const token = this.generation, epoch = s.epoch, attempt = s.current.attempt_id;this.trace('entry_selected');
