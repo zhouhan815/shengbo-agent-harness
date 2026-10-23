@@ -1,21 +1,29 @@
 /* One physical audio source, many logical sentence bookmarks. */
 class ContinuousTrackPlayer {
-  constructor(media, beforePlay, trace, fail) {
+  constructor(media, beforePlay, trace, fail, primedContext=null) {
     const Context=globalThis.AudioContext||globalThis.webkitAudioContext;
     if(!Context)throw Error('当前浏览器不支持连续音频调度，请使用新版 Chrome 或 Edge');
     this.media=media;this.beforePlay=beforePlay;this.trace=trace;this.fail=fail;
-    this.context=new Context();this.destination=this.context.createMediaStreamDestination();
+    this.context=primedContext||new Context();this.destination=this.context.createMediaStreamDestination();
     this.cache=new Map();this.revision=0;this.closed=false;this.physical=null;this.logical=null;
     this.progress=setInterval(()=>{if(this.view?.status==='playing'&&this.physical?.running)this.ack?.('progress',{position:Math.max(0,Math.min(this.end-this.begin,this.position()-this.begin))});},350);
   }
-  async unlock(){
+  async unlock(gesture=false){
+    if(gesture&&!this.physical&&this.context.state==='suspended'){
+      const Context=globalThis.AudioContext||globalThis.webkitAudioContext;
+      this.context.close().catch(()=>{});this.context=new Context();this.destination=this.context.createMediaStreamDestination();
+    }
     const resumed=this.context.resume();await this.beforePlay();
     if(this.context.state==='suspended'){
       let timer;
-      try{await Promise.race([resumed,new Promise((_,reject)=>{timer=setTimeout(()=>{const error=Error('请点击启用声音，允许连续音频播放');error.name='NotAllowedError';reject(error);},250);})]);}
+      try{await Promise.race([resumed,new Promise((_,reject)=>{timer=setTimeout(()=>{const error=Error('连续音频等待浏览器声音授权（'+this.context.state+'），请再次点击启用声音');error.name='NotAllowedError';reject(error);},gesture?5000:500);})]);}
       finally{clearTimeout(timer);}
     }else await resumed;
-    if(this.closed)return;this.media.srcObject=this.destination.stream;await this.media.play();
+    if(this.closed)return;
+    if(this.media.srcObject!==this.destination.stream)this.media.srcObject=this.destination.stream;
+    // A MediaStream play() promise may wait for its FIRST produced sample.
+    // Waiting for it before starting the source would deadlock both sides.
+    if(this.media.paused)this.media.play().catch(error=>{if(!this.closed&&error.name!=='AbortError'&&!['paused','stopped','completed'].includes(this.view?.status))this.fail(error);});
   }
   position(){const p=this.physical;return p?p.offset+(p.running?this.context.currentTime-p.clock:0):0;}
   load(url){

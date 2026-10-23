@@ -30,7 +30,10 @@ class VoicePlayer {
   getDiagnostics() { return this.playbackDiagnostics.map(item=>({...item})); }
   async unlock() {
     try {
-      if(this.continuousEngine){await this.continuousEngine.unlock();this.enabled=true;return;}
+      if(this.continuousEngine){await this.continuousEngine.unlock(true);this.enabled=true;return;}
+      // Create/resume during the user's gesture, before asynchronous API calls.
+      const Context=globalThis.AudioContext||globalThis.webkitAudioContext;
+      if(Context){if(!this.primedContinuousContext||this.primedContinuousContext.state==='closed')this.primedContinuousContext=new Context();this.primedContinuousContext.resume().catch(()=>{});}
       await this.beforePlay();
       if(this.completedAttempt?.attempt===this.state?.current?.attempt_id&&this.completedAttempt?.epoch===this.state?.epoch&&this.audio.ended&&this.state?.status==='paused'){this.enabled=true;this.trace('unlock_completed_attempt_without_replay');return;}
       if (!this.welcomeMayPlay()) this.reset();
@@ -72,7 +75,7 @@ class VoicePlayer {
     });
   }
   reset() {
-    if(this.continuousEngine){this.continuousEngine.dispose();this.continuousEngine=null;}
+    if(this.continuousEngine){if(this.primedContinuousContext===this.continuousEngine.context)this.primedContinuousContext=null;this.continuousEngine.dispose();this.continuousEngine=null;}
     this.generation++; this.starting = false; this.epoch = -1;this.ack=null;this.completedAttempt=null;this.readyObservedAt=null;this.playRequestedAt=null;
     const a = this.audio;
     a.onplaying = a.onended = a.onwaiting = a.onerror = a.ontimeupdate = a.onloadedmetadata = null;
@@ -124,7 +127,7 @@ class VoicePlayer {
     if(s.audio?.continuous_track||(this.continuousEngine&&(s.current.is_insertion||!s.audio||s.status==='paused'))){
       if(!this.continuousEngine){
         this.reset();
-        try{this.continuousEngine=new ContinuousTrackPlayer(this.audio,this.beforePlay,(event,detail)=>this.trace(event,detail),error=>{this.trace('continuous_play_failed',{error_name:error.name||'Error'});this.ack?.(error.name==='NotAllowedError'?'blocked':'failed');this.report(error.message||'连续音频播放失败');});}
+        try{this.continuousEngine=new ContinuousTrackPlayer(this.audio,this.beforePlay,(event,detail)=>this.trace(event,detail),error=>{this.trace('continuous_play_failed',{error_name:error.name||'Error'});this.ack?.(error.name==='NotAllowedError'?'blocked':'failed');this.report(error.message||'连续音频播放失败');},this.primedContinuousContext?.state==='closed'?null:this.primedContinuousContext);}
         catch(error){this.report(error.message);return;}
       }
       this.epoch=s.epoch;const epoch=s.epoch,attempt=s.current.attempt_id;

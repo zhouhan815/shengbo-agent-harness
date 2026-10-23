@@ -85,8 +85,12 @@ def adopt(service, server, room_id, operation_id, authorization_quote, actor_id)
             raise BusinessError("CONTINUOUS_ROOM_CHANGED", "请先结束本机测试播出，再采用连续音频")
         service._publication_review(c, pubref)
         identity = choice_id(pubref["id"], data["script_ref"]["id"])
-        old = c.execute("SELECT revision FROM records WHERE kind='continuous_audio_choice' AND id=?", (identity,)).fetchone()
-        ref = service.store.put(c, "continuous_audio_choice", identity, candidate, expected=old[0] if old else None, create=old is None)
+        old = c.execute("SELECT revision,body FROM records WHERE kind='continuous_audio_choice' AND id=?", (identity,)).fetchone()
+        prior = json.loads(old[1]) if old else None
+        if prior and all(prior.get(k) == candidate.get(k) for k in ("publication_ref", "script_ref", "source_operation_id", "timeline_hash", "audio")):
+            ref = service.store.get(c, "continuous_audio_choice", identity)["ref"]
+        else:
+            ref = service.store.put(c, "continuous_audio_choice", identity, candidate, expected=old[0] if old else None, create=old is None)
         service.store.event(c, room_id, "continuous_audio.adopted", {"ref": ref, "script_ref": data["script_ref"], "source_operation_id": operation_id})
     return {"ref": ref, "script_ref": data["script_ref"], "duration": duration, "sentence_count": len(timeline),
             "audio_url": "/room-audio/" + room_id + "/" + target.name, "timeline_hash": candidate["timeline_hash"], "started": False}

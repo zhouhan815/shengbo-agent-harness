@@ -28,3 +28,9 @@
 
 - 2026-10-22用户决定：正式话术（整版/模块）改用`DEEPSEEK_MODEL=deepseek-v4-pro`并开启思考`DEEPSEEK_SCRIPT_THINKING=enabled`、`DEEPSEEK_REASONING_EFFORT=high`；统一入口app/prelive/deepseek_options.py（思考时max_tokens+16000、超时300秒；未设置时保持原关闭思考/120秒）。实时欢迎与评论回复保持`DEEPSEEK_REPLY_MODEL=deepseek-flash`且关闭思考。播前Agent同时改用同一DeepSeek账户（见Agent项目AGENTS.md）。
 - 2026-10-22晚：整版与模块话术请求改为流式接收（deepseek_options.py的`streamed`与`read_provider_body`），本地拼回非流式结构后走原校验；请求指纹（input_hash）仍按原body计算，大小上限只计答案正文。原因：开思考的非流式请求在本机约60秒被切断，记为timeout_unknown并触发对账停机。tests/test_module_generation.py中test_fact_reference_failures_are_not_swallowed失败、test_missing_key_or_oversize_context_never_sends长时间不结束，均在此改动前已存在。
+
+- 2026-10-23连续主稿修复：`app/audio_timeline.py`负责供应商词时间戳归档与严格原文对齐；同一word_begin/word_end对应多音素时合并时间而不重复字词，标点释放时间归前句，禁止按字数估时间。`continuous_audio.py`是独立的人类采用门禁，绑定已采用publication、精确script_ref、试听回执、音频hash和timelinehash；试听批准本身不改变正式播出。既有正式manifest不原地改写，按一版显式采用覆盖；新稿/新整包不继承旧覆盖。当前只将网球第1版用用户本轮明确授权采用为连续音频，其他六版未重新合成。
+- 播放仍由唯一VoicePlayer输出；`web/continuous-player.js`用同一AudioBufferSource跨普通句界连续播放，句子事件只是逻辑书签。互动音频提前解码并在音频时钟的已对齐句尾停止，ended携带冻结的boundary_choice；晚就绪互动留到下一句，server不能因晚到状态把已经继续的主稿拦腰切断。暂停保留绝对音频offset；其他版本仍兼容旧句级路径。AudioContext在明确用户点击时预解锁，MediaStream.play不得在启动首个source前阻塞等待；同一个srcObject不得每句重复赋值。
+- 统一主播正本在prosody.continuous_host_style；整篇happy/speed1/pitch0/vol1，同一音色Friendly_Person；对应实时互动继承其真实参数但不请求字幕。情绪说明不冒充MiniMax自然语言角色prompt。参数统一通过不等于听感已获用户认可。
+- WebSocket仅delta=1客户端按队列标识复用已收队列；进度发送state_delta，旧客户端保留完整state。连续时钟source_started/source_retained/boundary/scheduled安全诊断写room_log；无昵称、凭据和URL。音频文件hash可按路径+size+mtime_ns+ctime_ns+期望hash缓存，变动即失效，不取消开播与商品停售检查。
+- 真实数据与验证在verification/20261023-continuous-audio。只调用一次MiniMax整版合成（436.922秒，38.329秒完成），额外短互动为实播测试；没有重写脚本或重复付费重发未知请求。第一轮首次授权等待故障已记录并修复；用户最终听感、真实OBS音轨和其他六版新连续音频仍是独立待验收项。
