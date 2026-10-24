@@ -44,6 +44,17 @@ def test_boundary_inside_unaligned_word_is_not_estimated():
                         [{'id':'1','spoken_text':'家'},{'id':'2','spoken_text':'长'}],2)
 
 
+def test_alignment_uses_exact_tts_text_when_spoken_projection_differs():
+    source = [
+        {'word':'价格','time_begin':0,'time_end':500},
+        {'word':'23.58元','time_begin':500,'time_end':1300},
+    ]
+    result = align_subtitles(source, [{
+        'id':'s1', 'text':'价格23.58元', 'spoken_text':'价格二十三点五八元',
+    }], 1.5)
+    assert result == [{'sentence_id':'s1','start':0.0,'end':1.5}]
+
+
 def test_subtitle_failure_preserves_safe_status_no_remote_retry(tmp_path):
     with patch('app.audio_timeline._public_json',side_effect=ValueError('DO_NOT_PERSIST_URL')) as fetch:
         archive_provider_subtitles({'subtitle_file':'https://example.invalid/signed'},tmp_path,'asset')

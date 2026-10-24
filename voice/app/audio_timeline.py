@@ -123,7 +123,12 @@ def align_subtitles(source, sentences, duration):
     for left, right in zip(words, words[1:]):
         if right["start"] < left["start"] or right["end"] < left["end"]:
             raise ValueError("subtitle order invalid")
-    target = "".join(normalized(s["spoken_text"]) for s in sentences)
+    # Continuous preview synthesis sends the immutable module ``text`` field.
+    # ``spoken_text`` is a separate pronunciation projection and can expand a
+    # numeric spelling (for example 23.58 -> 二十三点五八). Provider subtitles
+    # describe the text actually sent, so bind the timeline to that same field.
+    # Legacy callers without ``text`` keep the original spoken_text behaviour.
+    target = "".join(normalized(s.get("text", s["spoken_text"])) for s in sentences)
     actual = "".join(w["text"] for w in words)
     if actual != target:
         raise ValueError("subtitle text does not match approved script")
@@ -133,7 +138,7 @@ def align_subtitles(source, sentences, duration):
         ends[cursor] = word["end"]
     result, cursor, previous = [], 0, 0.0
     for sentence in sentences:
-        cursor += len(normalized(sentence["spoken_text"]))
+        cursor += len(normalized(sentence.get("text", sentence["spoken_text"])))
         if cursor not in ends:
             raise ValueError("sentence boundary falls inside a subtitle word")
         end = ends[cursor]
