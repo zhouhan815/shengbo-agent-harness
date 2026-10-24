@@ -23,7 +23,7 @@
     async function req(url,body,method){return api.request(url,body,method?{method}:{});}
     function button(title,action,fn,primary=false){const b=E('button',title,'wb-button'+(primary?' wb-button--primary':''));b.type='button';b.dataset.execAction=action;b.addEventListener('click',async()=>{if(b.disabled)return;b.disabled=true;b.dataset.execBusy='true';try{await fn();}catch(e){info(e.message||'操作未完成',true);}finally{delete b.dataset.execBusy;if(b.isConnected){b.disabled=false;availability();}}});return b;}
     function availability(){
-      if(view==='broadcast'&&playback){const s=playback,active=!!s.current;for(const action of ['pause','resume','retry','next','next_product','stop','insert-now','insert-after']){const b=q(`[data-exec-action="${action}"]`);if(b)b.disabled=action==='pause'?!active||s.status==='paused':action==='resume'?!active||!['paused','blocked'].includes(s.status):action==='stop'?['stopped','completed'].includes(s.status):!active;}const local=q('[data-exec-action=local-sound]'),start=q('[data-exec-action=start]'),copy=q('[data-exec-action=copy-obs]');if(local)local.disabled=['stopped','completed'].includes(s.status);if(start)start.disabled=!['stopped','completed'].includes(s.status);if(copy)copy.disabled=!q('[name=obs_url]')?.value;}
+      if(view==='broadcast'&&playback){const s=playback,active=!!s.current;for(const action of ['pause','resume','restart-version','retry','next','next_product','stop','insert-now','insert-after']){const b=q(`[data-exec-action="${action}"]`);if(b)b.disabled=action==='pause'?!active||s.status==='paused':action==='resume'?!active||!['paused','blocked'].includes(s.status):action==='stop'?['stopped','completed'].includes(s.status):!active;}const local=q('[data-exec-action=local-sound]'),start=q('[data-exec-action=start]'),copy=q('[data-exec-action=copy-obs]');if(local)local.disabled=['stopped','completed'].includes(s.status);if(start)start.disabled=!['stopped','completed'].includes(s.status);if(copy)copy.disabled=!q('[name=obs_url]')?.value;}
       if(view==='comments'){const send=q('[data-exec-action=comments-send]');if(send)send.disabled=!!conversation?.turns?.some(t=>['queued','running'].includes(t.status));}
       if(view==='platform')for(const action of ['platform-save','platform-connect','platform-disconnect']){const b=q(`[data-exec-action="${action}"]`);if(b)b.disabled=requesting;}
       qa('[data-exec-busy=true]').forEach(b=>b.disabled=true);
@@ -57,7 +57,7 @@
       try{await refresh();}catch(e){info(e.message,true);}return root;
     }
     function buildBroadcast(){
-      broadcastSignature='';const status=card('播出监控','句子、版本、商品与声音来源都会显示在这里。开播只播放已确认且已准备的语音。');const state=E('div');state.dataset.broadcastStatus='';status.append(state,row(button('开始本场直播','start',startInPlaceWithSound,true),button('暂停','pause',()=>mutation('pause')),button('继续','resume',()=>mutation('resume')),button('重播当前句','retry',()=>mutation('retry')),button('下一句','next',()=>mutation('next')),button('下一商品','next_product',()=>mutation('next_product')),button('结束直播','stop',()=>mutation('stop')),button('导出记录','export',async()=>download('声播播出记录.json',await req('/api/export')))));
+      broadcastSignature='';const status=card('播出监控','句子、版本、商品与声音来源都会显示在这里。开播只播放已确认且已准备的语音。');const state=E('div');state.dataset.broadcastStatus='';status.append(state,row(button('开始本场直播','start',startInPlaceWithSound,true),button('暂停','pause',()=>mutation('pause')),button('继续','resume',resumePlayback),button('当前版本从头播放','restart-version',()=>restartVersionWithSound(context,playback)),button('重播当前句','retry',()=>mutation('retry')),button('下一句','next',()=>mutation('next')),button('下一商品','next_product',()=>mutation('next_product')),button('结束直播','stop',()=>mutation('stop')),button('导出记录','export',async()=>download('声播播出记录.json',await req('/api/export')))));
       const output=card('声音输出与接入','无需复制链接：在上方“音频连接”选择输出设备，再让 OBS 采集对应音源。下方另保留 OBS 浏览器来源方式，二者选一种即可，避免重复采集。');const url=input('obs_url');url.readOnly=true;url.setAttribute('aria-label','OBS 播出链接');const progress=E('p','等待播出','wb-muted');progress.dataset.outputStatus='';output.append(row(url,button('复制 OBS 链接','copy-obs',async()=>{if(!url.value)throw Error('请先开播再复制播出链接');try{await navigator.clipboard.writeText(url.value);info('OBS 链接已复制');}catch{url.select();info('链接已选中，可手动复制。');}})),row(button('开启本机声音','local-sound',enableSound,true)),progress,detail('OBS 声音设置','浏览器来源宽 1080、高 1920。勾选“通过 OBS 控制音频”，检查混音器电平；如声音被拦截，在 OBS 来源“交互”中点击启用声音。OBS 接管后，本机声音自动让出。'));
       const current=card('当前播出 · 逐句定位');const currentBox=E('div',undefined,'wb-execution-current');currentBox.dataset.currentSentence='';const timeline=E('progress');timeline.max=1;timeline.value=0;timeline.setAttribute('aria-label','当前句播放进度');current.append(currentBox,timeline);
       const insert=card('手动插播','立即插播后重播被打断句；句尾插播后继续下一句。插播会按本场音色实时合成。');const text=textarea('insert',drafts.get('insert:'+room())||'');text.maxLength=500;text.setAttribute('aria-label','插播内容');const go=async mode=>{const value=text.value.trim();if(!value)throw Error('请填写插播内容');await mutation('insert',{text:value,mode});text.value='';cacheDraft();};text.addEventListener('input',cacheDraft);insert.append(text,row(button('句尾插播','insert-after',()=>go('after_sentence')),button('立即插播','insert-now',()=>go('immediate'),true)));
@@ -128,6 +128,38 @@
       if(room()!==target.room_id||context.preparation_id!==target.preparation_id)throw Error('已切换本场，本次没有恢复声音。');
       await enableSound();
     }
+    async function restartVersionWithSound(dest,observed=playback){
+      const target=copy(dest||context),initial=copy(observed);
+      if(!initial?.current||!target.room_id)throw Error('请先开始本场播出。');
+      const local=!initial.connected_player||player?.identity===initial.player_id;
+      // Unlock in the click, before navigation and HTTP. Do not resume old audio.
+      if(local)await localPlayer().unlock();
+      const sameTarget=()=>{const current=options.getContext?.()||context;return current.room_id===target.room_id&&current.preparation_id===target.preparation_id;};
+      if(!sameTarget())throw Error('已切换本场，本次没有从头播放。');
+      if(view!=='broadcast'){
+        if(options.onNavigate)await options.onNavigate({...target,view:'broadcast'});
+        else await open({...target,view:'broadcast'});
+      }else await refresh();
+      if(!sameTarget()||room()!==target.room_id)throw Error('已切换本场，本次没有从头播放。');
+      if(local){
+        await player.connect(target.room_id);
+        if(!sameTarget())return;
+        if(player.state?.player_id!==player.identity)await player.claim();
+      }
+      if(!sameTarget()||playback?.session_id!==initial.session_id)throw Error('场次已变化，请重新选择要播放的版本。');
+      const item=initial.queue?.[initial.index]||initial.current;
+      await mutation('restart_version',{expected_epoch:null,expected_script_id:item.script_id,...(item.occurrence_id?{expected_occurrence_id:item.occurrence_id}:{})});
+      info('当前版本已从第一句话重新播放，后续仍按原队列顺序播出。');
+    }
+    async function resumePlayback(){
+      // A fresh page has no media owner: resuming only the server clock cannot
+      // produce sound. Reconnect/unlock locally in this click before resuming.
+      // Preserve an already connected OBS/other-window owner instead of stealing it.
+      if(playback?.connected_player&&player?.identity!==playback.player_id){
+        await mutation('resume');return;
+      }
+      await enableSound();
+    }
     async function enableSound(){
       const boundRoom=room(),token=generation;
       localPlayer();
@@ -143,7 +175,7 @@
       q('[data-output-status]').textContent=global.ShengboAudioOutput?global.ShengboAudioOutput.describe(s,local).local:s.status==='paused'?'语音已暂停，当前不会输出声音':s.connected_player?'声音通道已连接；播放状态以上方实时状态为准':'等待声音来源';
       q('[data-current-sentence]').replaceChildren(E('p',c?`${c.product_name} · ${c.version} · 第 ${c.ordinal||'插播'} / ${c.total_sentences||'—'} 句 · ${phases[c.stage]||c.stage||''}`:'尚未播出','wb-record-meta'),E('p',c?.text||s.error||'准备完成后，点击“开始本场直播”。'));
       const progress=q('progress');progress.max=s.audio?.duration||1;progress.value=s.position||0;
-      for(const action of ['pause','resume','retry','next','next_product','stop','insert-now','insert-after']){const b=q(`[data-exec-action="${action}"]`);b.disabled=action==='pause'?!active||s.status==='paused':action==='resume'?!active||!['paused','blocked'].includes(s.status):action==='stop'?['stopped','completed'].includes(s.status):!active;}
+      for(const action of ['pause','resume','restart-version','retry','next','next_product','stop','insert-now','insert-after']){const b=q(`[data-exec-action="${action}"]`);b.disabled=action==='pause'?!active||s.status==='paused':action==='resume'?!active||!['paused','blocked'].includes(s.status):action==='stop'?['stopped','completed'].includes(s.status):!active;}
       q('[data-exec-action=local-sound]').disabled=['stopped','completed'].includes(s.status);q('[data-exec-action=start]').disabled=!['stopped','completed'].includes(s.status);q('[data-exec-action=copy-obs]').disabled=!q('[name=obs_url]').value;
       availability();
       // Queue changes and incoming events have separate lifecycles. Bounded event
@@ -252,7 +284,7 @@
     }
     const timer=setInterval(async()=>{if(disposed||!root.isConnected||polling||document.hidden||requesting)return;polling=true;try{await refresh();}catch(e){info('状态更新失败：'+e.message+'。输入内容已保留。',true);}finally{polling=false;}},1500);
     function getAudioStatus(){return {ownsPlayback:!!player?.identity&&player.state?.player_id===player.identity,paused:audio.paused,muted:audio.muted,volume:audio.volume,hasAudio:!!audio.srcObject||(!!audio.getAttribute('src')&&audio.getAttribute('src')!=='/assets/unlock.wav'),currentTime:audio.currentTime,sinkId:audio.sinkId||'default',routing:audioRouting?.getStatus()};}
-    return {open,refresh,startWithSound,resumeWithSound,getAudioStatus,audioRouting,dispose(){disposed=true;clearInterval(timer);player?.disconnect();audioRouting?.dispose();root.remove();},hasDirty(){return sourceDirty||commentDirty||!!(view==='broadcast'?q('[name=insert]')?.value.trim():String(drafts.get('insert:'+room())||'').trim());},getState(){return {view,context:copy(context),playback:copy(playback),source:copy(source),sessionId,hasDirty:this.hasDirty()};}};
+    return {open,refresh,startWithSound,resumeWithSound,restartVersionWithSound,getAudioStatus,audioRouting,dispose(){disposed=true;clearInterval(timer);player?.disconnect();audioRouting?.dispose();root.remove();},hasDirty(){return sourceDirty||commentDirty||!!(view==='broadcast'?q('[name=insert]')?.value.trim():String(drafts.get('insert:'+room())||'').trim());},getState(){return {view,context:copy(context),playback:copy(playback),source:copy(source),sessionId,hasDirty:this.hasDirty()};}};
   }
   global.ShengboWorkbenchExecution={mount};
 })(window);

@@ -65,7 +65,7 @@ class ContinuousTrackPlayer {
   async sync(s,ack){
     this.view=s;this.ack=ack;
     if(s.status==='paused'||s.status==='blocked'){this.pause();return;}
-    if(!s.audio)return;
+    if(!s.audio){if(this.logical&&this.logical.seekRevision!==(s.playback_seek_revision||0)){++this.revision;this.halt();}return;}
     const url=s.audio.url,timing=s.audio.continuous_track;
     const begin=timing?.start||0,end=timing?.end||s.audio.duration;
     const follows=timing&&this.logical?.url===url&&Math.abs(this.logical.end-begin)<.001;
@@ -75,7 +75,7 @@ class ContinuousTrackPlayer {
     try{
       const buffer=await this.load(url);if(this.closed||revision!==this.revision||this.view?.epoch!==s.epoch)return;
       await this.unlock();if(this.closed||revision!==this.revision)return;
-      const keep=!!timing&&this.physical?.url===url&&this.physical.running&&
+      const keep=!!timing&&this.logical?.seekRevision===(s.playback_seek_revision||0)&&this.physical?.url===url&&this.physical.running&&
         ((this.position()>=begin-.05&&this.position()<end)||(follows&&this.position()>=end));
       if(!keep){
         const pausedOffset=this.physical?.url===url&&!this.physical.running&&this.logical?.epoch===s.epoch?this.physical.offset:null;
@@ -85,7 +85,7 @@ class ContinuousTrackPlayer {
         node.onended=()=>{if(this.physical===physical){physical.offset=this.position();physical.running=false;}};
         node.start(physical.clock,offset);this.trace('continuous_source_started',{offset_seconds:offset});
       }else this.trace('continuous_source_retained',{offset_seconds:this.position()});
-      this.logical={url,epoch:s.epoch,end};this.finished=null;
+      this.logical={url,epoch:s.epoch,end,seekRevision:s.playback_seek_revision||0};this.finished=null;
       this.ack('playing');this.arm(s.epoch);this.prepareCut(this.view);
     }catch(error){if(!this.closed&&revision===this.revision)this.fail(error);}
   }

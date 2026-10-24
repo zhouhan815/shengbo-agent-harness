@@ -23,6 +23,16 @@ const flush=()=>new Promise(r=>setImmediate(r));
  await p.sync(s,(e,d)=>acks.push({epoch:2,e,d}));await flush();
  assert.equal(p.cut.queueId,'interaction');assert.equal(p.physical.node.stopAt,7);
  p.context.currentTime=7;p.alarm.onended();assert.equal(acks.at(-1).d.boundary_choice,'interaction');
+ // Explicit restart within the same first sentence must rewind, not retain.
+ await p.sync({...state(3,0,3),audio:null,playback_seek_revision:1},()=>{});
+ assert.equal(p.physical.running,false,'stop old sound immediately while deliberate seek is preparing');
+ const restart={...state(3,0,3),playback_seek_revision:1};
+ await p.sync(restart,()=>{});const restarted=p.physical.node;p.context.currentTime+=.7;
+ await p.sync({...restart,epoch:4,playback_seek_revision:2},()=>{});
+ assert.notEqual(p.physical.node,restarted);assert.equal(p.physical.offset,0);
+ const retained=p.physical.node;p.context.currentTime+=3.01;
+ await p.sync({...state(5,3,7),playback_seek_revision:2},()=>{});
+ assert.equal(p.physical.node,retained,'after a deliberate seek ordinary sentence boundaries remain continuous');
  p.dispose();assert.equal(media.srcObject,null);
  const waitingMedia={paused:true,play:()=>new Promise(()=>{}),pause(){this.paused=true;}};
  const waitingPlayer=new ctx.Player(waitingMedia,async()=>{},()=>{},e=>{throw e;});

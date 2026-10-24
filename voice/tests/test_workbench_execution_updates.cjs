@@ -3,7 +3,7 @@
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
 
 class Element {
-  constructor(tag){this.tagName=tag.toLowerCase();this.children=[];this.parentNode=null;this.dataset={};this.attributes={};this.listeners={};this.value='';this.checked=false;this.disabled=false;this.scrollTop=0;this.scrollHeight=0;this.textWrites=0;this._text='';this.paused=true;this.muted=false;this.volume=1;this.currentTime=0;}
+  constructor(tag){this.tagName=tag.toLowerCase();this.children=[];this.parentNode=null;this.dataset={};this.attributes={};this.style={};this.listeners={};this.value='';this.checked=false;this.disabled=false;this.scrollTop=0;this.scrollHeight=0;this.textWrites=0;this._text='';this.paused=true;this.muted=false;this.volume=1;this.currentTime=0;}
   get lastChild(){return this.children.at(-1);}
   get isConnected(){return this.connectedRoot||!!this.parentNode?.isConnected;}
   set textContent(value){this._text=String(value??'');this.children=[];this.textWrites++;}
@@ -33,7 +33,7 @@ async function main(){
   vm.runInContext(fs.readFileSync(path.join(__dirname,'../web/workbench-execution.js'),'utf8'),scope);
   let state={status:'paused',epoch:8,session_id:'live1',index:0,current:{queue_id:'q1',product_name:'拖鞋',product_id:'p1',script_id:'v1',text:'当前句',version:'第1版',ordinal:1,total_sentences:2},queue:[{queue_id:'q1',product_name:'拖鞋',product_id:'p1',script_id:'v1',text:'当前句',version:'第1版',ordinal:1,total_sentences:2},{queue_id:'q2',product_name:'拖鞋',product_id:'p1',script_id:'v1',text:'第二句',version:'第1版',ordinal:2,total_sentences:2}],connected_player:false,logs:[],audience_events:[],position:1,audio:{duration:5}};
   const calls=[],clone=value=>JSON.parse(JSON.stringify(value));
-  const api={async request(url,body,options){calls.push({url,body,options});if(url==='/api/library')return {rooms:[{id:'r1'},{id:'r2'}],scripts:[]};if(url.endsWith('/state'))return clone(state);if(url.includes('/live-source'))return {config:{url:'https://live.douyin.com/123456',purpose:'external_test',enabled:false},status:{state:'disconnected',metrics:{}},events:[],next_cursor:0};if(url.endsWith('/reply-knowledge'))return {products:[{id:'p1',name:'拖鞋'}],documents:[],chunk_count:0};if(url.endsWith('/reply-sessions'))return {sessions:[]};if(url.startsWith('/api/jobs?'))return {jobs:[]};throw Error('Unexpected API route '+url);}};
+  const api={async request(url,body,options){calls.push({url,body,options});if(url==='/api/library')return {rooms:[{id:'r1'},{id:'r2'}],scripts:[]};if(url.endsWith('/state'))return clone(state);if(url.endsWith('/control')){state.status=body.action==='resume'?'playing':state.status;return {ok:true};}if(url.includes('/live-source'))return {config:{url:'https://live.douyin.com/123456',purpose:'external_test',enabled:false},status:{state:'disconnected',metrics:{}},events:[],next_cursor:0};if(url.endsWith('/reply-knowledge'))return {products:[{id:'p1',name:'拖鞋'}],documents:[],chunk_count:0};if(url.endsWith('/reply-sessions'))return {sessions:[]};if(url.startsWith('/api/jobs?'))return {jobs:[]};throw Error('Unexpected API route '+url);}};
   const execution=scope.ShengboWorkbenchExecution.mount({container:host,api});
   const select=selector=>host.querySelector(selector);
   let checks=0;const check=(condition,message)=>{assert.ok(condition,message);checks++;};
@@ -71,6 +71,32 @@ async function main(){
   await execution.open({room_id:'r1',view:'broadcast'});check(select('[name=insert]').value===''&&execution.hasDirty(),'room one keeps only its own comment/source drafts');
   await execution.open({room_id:'r2',view:'broadcast'});check(select('[name=insert]').value==='尚未发送的插播','returning restores the insertion draft in its original room');
   check(calls.every(call=>call.body===undefined),'opening, polling and draft navigation perform no write or paid operation');
+  // Returning to a paused room must reconnect local audio before server resume.
+  let rejectUnlock=false;const soundCalls=[];
+  scope.VoicePlayer=class{
+    constructor(){this.identity='local';this.state={player_id:'local',session_id:'live1'};}
+    async unlock(){soundCalls.push('unlock');if(rejectUnlock)throw Error('test sound permission denied');}
+    async connect(){soundCalls.push('connect');state.connected_player=true;state.player_id='local';}
+    async claim(){soundCalls.push('claim');}disconnect(){}
+  };
+  state.status='paused';state.connected_player=false;state.player_id=null;
+  await execution.refresh();const firstCall=calls.length;
+  await select('[data-exec-action=resume]').emit('click');
+  check(soundCalls.join(',')==='unlock,connect','fresh-page continue unlocks and connects its sound player');
+  check(calls.slice(firstCall).some(c=>c.body?.action==='resume')&&state.status==='playing','resume follows successful sound connection');
+  state.status='paused';state.connected_player=true;state.player_id='obs-owner';state.output_source='obs';
+  await execution.refresh();soundCalls.length=0;await select('[data-exec-action=resume]').emit('click');
+  check(soundCalls.length===0&&state.status==='playing','connected OBS owner is resumed without stealing its sound');
+  state.status='paused';state.connected_player=false;rejectUnlock=true;
+  await execution.refresh();const failedCall=calls.length;await select('[data-exec-action=resume]').emit('click');
+  check(!calls.slice(failedCall).some(c=>c.body?.action==='resume')&&state.status==='paused','sound unlock failure must not silently resume the server');
+  rejectUnlock=false;state.status='paused';state.connected_player=false;state.player_id=null;
+  await execution.refresh();soundCalls.length=0;const restartCalls=calls.length;
+  await select('[data-exec-action=restart-version]').emit('click');
+  check(soundCalls.join(',')==='unlock,connect','version restart unlocks and connects audio on a fresh page');
+  const restartWrites=calls.slice(restartCalls).filter(c=>c.body?.action);
+  check(restartWrites.length===1&&restartWrites[0].body.action==='restart_version','version restart does not briefly resume the old position');
+  check(restartWrites[0].body.expected_epoch===null&&restartWrites[0].body.expected_script_id==='v1'&&restartWrites[0].body.expected_session_id==='live1','restart targets observed version and session');
   execution.dispose();check(host.children.length===0,'adapter disposal removes the view');
   process.stdout.write(JSON.stringify({passed:checks,scope:'Node VM and minimal DOM; no browser/network/LLM/TTS/platform or production data'},null,2)+'\n');
 }

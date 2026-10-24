@@ -34,3 +34,5 @@
 - 统一主播正本在prosody.continuous_host_style；整篇happy/speed1/pitch0/vol1，同一音色Friendly_Person；对应实时互动继承其真实参数但不请求字幕。情绪说明不冒充MiniMax自然语言角色prompt。参数统一通过不等于听感已获用户认可。
 - WebSocket仅delta=1客户端按队列标识复用已收队列；进度发送state_delta，旧客户端保留完整state。连续时钟source_started/source_retained/boundary/scheduled安全诊断写room_log；无昵称、凭据和URL。音频文件hash可按路径+size+mtime_ns+ctime_ns+期望hash缓存，变动即失效，不取消开播与商品停售检查。
 - 真实数据与验证在verification/20261023-continuous-audio。只调用一次MiniMax整版合成（436.922秒，38.329秒完成），额外短互动为实播测试；没有重写脚本或重复付费重发未知请求。第一轮首次授权等待故障已记录并修复；用户最终听感、真实OBS音轨和其他六版新连续音频仍是独立待验收项。
+
+- 2026-10-24播放控制：页头提供暂停/继续、当前版本从头播放、结束直播；监控复用同一restartVersionWithSound。Room.restart_version仅回退当前连续occurrence的起点，保留队列/场次/长短开场和正式音频；expected_session与version绑定，普通换句不以epoch拦截，但跨版本仍拒绝。playback_seek_revision使连续引擎在准备期间立即停旧source，ready后真正seek，重播当前句同用该标记。结束只停止声播输出，不关闭抖音。验证在verification/20261024-playback-controls，测试不调用模型/TTS。

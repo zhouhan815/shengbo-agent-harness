@@ -80,6 +80,11 @@
     $('start-preparation').disabled = startingBroadcast || hasPlaybackBlockingChanges();
     $('start-preparation').title = hasPlaybackBlockingChanges() ? '请先保存商品或本场的修改，再开始播出' : '通过所选设备播放声播声音，不会自动在抖音开播';
     $('start-preparation').textContent = startingBroadcast ? '正在开始…' : '▶ 开始播出';
+    const canStop=!!liveState&&!['stopped','completed'].includes(liveState.status);
+    $('stop-preparation').hidden=!canStop;
+    $('stop-preparation').disabled=playbackControlBusy;
+    $('restart-version-preparation').hidden=!canPause;
+    $('restart-version-preparation').disabled=playbackControlBusy;
     $('pause-preparation').hidden = !canPause;
     $('pause-preparation').disabled = playbackControlBusy;
     $('pause-preparation').textContent = playbackControlBusy ? '正在处理…' : liveState?.status === 'paused' ? '▶ 继续播出' : '⏸ 暂停播出';
@@ -273,6 +278,19 @@
       }
     } catch (e) { notice(e.message || '操作未完成，请检查当前播放状态。'); }
     finally { playbackControlBusy = false; await refreshPlaybackHeader(); heading(); }
+  });
+  for(const [id,action] of [['stop-preparation','stop'],['restart-version-preparation','restart_version']]) $(id).addEventListener('click',async()=>{
+    if(playbackControlBusy||!headerPlayback?.session_id||headerPlayback.room_id!==context.room_id)return;
+    const observed=clone(headerPlayback);playbackControlBusy=true;heading();
+    try{
+      if(action==='restart_version')await execution.restartVersionWithSound(clone(context),observed);
+      else await api.request('/api/rooms/'+encodeURIComponent(observed.room_id)+'/control',{action,action_id:api.uuid(),expected_session_id:observed.session_id});
+      if(context.room_id===observed.room_id){
+        await refreshPlaybackHeader();if(context.view==='broadcast')await execution?.refresh();
+        notice(action==='stop'?'声播输出已结束；抖音直播需在抖音端自行结束。':'当前版本已从第一句话重新播放，后续按原队列顺序播出。');
+      }
+    }catch(e){notice(e.message||'操作未完成，请核对播出状态。');}
+    finally{playbackControlBusy=false;await refreshPlaybackHeader();heading();}
   });
   $('start-preparation').addEventListener('click', async () => {
     if (startingBroadcast) return;

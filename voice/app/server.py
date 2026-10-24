@@ -960,8 +960,33 @@ class Room:
                     while self.state["index"]+1 < len(self.state["queue"]) and self.state["queue"][self.state["index"]+1]["product_id"] == product_id:
                         self.state["index"] += 1
                 await self.advance()
+            elif name == "restart_version":
+                item = self.current_item()
+                if not item or not self.state["current"] or self.state["status"] in {"stopped", "completed"}:
+                    raise HTTPException(409, "本场已结束，请重新开始播出")
+                for key in ("occurrence_id", "script_id"):
+                    expected = data.get("expected_" + key)
+                    if expected is not None and expected != item.get(key):
+                        raise HTTPException(409, "当前话术版本已变化，请刷新后再从头播放")
+                def version_key(value):
+                    return (value.get("product_id"), value.get("occurrence_id") or value.get("script_id"))
+                index = self.state["index"]
+                while index > 0 and version_key(self.state["queue"][index - 1]) == version_key(item):
+                    index -= 1
+                insertion = self.state["insertion"]
+                if insertion:
+                    pending = insertion.get("pending") or self.state["current"]
+                    self.release_unplayed_like(pending, "manual_restart")
+                    if pending.get("is_welcome"):
+                        self.welcome_log("skipped", pending["welcome_event_id"], reason="manual_restart")
+                self.state.update(index=index, insertion=None,
+                                  playback_seek_revision=self.state.get("playback_seek_revision", 0) + 1)
+                self.resume_item = None
+                self.set_current(self.current_item())
+                self.log("version_restarted", {"index": index, "script_id": item.get("script_id"), "occurrence_id": item.get("occurrence_id")})
             elif name == "retry":
                 if self.state["current"]:
+                    self.state["playback_seek_revision"] = self.state.get("playback_seek_revision", 0) + 1
                     self.set_current(self.state["current"])
             elif name == "insert":
                 text = str(data.get("text", "")).strip()
