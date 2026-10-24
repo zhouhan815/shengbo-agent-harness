@@ -532,6 +532,21 @@ class PreliveService:
             script = self.store.get(c, "script_revision", identity)
             body = script["body"]
             product = self.store.exact(c, body["product_ref"])["body"]
+            # The legacy readiness screen compares a script's generation
+            # signature with the current product/session configuration.  A
+            # managed script is immutable, so derive its signature from the
+            # pinned product revision and the draft that produced it instead
+            # of treating every structured product as automatically stale.
+            prep = self._prep(c, body["preparation_id"])
+            commerce_signature = None
+            context_ref = body.get("generation_provenance", {}).get("context_ref")
+            context = self._artifact(c, context_ref, "context", body["preparation_id"])["body"] if context_ref else {}
+            draft_ref = context.get("draft_ref")
+            if draft_ref:
+                draft = self._artifact(c, draft_ref, "draft", body["preparation_id"])["body"].get("draft", {})
+                generation_config = {"commerce": draft.get("commerce", commerce.parse_room({}))}
+                pinned_effective = commerce.effective_product(product, generation_config)
+                commerce_signature = commerce.generation_signature(pinned_effective)
             sentences, blocks = [], []
             for key in MODULE_KEYS:
                 ref = body["module_refs"].get(key)
@@ -543,7 +558,7 @@ class PreliveService:
                 for sentence in module["sentences"]:
                     sentences.append({**sentence, "ordinal": len(sentences) + 1, "block_id": block_id, "block_ordinal": len(blocks), "stage": key, "fact_ids": []})
             from ..welcome import build_product_templates
-            return {"id": identity, "product_id": body["product_id"], "product_snapshot": product, "room_id": self._prep(c, body["preparation_id"])["body"]["room_id"], "version_number": body["version_number"], "revision": body["script_revision"], "variant_id": body["variant_id"], "module_refs": body["module_refs"], "angle": "本场策划话术", "label": "本场策划话术", "source": "prelive-agent", "facts": [], "status": "draft", "prelive_managed": True, "sentences": sentences, "blocks": blocks, "created_at": body["created_at"], "issues": [], "welcome_templates": deepcopy(body.get("welcome_templates") or build_product_templates(product))}
+            return {"id": identity, "product_id": body["product_id"], "product_snapshot": product, "room_id": prep["body"]["room_id"], "version_number": body["version_number"], "revision": body["script_revision"], "variant_id": body["variant_id"], "module_refs": body["module_refs"], "angle": "本场策划话术", "label": "本场策划话术", "source": "prelive-agent", "facts": [], "status": "draft", "prelive_managed": True, "commerce_signature": commerce_signature, "sentences": sentences, "blocks": blocks, "created_at": body["created_at"], "issues": [], "welcome_templates": deepcopy(body.get("welcome_templates") or build_product_templates(product))}
 
     def _cmd_update_preparation_products(self, c, a, m, p, s):
         prep = self._prep(c, a.preparation_id, a.expected_revision)

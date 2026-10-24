@@ -69,7 +69,8 @@ class ServerBridgeTests(unittest.IsolatedAsyncioTestCase):
             playlist_ref = self.service.store.artifact(connection, "playlist", {"preparation_id": prep_ref["id"], "items": [], "loop_mode": "once"})
             module_ref = self.service.store.artifact(connection, "module", self.service._module_body("opening_long", ["欢迎了解测试商品。"]))
             module = self.service.store.exact(connection, module_ref)["body"]
-            script_ref = self.service.store.artifact(connection, "script_revision", {"preparation_id": prep_ref["id"], "product_id": self.product["id"], "product_ref": product_ref, "variant_id": "variant-bridge", "version_number": 1, "script_revision": 1, "module_refs": {"opening_long": module_ref}, "created_at": "2026-10-16T00:00:00+00:00"})
+            context_ref = self.service.store.artifact(connection, "context", {"preparation_id": prep_ref["id"], "draft_ref": draft_ref})
+            script_ref = self.service.store.artifact(connection, "script_revision", {"preparation_id": prep_ref["id"], "product_id": self.product["id"], "product_ref": product_ref, "variant_id": "variant-bridge", "version_number": 1, "script_revision": 1, "module_refs": {"opening_long": module_ref}, "generation_provenance": {"context_ref": context_ref}, "created_at": "2026-10-16T00:00:00+00:00"})
         audio_id = "a" * 64
         path = Path(self.temp.name) / "room_audio" / config["id"] / (audio_id + ".wav")
         path.parent.mkdir(parents=True)
@@ -101,7 +102,15 @@ class ServerBridgeTests(unittest.IsolatedAsyncioTestCase):
         await asyncio.sleep(.05)
         self.assertEqual(target.state["index"], 0)
         self.assertEqual(target.state["status"], "ready")
-        self.assertTrue(server.get("script", script_ref["id"])["prelive_managed"])
+        projection = server.get("script", script_ref["id"])
+        self.assertTrue(projection["prelive_managed"])
+        self.assertTrue(projection["commerce_signature"])
+        self.assertFalse(server.commerce.script_is_stale(
+            projection, server.get("product", self.product["id"]), server.settings(config["id"])))
+        different_config = deepcopy(server.settings(config["id"]))
+        different_config["commerce"]["scene"] = "新活动场景"
+        self.assertTrue(server.commerce.script_is_stale(
+            projection, server.get("product", self.product["id"]), different_config))
         with self.assertRaises(HTTPException):
             await server.edit_script(script_ref["id"], {"lines": ["不可通过旧接口修改。"]})
         await target.action({"action": "stop"})
