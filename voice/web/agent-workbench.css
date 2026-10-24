@@ -162,3 +162,9 @@ input[data-agent-input-locked], textarea[data-agent-input-locked], select[data-a
 
 /* Sentence editing is optional; the normal reader keeps its compact card layout. */
 .wb-script-sentence{position:relative;display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:start;gap:8px;padding:7px 0;border-bottom:1px solid #eef2f7}.wb-script-sentence:last-child{border-bottom:0}.wb-script-sentence>.wb-button{font-size:10px;min-height:26px;padding:4px 8px;color:#59749b;background:#f6f9fe}.wb-script-sentence-edit{grid-column:1/-1}.wb-script-sentence-edit[hidden]{display:none}.wb-script-sentence-edit textarea{width:100%;box-sizing:border-box;resize:vertical;min-height:88px;padding:11px 12px;font:inherit;font-size:13px;line-height:1.9;color:#35465f;border:1px solid #b9cdec;border-radius:9px;background:#fff}.wb-script-sentence-edit textarea:focus{outline:2px solid #d4e3fb;outline-offset:1px}.wb-script-sentence-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding-top:7px}.wb-script-sentence-actions .wb-button{font-size:11px;min-height:29px;padding:5px 10px}.wb-script-sentence-status{font-size:10px;color:#7e8da3}.wb-script-reader>[data-sentence-save-status]{flex:none;margin:8px 0;font-size:11px}.wb-script-sentence>[hidden]{display:none!important}
+
+/* Playback device is a primary control, never hidden under OBS setup. */
+.wb-route-label{display:flex;align-items:center;gap:10px;flex:1;min-width:180px;font-size:12px;color:#44516a}
+.wb-route-select{flex:1;min-width:0;max-width:100%;padding:8px 12px;border:1px solid #d4dce7;border-radius:9px;background:#fff;color:#303b50;font:inherit}
+.wb-audio-routing .wb-route-guide{background:transparent;padding:0;margin:4px 0;color:#7a8391;line-height:1.6}
+.wb-route-label+button{white-space:nowrap}

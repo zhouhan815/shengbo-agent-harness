@@ -36,3 +36,5 @@
 - 真实数据与验证在verification/20261023-continuous-audio。只调用一次MiniMax整版合成（436.922秒，38.329秒完成），额外短互动为实播测试；没有重写脚本或重复付费重发未知请求。第一轮首次授权等待故障已记录并修复；用户最终听感、真实OBS音轨和其他六版新连续音频仍是独立待验收项。
 
 - 2026-10-24播放控制：页头提供暂停/继续、当前版本从头播放、结束直播；监控复用同一restartVersionWithSound。Room.restart_version仅回退当前连续occurrence的起点，保留队列/场次/长短开场和正式音频；expected_session与version绑定，普通换句不以epoch拦截，但跨版本仍拒绝。playback_seek_revision使连续引擎在准备期间立即停旧source，ready后真正seek，重播当前句同用该标记。结束只停止声播输出，不关闭抖音。验证在verification/20261024-playback-controls，测试不调用模型/TTS。
+
+- 2026-10-24输出设备：工作台播放条直接显示“播放设备”选择器，默认自动跟随Windows默认；已保存的手动设备不擅自覆盖。audio-routing唯一负责浏览器deviceId与setSinkId，Windows设备仅按唯一同名映射，禁止把Windows端点ID当浏览器sinkId。系统默认变化/devicechange重读，解析到物理设备时显式设sink，避免浏览器按应用旧路由；权限不足保留浏览器默认并明确未匹配。指定设备断开暂停且提示，不静默切扬声器。商品详情/音色/任务样本试听通过registerMedia共用路由，不自动播。界面不把选择某设备称为OBS已连接；OBS需采集同一设备。验证verification/20261024-output-device。

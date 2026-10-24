@@ -116,11 +116,12 @@
     $('audio-current-meta').hidden=!liveState?.current;
     // The monitor already shows the complete current sentence in its main card.
     $('audio-current-text').hidden=!liveState?.current||context.view==='broadcast';
-    const routeFault=route?.mode==='external'&&route.status!=='ready';
+    const routeFault=!!route&&(route.status==='unavailable'||(route.mode==='external'&&route.status!=='ready'));
+    const deviceMuted=!!route?.deviceMuted;
     const playbackFault=['blocked','error'].includes(liveState?.status);
     const warning=$('audio-output-warning');
-    warning.hidden=!routeFault&&!playbackFault;
-    warning.textContent=routeFault ? (route.message||'外部声音设备未就绪，请展开声音设置检查。') : playbackFault ? (liveState?.error||value.local||'声音输出需要检查，请展开声音设置。') : '';
+    warning.hidden=!routeFault&&!playbackFault&&!deviceMuted;
+    warning.textContent=routeFault ? (route.message||'外部声音设备未就绪，请展开声音设置检查。') : playbackFault ? (liveState?.error||value.local||'声音输出需要检查，请展开声音设置。') : deviceMuted ? '所选播放设备在 Windows 中处于静音，请取消设备静音或选择其他设备。' : '';
   }
   async function refreshAudioOutput() {
     if(outputPolling||Date.now()-outputReadAt<3000)return;
@@ -238,6 +239,7 @@
   }
   editors = global.ShengboWorkspaceEditors.mount({
     container: $('workspace-editor'), api,
+    onAudioElement:audio=>execution?.audioRouting?.registerMedia(audio),
     onSelect(selection) { assistant.toggleSelection(selection,{focus:false});showSelectionNotice(selectionItems(assistant.getState().selected).length);focus('work'); },
     onNavigate: dest => navigate(dest),
     onDirty: () => heading(),
