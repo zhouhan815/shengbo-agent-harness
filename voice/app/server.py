@@ -1801,12 +1801,26 @@ async def socket(ws: WebSocket):
             elif data.get("type") == "ack" and role == "player":
                 await room.acknowledge(identity, data)
             elif data.get("type") == "playback_diagnostic" and role == "player" and identity == room.owner:
-                allowed = {"continuous_source_started", "continuous_source_retained", "continuous_sentence_boundary", "continuous_interaction_scheduled", "continuous_play_failed"}
+                allowed = {"continuous_source_started", "continuous_source_retained", "continuous_sentence_boundary", "continuous_interaction_scheduled", "continuous_play_failed", "continuous_clock_confirmed", "continuous_clock_stalled"}
                 if data.get("event") in allowed and data.get("epoch") == room.state["epoch"]:
                     offset = data.get("offset_seconds")
                     import math
                     if offset is None or (type(offset) in {int, float} and math.isfinite(offset) and 0 <= offset <= 1800):
-                        room.log("playback_" + data["event"], {"offset_seconds": offset, "sentence_id": (room.state.get("current") or {}).get("id")})
+                        detail = {"offset_seconds": offset, "sentence_id": (room.state.get("current") or {}).get("id")}
+                        if data["event"] in {"continuous_source_started", "continuous_clock_confirmed", "continuous_clock_stalled"}:
+                            if data.get("context_state") in {"running", "suspended", "interrupted", "closed", "unknown"}:
+                                detail["context_state"] = data["context_state"]
+                            for key in ("context_time", "media_time", "graph_peak", "media_volume"):
+                                value = data.get(key)
+                                if type(value) in {int, float} and math.isfinite(value) and 0 <= value <= 86400:
+                                    detail[key] = round(value, 4)
+                            for key in ("media_paused", "silent_clock", "media_muted"):
+                                if type(data.get(key)) is bool: detail[key] = data[key]
+                            if data.get("output_mode") in {"web_audio_direct", "media_stream"}:
+                                detail["output_mode"] = data["output_mode"]
+                            if type(data.get("media_ready_state")) is int and 0 <= data["media_ready_state"] <= 4:
+                                detail["media_ready_state"] = data["media_ready_state"]
+                        room.log("playback_" + data["event"], detail)
     except (WebSocketDisconnect, RuntimeError):
         pass
     finally:

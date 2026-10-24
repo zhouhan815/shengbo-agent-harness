@@ -82,7 +82,7 @@
     function localPlayer(){
       const Player=global.VoicePlayer||(typeof VoicePlayer==='function'?VoicePlayer:null);
       if(!Player)throw Error('声音播放器尚未加载，请重新打开应用。');
-      if(!player)player=new Player(audio,message=>{const n=q('[data-output-status]');if(n)n.textContent=message;},{beforePlay:()=>audioRouting?.ensureReady()});
+      if(!player)player=new Player(audio,message=>{const n=q('[data-output-status]');if(n)n.textContent=message;},{beforePlay:()=>audioRouting?.ensureReady(),onContinuousOutput:output=>audioRouting?.registerMedia(output)});
       return player;
     }
     async function startInPlaceWithSound(){
@@ -283,7 +283,7 @@
       if(selectedView==='jobs'){const queries=[req('/api/jobs?room_id='+encodeURIComponent(id)),libPromise];if(context.preparation_id)queries.push(api.query('read_completion_observation',{preparation_id:context.preparation_id}));const [legacy,lib,observation]=await Promise.all(queries);if(token!==generation)return;library=lib;legacyJobs=legacy.jobs||[];v2Jobs=observation?.jobs||[];renderJobs();}
     }
     const timer=setInterval(async()=>{if(disposed||!root.isConnected||polling||document.hidden||requesting)return;polling=true;try{await refresh();}catch(e){info('状态更新失败：'+e.message+'。输入内容已保留。',true);}finally{polling=false;}},1500);
-    function getAudioStatus(){return {ownsPlayback:!!player?.identity&&player.state?.player_id===player.identity,paused:audio.paused,muted:audio.muted,volume:audio.volume,hasAudio:!!audio.srcObject||(!!audio.getAttribute('src')&&audio.getAttribute('src')!=='/assets/unlock.wav'),currentTime:audio.currentTime,sinkId:audio.sinkId||'default',routing:audioRouting?.getStatus()};}
+    function getAudioStatus(){return {ownsPlayback:!!player?.identity&&player.state?.player_id===player.identity,paused:player?.continuousEngine?.directOutput?!player.continuousEngine.physical?.running:audio.paused,muted:audio.muted,volume:audio.volume,hasAudio:!!player?.continuousEngine?.physical||!!audio.srcObject||(!!audio.getAttribute('src')&&audio.getAttribute('src')!=='/assets/unlock.wav'),currentTime:audio.currentTime,sinkId:audio.sinkId||'default',routing:audioRouting?.getStatus()};}
     return {open,refresh,startWithSound,resumeWithSound,restartVersionWithSound,getAudioStatus,audioRouting,dispose(){disposed=true;clearInterval(timer);player?.disconnect();audioRouting?.dispose();root.remove();},hasDirty(){return sourceDirty||commentDirty||!!(view==='broadcast'?q('[name=insert]')?.value.trim():String(drafts.get('insert:'+room())||'').trim());},getState(){return {view,context:copy(context),playback:copy(playback),source:copy(source),sessionId,hasDirty:this.hasDirty()};}};
   }
   global.ShengboWorkbenchExecution={mount};

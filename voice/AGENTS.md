@@ -38,3 +38,5 @@
 - 2026-10-24播放控制：页头提供暂停/继续、当前版本从头播放、结束直播；监控复用同一restartVersionWithSound。Room.restart_version仅回退当前连续occurrence的起点，保留队列/场次/长短开场和正式音频；expected_session与version绑定，普通换句不以epoch拦截，但跨版本仍拒绝。playback_seek_revision使连续引擎在准备期间立即停旧source，ready后真正seek，重播当前句同用该标记。结束只停止声播输出，不关闭抖音。验证在verification/20261024-playback-controls，测试不调用模型/TTS。
 
 - 2026-10-24输出设备：工作台播放条直接显示“播放设备”选择器，默认自动跟随Windows默认；已保存的手动设备不擅自覆盖。audio-routing唯一负责浏览器deviceId与setSinkId，Windows设备仅按唯一同名映射，禁止把Windows端点ID当浏览器sinkId。系统默认变化/devicechange重读，解析到物理设备时显式设sink，避免浏览器按应用旧路由；权限不足保留浏览器默认并明确未匹配。指定设备断开暂停且提示，不静默切扬声器。商品详情/音色/任务样本试听通过registerMedia共用路由，不自动播。界面不把选择某设备称为OBS已连接；OBS需采集同一设备。验证verification/20261024-output-device。
+
+- 2026-10-24首句卡住/有进度无声：支持AudioContext.setSinkId的浏览器正式连续音频改为source→gain→analyser→context.destination，所选设备通过同一routing.registerMedia的outputRoute适配器同步到Context，禁止同时再走MediaStream导致双播；非支持浏览器保留MediaStream兼容。createContext先用无物理输出时钟初始化，直接模式在unlock按所选sink切到实际输出。时钟实际推进才ack playing，3秒不推进/未启动停止并明确错误，明确用户重试可重建失败ctx。clock_confirmed/stalled记录白名单状态/时钟/graph_peak/output_mode，不能把source.start或图内信号当作最终听感。真实Chrome用户确认声音和进度正常、耳机会话电平正值，证据verification/20261024-first-sentence-stall。当前保持用户播出，未重合成音频。

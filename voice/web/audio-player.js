@@ -7,6 +7,7 @@ class VoicePlayer {
     this.enabled = false; this.starting = false; this.generation = 0;
     this.closed = true;
     this.beforePlay = options.beforePlay || (() => {});
+    this.onContinuousOutput=options.onContinuousOutput||(()=>{});
     this.onPlaybackEvent = options.onPlaybackEvent || (() => {});
     this.playbackDiagnostics = []; this.eventSequence = 0; this.completedAttempt = null;
   }
@@ -21,7 +22,8 @@ class VoicePlayer {
     this.playbackDiagnostics.push(detail);if(this.playbackDiagnostics.length>300)this.playbackDiagnostics.shift();
     if(event.startsWith('continuous_')&&this.ws?.readyState===1&&this.identity===this.state?.player_id){
       this.ws.send(JSON.stringify({type:'playback_diagnostic',event,epoch:this.state.epoch,attempt_id:current?.attempt_id,
-        offset_seconds:extra.offset_seconds??extra.boundary_offset_seconds??null}));
+        offset_seconds:extra.offset_seconds??extra.boundary_offset_seconds??null,
+        context_state:extra.context_state,context_time:extra.context_time,media_paused:extra.media_paused,media_time:extra.media_time,media_ready_state:extra.media_ready_state,silent_clock:extra.silent_clock,output_mode:extra.output_mode,graph_peak:extra.graph_peak,media_muted:extra.media_muted,media_volume:extra.media_volume}));
     }
     try { this.onPlaybackEvent({...detail}); } catch (_) { /* Diagnostics cannot interrupt playback. */ }
     try { if(typeof CustomEvent==='function'&&typeof this.audio.dispatchEvent==='function')this.audio.dispatchEvent(new CustomEvent('shengbo:playback',{detail:{...detail},bubbles:true})); } catch (_) {}
@@ -33,7 +35,7 @@ class VoicePlayer {
       if(this.continuousEngine){await this.continuousEngine.unlock(true);this.enabled=true;return;}
       // Create/resume during the user's gesture, before asynchronous API calls.
       const Context=globalThis.AudioContext||globalThis.webkitAudioContext;
-      if(Context){if(!this.primedContinuousContext||this.primedContinuousContext.state==='closed')this.primedContinuousContext=new Context();this.primedContinuousContext.resume().catch(()=>{});}
+      if(Context){if(!this.primedContinuousContext||this.primedContinuousContext.state==='closed')this.primedContinuousContext=typeof ContinuousTrackPlayer!=='undefined'?ContinuousTrackPlayer.createContext():new Context();this.primedContinuousContext.resume().catch(()=>{});}
       await this.beforePlay();
       if(this.completedAttempt?.attempt===this.state?.current?.attempt_id&&this.completedAttempt?.epoch===this.state?.epoch&&this.audio.ended&&this.state?.status==='paused'){this.enabled=true;this.trace('unlock_completed_attempt_without_replay');return;}
       if (!this.welcomeMayPlay()) this.reset();
@@ -129,6 +131,7 @@ class VoicePlayer {
         this.reset();
         try{this.continuousEngine=new ContinuousTrackPlayer(this.audio,this.beforePlay,(event,detail)=>this.trace(event,detail),error=>{this.trace('continuous_play_failed',{error_name:error.name||'Error'});this.ack?.(error.name==='NotAllowedError'?'blocked':'failed');this.report(error.message||'连续音频播放失败');},this.primedContinuousContext?.state==='closed'?null:this.primedContinuousContext);}
         catch(error){this.report(error.message);return;}
+        if(this.continuousEngine.directOutput)Promise.resolve(this.onContinuousOutput(this.continuousEngine.outputRoute)).catch(error=>this.failOutput(error.message));
       }
       this.epoch=s.epoch;const epoch=s.epoch,attempt=s.current.attempt_id;
       this.ack=(event,extra={})=>{if(this.ws?.readyState!==1||this.state?.epoch!==epoch||this.identity!==this.state.player_id)return;this.ws.send(JSON.stringify({type:'ack',event,epoch,attempt_id:attempt,...extra}));if(event!=='progress')this.trace('ack_sent',{ack_event:event});};
