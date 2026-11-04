@@ -387,10 +387,21 @@ class ScriptPlanModuleBaseInvalidDetails(DTO):
         return value
 
 
+class ScriptRecapDisposition(DTO):
+    recap_ref: Ref | None = Field(default=None, description="所采用或处置的精确复盘引用；同名意见有多份时必填。")
+    finding_id: str = Field(min_length=1, max_length=200)
+    action: Literal["apply", "partial", "reject", "defer", "already_covered"]
+    reason: str = Field(min_length=1, max_length=2000, description="处置理由；部分采用时写清只采用什么。")
+    target_modules: list[Literal[MODULE_KEYS]] = Field(default_factory=list, max_length=len(MODULE_KEYS),
+        description="采用或部分采用时填本次计划里确实生成或修改的模块。")
+    target_product_ids: list[str] = Field(default_factory=list, max_length=64,
+        description="只适用于部分本次商品时填写真实ID；未填写时作用于本次计划中所列模块。")
+
+
 class SaveScriptPlanArgs(PreparationArgs):
     bundle_ref: Ref
     items: list[ScriptPlanItem]
-    recap_dispositions: list[dict[str, Any]] = Field(default_factory=list)
+    recap_dispositions: list[ScriptRecapDisposition] = Field(default_factory=list)
 
 
 class SubmitScriptsArgs(PreparationArgs):
@@ -630,7 +641,7 @@ QUERY_NAMES = (
     "read_script_audio_preview",
     "list_script_audio_previews",
     "read_script_usage", "voice_options", "validate_product_assembly", "get_workspace_snapshot",
-    "read_completion_observation", "read_job", "create_review", "read_operation_receipt",
+    "read_completion_observation", "read_job", "create_review", "read_start_readiness", "read_operation_receipt",
     "read_events", "read_blob",
 )
 
@@ -658,6 +669,7 @@ _QUERY_FIELDS = {
     "get_workspace_snapshot": ((), ("preparation_id", "cursor", "limit")),
     "read_completion_observation": ((), ("preparation_id",)),
     "read_job": (("job_id",), ()), "create_review": ((), ("preparation_id", "ref")),
+    "read_start_readiness": (("preparation_id",), ()),
     "read_operation_receipt": (("operation_id",), ("principal_id",)),
     "read_events": ((), ("cursor", "limit", "scope_id", "include_catalog", "order")),
     "read_blob": (("ref",), ("byte_start", "byte_end")),

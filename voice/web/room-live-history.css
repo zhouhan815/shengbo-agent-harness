@@ -1,0 +1,54 @@
+.wb-live-history-body {
+  display: grid;
+  grid-template-columns: minmax(170px, .8fr) minmax(0, 2.4fr);
+  flex: 1;
+  min-height: 0;
+}
+.wb-live-history :is(h3,h4) { margin: 0 0 7px; line-height: 1.4; }
+.wb-live-history h3 { font-size: .94rem; }
+.wb-live-history h4 { font-size: .81rem; }
+.wb-live-history-sessions,
+.wb-live-history-detail { padding: 12px 14px; overflow: auto; min-height: 0; min-width: 0; }
+.wb-live-history-sessions { background: #f6f9ff; border-right: 1px solid var(--wb-line); }
+.wb-live-history :is(.wb-live-history-list,.wb-live-history-events) { list-style: none; padding: 0; margin: 0 0 10px; }
+.wb-live-history-list li + li { margin-top: 5px; }
+.wb-live-history-list .wb-button {
+  display: grid;
+  justify-items: start;
+  gap: 2px;
+  width: 100%;
+  text-align: left;
+  padding: 6px 8px;
+  line-height: 1.35;
+}
+.wb-live-history-list .wb-button small { color: var(--wb-muted); }
+.wb-live-history-list .wb-button[aria-current="true"] { background: #e5efff; border-color: #a9c4ee; }
+.wb-live-history-detail-title { display: flex; flex-wrap: wrap; align-items: center; gap: 5px 9px; }
+.wb-live-history-detail-title h3 { margin: 0; }
+.wb-live-history-sources { margin-block: 12px 15px; }
+.wb-live-history-source {
+  padding: 8px 10px;
+  margin-bottom: 6px;
+  border: 1px solid var(--wb-line);
+  border-radius: 8px;
+  background: #f6f9ff;
+}
+.wb-live-history-source p { margin: 0 0 5px; }
+.wb-live-history-metrics {
+  display: grid;
+  grid-template-columns: repeat(3,minmax(0,1fr));
+  gap: 7px;
+  margin: 0;
+}
+.wb-live-history-metrics dt,
+.wb-live-history-metrics small,
+.wb-live-history-events small { color: var(--wb-muted); font-size: .72rem; }
+.wb-live-history-metrics dd { margin: 2px 0 0; font-weight: 650; overflow-wrap: anywhere; }
+.wb-live-history-events li { padding: 5px 0; border-bottom: 1px solid var(--wb-line); }
+.wb-live-history-events p { margin: 0; font-size: .84rem; overflow-wrap: anywhere; }
+@media (max-width: 630px) {
+  .wb-live-history-body { grid-template-columns: minmax(0,1fr); grid-template-rows: auto minmax(0,1fr); }
+  .wb-live-history-sessions { max-height: 25dvh; border-right: 0; border-bottom: 1px solid var(--wb-line); }
+  .wb-live-history-list { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 5px; }
+  .wb-live-history-list li + li { margin-top: 0; }
+}

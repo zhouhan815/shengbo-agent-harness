@@ -112,7 +112,7 @@
         select.value=pref.mode==='external'?pref.deviceId:'';
       }
       select.disabled=state.busy||!supported;
-      const fallback=pref.mode==='local'&&!state.defaultResolved&&host?'尚未匹配系统默认设备；可点“读取设备列表”，或手动选择。':'';
+      const fallback=pref.mode==='local'&&!state.defaultResolved&&host?'默认设备待匹配。可读取设备列表。':'';
       container.querySelector('[data-route-state]').textContent=state.busy?'正在切换播放设备…':message||(status==='unavailable'?'播放设备未就绪，已暂停。':fallback||(pref.mode==='local'?'跟随系统默认 · '+state.label:'已选择 · '+state.label))+(state.deviceMuted?'；该设备在 Windows 中已静音，请取消静音。':'');
       const auth=container.querySelector('[data-route-authorize]');auth.disabled=state.busy||!supported;
       auth.textContent=media?.selectAudioOutput?'选择其他设备':'读取设备列表';

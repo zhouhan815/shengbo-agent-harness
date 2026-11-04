@@ -362,10 +362,14 @@ def test_context_fence_follows_the_actual_model():
 def test_split_trusted_context_keeps_phase_stable_fields_in_the_cached_prefix():
     """Batch 3 B1: Goal/authority/request travel in system; changing state is the tail."""
     projection = {"phase": "execute", "role": "main", "goal": {"objective": "prepare_session"}, "allowed_effects": ["x"],
-                  "original_user_request": "做播前准备", "branches": {"items": []}, "business_receipts": [], "decisions": []}
+                  "original_user_request": "做播前准备", "branches": {"items": []}, "business_receipts": [], "decisions": [],
+                  "selection_binding": {"status": "pending"}}
     stable, volatile = mw.split_projection(projection)
     assert set(stable) == {"phase", "role", "goal", "allowed_effects", "original_user_request"}
-    assert set(volatile) == {"branches", "business_receipts", "decisions"}
+    assert set(volatile) == {"branches", "business_receipts", "decisions", "selection_binding"}
+    rebound_stable, rebound_volatile = mw.split_projection({**projection, "selection_binding": {"status": "bound"}})
+    assert mw.stable_context_text(rebound_stable) == mw.stable_context_text(stable)
+    assert mw.trusted_context_text(rebound_volatile) != mw.trusted_context_text(volatile)
     request = ModelRequest(model=FakeListChatModel(responses=["x"]), messages=[HumanMessage("开始")],
                            system_message=SystemMessage("规则"), tools=[], state={"messages": []}, runtime=None)
     sent = mw.with_trusted_context(request, (mw.stable_context_text(stable), mw.trusted_context_text(volatile)), "split")

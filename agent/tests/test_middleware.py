@@ -36,6 +36,15 @@ class FakeStore:
         self.data[(kind, identity)].update(changes)
         return self.get(kind, identity)
 
+    def claim_tool_correction(self, run_id, key, limit):
+        counters = dict(self.get("run", run_id).get("correctable_tool_errors") or {})
+        count = counters.get(key, 0)
+        if count >= limit or self.get("run", run_id).get("pending_unknown_operation"):
+            return None
+        counters[key] = count + 1
+        self.update("run", run_id, correctable_tool_errors=counters)
+        return count + 1
+
 
 class FakeTrace:
     def __init__(self):
@@ -291,6 +300,32 @@ async def test_audit_never_replaces_graph_interrupt_or_cancellation():
         await Audit(engine).awrap_tool_call(tool_request("read_product"), interrupted)
 
 
+@pytest.mark.asyncio
+@pytest.mark.parametrize("kind", ["tool", "model"])
+async def test_audit_distinguishes_graph_pause_from_failure(kind):
+    engine = FakeEngine()
+    audit = Audit(engine)
+    wrap, request = (audit.awrap_tool_call, tool_request("request_user_decision")) if kind == "tool" else (
+        audit.awrap_model_call, model_request())
+
+    async def interrupted(request):
+        raise GraphInterrupt((Interrupt(value={"decision_id": "d1"}),))
+
+    async def failed(request):
+        raise RuntimeError("test failure")
+
+    with pytest.raises(GraphInterrupt):
+        await wrap(request, interrupted)
+    with pytest.raises(RuntimeError, match="test failure"):
+        await wrap(request, failed)
+
+    paused_start, paused, failed_start, failure = engine.trace.events
+    assert (paused["type"], paused["data"]["status"], paused["parent_event_id"]) == (
+        f"{kind}.interrupted", "INTERRUPTED", paused_start["event_id"])
+    assert (failure["type"], failure["data"]["status"], failure["parent_event_id"]) == (
+        f"{kind}.failed", "FAILED", failed_start["event_id"])
+
+
 def test_factories_have_nine_distinct_boundaries_and_no_native_task_entry():
     engine = FakeEngine()
     main = main_middleware(engine)
@@ -408,7 +443,11 @@ async def test_session_worker_corrects_null_ref_locally_and_reads_real_schema_an
     result = await graph.ainvoke({"messages": [HumanMessage("分析本场配置，按真实schema选择声音")]},
         {"configurable": {"thread_id": "session-null-correction"}}, context=runtime("session_config").context)
     error = next(message for message in result["messages"] if isinstance(message, ToolMessage) and message.tool_call_id == "bad-null")
-    assert error.status == "error" and "ref" in error.content
+    assert error.status == "error"
+    feedback = json.loads(error.content)
+    assert feedback["error"]["code"] == "TOOL_ARGUMENTS_INVALID"
+    assert feedback["error"]["details"]["commit_state"] == "not_committed"
+    assert any(issue["loc"][0] == "ref" for issue in feedback["error"]["details"]["issues"])
     assert {key for key, _ in calls} == {"get_business_schema", "voice_options"}
     assert engine.prepared_report["status"] == "PREPARED"
     assert len([message for message in result["messages"] if isinstance(message, AIMessage)]) == 3

@@ -16,11 +16,15 @@ description: 识别播前任务、复用历史、按需并行分派三类分析�
 4. 分类可为商品更新、商品事实分析、顾客研究、本场配置、改稿、编排、整场准备、仅生成已批准语音或只读解释。只读解释完成也需finish_turn。
 5. 默认更新商品：catalog_delivery=`standard_update`，保存商品全字段、维护相关顾客研究、列受影响话术；未请求不改稿。明确仅改某字段时其它字段保留。用户明确限定当前只整理/保存基础商品、暂不开展顾客研究时，选择catalog_delivery=`basic_facts_only`并在catalog_delivery_quote逐字引用该范围的原始用户指令；不要从资料里的“本阶段”说明、模型摘要或required_analyses空列表推断豁免。basic_facts_only仍需真实保存回执和精确商品版本；不额外强迫顾客研究或话术影响清单。该范围不能同时声明顾客/本场研究为本次必要分析。
 6. 用户明确要求从商品资料到生成/保存话术文本，并明确本轮不做声音或完整直播交付时，选择objective=`materials_to_script`。该目标仍需真实商品/本场/上下文与话术保存回执，但不额外要求排序、素材清单、语音批准、音频或候选发布；完成文本后用finish_turn(outcome='COMPLETED')交付。READY_FOR_REVIEW表示已有完整语音候选，不用于纯文本任务。用户要求完整播前准备仍用prepare_session；只更新资料用catalog_update，不因本场已存在而扩大目标。
+7. 只要素材准备建议时选`asset_preparation`。用`wf_playback_review(action='asset_inputs')`一次取得本场主题、已选商品和已有清单，必要时再读用户指定的附件。程序已记录独立素材任务的执行计划。按优先级给出具体可执行的建议，覆盖相关电商短视频、商品展示素材和直播间布置。每项写清用途与拍摄/布置方法，区分优先准备与可选；没有真实文件的项目标待准备，不把商品条件、价格或演示效果猜成事实。新增建议时保留仍适用的已绑定材料和状态。用`save_assets`回传精确`asset_preparation_ref`和类型化`asset_checklist`；程序核验保存回执后直接交付，并展示优先事项。建议素材属于本场准备信息，不触发生成视频、改本场配置、音频或开播。
+8. 单独改本场设置用`session_config`。用`wf_context_bundle(action='apply_session_settings')`一次提交`session_updates`，只填用户明确要求改动的路径和值。活动仅改某款或某一项时给具体叶子路径，不重写整个commerce；涉及商品时使用当前本场已选精确ID，活动截止时间带时区。程序读取当前草案、保留其余字段并走原业务校验；独立任务保存成功即交付。缺少必要参数、商品或时间有歧义时请用户补充。
 
 ## 三类分析的调用与汇合
 
 1. 读取该商品研究历史与本场历史，用精确ref判断是否仍适用，非空历史不等于有效历史。
 2. 独立的商品事实、顾客使用场景、本场配置可dispatch_analysis_batch并行。给每路最小必要source_refs、product_ids、prior_report_refs、input_refs及具体研究问题。
+   - 如后续明确依赖这批所有报告，优先同一次提交assessment并设置wait_for_results=true。已明确约定通过条件且不需逐份人工或语义取舍时，可选on_ready=accept_clean。返回ACCEPTED使用正式引用；NEEDS_REVIEW只查需要处理的分支，保留已完成报告。顾客研究先进入空白核心卖点生成，本场配置可独立处理，汇合真实商品、本场草案与适用研究后才制定话术计划。
+   - 新商品要补空白核心卖点，且本轮原话有独立指令（例如「缺少核心卖点时，先根据顾客研究生成并保存核心卖点」），可调用wf_product_materials.save_from_facts，一并传selling_points_from_research中的正式研究ref、研究分支ID和逐字user_quote。必须同一来源并适用当前款，程序先按商品证据写作、复核，再一次保存商品；已有卖点原样保留。保存后按回执选入本场，把同一研究正式绑定并交给话术上下文，不重复调研。已有商品或有争议的材料走原精确版本和确认入口。
 3. 分析同伴不相互改正式数据；新发现会影响另一支时，等待完整PREPARED报告，由主Agent读取后决定是否定向重跑，避免传递半成品事实。
 4. 用read_analysis_batch检查状态，默认仅新报告返回全文，旧报告保留full_ref，需要原文时report_mode=full或按精确引用回读。PREPARED仍是候选，主验证来源、事实/假设分离、冲突和目标范围，accept_analysis_reports后才可作为正式依据。
 5. 后台未完成时finish_turn WAITING_JOBS；没有独立工作可先做时，可用wait_for_branch_ids明确等待哪些分支都完成，避免只为一条部分报告反复唤醒；若想利用部分成果继续工作则不填。协调器在实际变化后唤醒，失败可提前返回。不要在模型循环反复查状态。
@@ -31,7 +35,7 @@ description: 识别播前任务、复用历史、按需并行分派三类分析�
 
 ## 记录与上下文
 
-执行阶段先读后定：本轮需要的资料、能力与数据结构读取结果返回后，再单独提交首份save_task_assessment，不与读取并行发出。capabilities只填当前可用工具ID或分析角色ID，不填业务命令ID（如save_product、save_script_plan）。执行途中通过save_task_assessment.decision_basis记录计划变化；最终交付可直接用finish_turn.summary记录公开审阅结论，验收通过后delivery_record绑定实际正式refs，不必重复写结束计划；两种记录均不是人工批准。不要输出私有思维链。工具结果很大时回读必要章节并保留精确ref，原始记录不会被摘要替换。身份、价格、活动条件、授权边界、待答问题、精确ref和未知付费结果不可丢失。
+执行阶段先读后定：独立本场配置和素材清单的固定计划由对应工具保存。其他任务在必要读取结果返回后提交首份save_task_assessment，或与已确定的派发合并提交，不与独立读取并行发出。capabilities只填当前可用工具ID或分析角色ID，不填业务命令ID（如save_product、save_script_plan）。执行途中通过save_task_assessment.decision_basis记录计划变化；最终交付可直接用finish_turn.summary记录公开审阅结论，验收通过后delivery_record绑定实际正式refs，不必重复写结束计划；两种记录均不是人工批准。不要输出私有思维链。工具结果很大时回读必要章节并保留精确ref，原始记录不会被摘要替换。身份、价格、活动条件、授权边界、待答问题、精确ref和未知付费结果不可丢失。
 
 ## 可选择的轻量工具流
 
@@ -40,15 +44,15 @@ description: 识别播前任务、复用历史、按需并行分派三类分析�
 | 工具 | 已选动作的执行范围 |
 | --- | --- |
 | wf_product_materials | inspect材料/schema/候选；save完整字段或save_from_facts原样保存已验收候选；select选择引用 |
-| wf_selling_points | offer正式询问是否生成及方向；propose提交模型有据候选并确认；save只保存已确认卖点；不自动生成未知事实 |
+| wf_selling_points | 报告一键补空时，propose校验当前商品证据编号和正式顾客研究并保存；其他入口按需offer、propose确认和save。详见core-selling-points Skill |
 | wf_analysis_coordination | 按需dispatch/inspect/accept；符合条件的来源报告bind正式新商品 |
 | wf_context_bundle | inspect默认index按需回读，plan为研究计划正文、full为显式全文；save绑定完整正式引用 |
-| wf_script_execution | execute已保存计划；status精简进度；review一次读取本次当前稿件完整审阅文字，仍由模型判断；已有有效job续用 |
+| wf_script_execution | plan_execute_wait按已冻结上下文提交新整版或同一精确原稿的扩版、登记等待；execute执行已保存计划；status看进度，review一次读本次正式稿供判断 |
 | wf_playback_review | prepare_order装配模型已选的精确序列；save_playlist、save_assets、compile、review；不替代内容审查或人工决定 |
 | wf_required_audio | inspect当前批准与音频；prepare只补已批准缺项 |
 | wf_finalize_preparation | 核验、幂等发布候选、回执核对；不采用、不开播 |
 
-返回WAITING后finish_turn WAITING_JOBS，等待有效事件唤醒。NEEDS_REPLAN/NEEDS_DECISION包含具体缺项，由你选择增加或调整步骤，不能重复调用同工具碰运气。OUTCOME_UNKNOWN先查原操作，不能盲重发。完整调试记录可查，当前工作集只携带状态、必要数据和精确引用。
+返回WAITING且尚未登记等待时，用finish_turn WAITING_JOBS等待有效事件。NEEDS_REPLAN/NEEDS_DECISION按具体缺项调整。OUTCOME_UNKNOWN先查原操作，不能盲重发。当前工作集只携带必要数据和精确引用。
 
 ## 按任务预加载的分册
 

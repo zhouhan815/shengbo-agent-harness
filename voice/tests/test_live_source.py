@@ -6,7 +6,7 @@ import unittest
 from unittest.mock import AsyncMock, patch
 
 from fastapi import HTTPException
-from app import live_source, server
+from app import live_history, live_source, server
 
 
 class FakeSocket:
@@ -369,6 +369,75 @@ class LiveSourceTests(unittest.IsolatedAsyncioTestCase):
                 socket.queue.put_nowait(message)
             await self.spin(lambda: live_source.get_view("voice_a")["status"]["unknown_messages"] == 3)
             self.assertEqual(live_source.get_view("voice_a")["events"], [])
+
+    async def test_playback_history_uses_real_starts_and_exact_source_scope(self):
+        def log(identity, session, when, event, detail):
+            server.put("room_log", {"id": server.uid("room_log"), "room_id": identity, "session_id": session,
+                                    "time": when, "event": event, "detail": detail})
+
+        server.put("prelive_session", {"id": "early", "room_id": "voice_a", "state": "stopped",
+                    "started_at": "2026-11-03T02:00:00.500+00:00", "stopped_at": "2026-11-03T03:00:00.450+00:00"})
+        log("voice_a", "early", "2026-11-03T10:00:00+08:00", "prelive_publication_started", {})
+        log("voice_a", "late", "2026-11-03T21:00:00+08:00", "control_accepted", "start")
+        log("voice_a", "late", "2026-11-03T20:59:00+08:00", "control_accepted", "stop")
+        log("voice_a", "late", "2026-11-03T22:00:00+08:00", "playback_completed", {})
+        log("voice_a", "late", "2026-11-03T22:01:00+08:00", "control_accepted", "stop")
+        log("voice_a", "idle", "2026-11-03T23:00:00+08:00", "control_accepted", "stop")
+        log("voice_b", "other", "2026-11-03T09:00:00+08:00", "control_accepted", "start")
+
+        def record(session, event_id, when, *, config=None, mark=None, method="WebcastChatMessage", **extra):
+            event, key = live_source.normalize(self.message(method,event_id,**extra),config or self.config,"capture_test")
+            event.update(session_id=session,time=when)
+            if mark is not None:
+                event["during_playback"] = mark
+            live_source._persist(event,key)
+
+        record("early","1","2026-11-03T10:00:00+08:00",method="WebcastRoomUserSeqMessage",total="66")
+        record("early","2","2026-11-03T10:10:00+08:00")
+        record("early","3","2026-11-03T11:00:00+08:00")  # ambiguous historical stop second
+        record("early","4","2026-11-03T11:10:00+08:00")  # old collector retained the stopped session ID
+        record("early","5","2026-11-03T09:59:00+08:00")
+        record("idle","6","2026-11-03T10:10:00+08:00")
+        record("late","7","2026-11-03T21:30:00+08:00",mark=True)
+        own = live_source._validated("voice_a", {"room":"99999999999","purpose":"own_room"})
+        record("late","8","2026-11-03T21:40:00+08:00",config=own,mark=True)
+        record("late","9","2026-11-03T22:00:00+08:00",mark=True)
+        other = live_source._validated("voice_b", {"room":"99999999999"})
+        record("late","10","2026-11-03T21:40:00+08:00",config=other,mark=True)
+        record("early","11","2026-11-03T11:00:00.400+08:00")
+        record("early","12","2026-11-03T11:00:00.550+08:00")
+        self.assertEqual([item["id"] for item in live_history.list_sessions("voice_a")["items"]],["late","early"])
+        with self.assertRaises(HTTPException):
+            live_history.read_session("voice_a","other")
+        with self.assertRaises(HTTPException):
+            live_history.read_session("voice_a","idle")
+        early = live_history.read_session("voice_a","early")
+        self.assertEqual(len(early["events"]),3)
+        self.assertEqual(early["sources"][0]["metrics"]["online"]["value"],66)
+        self.assertEqual(early["sources"][0]["counts"]["comment"],2)
+        with patch.object(live_history,"EVENT_PAGE",2):
+            late = live_history.read_session("voice_a","late")
+            self.assertEqual(len(late["events"]),2)
+            next_page = live_history.read_session("voice_a","late",late["next_before"])
+            self.assertEqual(len(next_page["events"]),1)
+            self.assertNotIn(next_page["events"][0]["id"],[event["id"] for event in late["events"]])
+            self.assertEqual(late["session"]["state"],"ended")
+            self.assertEqual(late["session"]["ended_at"],"2026-11-03T22:00:00+08:00")
+            self.assertEqual({item["purpose"] for item in late["sources"]},{"own_room","external_test"})
+            self.assertEqual(sum(item["counts"]["comment"] for item in late["sources"]),3)
+
+    async def test_capture_tags_only_active_playback_and_setup_can_read_status_only(self):
+        target = server.room_instance("voice_a")
+        source = {"capture_id":"capture_live","config":self.config,"counts":live_source.Counter(),"unknown_messages":0}
+        await live_source._publish("voice_a",source,self.message(event_id="1"))
+        target.state.update(status="paused", session_id="active")
+        await live_source._publish("voice_a",source,self.message(event_id="2"))
+        events = live_source.get_view("voice_a")["events"]
+        self.assertEqual([(event["session_id"],event["during_playback"]) for event in events],[(None,False),("active",True)])
+        with patch.object(live_source,"_schema",side_effect=AssertionError("status-only read scanned events")):
+            summary = live_source.get_view("voice_a",summary_only=True)
+        self.assertEqual(set(summary),{"config","status"})
+        self.assertEqual(summary["status"]["state"],"disabled")
 
 
 if __name__ == "__main__":

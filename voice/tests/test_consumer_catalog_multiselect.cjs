@@ -75,7 +75,7 @@ async function main(){
     await check('核心卖点编辑仅提交canonical patch，兼容投影同步且历史活动保留',async()=>{
       await nav({view:'products',product_id:'product-A',preparation_id:null});
       await page.getByLabel('卖点名称 1',{exact:true}).fill('轻便携带');await page.getByLabel('卖点内容 1',{exact:true}).fill('出游携带方便');
-      await page.getByRole('button',{name:'保存商品',exact:true}).click();await idle();
+      await page.getByRole('button',{name:'保存修改',exact:true}).click();await idle();
       const save=state.calls.filter(c=>c.body?.command==='save_product').at(-1).body.args;
       assert.equal(save.fields.core_selling_points[0],'轻便携带：出游携带方便');assert.equal(save.fields.core_selling_points[1],'易清洁');
       assert.equal(save.fields.selling_points,save.fields.core_selling_points.join('\n'));
@@ -103,6 +103,7 @@ async function main(){
       await page.getByRole('button',{name:'清空选择',exact:true}).click();
     });
     await check('关闭自动跟随仍保持视图，另有清晰最新成果入口且偏好可恢复',async()=>{
+      await page.getByLabel('自动跟随当前任务成果',{exact:true}).uncheck();
       await nav({view:'products',product_id:'product-B',preparation_id:null});
       state.run.status='COMPLETED';state.run.artifacts=[{label:'查看准备好的模块',destination:{view:'scripts',preparation_id:'prep-A',room_id:'room-A',resource_id:'script-A1'}}];
       await page.evaluate(()=>shengboWorkbench.assistant.refresh());assert.equal(await page.evaluate(()=>shengboWorkbench.state().view),'products');

@@ -6,7 +6,7 @@ const fs=require('node:fs');
 const path=require('node:path');
 const http=require('node:http');
 const {chromium}=require('C:/Users/lizhe/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright');
-const out=path.resolve('verification/audio-routing-20261017');
+const out=path.resolve(process.env.SHENGBO_ROUTE_UI_REPORT_DIR || 'verification/audio-routing-20261017');
 const results=[];
 const server=http.createServer((req,res)=>{
   if(req.url==='/audio-routing.js'){res.setHeader('Content-Type','application/javascript');res.end(fs.readFileSync('web/audio-routing.js'));return;}
@@ -36,27 +36,28 @@ const server=http.createServer((req,res)=>{
     const errors=[];page.on('pageerror',e=>errors.push(e.message));
     const check=async(name,fn)=>{await fn();results.push({name,result:'PASS'});console.log('PASS '+name);};
     await page.goto('http://127.0.0.1:'+server.address().port);await page.evaluate(()=>route.ready);
+    const device=page.getByRole('combobox',{name:'播放设备',exact:true});
     await check('默认保持本机播放，不主动授权或播放',async()=>{
-      assert.equal(await page.locator('[data-route-local]').getAttribute('aria-pressed'),'true');
+      assert.equal(await device.isVisible(),true);
+      assert.equal(await device.inputValue(),'');
       assert.deepEqual(await page.evaluate(()=>[testMedia.requests,window.plays||0]),[0,0]);
     });
-    await page.locator('[data-route-external]').click();
-    await check('连接按钮展开设置，未选设备时不虚报连接',async()=>{
-      assert.equal(await page.locator('details').getAttribute('open'),'');
-      assert.equal(await page.locator('[data-route-external]').getAttribute('aria-pressed'),'false');
+    await check('设备列表授权前只显示系统默认项',async()=>{
+      assert.equal(await device.locator('option').count(),1);
+      assert.equal(await page.evaluate(()=>route.getStatus().mode),'local');
     });
     await page.locator('[data-route-authorize]').click();
     await check('点击授权才读取设备，读取后立即关闭所有测试麦克风轨道',async()=>{
       await page.waitForFunction(()=>testMedia.stops===1);
-      assert.equal(await page.locator('[data-route-device]').count(),2);
+      assert.equal(await device.locator('option').count(),3);
       assert.deepEqual(await page.evaluate(()=>[testMedia.requests,testMedia.stops,window.plays||0]),[1,1,0]);
     });
-    await page.locator('[data-route-device="test-cable"]').click();
+    await device.selectOption('test-cable');
     await check('选择虚拟输出后显示精确 OBS 输入端与待验证状态',async()=>{
       await page.waitForFunction(()=>route.getStatus().status==='ready');
-      assert.equal(await page.locator('[data-route-external]').getAttribute('aria-pressed'),'true');
-      assert.match(await page.locator('[data-route-receiver]').innerText(),/音频输入采集.*CABLE Output/);
-      assert.match(await page.locator('[data-route-state]').innerText(),/待验证/);
+      assert.equal(await device.inputValue(),'test-cable');
+      assert.match(await page.locator('[data-route-guide]').innerText(),/音频输入采集.*CABLE Output/);
+      assert.match(await page.locator('[data-route-state]').innerText(),/已选择/);
       assert.equal(await page.evaluate(()=>document.querySelector('audio').sinkId),'test-cable');
     });
     await page.evaluate(()=>{testMedia.devices=testMedia.devices.filter(d=>d.deviceId!=='test-cable');return route.refresh();});
@@ -66,31 +67,32 @@ const server=http.createServer((req,res)=>{
       assert.match(await page.locator('[data-route-state]').innerText(),/已暂停/);
       assert.equal(await page.evaluate(async()=>{try{await route.ensureReady();return false;}catch(e){return e.code==='OUTPUT_DEVICE_UNAVAILABLE';}}),true);
     });
-    await page.locator('[data-route-local]').click();
+    await device.selectOption('');
     await check('用户可显式关闭外部输出，恢复本机默认设备',async()=>{
       await page.waitForFunction(()=>route.getStatus().mode==='local');
       assert.equal(await page.evaluate(()=>document.querySelector('audio').sinkId),'');
-      assert.equal(await page.locator('[data-route-guide]').isVisible(),false);
+      assert.match(await page.locator('[data-route-guide]').innerText(),/桌面音频.*默认/);
     });
-    await page.locator('[data-route-device="test-realtek"]').click();
+    await device.selectOption('test-realtek');
     await check('普通扬声器对应音频输出采集，文案不混淆输入和输出',async()=>{
       await page.waitForFunction(()=>route.getStatus().status==='ready');
-      assert.match(await page.locator('[data-route-receiver]').innerText(),/音频输出采集.*Realtek/);
+      assert.match(await page.locator('[data-route-guide]').innerText(),/音频输出采集.*Realtek/);
     });
     await page.reload();await page.evaluate(()=>route.ready);
     await check('重载无权限时保留外部设置并安全暂停，再授权可恢复',async()=>{
       assert.equal(await page.evaluate(()=>route.getStatus().mode),'external');
       assert.equal(await page.evaluate(()=>route.getStatus().status),'unavailable');
-      await page.locator('summary').click();await page.locator('[data-route-authorize]').click();
+      await page.locator('[data-route-authorize]').click();
       await page.waitForFunction(()=>route.getStatus().status==='ready');
       assert.equal(await page.evaluate(()=>document.querySelector('audio').sinkId),'test-realtek');
       assert.equal(await page.evaluate(()=>window.plays||0),0);
     });
-    await page.locator('[data-route-local]').click();await page.evaluate(()=>{testMedia.denied=true;});
+    await device.selectOption('');await page.waitForFunction(()=>route.getStatus().mode==='local'&&!route.getStatus().busy);
+    await page.evaluate(()=>{testMedia.denied=true;});
     await page.locator('[data-route-authorize]').click();
     await check('拒绝授权不破坏本机播放设置',async()=>{
       await page.waitForFunction(()=>route.getStatus().message.includes('未获授权'));
-      assert.equal(await page.locator('[data-route-local]').getAttribute('aria-pressed'),'true');
+      assert.equal(await device.inputValue(),'');
     });
     for(const width of [800,390,320]){
       await page.setViewportSize({width,height:850});

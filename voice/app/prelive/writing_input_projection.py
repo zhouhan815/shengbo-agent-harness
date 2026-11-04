@@ -7,6 +7,8 @@ the persistent source artifact rather than becoming an active writing task.
 """
 from copy import deepcopy
 
+from ..platform_rules import platform_policy
+
 
 VERSION_CONTEXT_CONTRACT = "existing-script-text-v3"
 PROJECTION_REVISION = "writing-input-role-projection-v1"
@@ -171,4 +173,71 @@ def project_writing_context(context, spec):
         "questions": "Research concerns are optional planning data. A gap is only a claim boundary; no gap does not prove an answer. Use current product facts to decide what can be answered.",
         "consumer_limits": "Confirmed product, promotion and consumer restrictions remain authoritative. Research unknowns are not confirmed consumer limits or a required disclaimer.",
         "persistence": "Source records remain complete and unchanged; omitted workflow/audit text is addressable by each exact source artifact reference."}
+    return result
+
+
+WHOLE_WRITER_INPUT_REVISION = "whole-script-focused-input-v1"
+_AUDIENCE_HINT_FIELDS = {"segments": ("id", "who", "need", "scene_ids"),
+                         "scenes": ("id", "situation", "task", "obstacle")}
+_PLATFORM_TEMPLATE_FIELDS = ("shipping_time", "return_policy")
+
+
+def whole_writer_product(product):
+    """Omit generic platform boilerplate from main-copy facts, not merchant terms."""
+    result = deepcopy(product)
+    platform = result.get("sales_platform")
+    policy = platform_policy(platform) if isinstance(platform, str) else None
+    if not policy:
+        return result
+    for key in _PLATFORM_TEMPLATE_FIELDS:
+        if key == "shipping_time" and result.get("_shipping_overridden"):
+            continue
+        defaults = (policy["defaults"][key], *policy.get("replaceable_defaults", {}).get(key, []))
+        if isinstance(result.get(key), str) and result[key].strip() in defaults:
+            del result[key]
+    return result
+
+
+def _audience_hints(report):
+    if not isinstance(report, dict) or not isinstance(report.get("fields"), dict):
+        return None
+    hints = {}
+    for section, fields in _AUDIENCE_HINT_FIELDS.items():
+        rows = report["fields"].get(section)
+        if isinstance(rows, list):
+            hints[section] = [{key: row[key] for key in fields if key in row}
+                              for row in rows if isinstance(row, dict) and any(key in row for key in fields[1:])]
+    if not any(hints.values()):
+        # The only conclusion of a summary-only or nonstandard report can live
+        # outside these typed fields. Keep the existing representation in that case.
+        return None
+    return {"fields": hints, "writing_role": "audience_and_scene_hints_only_not_product_evidence"}
+
+
+def whole_writer_context(context):
+    """Keep persisted context intact and project a narrower outbound writer view."""
+    result = deepcopy(context)
+    original = result.get("original_script")
+    if result.get("expansion_expression") and isinstance(original, dict):
+        # Keep the module rows as the comparison text and remove duplicate copies.
+        body = original.get("body")
+        if isinstance(body, dict):
+            body.pop("raw_text", None)
+        result.pop("same_product_existing_scripts", None)
+    records = result.get("records", [])
+    records = list(records.values()) if isinstance(records, dict) else records
+    if not isinstance(records, list):
+        return result
+    for record in records:
+        if not isinstance(record, dict) or not isinstance(record.get("body"), dict):
+            continue
+        body = record["body"]
+        ref = record.get("ref", {})
+        kind = ref.get("kind") if isinstance(ref, dict) else None
+        if kind == "product":
+            record["body"] = whole_writer_product(body)
+        elif kind == "analysis" and body.get("role") == "audience_scenes":
+            hints = _audience_hints(body.get("report"))
+            if hints is not None:
+                body["report"] = hints
     return result

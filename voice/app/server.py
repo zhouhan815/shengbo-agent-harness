@@ -25,7 +25,7 @@ from pydantic import BaseModel, Field
 from opencc import OpenCC
 
 from .speech import POOL, render
-from . import production, reply_lab, live_source, commerce_config as commerce
+from . import production, reply_lab, live_source, live_history, commerce_config as commerce
 from .welcome import WelcomeRuntime, build_product_templates
 from .like_thanks import LikeThanksRuntime
 from .prosody import sentence_style, profile_catalog, interaction_style
@@ -458,6 +458,7 @@ class Room:
         self.player_sources = {}
         self.resume_item = None
         self.actions = {}
+        self.last_completed_session = None
         self.lock = asyncio.Lock()
         self.welcomes = WelcomeRuntime()
         self.likes = LikeThanksRuntime()
@@ -880,6 +881,9 @@ class Room:
         service = _active_prelive()
         if service:
             service.release_live_slot(self.state["room_id"])
+        if self.state["status"] == "completed" and self.last_completed_session != self.state["session_id"]:
+            self.log("playback_completed", {})
+            self.last_completed_session = self.state["session_id"]
 
     async def action(self, data):
         action_id = data.get("action_id") or uid("action")
@@ -1698,8 +1702,18 @@ async def reply_knowledge(identity: str):
 
 
 @app.get("/api/rooms/{identity}/live-source")
-async def get_live_source(identity: str):
-    return live_source.get_view(identity)
+async def get_live_source(identity: str, summary_only: bool = False):
+    return live_source.get_view(identity, summary_only=summary_only)
+
+
+@app.get("/api/rooms/{identity}/live-history")
+async def get_live_history(identity: str, cursor: int = 0):
+    return live_history.list_sessions(identity, cursor)
+
+
+@app.get("/api/rooms/{identity}/live-history/{session_id}")
+async def get_live_history_session(identity: str, session_id: str, before: int | None = None):
+    return live_history.read_session(identity, session_id, before)
 
 
 @app.put("/api/rooms/{identity}/live-source")

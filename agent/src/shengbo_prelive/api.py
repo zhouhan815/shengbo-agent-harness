@@ -201,7 +201,12 @@ def create_app(engine, service_token: str) -> FastAPI:
 
     @app.get(base + "/runs/{run_id}", dependencies=protected)
     async def get_run(run_id: str):
-        return _response(await _call(engine.get_run, _require_id(run_id)))
+        value = await _call(engine.get_run, _require_id(run_id))
+        if value.get("status") == "COMPLETED" and value.get("catalog_intake_result"):
+            from .catalog_intake_report import refresh_catalog_intake_requirements
+            report = await refresh_catalog_intake_requirements(engine.client, value["catalog_intake_result"])
+            value = {**value, "catalog_intake_result": report}
+        return _response(value)
 
     @app.post(base + "/runs/{run_id}/cancel", dependencies=protected)
     async def cancel_run(run_id: str, body: CancelRequest | None = None):

@@ -77,6 +77,30 @@ def test_failed_whole_raw_is_one_response_with_module_scoped_index_and_no_partia
         assert "module_ref" not in row
 
 
+@pytest.mark.parametrize("tamper", [False, True])
+def test_whole_validation_hints_name_only_verified_failures_and_keep_other_modules_uncommitted(tamper):
+    job = make_whole_job(failed=True)
+    item = job["body"]["items"][0]
+    attempt = item["provider_attempts"][0]
+    item["input"]["modules"] = [{"key": key, "action": "generate"} for key in KEYS]
+    attempt["input_hash"] = canonical_hash(attempt["input"])
+    attempt["validation_error"]["details"] = {
+        "recovery": {"workflow": "whole_script", "step_id": "validate_provider_response",
+            "strategy": "validate_existing_response", "disposition": "field_repair", "status": "failed",
+            "selected_by": "program", "model_requests": 0, "issue_codes": ["WHOLE_SCRIPT_RESPONSE_INVALID"],
+            "affected_units": ["product_intro" if tamper else "selling_points"]},
+        "module_validation_failures": [{"module_key": "selling_points", "code": "WHOLE_SCRIPT_RESPONSE_INVALID"}],
+        "content_validated_module_keys": [key for key in KEYS if key != "selling_points"],
+    }
+    rows = {row["module_key"]: row for row in project(job)["modules"]}
+    assert {key for key, row in rows.items() if row["status"] == "validation_rejected"} == (
+        set(KEYS) if tamper else {"selling_points"})
+    assert all("module_ref" not in row and "accepted_output_reader" not in row for row in rows.values())
+    if not tamper:
+        assert rows["cta"]["status"] == "uncommitted_result"
+        assert "error_code" not in rows["cta"]
+
+
 def test_whole_unknown_attempt_counts_once_globally_and_never_falls_back_to_old_accepted():
     job = make_whole_job()
     pending = deepcopy(job["body"]["items"][0]["provider_attempts"][0])

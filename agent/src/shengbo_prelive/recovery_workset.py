@@ -14,6 +14,7 @@ from pydantic import ValidationError
 
 from shengbo_contracts.business import MODULE_KEYS, PublicProviderResponseView
 from shengbo_contracts.common import ArtifactRef, RecordRef, SCHEMA_VERSION, canonical_hash
+from shengbo_contracts.workflow_recovery import WorkflowRecoveryReceipt
 from .observability import sanitize
 
 
@@ -196,6 +197,45 @@ def _public_reader(attempt, key, path, snapshot_ref):
             "reusable": False, "approvable": False, "response_scope": response_scope}
 
 
+def _scoped_whole_rejection(attempt, spec, public):
+    if not public or public["response_scope"] != "whole_script" or attempt.get("validation_state") != "rejected":
+        return None
+    if not isinstance(spec, dict) or spec.get("generation_mode") != "whole_script":
+        return None
+    expected = set(_attempt_module_keys(attempt))
+    actions = spec.get("modules")
+    if not isinstance(actions, list) or any(not isinstance(action, dict) for action in actions):
+        return None
+    generated = [action.get("key") for action in actions if action.get("action") == "generate"]
+    if len(generated) != len(expected) or any(not isinstance(key, str) or key not in expected for key in generated):
+        return None
+    if set(generated) != expected or attempt.get("input_hash") != canonical_hash(attempt["input"]):
+        return None
+    error = attempt.get("validation_error")
+    details = error.get("details") if isinstance(error, dict) else None
+    if not isinstance(details, dict):
+        return None
+    try:
+        recovery = WorkflowRecoveryReceipt.model_validate(details.get("recovery"), strict=True)
+    except ValidationError:
+        return None
+    if (recovery.workflow != "whole_script" or recovery.step_id != "validate_provider_response"
+            or recovery.strategy != "validate_existing_response" or recovery.disposition != "field_repair"
+            or recovery.status != "failed" or recovery.selected_by != "program" or recovery.model_requests != 0):
+        return None
+    affected = set(recovery.affected_units)
+    failures, siblings = details.get("module_validation_failures"), details.get("content_validated_module_keys")
+    if (not affected or not affected <= expected or len(affected) != len(recovery.affected_units)
+            or not isinstance(failures, list) or len(failures) != len(affected)
+            or any(not isinstance(row, dict) or not isinstance(row.get("module_key"), str)
+                   or not _code(row) or _code(row) not in recovery.issue_codes for row in failures)
+            or {row["module_key"] for row in failures} != affected
+            or not isinstance(siblings, list) or len(siblings) != len(expected - affected)
+            or any(not isinstance(key, str) for key in siblings) or set(siblings) != expected - affected):
+        return None
+    return {row["module_key"]: row["code"] for row in failures}
+
+
 def _outcome(attempt):
     state = attempt.get("state")
     if state in _UNKNOWN or attempt.get("validation_state") == "unknown":
@@ -353,9 +393,14 @@ def project_job_recovery_workset(job, *, snapshot_ref, snapshot_body, expected_r
                 validation = attempt.get("validation_state")
                 row["validation_state"] = validation if validation in {"pending", "accepted", "rejected", "unknown"} else "unclassified"
                 code = _code(attempt.get("validation_error")) or _code(attempt.get("error")) or _code(item.get("error"))
-                if code:
-                    row["error_code"] = code
                 public = _public_reader(attempt, key, item_path + f"/provider_attempts/{position}", snapshot)
+                scoped_rejection = _scoped_whole_rejection(attempt, spec, public) if status == "validation_rejected" else None
+                if scoped_rejection is not None and key not in scoped_rejection:
+                    row.update(status="uncommitted_result", validation_state="unclassified")
+                elif scoped_rejection is not None:
+                    row["error_code"] = scoped_rejection[key]
+                elif code:
+                    row["error_code"] = code
                 if public is not None and outcome == "known_result":
                     row["public_response_reader"] = public["reader"]
                     row["public_response_hash"] = public["content_hash"]

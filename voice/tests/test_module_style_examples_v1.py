@@ -94,7 +94,7 @@ def test_shared_energy_guidance_reaches_whole_and_local_system_once():
     local_body = local.build_request(product(), {}, "selling_points", [], model="offline")
     for request in (body, local_body):
         system = request["messages"][0]["content"]
-        assert system.count("live-commerce-writing-v6.1-purpose-bound-scenes") == 1
+        assert system.count("live-commerce-writing-v6.2-grounded-marketing") == 1
         assert "场景一两句就回到商品" not in system
         assert "场景用于一句两句说清需求" not in system
         assert "脚本不写“有朋友问" in system

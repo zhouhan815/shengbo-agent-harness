@@ -22,7 +22,7 @@ async function main(){
       assert.equal(await page.locator('[data-field=name]').isDisabled(),false);
       assert.equal(await page.locator('[data-field=name]').inputValue(),'我的未保存商品名');
       assert.equal(await page.evaluate(()=>originalPrice===document.querySelector('[data-field=price]')),true);
-      assert.equal(await page.getByRole('button',{name:'保存商品',exact:true}).isDisabled(),true);
+      assert.equal(await page.getByRole('button',{name:'保存修改',exact:true}).isDisabled(),true);
     });
     await check('另一个商品仍可编辑，历史会话锁不依赖右侧当前会话',async()=>{
       await nav({view:'products',product_id:'product-B',preparation_id:null});
@@ -75,14 +75,13 @@ async function main(){
       await page.evaluate(()=>shengboWorkbench.refreshEditorLocks());assert.equal(await page.locator('[data-occurrence]').first().getAttribute('draggable'),'false');
       await locks([]);assert.equal(await page.locator('[data-occurrence]').first().getAttribute('draggable'),'true');
     });
-    await check('补充资料整理要求保留未发送聊天内容且不重复追加',async()=>{
+    await check('商品库没有上传资料时不能提交新建任务，原聊天草稿不变',async()=>{
       await nav({view:'products',product_id:null,preparation_id:null,room_id:null});
       await page.locator('.sb-a-input').fill('这是我正在写的原始要求');
-      await page.getByRole('button',{name:'请 Agent 整理这些资料',exact:true}).click();
-      await page.getByRole('button',{name:'请 Agent 整理这些资料',exact:true}).click();
-      const text=await page.locator('.sb-a-input').inputValue();
-      assert.ok(text.startsWith('这是我正在写的原始要求'));
-      assert.equal(text.split('请分析我上传的资料').length,2);
+      const flow=page.locator('[data-product-material-flow="create"]');
+      assert.equal(await flow.getByRole('button',{name:'上传并加入对话',exact:true}).isDisabled(),true);
+      assert.equal(await flow.getByRole('button',{name:'交给 Agent 新增商品',exact:true}).isDisabled(),true);
+      assert.equal(await page.locator('.sb-a-input').inputValue(),'这是我正在写的原始要求');
     });
     await check('变更记录请求本场与catalog最新记录并使用游标加载更多',async()=>{
       const queries=[];

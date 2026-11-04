@@ -71,9 +71,7 @@ def import_script(service, c, args):
         raise BusinessError("SCRIPT_IMPORT_LOSSLESS_INVARIANT")
     module_ref = service.store.artifact(c, "module", {"module_key": "product_intro", "parent_ref": None,
         "sentences": rows, "origin": "imported", "raw_text_hash": digest(args.text)})
-    numbers = [service._artifact(c, ref, "script_revision")["body"].get("version_number", 1)
-               for ref in prep["body"]["script_refs"]
-               if service._artifact(c, ref, "script_revision")["body"].get("product_id") == product["ref"]["id"]]
+    numbers = service._script_version_numbers(c, prep["body"]).get(product["ref"]["id"], ())
     body = {"preparation_id": args.preparation_id, "product_id": product["ref"]["id"],
         "product_ref": product["ref"], "variant_id": args.variant_id, "version_number": max(numbers, default=0) + 1,
         "script_revision": 1, "parent_ref": None, "language": args.language, "origin": "imported",
@@ -84,6 +82,7 @@ def import_script(service, c, args):
     script_ref = service.store.artifact(c, "script_revision", body)
     updated = deepcopy(prep["body"])
     updated["script_refs"].append(script_ref)
+    updated["playlist_ref"], _ = service._update_script_playlist(c, updated, append_missing=True)
     updated.update(plan_ref=None, compiled_plan_ref=None, requirements_ref=None, audio_manifest_ref=None)
     if source_ref not in updated["source_refs"]:
         updated["source_refs"].append(source_ref)

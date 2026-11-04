@@ -22,11 +22,22 @@ async function main(){
   const check=async(name,fn)=>{await fn();results.push(name);console.log('PASS '+name);};
   const open=async()=>{await page.locator('.wb-version-card[data-script-id="script-A2"] .wb-version-card-info').click();await page.locator('.wb-script-reader').waitFor();await page.waitForTimeout(180);};
   const close=async()=>{await page.locator('[data-close-script-reader]').click();await page.locator('.wb-script-reader').waitFor({state:'detached'});};
+  const readUnderlay=()=>page.evaluate(()=>{
+    const panel=document.getElementById('work-panel'),states=[];
+    for(let surface=document.getElementById('workspace-editor');surface!==panel;surface=surface.parentElement){
+      for(const sibling of surface.parentElement.children){
+        if(sibling!==surface)states.push({inert:sibling.inert,hidden:sibling.getAttribute('aria-hidden')});
+      }
+    }
+    return states;
+  });
   const beforeCalls=state.calls.length;
   try{
     await page.goto('http://127.0.0.1:'+fixture.server.address().port);await page.evaluate(()=>shengboWorkbench.ready);
-    await page.evaluate(()=>shengboWorkbench.navigate({view:'scripts',preparation_id:'prep-A',room_id:'room-A',product_id:null}));
-    await page.evaluate(()=>shengboWorkbench.focus('work'));await idle();
+    await page.locator('#mobile-work').click();
+    await page.locator('#room-dashboard [data-room-section="scripts"]').click();
+    await page.locator('#room-sheet .wb-version-card[data-script-id="script-A2"]').waitFor();
+    await idle();
     for(const size of [{width:726,height:764,minBody:220},{width:1440,height:900,minBody:350},
                        {width:375,height:667,minBody:140},{width:844,height:600,minBody:110}]){
       await check(size.width+'×'+size.height+' reader provides a usable scrolling body inside its result panel',async()=>{
@@ -57,15 +68,20 @@ async function main(){
       await close();assert.equal(await page.locator('.wb-version-card[data-script-id="script-A2"]').count(),1);
     });
     await check('closing or navigating away restores background controls and keyboard focus',async()=>{
-      const before=await page.locator('#work-panel').evaluate(panel=>[...panel.children].filter(node=>node.id!=='workspace-editor').map(node=>({inert:node.inert,hidden:node.getAttribute('aria-hidden')})));
-      await open();assert.ok(await page.locator('#work-panel').evaluate(panel=>[...panel.children].filter(node=>node.id!=='workspace-editor').every(node=>node.inert&&node.getAttribute('aria-hidden')==='true')));
+      const before=await readUnderlay();
+      await open();
+      assert.ok((await readUnderlay()).every(item=>item.inert&&item.hidden==='true'));
+      assert.equal(await page.locator('.wb-script-reader').evaluate(reader=>reader.closest('[inert],[aria-hidden="true"]')),null);
       await page.keyboard.press('Escape');await page.locator('.wb-script-reader').waitFor({state:'detached'});
       assert.equal(await page.locator('#work-panel').evaluate(node=>node.classList.contains('wb-script-reader-open')),false);
-      assert.deepEqual(await page.locator('#work-panel').evaluate(panel=>[...panel.children].filter(node=>node.id!=='workspace-editor').map(node=>({inert:node.inert,hidden:node.getAttribute('aria-hidden')}))),before);
+      assert.deepEqual(await readUnderlay(),before);
       assert.equal(await page.evaluate(()=>document.activeElement.dataset.scriptId),'script-A2');
-      await open();await page.evaluate(()=>shengboWorkbench.navigate({view:'overview',preparation_id:'prep-A',room_id:'room-A'}));
-      assert.equal(await page.locator('.wb-script-reader').count(),0);assert.equal(await page.locator('#work-panel').getAttribute('class'),'wb-work-panel');
-      assert.equal(await page.locator('.wb-view-tabs').evaluate(node=>node.inert),false);
+      await open();
+      await page.evaluate(()=>shengboWorkbench.navigate({view:'room-config',preparation_id:'prep-A',room_id:'room-A',room_section:null}));
+      assert.equal(await page.locator('.wb-script-reader').count(),0);
+      assert.equal(await page.locator('#work-panel').evaluate(node=>node.classList.contains('wb-script-reader-open')),false);
+      await page.locator('#room-dashboard [data-room-section="scripts"]').waitFor();
+      assert.equal(await page.locator('#room-dashboard').evaluate(node=>node.inert),false);
     });
     await check('reading never sends a mutation, Agent message or audio command',async()=>{
       const calls=state.calls.slice(beforeCalls);assert.ok(!calls.some(call=>call.body?.command||call.path.endsWith('/messages')),JSON.stringify(calls));

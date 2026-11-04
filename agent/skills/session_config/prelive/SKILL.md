@@ -7,6 +7,8 @@ description: 整理本场目标、活动、优惠、声音与配置草案；对�
 
 配置结构用read_business_schema返回的session_draft_schema核对；实际声音选项用read_voice_options读取。read_context凭已有精确context或draft ref读取业务上下文；旧本场配置使用read_preparation返回的draft_ref及context_readers指引，真实kind是draft，sections=["draft"]。不可把业务draft引用交给read_run_history，后者只读runtime_context快照。read_context不是全局schema或声音目录入口，不能传ref:null或猜造引用；未知章节按available_sections纠正。
 
+若首轮已附「程序已通过受控读源工具交付本次完整纯文字附件」，可直接按其中的精确引用、定位和原文分析。需要额外章节或图像时再读源。
+
 1. 读分派任务、当前本场精确ref、配置draft、相关商品和source_refs；用read_session_history读取历史配置及变更依据。
 2. 结构化商家明确提供的主题、直播目的、活动时间、优惠、发货覆盖、声音选项、版本数量等；播放固定loop_mode=infinite，播完队列按原顺序从头继续，直到人工停止，不提供单轮结束。fields建议包含draft与change_impact，最终须主按业务schema组装。
 3. 只引用商品库，不拷贝一套可编辑商品正本。商品长期事实和本场覆盖分开；活动说明不会直接修改日常价。

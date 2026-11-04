@@ -94,11 +94,11 @@ async def test_expansion_delivers_exact_original_to_both_generation_protocols(en
 
     async def generate_module(context, key, product, previous):
         captures.append(deepcopy(context))
-        return [product["name"] + "：" + key + "的真实隔离测试文字。"]
+        return ["从日常选购聊起。"]
 
     async def generate_script(context, actions, product):
         captures.append(deepcopy(context))
-        return {"modules": {action["key"]: {"sentences": [product["name"] + "：" + action["key"] + "的真实隔离测试文字。"]}
+        return {"modules": {action["key"]: {"sentences": ["从日常选购聊起。"]}
             for action in actions if action["action"] == "generate"}}
 
     service.adapter.generate_module = generate_module

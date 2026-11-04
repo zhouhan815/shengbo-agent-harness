@@ -25,6 +25,7 @@ from langchain_core.outputs import ChatGeneration, ChatGenerationChunk, ChatResu
 from langchain_core.utils.function_calling import convert_to_openai_tool
 
 from .credentials import CredentialManager, CredentialError, RESOURCE
+from .tool_arguments import parse_tool_arguments
 
 
 TRANSPORT_PHASES = frozenset({"credential", "client_setup", "catalog_get", "request_observation",
@@ -289,9 +290,7 @@ def _public_output(value):
                       ("id", "type", "name", "namespace", "call_id", "status") if key in item}
             arguments = item.get("arguments")
             try:
-                parsed = json.loads(arguments) if isinstance(arguments, str) else None
-                if not isinstance(parsed, dict):
-                    raise ValueError()
+                parsed = parse_tool_arguments(arguments)
             except (TypeError, ValueError):
                 # Malformed provider output is diagnostic data, not legitimate
                 # tool parameters. Never preserve its arbitrary exception-like
@@ -585,8 +584,8 @@ class ChatGPTPlanModel(BaseChatModel):
                         output.append(part.get("refusal", ""))
             elif kind == "function_call":
                 try:
-                    args = json.loads(item["arguments"])
-                    if (not isinstance(args, dict) or not item.get("name") or not item.get("call_id")
+                    args = parse_tool_arguments(item["arguments"])
+                    if (not item.get("name") or not item.get("call_id")
                             or item.get("namespace", "functions") != "functions"):
                         raise ValueError()
                 except (KeyError, ValueError, TypeError):

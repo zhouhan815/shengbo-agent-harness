@@ -153,9 +153,20 @@ class ProviderContractTests(unittest.TestCase):
         self.assertEqual(context.exception.http_status, 401)
 
     def test_invalid_tool_args_blocked(self):
-        model = self.model(lambda _: sse_response([{"type": "function_call", "namespace": "functions", "name": "x", "call_id": "call_bad", "arguments": "[]"}]))
-        with self.assertRaisesRegex(ModelProviderError, "model_tool_call_invalid"):
-            model.invoke("hi")
+        cases = ("[]", '{"x":1,"x":2}', r'{"nested":[{"a":1,"\u0061":2}]}',
+                 '{"x":NaN}', '{"x":Infinity}', '{"x":-Infinity}', '{"x":1e999}')
+        for arguments in cases:
+            with self.subTest(arguments=arguments):
+                responses = []
+                model = self.model(lambda _: sse_response([{"type": "function_call", "namespace": "functions",
+                    "name": "x", "call_id": "call_bad", "arguments": arguments}]), on_response=responses.append)
+                with self.assertRaisesRegex(ModelProviderError, "model_tool_call_invalid") as caught:
+                    model.invoke("hi")
+                self.assertFalse(caught.exception.outcome_unknown)
+                recorded = responses[0]["output"][0]
+                self.assertIsNone(recorded["arguments"])
+                self.assertEqual(recorded["arguments_diagnostic"]["reason"], "invalid_json_object")
+                self.assertEqual(recorded["arguments_diagnostic"]["characters"], len(arguments))
 
     def test_image_material_data_url_conversion_and_remote_path_rejection(self):
         # Synthetic signature payload is sufficient for wire conversion testing.

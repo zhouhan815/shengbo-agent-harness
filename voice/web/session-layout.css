@@ -1,0 +1,75 @@
+.wb-session-settings > summary {
+  color: var(--wb-ink, #223a56);
+  font-size: .9rem;
+  font-weight: 650;
+  cursor: pointer;
+  padding: 5px 0;
+}
+.wb-editor .wb-session-settings[open] > summary { margin-bottom: 0; }
+.wb-session-settings > .wb-session-form { padding-top: 5px; }
+.wb-session-settings .wb-session-form > .wb-grid { gap: 4px 8px; }
+.wb-session-settings .wb-field { gap: 3px; line-height: 1.4; }
+.wb-session-settings .wb-field :is(input:not([type=checkbox],[type=radio]),select,textarea) { padding: 5px 7px; }
+@container (min-width: 740px) {
+  .wb-session-settings .wb-session-form > .wb-grid {
+    grid-template-columns: minmax(0,.85fr) minmax(0,1.3fr) repeat(2,minmax(0,.9fr));
+  }
+}
+.wb-session-settings .wb-commerce-editor {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 255px), 1fr));
+  align-items: start;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.wb-session-settings .wb-commerce-editor > .wb-card { margin: 0; padding: 10px; }
+.wb-session-settings .wb-commerce-editor > .wb-optional-settings { grid-column: 1 / -1; }
+.wb-session-settings .wb-field, .wb-session-product-dialog .wb-field { margin-bottom: 7px; }
+.wb-session-settings .wb-field textarea, .wb-session-product-dialog .wb-field textarea { min-height: 48px; }
+.wb-session-settings .wb-session-form > .wb-grid textarea { min-height: 40px; }
+.wb-session-product-dialog {
+  position: fixed;
+  inset: 0;
+  margin: auto;
+  box-sizing: border-box;
+  width: min(620px, calc(100vw - 24px));
+  max-height: min(690px, calc(100dvh - 28px));
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid var(--wb-line, #d6e2ee);
+  border-radius: 12px;
+  color: var(--wb-ink, #223a56);
+  background: #fff;
+  box-shadow: 0 18px 56px #17304d33;
+}
+.wb-session-product-dialog[open] { display: flex; flex-direction: column; }
+.wb-session-product-dialog::backdrop { background: #142a5059; }
+.wb-session-product-head, .wb-session-product-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex: none;
+  padding: 9px 14px;
+  background: #f4f8ff;
+}
+.wb-session-product-head { border-bottom: 1px solid var(--wb-line, #d6e2ee); }
+.wb-session-product-head h3 { margin: 0; font-size: .97rem; overflow-wrap: anywhere; }
+.wb-session-product-actions { border-top: 1px solid var(--wb-line, #d6e2ee); }
+.wb-session-product-body { overflow: auto; min-height: 0; padding: 10px 14px; }
+.wb-session-product-body > p { margin: 0 0 8px; }
+.wb-session-product-body .wb-inline-alert > p { margin: 0 0 5px; }
+.wb-session-product-body .wb-inline-alert > button { margin: 3px 5px 0 0; }
+.wb-session-product-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 10px; }
+.wb-session-product-fields > .wb-session-product-toggle {
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 6px;
+  grid-column: 1 / -1;
+}
+.wb-session-product-toggle > input[type="checkbox"] { margin: 0; width: auto; }
+@media (max-width: 460px) {
+  .wb-session-product-fields { grid-template-columns: minmax(0, 1fr); }
+}

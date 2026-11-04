@@ -8,7 +8,7 @@ from shengbo_prelive.models import RunScope
 from shengbo_prelive.runtime import CURRENT_SCOPE
 from shengbo_prelive.middleware import ContextProjection,ToolPolicy,Audit
 from shengbo_prelive.tools import build_tools
-from shengbo_prelive.tool_presentation import CORE_TOOLS,CONTROL_TOOLS,activate,catalog,expanded_names,visible_names
+from shengbo_prelive.tool_presentation import CORE_TOOLS,CONTROL_TOOLS,GROUPS,activate,catalog,expanded_names,presentation_view,visible_names
 from shengbo_prelive.policy import check_tool_allowed
 from shengbo_prelive.store import RuntimeStore
 from test_runtime_business import env
@@ -85,6 +85,71 @@ async def test_restart_catalog_pagination_and_full_schema_fallback(env):
  reopened.tool_presentation_enabled=False
  assert visible_names(reopened,scope,engine.allowed_tool_names(scope))==engine.allowed_tool_names(scope)
  assert engine.store.list('operation')==original_operations
+
+@pytest.mark.asyncio
+async def test_receipt_driven_disclosure_keeps_next_tools_and_manual_choices(env):
+    engine, _ = env
+    run = await authorize(engine, await new_run(engine, '完整准备本场直播'), [
+        'save_product', 'save_session_draft', 'save_context_bundle', 'save_script_plan', 'submit_script_change',
+        'save_asset_checklist', 'save_playlist', 'compile_playback_plan', 'prepare_required_audio', 'publish_preparation',
+        'retry_failed_items'])
+    engine.store.update('run', run['id'], allowed_tools=['save_asset_checklist', 'compile_playback_plan',
+        'prepare_required_audio', 'publish_preparation', 'retry_failed_items'])
+    scope = await enable(engine, run)
+    activate(engine, scope, groups=GROUPS, pinned=True)
+    allowed = engine.allowed_tool_names(scope)
+    initial = engine.visible_tool_names(scope)
+    assert {'search_catalog', 'read_voice_options', 'prepare_required_audio'} <= initial
+
+    def record(*commands, **changes):
+        engine.store.update('run', run['id'], receipts=[{'command': command} for command in commands], **changes)
+
+    record('save_context_bundle')
+    writing = engine.visible_tool_names(scope)
+    assert {'wf_script_execution', 'read_generation_output', 'retry_failed_items', 'save_asset_checklist'} <= writing
+    assert {'search_catalog', 'read_voice_options', 'prepare_required_audio'} <= allowed - writing
+    assert presentation_view(engine, scope, allowed)['workflow_phase'] == 'script'
+    assert 'search_catalog' in {row['name'] for row in catalog(engine, scope, query='search_catalog')['items']}
+    check_tool_allowed(scope, engine.store.get('run', run['id']), 'search_catalog')
+    activate(engine, scope, names=['search_catalog'])
+    assert 'search_catalog' in engine.visible_tool_names(scope)
+
+    record('save_context_bundle', 'save_playlist')
+    delivery = engine.visible_tool_names(scope)
+    assert {'compile_playback_plan', 'prepare_required_audio', 'publish_preparation', 'read_job'} <= delivery
+    assert 'search_catalog' in delivery and 'read_voice_options' not in delivery
+    assert presentation_view(engine, scope, allowed)['workflow_phase'] == 'delivery'
+
+    record('save_context_bundle', 'save_playlist', pending_unknown_operation='op1')
+    assert initial <= engine.visible_tool_names(scope)
+    record('save_context_bundle', 'save_playlist', pending_unknown_operation=None)
+    engine.store.put('question', {'id': 'question1', 'run_id': run['id'], 'status': 'OPEN'})
+    assert initial <= engine.visible_tool_names(scope)
+    engine.store.update('question', 'question1', status='ANSWERED')
+    engine.store.put('branch', {'id': 'branch1', 'run_id': run['id'], 'status': 'PREPARED'})
+    assert initial <= engine.visible_tool_names(scope)
+    engine.store.update('branch', 'branch1', status='ACCEPTED')
+    assert engine.visible_tool_names(scope) == delivery
+
+    record('save_context_bundle', 'save_playlist', 'save_session_draft')
+    assert initial <= engine.visible_tool_names(scope)
+    record('save_context_bundle', 'save_script_plan', goal={'objective': 'materials_to_script'})
+    assert presentation_view(engine, scope, allowed)['workflow_phase'] == 'script_only'
+    assert {'read_voice_options', 'save_asset_checklist', 'prepare_required_audio'} <= allowed - engine.visible_tool_names(scope)
+
+
+@pytest.mark.asyncio
+async def test_legacy_expansions_keep_their_original_visibility(env):
+    engine, _ = env
+    run = await authorize(engine, await new_run(engine, '完整准备本场直播'), ['save_context_bundle'])
+    scope = await enable(engine, run)
+    activate(engine, scope, names=['search_catalog'])
+    row = engine.store.list('tool_presentation')[0]
+    engine.store.put('tool_presentation', {key: value for key, value in row.items()
+        if key not in {'manual_names', 'pinned_names'}})
+    engine.store.update('run', run['id'], receipts=[{'command': 'save_context_bundle'}])
+    assert 'search_catalog' in engine.visible_tool_names(scope)
+
 
 @pytest.mark.asyncio
 async def test_disclosure_never_expands_intent_or_child_permissions(env):

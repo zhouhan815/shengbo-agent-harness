@@ -9,7 +9,9 @@ from pydantic import Field, create_model
 
 from shengbo_contracts.business import COMMAND_ARGS, QUERY_ARGS
 from shengbo_contracts.common import ArtifactRef, RecordRef, StrictModel, ContractError
-from .models import AnalysisReport, AnalysisTask, DecisionRequest, IntentAssessment, TaskAssessment
+from .models import AnalysisTask, DecisionRequest, IntentAssessment, TaskAssessment
+from .report_tool_contract import ProductFactsReportInput, ReportInput
+from .script_product_view import script_product_view
 
 
 class Empty(StrictModel):
@@ -70,6 +72,9 @@ class AssessmentInput(StrictModel):
 class DispatchInput(StrictModel):
     tasks: list[AnalysisTask] = Field(min_length=1, max_length=3)
     reason: str = Field(min_length=1, max_length=2000)
+    wait_for_results: bool = Field(default=False, description="后续必须等本批时设true，并单独调用本工具，同一次调用即登记等待。")
+    assessment: TaskAssessment | None = Field(default=None, description="可在首次派发时单独调用本工具，同时保存已依据读取结果形成的执行计划。")
+    on_ready: Literal["review", "accept_clean"] = Field(default="review", description="仅wait_for_results=true可用accept_clean：按计划正式验收范围、来源和依赖匹配且无冲突/缺项的报告；任何疑点留给主Agent。不会批准草案、话术或付费动作。")
 
 
 class BatchInput(StrictModel):
@@ -86,10 +91,6 @@ class FinishInput(StrictModel):
     summary: str = Field(min_length=1, max_length=6000)
     wait_for_branch_ids: list[str] = Field(default_factory=list, max_length=30,
         description="WAITING_JOBS时可选：你决定等待这些分支都完成再唤醒，失败仍提前唤醒。未填可在部分分支就绪时继续规划；不强制固定依赖。")
-
-
-class ReportInput(StrictModel):
-    report: AnalysisReport
 
 
 class ResearchInput(StrictModel):
@@ -143,7 +144,12 @@ def build_tools(engine, role="main"):
         def bind_query(query_key):
             async def call(runtime: ToolRuntime, **kwargs):
                 try:
-                    return await engine.business_query(runtime.context, query_key, kwargs)
+                    value = await engine.business_query(runtime.context, query_key, kwargs)
+                    if query_key == "read_product" and runtime.context.role == "main":
+                        run = engine.store.get("run", runtime.context.run_id)
+                        if (run.get("goal") or {}).get("script_generation"):
+                            return script_product_view(value)
+                    return value
                 except ContractError as error:
                     # This is the read-only whole-package approval preview,
                     # not a prerequisite for reviewing saved script text.
@@ -250,10 +256,16 @@ def build_tools(engine, role="main"):
             "可选精确生成结果读取：给job_id/item_id/module_key，view选accepted_module或latest_failed_response，可选attempt_id。程序核对当前允许任务和精确档案后只返回选中归档正文，无需手写JSON路径/猜快照；未就绪/未知/无正文如实返回。不是正式Module正文或人工批准，不自动重试、改稿或执行；原通用读取仍可用。"))
 
     if role != "main":
+        product_facts = role == "product_facts"
         async def report(runtime: ToolRuntime, report):
+            if product_facts:
+                return engine.submit_report(runtime.context, report, strict_evidence=True)
             return engine.submit_report(runtime.context, report)
-        tools.append(_tool(f"submit_{role}_report", ReportInput, report,
-                           "提交本角色的严格结构化分析报告，含事实/假设/来源/缺口；只暂存PREPARED，不直接写正式商品或接受自身报告。"))
+        contract = "提交本角色的结构化分析报告，含事实、假设、来源和缺口。只暂存PREPARED，正式验收由主Agent执行。"
+        if product_facts:
+            contract += "每条证据用单个精确source_ref。引用上传材料时用同一来源的真实locator，有正文时逐字摘录。缺项level与status使用参数枚举；只有真实缺项才列。"
+        tools.append(_tool(f"submit_{role}_report", ProductFactsReportInput if product_facts else ReportInput,
+                           report, contract))
         from .report_corrections import CorrectReportInput, correct_report
         async def correct(runtime: ToolRuntime, draft_ref, patches=None, action="patch"):
             return correct_report(engine, runtime.context, draft_ref, patches or [], action=action)
@@ -292,8 +304,9 @@ def build_tools(engine, role="main"):
 
     async def assess(runtime: ToolRuntime, assessment):
         return engine.save_assessment(runtime.context, assessment)
-    async def dispatch(runtime: ToolRuntime, tasks, reason):
-        return await engine.dispatch(runtime.context, tasks, reason, runtime.tool_call_id)
+    async def dispatch(runtime: ToolRuntime, tasks, reason, wait_for_results=False, assessment=None, on_ready="review"):
+        return await engine.dispatch(runtime.context, tasks, reason, runtime.tool_call_id,
+                                     wait_for_results=wait_for_results, assessment=assessment, on_ready=on_ready)
     async def batch(runtime: ToolRuntime, branch_task_ids=None, report_mode="new"):
         return engine.read_batch_view(runtime.context, branch_task_ids or [], report_mode)
     async def accept(runtime: ToolRuntime, branch_task_ids=None):
@@ -303,21 +316,21 @@ def build_tools(engine, role="main"):
     async def finish(runtime: ToolRuntime, outcome, summary, wait_for_branch_ids=None):
         return await engine.finish(runtime.context, outcome, summary, wait_for_branch_ids=wait_for_branch_ids or [])
     tools.extend([
-        _tool("save_task_assessment", AssessmentInput, assess, "intent阶段保存任务识别(必须引用本次用户原文)，execute阶段保存可观察计划。提议不授予权限，不可擅自扩大Goal。"),
-        _tool("dispatch_analysis_batch", DispatchInput, dispatch, "按本次已授权目标持久派发1至3个独立分析任务；每个任务独立上下文，返回任务ID，不同步等待所有任务。"),
+        _tool("save_task_assessment", AssessmentInput, assess, "intent阶段保存任务识别，本场明确新增整版文字的受支持请求由程序取原文，其余须逐字引用本次原文。execute阶段保存可观察计划。提议不授予权限，不可擅自扩大Goal。"),
+        _tool("dispatch_analysis_batch", DispatchInput, dispatch, "按本次授权持久派发1至3个独立分析任务；首份执行计划可通过assessment同时登记。完全相同的任务复用原ID与状态。后续依赖分析时可选wait_for_results；有独立工作可继续。"),
         _tool("read_analysis_batch", BatchReadInput, batch, "读取当前任务子任务进度与PREPARED报告；默认只给新报告全文，旧报告有精确full_ref；需要时report_mode=full再读。可只读必要分支。"),
         _tool("accept_analysis_reports", BatchInput, accept, "主Agent校验并将实际PREPARED报告接受到声播业务库；只接受本任务真实产物，失败分支不能冒充成功。"),
-        _tool("request_user_decision", DecisionRequest, decide, "仅在身份、冲突、范围、播放顺序或文案到语音批准等确实需要用户决定时提问并中断；不能自行提供批准答案。text_audio_approval只需kind和prompt：服务端读取当前整包review并绑定预览、声音、顺序和hash，无需模型拼接context/review_hash/批准答案。已审阅当前稿时可直接申请；如仍需内容核查，可先read_text_review。playlist_order必须在context.playlist提供完整精确items/occurrence_id/ref/loop提案；confirmed后按返回playlist_order_binding原样保存，不改名换序。"),
+        _tool("request_user_decision", DecisionRequest, decide, "仅在身份、冲突、范围、播放顺序或语音批准等确实需要用户决定时提问并中断。prompt和选项label会直接给用户看。用中文业务名称和具体的选择后果，勿显示接口字段、工具名、JSON或内部引用。适合列选项时提供两到三个可实际执行且有区别的选项，每项都用固定字段value和label，例如{value:'save_standard',label:'只保存标准装'}。必须由用户补充事实时直接提问，不凑选项。收到自定义text时按意见澄清或调整，收到含choice和text的修改意见不视为批准固定提案。text_audio_approval只需kind和prompt，服务端绑定完整预览、声音和顺序；需核查内容可先read_text_review。playlist_order必须在context.playlist提供完整精确items/occurrence_id/ref/loop提案；confirmed后按返回playlist_order_binding原样保存，不改名换序。"),
         _tool("finish_turn", FinishInput, finish, "以真实成果/回执结束本轮或等待已受理任务。summary可直接记录本轮公开审阅结论；验收通过后绑定实际正式稿refs并结束，无需仅为更新结束计划再调用save_task_assessment。COMPLETED必须满足原Goal，不构成人工批准。"),
     ])
     from .workflows import WORKFLOW_SCHEMAS, run_workflow
     descriptions = {
-        "wf_selling_points": "可选卖点补全：商品事实已保存但无核心卖点时offer询问用户，支持生成方向；模型复用已有商品和有效顾客研究整理候选后propose，服务端展示精确卖点并等待确认；approve后save(proposal_id)原样写回商品核心卖点。用户要求保存后询问是否补卖点时须用offer产生正式确认卡，不能以finish自然语言问题代替。inspect读取现状。没有现成卖点文案可整理，缺性能事实不能编造；不自动改话术，不新增模型调用或常驻Agent。",
-        "wf_product_materials": "F01可选：inspect按detail(auto/overview/full)读材料/schema/候选；assess用parameters.branch_task_ids/purpose/requested_actions汇总真实报告的四级缺项，只表示声明的阻断项，不证明理解正确。save用完整字段；save_from_facts用branch_task_id与精确accepted_report_ref原样保存已验收事实，可带product_ref/显式overrides。select由你显式给完整selected_product_refs。不自动选品/验收报告/生成话术，权限、CAS和必要身份确认不变。",
-        "wf_analysis_coordination": "F02可选工具流：dispatch按你选的tasks/reason派发；inspect读报告；语义验收后accept；新建单商品且原来源未变时bind只选尚未绑定的product_facts/audience_scenes，session_config不绑定。已正式关联同一精确商品的accepted_ref直接复用。parameters.conflict_reviews逐branch_task_id/report_hash给issue_dispositions，包含issue_index/issue_hash/classification(nonblocking_boundary_note或unresolved)/rationale/basis_refs并覆盖全部注释。issue_hash为原注释canonical_hash，basis_refs只用review_inputs.allowed_basis_refs，不用analysis_ref/任务ID。unresolved或明确事实/来源hash/价格冲突不豁免。NEEDS_REPLAN时按返回review_inputs定向复核，不默认重跑研究。",
-        "wf_context_bundle": "F03可选工具流：inspect汇合当前商品/本场草案/正式研究/复盘及旧稿引用；缺选品或草案时返回当前精确ref/CAS及可选补充入口，由主Agent选择。默认index，可按需plan/full；save可用analysis_refs显式追加指定正式研究，核验读取权限/accepted/精确商品版本后绑定完整正文；user_decisions的ID不算采用。不自动选品、配置、重做研究或写稿。",
-        "wf_script_execution": "F04可选：execute执行已存plan_ref；status核进度；review一次获取本run作业的当前正式稿、精确读取入口及完整审阅文字；显式承接的可信原run作业也可提供正文作为审阅依据，但历史身份不认证为本run新生成。缺项/截断/未知会明确标注，不代表内容已合格。失败由主Agent重规划，未知先对账；WAITING后finish_turn WAITING_JOBS。",
-        "wf_playback_review": "F05可选工具流：prepare_order只装配你给定的ordered_script_refs序列和合法提问参数；不替你审稿/选序/提问。用户决定后save_playlist；save_assets保存素材建议；compile计算实际开场；review取得整包审核。缺项返回主Agent，不自动改稿或批准。",
+        "wf_selling_points": "核心卖点：inspect看依据，offer请求意愿，propose提交有据候选，save按原确认保存。报告一键补空可直接写；按精确商品证据和正式研究核验。",
+        "wf_product_materials": "F01可选：inspect读资料，assess查报告缺项，save或save_from_facts保存商品，select提交完整选品。精确版本、身份确认和原权限继续生效。",
+        "wf_analysis_coordination": "F02可选：dispatch派发，inspect读取，accept正式验收；bind为同源新建单商品关联未绑定的事实或顾客报告。已有同版本报告直接复用。有注释按review_inputs逐条提供conflict_reviews；真实矛盾定向核查。",
+        "wf_context_bundle": "F03：inspect查看本场与正式研究；save冻结精确引用。apply_session_settings只提交明确要改的设置，程序保留其余草案。",
+        "wf_script_execution": "F04：plan_execute_wait用于新整版或同原稿扩版，单独调用，保存、提交并等待。execute执行已存计划；status看进度；review核对正式稿。失败定向处理，未知先对账。",
+        "wf_playback_review": "F05：prepare_order装配顺序提案；reorder按明确指令预览、保存和编译。asset_inputs读取本场，save_assets保存素材建议。compile核算开场；review核对整包。人工确认按原规则。",
         "wf_required_audio": "F06可选工具流：inspect核对语音就绪；prepare仅在当前人工批准后生成缺失所需音频，复用有效资产。WAITING后交回协调器；不自动改稿/换音色/发布。",
         "wf_finalize_preparation": "F07可选发布收尾：在本次允许发布时核对批准/全部音频/当前性，幂等发布并核对候选回执。已有有效候选直接复用；缺项交还主Agent规划。不采用、不开播。",
     }

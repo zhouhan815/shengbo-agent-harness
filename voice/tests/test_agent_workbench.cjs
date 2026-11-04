@@ -10,7 +10,8 @@ const http = require('node:http');
 const crypto = require('node:crypto');
 const { chromium } = require('C:/Users/lizhe/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright');
 const WEB = path.resolve(__dirname, '../web');
-const OUT = path.resolve(__dirname, '../verification/agent-workbench-ui');
+const OUT = path.resolve(__dirname, process.argv.includes('--start-audit-only')
+  ? '../verification/20261104-start-audit' : '../verification/agent-workbench-ui');
 const VERSION = 'PRELIVE-2.3';
 const sorted = x => Array.isArray(x) ? x.map(sorted) : x && typeof x === 'object' ? Object.fromEntries(Object.keys(x).sort().map(k => [k, sorted(x[k])])) : x;
 const hash = x => 'sha256:' + crypto.createHash('sha256').update(JSON.stringify(sorted(x))).digest('hex');
@@ -40,7 +41,21 @@ function emit(type, data = {}) {
 }
 function businessQuery(name, a) {
   if (name === 'get_workspace_snapshot') return snapshot(a.preparation_id);
-  if (name === 'get_business_schema') return { contract_version: VERSION, schema_hash: hash('fixture-schema'), schema: { product: { type: 'object', properties: Object.fromEntries(Object.keys(state.products[0].body).filter(k => k !== 'id').map(k => [k, { type: k === 'price' ? 'number' : ['knowledge_documents', 'core_selling_points', 'specifications', 'hidden_optional_fields'].includes(k) ? 'array' : 'string' }])) }, commerce: { type: 'object', properties: {} }, module_keys: Object.keys(state.details.scripts[0].modules) } };
+  if (name === 'read_start_readiness') return {ready:false,room_id:'room-A',preparation_ref:state.preparation.ref,blockers:state.startAuditBlockers || [
+    {code:'START_PRODUCT_SELLING_POINTS_REQUIRED',product_ref:state.products[0].ref,product_name:state.products[0].body.name},
+    {code:'TEXT_APPROVAL_NOT_CURRENT'}
+  ]};
+  if (name === 'get_business_schema') {
+    const properties = Object.fromEntries(Object.keys(state.products[0].body).filter(k => !['id', 'archived'].includes(k))
+      .map(k => [k, { type: k === 'price' ? 'number' : ['knowledge_documents', 'core_selling_points', 'specifications', 'hidden_optional_fields'].includes(k) ? 'array' : 'string' }]));
+    properties.knowledge_documents.items = { type: 'object', properties: {
+      id: { type: 'string' }, title: { type: 'string' }, content: { type: 'string' }
+    } };
+    return { contract_version: VERSION, schema_hash: hash('fixture-schema'), schema: {
+      product: { type: 'object', properties }, commerce: { type: 'object', properties: {} },
+      module_keys: Object.keys(state.details.scripts[0]?.modules || {})
+    } };
+  }
   if (name === 'search_products') return { items: state.products.filter(p => !a.q || p.body.name.includes(a.q)).map(p => ({ ref: p.ref, ...p.body })), next_cursor: null };
   if (name === 'read_product') return clone(state.products.find(p => p.ref.id === (a.product_id || a.ref?.id)));
   if (name === 'read_preparation') return clone(state.preparation);
@@ -62,6 +77,7 @@ function businessQuery(name, a) {
   throw Error('unhandled query ' + name);
 }
 function businessCommand(name, a) {
+  if (name === 'record_product_revision_choice') return {preparation_ref:state.preparation.ref};
   if (name === 'save_product') {
     let p = state.products.find(p => p.ref.id === a.product_id);
     if (!p) { p = product('product-new', a.fields.name); state.products.push(p); }
@@ -93,6 +109,7 @@ const server = http.createServer(async (req, res) => {
     state.calls.push({ path: url.pathname, method: req.method, body: clone(body), csrf: req.headers['x-csrf-token'] });
     if (url.pathname === '/api/audio/output-status') return json({schema_version:'AUDIO-OUTPUT-1',available:true,devices:[{id:'speakers',name:'测试扬声器',default:true}],browser_sessions:[{application:'Chrome',device_name:'测试扬声器',active:true,peak:.25,muted:false,volume_percent:100}]});
     if (/^\/api\/rooms\/[^/]+\/state$/.test(url.pathname)) return json(state.playback || { status:'stopped', current:null });
+    if (/^\/api\/rooms\/[^/]+\/live-source$/.test(url.pathname) && req.method === 'GET') return json({ config:{enabled:false}, status:{state:'disabled',connected:false}, events:[], next_cursor:0 });
     if (/^\/api\/rooms\/[^/]+\/control$/.test(url.pathname)) {
       assert.equal(body.expected_session_id, state.playback.session_id);
       assert.equal(body.expected_epoch, undefined, 'pause/resume apply to the active session across sentence boundaries');
@@ -138,8 +155,51 @@ async function main() {
   const chatInput = () => page.locator('.sb-a-input');
   try {
     await page.goto(base); await page.waitForFunction(() => !!window.shengboWorkbench); await ui(() => window.shengboWorkbench.ready);
+    if(process.argv.includes('--start-audit-only')){
+      await navigate({view:'room-config',room_id:'room-A',preparation_id:'prep-A'});
+      const start=page.locator('#room-broadcast-tile [data-exec-action="start"]');
+      await start.click();
+      const dialog=page.locator('#chat-panel dialog.sb-a-start-audit[open]');
+      await dialog.waitFor();
+      assert.match(await dialog.innerText(),/足弓支撑拖鞋 A.*缺少核心卖点/);
+      assert.match(await dialog.innerText(),/审核并批准当前话术/);
+      assert.equal(state.calls.filter(c=>c.body?.query==='read_start_readiness').length,1);
+      assert.equal(state.calls.filter(c=>c.body?.command==='start_prepared_room'||c.body?.action==='start'||c.path.endsWith('/messages')).length,0);
+      await dialog.screenshot({path:path.join(OUT,'start-audit.png')});
+      await dialog.getByRole('textbox').fill('根据已有资料，帮我补一条拖鞋的核心卖点。');
+      await Promise.all([page.waitForResponse(r=>r.url().endsWith('/messages')),dialog.getByRole('button',{name:'发送给 Agent'}).click()]);
+      const request=state.calls.filter(c=>c.path.endsWith('/messages')).at(-1).body;
+      assert.equal(request.scope.preparation_id,'prep-A');
+      assert.equal(request.selection.target.object_ref.id,'product-A');
+      assert.equal(request.selection.target.field_path,'/core_selling_points');
+      assert.match(request.text,/足弓支撑拖鞋 A.*缺少核心卖点/);
+      assert.match(request.text,/根据已有资料，帮我补一条拖鞋的核心卖点/);
+      assert.equal(state.calls.filter(c=>c.body?.command==='start_prepared_room'||c.body?.action==='start').length,0);
+      const original=state.products[0].ref, updated=ref('product',original.id,2), diffHash=hash('confirmed revision difference');
+      state.startAuditBlockers=[{code:'START_PRODUCT_VERSION_REQUIRED',product_ref:updated,product_name:state.products[0].body.name,
+        pinned_product_ref:original,diff_hash:diffHash}];
+      await start.click();
+      await dialog.waitFor();
+      await Promise.all([page.waitForResponse(r => r.url().endsWith('/commands')),dialog.getByRole('button',{name:'将本场改用商品新版'}).click()]);
+      const choice=state.calls.filter(c=>c.body?.command==='record_product_revision_choice').at(-1).body.args;
+      assert.deepEqual(choice,{preparation_id:'prep-A',expected_revision:state.preparation.ref.revision,
+        pinned_product_ref:original,observed_head_ref:updated,diff_hash:diffHash,choice:'refresh'});
+      assert.equal(state.calls.filter(c=>c.body?.command==='start_prepared_room'||c.body?.action==='start').length,0);
+      results.push({name:'开播右侧检查、缺项提交及新版商品显式采用',result:'PASS'});
+      console.log('Start audit UI: scoped checks, exact Agent submission, exact human revision choice, no start command');
+      return;
+    }
     await check('UX00 Agent 主工作台与左右内容真实挂载', async () => { assert.equal(await page.locator('#work-panel').count(), 1); assert.equal(await page.locator('#chat-panel .sb-a-input').count(), 1); assert.equal(await page.locator('#workspace-editor').count(), 1); assert.ok((await page.title()).includes('Agent') || (await page.title()).includes('播前')); });
-    await check('过程开关与自动跟随默认关闭', async () => { assert.equal(await page.getByRole('switch', { name: '显示执行过程' }).isChecked(), false); const s = await ui(() => window.shengboWorkbench.state()); assert.equal(s.followResults, false); });
+    await check('过程默认关闭，自动跟随默认开启并尊重用户关闭偏好', async () => {
+      const follow = page.getByRole('checkbox', { name: '自动跟随当前任务成果' });
+      assert.equal(await page.getByRole('switch', { name: '显示执行过程' }).isChecked(), false);
+      assert.equal(await follow.isChecked(), true);
+      assert.equal((await ui(() => window.shengboWorkbench.state())).followResults, true);
+      await follow.uncheck();
+      await page.reload();
+      await ui(() => window.shengboWorkbench.ready);
+      assert.equal(await follow.isChecked(), false);
+    });
     await openProduct('product-A'); await field('name').waitFor();
     for (const width of [1440, 1024, 768, 390, 320]) await check('UX08 ' + width + 'px 双焦点布局与无页面横向溢出', async () => {
       await page.setViewportSize({ width, height: 1000 });
@@ -170,7 +230,7 @@ async function main() {
       await page.locator('#focus-work').focus(); await page.keyboard.press('Enter'); await page.waitForTimeout(260); assert.equal(await ui(() => document.body.dataset.focusMode), 'work');
     });
     await check('人工商品编辑通过统一命令并携带基础修订保存', async () => {
-      await field('price').fill('188'); await page.getByRole('button', { name: '保存商品', exact: true }).click(); await page.waitForFunction(() => window.shengboWorkbench.editors.hasDirty() === false);
+      await field('price').fill('188'); await page.getByRole('button', { name: '保存修改', exact: true }).click(); await page.waitForFunction(() => window.shengboWorkbench.editors.hasDirty() === false);
       const command = state.calls.filter(c => c.body?.command === 'save_product').at(-1); assert.ok(command); assert.equal(command.body.args.expected_revision, 1); assert.equal(Number(state.products[0].body.price), 188); assert.equal(state.products[0].body.core_selling_points[0], '尚未保存的卖点草稿，继续编辑。');assert.equal(state.products[0].body.core_selling_points[1],'易清洁');assert.equal(state.products[0].body.selling_points,state.products[0].body.core_selling_points.join('\n'));
     });
     await check('UX04 明确指定价格字段后保持左侧，并显示目标路径', async () => { await page.locator('[data-select-field="price"]').click(); assert.equal(await ui(() => document.body.dataset.focusMode), 'work'); assert.equal(await page.locator('.sb-a-selection').isVisible(), true); assert.match(await page.locator('.sb-a-selection').textContent(), /价|price/); });
@@ -267,6 +327,45 @@ async function main() {
       assert.equal(await page.locator('#audio-route-controls [data-route-external]').getAttribute('aria-pressed'),'false');
       assert.equal(state.calls.slice(before).filter(c=>c.method==='POST').length,0);
       await page.locator('#audio-route-controls summary').click();
+    });
+    await check('待确认弹窗留在右侧，离开日志也可选择或自填', async () => {
+      state.run.status = 'WAITING_USER';
+      state.run.questions = [{ decision_id: 'catalog-fixture', kind: 'catalog_intake_approval', status: 'OPEN', revision: 1, allow_text: false,
+        revision_text: { choice: 'revise', label: '提交修改意见', placeholder: '说明希望调整的规格或价格' },
+        prompt: '已读完模拟商品资料。标准装 29.90 元，加量装 39.90 元。请选择入库范围。\n资料中的促销参考价只供记录。本场活动价需在直播间单独设置。',
+        options: [{ value: 'save_all', label: '全部分别入库' }, { value: 'save_1', label: '只保存标准装' }, { value: 'skip', label: '暂不保存' }] }];
+      const before = state.calls.length;
+      await navigate({view:'products'}); await focus('chat');
+      const processSwitch = page.getByRole('switch', { name: '显示执行过程' });
+      if (!await processSwitch.isChecked()) await processSwitch.check();
+      await ui(() => window.shengboWorkbench.assistant.refresh());
+      const dialog = page.getByRole('dialog', { name: '确认商品入库方案' });
+      await dialog.waitFor();
+      assert.equal(await dialog.getByText('待确认，尚未入库', { exact: true }).count(), 1);
+      const geometry = await ui(() => {
+        const panel = document.querySelector('#chat-panel').getBoundingClientRect();
+        const pop = document.querySelector('.sb-a-decision-dialog').getBoundingClientRect();
+        return { left: panel.left, right: panel.right, top: panel.top, bottom: panel.bottom, x: pop.left, y: pop.top, end: pop.right, low: pop.bottom };
+      });
+      assert.ok(geometry.x >= geometry.left && geometry.end <= geometry.right && geometry.y >= geometry.top && geometry.low <= geometry.bottom);
+      assert.equal(await page.locator('.sb-a-transcript [data-decision-id]').count(), 0);
+      assert.equal(await dialog.getByRole('button', { name: '只保存标准装' }).count(), 1);
+      assert.equal(await dialog.getByRole('textbox').count(), 1);
+      await page.screenshot({ path: path.join(OUT, 'right-agent-confirmation.png') });
+      await dialog.getByRole('button', { name: '稍后处理' }).click();
+      assert.equal(await dialog.count(), 0);
+      await page.setViewportSize({ width: 390, height: 844 });
+      await page.locator('#mobile-work').click();
+      assert.match(await page.locator('#mobile-chat').innerText(), /1 项待确认/);
+      await page.locator('#mobile-chat').click();
+      await page.getByRole('button', { name: '查看待确认' }).click();
+      assert.ok(await dialog.isVisible());
+      assert.equal(await ui(() => document.documentElement.scrollWidth > innerWidth), false);
+      state.run.status = 'CANCELLED';
+      await ui(() => window.shengboWorkbench.assistant.refresh());
+      assert.equal(await dialog.count(), 0, 'cancelled tasks must not surface an old open question');
+      assert.ok(state.calls.slice(before).every(call => !call.path.endsWith('/answers') && !call.path.endsWith('/commands')));
+      await page.setViewportSize({ width: 1440, height: 1000 });
     });
     await check('无未处理浏览器异常与未定义模拟路由', async () => { assert.deepEqual(errors, []); assert.deepEqual(state.failures, []); });
   } finally {

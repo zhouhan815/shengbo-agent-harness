@@ -159,7 +159,9 @@ class ExistingVoiceAdapter:
 
     def script_generation_signature(self):
         """Whole responses never share a cache identity with legacy modules."""
-        from .prelive.whole_script_generation import PROTOCOL
+        from .prelive.whole_script_generation import PROTOCOL, whole_script_flash_options
+        if options := whole_script_flash_options():
+            return {"provider": "deepseek", "model": options["model"], "thinking": options["thinking"], "protocol": PROTOCOL}
         return {**self.module_generation_signature(), "protocol": PROTOCOL}
 
     async def generate_script(self, context, actions, product, *, response_observer=None):

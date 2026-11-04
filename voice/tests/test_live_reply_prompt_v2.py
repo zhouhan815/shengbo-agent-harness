@@ -14,7 +14,8 @@ def fake_transport(monkeypatch, answer):
     def urlopen(request, timeout):
         body = json.loads(request.data)
         requests.append((body, timeout))
-        content = {"choices": [{"message": {"content": json.dumps(answer, ensure_ascii=False)}}],
+        model_output = answer if isinstance(answer, str) else json.dumps(answer, ensure_ascii=False)
+        content = {"choices": [{"message": {"content": model_output}}],
                    "usage": {"total_tokens": 20}}
         return io.BytesIO(json.dumps(content, ensure_ascii=False).encode())
 
@@ -37,6 +38,13 @@ def test_real_request_contains_question_scope_and_location_boundary(monkeypatch,
     assert timeout == 20 and body["max_tokens"] == 600
     system, user = body["messages"]
     assert system["role"] == "system" and system["content"] == reply_lab.prompt()
+    schema = json.loads(system["content"].split("输出结构约束（JSON Schema）：\n", 1)[1])
+    assert schema == reply_lab.ReplyOutput.model_json_schema()
+    assert schema["additionalProperties"] is False
+    assert schema["properties"]["citations"]["maxItems"] == 12
+    assert schema["properties"]["missing_information"]["maxItems"] == 8
+    assert set(schema["required"]) == {"answer", "status", "citations"}
+    assert schema["$defs"]["ReplyCitation"]["additionalProperties"] is False
     assert json.loads(user["content"]) == context
     assert required_example in system["content"]
     for rule in ("只正面回答当前问题所需的已知事实", "回答完就结束", "不必在末尾加建议或推荐",
@@ -73,3 +81,37 @@ async def test_production_live_reply_uses_same_prompt_and_real_retrieval(monkeyp
     assert "证据只支持户外，就不能推成室内或家里也适用" in seen[0][0]["messages"][0]["content"]
     assert all(chunk["product_id"] == "p-outdoor" for chunk in seen[0][1]["evidence"])
     assert "家里" not in result["answer"] and "配置" not in result["answer"]
+
+
+
+@pytest.mark.parametrize("model_output", [
+    '{"answer":"已核对。","answer":"不应覆盖。","status":"chat","citations":[]}',
+    '{"answer":"已核对。","status":"answered","citations":[{"chunk_id":"a","chunk_id":"b","quote":"原文依据"}]}',
+    '{"answer":"已核对。","status":"chat","citations":[],"missing_information":[NaN]}',
+])
+def test_remote_reply_rejects_invalid_json_in_one_request(monkeypatch, model_output):
+    requests = fake_transport(monkeypatch, model_output)
+    with pytest.raises(RuntimeError, match="返回格式异常"):
+        reply_lab.complete_remote({"comment": "你好"})
+    assert len(requests) == 1
+
+
+@pytest.mark.parametrize("change", [
+    {"unexpected": "内部字段"},
+    {"status": ["chat"]},
+    {"citations": [{"chunk_id": "evidence-1", "quote": "原文依据", "extra": "额外字段"}]},
+    {"citations": [{"chunk_id": "evidence-1", "quote": "原文依据"}] * 12
+                  + [{"chunk_id": "not-retrieved", "quote": "不能截掉后发布"}]},
+    {"missing_information": ["待核实"] * 9},
+])
+def test_reply_shape_rejects_extra_fields_and_overflow(change):
+    response = {"answer": "已核对。", "status": "answered",
+                "citations": [{"chunk_id": "evidence-1", "quote": "原文依据"}]}
+    retrieval = {"chunks": [{"id": "evidence-1", "text": "原文依据"}]}
+    with pytest.raises(RuntimeError, match="回复结构不符合要求"):
+        reply_lab.validate_answer({**response, **change}, retrieval)
+
+
+def test_reply_validation_keeps_missing_information_optional():
+    result = reply_lab.validate_answer({"answer": "  你好呀。  ", "status": "chat", "citations": []}, {"chunks": []})
+    assert result == {"answer": "你好呀。", "answer_status": "chat", "citations": [], "missing_information": []}

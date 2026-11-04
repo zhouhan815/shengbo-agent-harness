@@ -1,0 +1,133 @@
+.wb-room-product-dialog {
+  --wb-picker-page-size: 8;
+  --wb-picker-columns: 2;
+  --wb-picker-gap: 12px;
+  box-sizing: border-box;
+  width: min(580px, calc(100vw - 32px));
+  max-height: calc(100dvh - 24px);
+  padding: 18px;
+  border: 1px solid #dce4ee;
+  border-radius: 12px;
+  color: #25364e;
+  background: #fff;
+  box-shadow: 0 16px 55px #172a4938;
+}
+
+.wb-room-product-dialog[open] {
+  display: grid;
+  gap: var(--wb-picker-gap);
+}
+
+.wb-room-product-dialog::backdrop {
+  background: #172a4960;
+}
+
+.wb-room-product-dialog header,
+.wb-room-product-dialog footer,
+.wb-room-picker-search,
+.wb-room-picker-pager {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.wb-room-product-dialog h2 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.wb-room-product-dialog .wb-button {
+  min-height: 36px;
+  white-space: nowrap;
+}
+
+.wb-room-picker-search input[type="search"] {
+  flex: 1 1 auto;
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  padding: 7px 9px;
+  border: 1px solid var(--wb-line, #dce4ee);
+  border-radius: 6px;
+  font: inherit;
+}
+
+.wb-room-picker-search label,
+.wb-room-picker-options label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: .84rem;
+}
+
+.wb-room-picker-search label {
+  flex: none;
+}
+
+.wb-room-picker-options {
+  display: grid;
+  grid-template-columns: repeat(var(--wb-picker-columns), minmax(0, 1fr));
+  gap: 6px;
+}
+
+.wb-room-picker-options label {
+  min-height: 36px;
+  padding: 4px 8px;
+  border: 1px solid var(--wb-line, #dce4ee);
+  border-radius: 6px;
+  background: #f7f9fc;
+  cursor: pointer;
+}
+
+.wb-room-picker-options label:has(:checked) {
+  border-color: #7f9fce;
+  background: #eef5ff;
+}
+
+.wb-room-picker-options label:has(:disabled) {
+  opacity: .7;
+  cursor: default;
+}
+
+.wb-room-picker-options span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.wb-room-product-dialog footer {
+  padding-top: 8px;
+  border-top: 1px solid var(--wb-line, #dce4ee);
+}
+
+.wb-room-product-dialog :is(footer, nav) span {
+  color: #4f627d;
+  font-size: .83rem;
+}
+
+#room-product-options-status {
+  white-space: normal;
+}
+
+@media (max-width: 520px) {
+  .wb-room-product-dialog {
+    --wb-picker-page-size: 5;
+    --wb-picker-columns: 1;
+    width: calc(100vw - 24px);
+    padding: 12px;
+    --wb-picker-gap: 8px;
+  }
+}
+
+@media (max-height: 540px) {
+  .wb-room-product-dialog {
+    --wb-picker-page-size: 4;
+  }
+}
+
+@media (max-width: 520px) and (max-height: 480px) {
+  .wb-room-product-dialog {
+    --wb-picker-page-size: 2;
+  }
+}

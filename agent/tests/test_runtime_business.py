@@ -281,7 +281,9 @@ async def test_agent_can_add_own_created_product_without_manual_selection(env):
     scope = RunScope(run['id'], 'selection-add-test', 'execute')
     assert 'update_preparation_products' in engine.allowed_tool_names(scope)
     assert 'refresh_product_reference' not in engine.main_tool_names
-    fields = Product(name='新增测试精华', price=99).model_dump()
+    fields = Product(name='新增测试精华', price=99, knowledge_documents=[{
+        'id': 'doc_test_usage', 'title': '使用说明', 'content': '开封后请盖紧瓶盖。',
+    }]).model_dump()
     created = await engine.business_command(scope, 'save_product', {'fields': fields, 'schema_hash': service.schema()['schema_hash'], 'patches': []}, 'create-product')
     assert created['data']['created'] is True
     new_ref = created['data']['product_ref']
@@ -293,6 +295,16 @@ async def test_agent_can_add_own_created_product_without_manual_selection(env):
     frozen = engine.store.get('run', run['id'])
     assert frozen['goal']['target_product_ids'] == [pinned['id']]
     assert frozen['created_product_ids'] == [new_ref['id']]
+    artifacts = engine.get_run(run['id'])['artifacts']
+    assert [item['destination']['view'] for item in artifacts] == ['preparation', 'products', 'products', 'products']
+    shared_product = {'authority': 'voice', 'view': 'products', 'product_id': new_ref['id'],
+                      'preparation_id': None, 'room_id': None, 'object_ref': new_ref}
+    assert artifacts[1]['destination'] == shared_product
+    assert artifacts[2]['destination'] == {**shared_product, 'field_path': '/knowledge_documents',
+                                            'knowledge_document_id': 'doc_test_usage'}
+    assert artifacts[-1]['destination']['object_ref'] == receipt['data']['preparation_ref']
+    assert artifacts[-1]['destination']['room_section'] == 'products'
+    assert engine.get_conversation(run['conversation_id'])['runs'][0]['artifacts'] == artifacts
 
 
 @pytest.mark.asyncio
@@ -478,7 +490,7 @@ async def _run_plan_script(engine, execute_turns):
     run = await new_run(engine, text)
     for _ in range(180):
         current = engine.get_run(run['id'])
-        if current['status'] in {'COMPLETED', 'BLOCKED', 'FAILED'}:
+        if current['status'] in {'COMPLETED', 'WAITING_USER'}:
             break
         await asyncio.sleep(.05)
     return current
@@ -499,11 +511,12 @@ async def test_execute_plan_with_command_ids_is_corrected_once(env):
 
 
 @pytest.mark.asyncio
-async def test_second_wrong_execute_plan_keeps_hard_stop(env):
+async def test_second_wrong_execute_plan_waits_without_expanding_scope(env):
     engine, service = env
     current = await _run_plan_script(engine, [[_execute_plan('bad-plan-1', ['compile_playback_plan'])],
                                               [_execute_plan('bad-plan-2', ['prepare_required_audio'])]])
-    assert current['status'] == 'BLOCKED'
+    assert current['status'] == 'WAITING_USER' and not current.get('closure_ref')
+    assert current['questions'][0]['kind'] == 'runtime_recovery'
     assert current['error']['code'] == 'PLAN_CAPABILITY_DENIED'
     assert current['correctable_tool_errors']['PLAN_CAPABILITY_DENIED'] == 1
     assert not current.get('task_assessment')
@@ -605,17 +618,19 @@ async def test_actual_engine_bounds_unknown_enum_but_keeps_true_scope_conflict_h
     run = await new_run(engine, text)
     for _ in range(180):
         current = engine.get_run(run['id'])
-        if current['status'] in {'COMPLETED', 'BLOCKED', 'FAILED'}:
+        if current['status'] in {'COMPLETED', 'WAITING_USER'}:
             break
         await asyncio.sleep(.05)
-    assert current['status'] == 'BLOCKED', (current.get('error'), current.get('correctable_tool_errors'))
+    assert current['status'] == 'WAITING_USER', (current.get('error'), current.get('correctable_tool_errors'))
+    assert not current.get('closure_ref') and current['questions'][0]['kind'] == 'runtime_recovery'
     assert current['error']['code'] == expected_code
     assert current.get('correctable_tool_errors', {}).get('INVALID_EFFECT_ENUM', 0) == corrections
     assert not current.get('intent_assessment') and not current.get('goal') and not current.get('grant_id')
 
 
 @pytest.mark.asyncio
-async def test_full_prelive_parallel_human_approval_audio_candidate_closed_loop(tmp_path):
+@pytest.mark.parametrize("join", ["review", "accept_clean", "conflict"])
+async def test_full_prelive_parallel_human_approval_audio_candidate_closed_loop(tmp_path, join):
     """Exercise the entire real harness/services with silent local test audio."""
     import hashlib
     import json
@@ -627,9 +642,17 @@ async def test_full_prelive_parallel_human_approval_audio_candidate_closed_loop(
 
     class SilentAdapter(FakeAdapter):
         rendered = 0
+        generated = 0
         async def generate_module(self, context, module_key, product, previous):
+            self.generated += 1
             await asyncio.sleep(.03)
             return await super().generate_module(context, module_key, product, previous)
+
+        async def generate_script(self, context, actions, product):
+            self.generated += 1
+            await asyncio.sleep(.03)
+            return {'modules': {action['key']: {'sentences': await super(SilentAdapter, self).generate_module(
+                context, action['key'], product, [])} for action in actions if action['action'] == 'generate'}}
 
         async def render_audio(self, text, room_id, voice):
             self.rendered += 1
@@ -665,8 +688,10 @@ async def test_full_prelive_parallel_human_approval_audio_candidate_closed_loop(
     engine = RuntimeEngine(tmp_path / 'agent', client, model=BindableFakeModel(responses=[AIMessage(content='unused')]))
     p = await product(service)
     room = (await human_command(service, 'create_room', {'name': '全流程隔离直播间'}))['data']['room_ref']
-    text = '为' + room['id'] + '准备整场直播，使用' + p['id'] + '，生成话术并准备语音'
+    text = '为' + room['id'] + '准备整场直播，使用' + p['id'] + '，生成话术，由我确认编排后准备语音'
     counter = 0
+    model_calls = []
+    started_at = asyncio.get_running_loop().time()
 
     def call(name, args):
         nonlocal counter
@@ -675,12 +700,14 @@ async def test_full_prelive_parallel_human_approval_audio_candidate_closed_loop(
 
     async def logic(messages):
         scope = CURRENT_SCOPE.get()
+        model_calls.append((scope.phase, scope.role))
         run = engine.store.get('run', scope.run_id)
         if scope.role != 'main':
             branch = engine.store.get('branch', scope.branch_task_id)
             if not branch.get('report'):
                 await asyncio.sleep(.08)  # Three actual branch lifetimes overlap.
-                return call('submit_' + scope.role + '_report', {'report': {'summary': scope.role + '已完成完整结构化候选', 'product_ids': [p['id']], 'fields': {'context': {'market': '中国', 'language': '普通话'}}, 'insights': [{'use_scene': '居家日常使用'}], 'evidence': [], 'hypotheses': ['目标顾客仍需后续真实验证'], 'conflicts': [], 'missing_fields': [], 'asset_suggestions': [], 'source_refs': [], 'dependencies': [p]}})
+                conflict = join == 'conflict' and scope.role == 'session_config'
+                return call('submit_' + scope.role + '_report', {'report': {'summary': scope.role + '已完成完整结构化候选', 'product_ids': [p['id']], 'fields': {'context': {'market': '中国', 'language': '普通话'}}, 'insights': [{'use_scene': '居家日常使用'}], 'evidence': [], 'hypotheses': ['目标顾客仍需后续真实验证'], 'conflicts': [{'note': '本场稿件仅采用已确认的商品信息'}] if conflict else [], 'missing_fields': [], 'asset_suggestions': [], 'source_refs': [], 'dependencies': [p]}})
             return AIMessage(content='本角色报告已暂存，等待主 Agent 验收')
         if scope.phase == 'intent':
             if not run.get('intent_assessment'):
@@ -693,11 +720,13 @@ async def test_full_prelive_parallel_human_approval_audio_candidate_closed_loop(
                     return AIMessage(content='本轮结果已通过可信检查')
             except (ValueError, TypeError):
                 pass
-        if not run.get('task_assessment'):
-            return call('save_task_assessment', {'assessment': {'summary': '并行分析后汇合完整资料，生成并确认本场播出候选', 'capabilities': ['product_facts', 'session_config', 'audience_scenes'], 'steps': ['并行分析', '接受报告', '生成话术', '人工顺序与整包批准', '语音与候选'], 'decision_basis': ['只使用用户指定商品', '语音必须人工批准']}})
+        plan = {'summary': '并行分析后汇合完整资料，生成并确认本场播出候选', 'capabilities': ['product_facts', 'session_config', 'audience_scenes'], 'steps': ['并行分析', '接受报告', '生成话术', '人工顺序与整包批准', '语音与候选'], 'decision_basis': ['只使用用户指定商品', '语音必须人工批准']}
+        if not run.get('task_assessment') and join == 'review':
+            return call('save_task_assessment', {'assessment': plan})
         branches = [branch for branch in engine.store.list('branch') if branch['run_id'] == run['id']]
         if not branches:
-            return call('dispatch_analysis_batch', {'reason': '三类研究使用共同稳定商品事实，允许独立并行', 'tasks': [{'role': role, 'instruction': '完成本角色分析，保留完整结构、事实与假设边界', 'product_ids': [p['id']], 'source_refs': [], 'input_refs': [p]} for role in ('product_facts', 'session_config', 'audience_scenes')]})
+            return call('dispatch_analysis_batch', {'reason': '三类研究使用共同稳定商品事实，允许独立并行', 'tasks': [{'role': role, 'instruction': '完成本角色分析，保留完整结构、事实与假设边界', 'product_ids': [p['id']], 'source_refs': [], 'input_refs': [p]} for role in ('product_facts', 'session_config', 'audience_scenes')],
+                'wait_for_results': True, **({'assessment': plan, 'on_ready': 'accept_clean'} if join != 'review' else {})})
         if any(branch['status'] in {'QUEUED', 'RUNNING', 'RECOVERING'} for branch in branches):
             return call('finish_turn', {'outcome': 'WAITING_JOBS', 'summary': '等待已持久派发的并行分析'})
         if any(branch['status'] != 'ACCEPTED' for branch in branches):
@@ -713,14 +742,20 @@ async def test_full_prelive_parallel_human_approval_audio_candidate_closed_loop(
         if not body['bundle_ref']:
             return call('build_context_bundle', {**base, 'product_refs': body['selected_product_refs'], 'analysis_refs': body['analysis_refs'], 'draft_ref': body['draft_ref'], 'recap_refs': [], 'source_refs': [], 'prior_script_refs': [], 'user_decisions': []})
         if not body['plan_ref']:
-            return call('save_script_change_plan', {**base, 'bundle_ref': body['bundle_ref'], 'items': [{'product_ref': p, 'variant_id': 'full-harness-variant', 'modules': [{'key': key, 'action': 'disable' if key in {'campaign', 'transition'} else 'generate'} for key in MODULE_KEYS]}]})
+            items = [{'product_ref': p, 'variant_id': 'full-harness-variant', 'modules': [{'key': key, 'action': 'disable' if key in {'campaign', 'transition'} else 'generate'} for key in MODULE_KEYS]}]
+            if join != 'review':
+                return call('wf_script_execution', {'action': 'plan_execute_wait', 'bundle_ref': body['bundle_ref'], 'items': items})
+            return call('save_script_change_plan', {**base, 'bundle_ref': body['bundle_ref'], 'items': items})
         obs = await service.query('read_completion_observation', {'preparation_id': prep_id})
         if obs['pending_job_ids']:
             return call('finish_turn', {'outcome': 'WAITING_JOBS', 'summary': '等待已经提交的业务生成任务'})
         if not body['script_refs']:
             return call('execute_script_plan', {**base, 'plan_ref': body['plan_ref'], 'context_bundle_ref': body['bundle_ref'], 'expected_generation_epoch': body['generation_epoch']})
         questions = [q for q in engine.store.list('question') if q['run_id'] == run['id']]
-        if not body['playlist_ref']:
+        workspace = await service.query('get_workspace_snapshot', {'preparation_id': prep_id})
+        items = workspace['preparation_details']['playlist']['body']['items']
+        assert [item['script_revision_ref'] for item in items] == body['script_refs']
+        if items[0]['occurrence_id'] != 'full-o1':
             if not any(q['kind'] == 'playlist_order' and q['status'] == 'ANSWERED' for q in questions):
                 return call('request_user_decision', {'kind': 'playlist_order', 'prompt': '本场仅此一商品版本，确认按该顺序播放？', 'context': {'playlist': {
                     'preparation_id': prep_id, 'items': [{'occurrence_id': 'full-o1', 'product_id': p['id'], 'script_revision_ref': body['script_refs'][0]}], 'loop_mode': 'infinite'}}})
@@ -761,6 +796,15 @@ async def test_full_prelive_parallel_human_approval_audio_candidate_closed_loop(
         assert {branch['role'] for branch in current['branches'] if branch['status'] == 'ACCEPTED'} == {'product_facts', 'session_config', 'audience_scenes'}
         prep = await service.query('read_preparation', {'preparation_id': current['scope']['preparation_id']})
         assert len(prep['body']['analysis_refs']) == 3
+        exact_results = [item['destination'] for item in current['artifacts'] if item['destination'].get('object_ref')]
+        audience = next(branch['accepted_ref'] for branch in current['branches'] if branch['role'] == 'audience_scenes')
+        assert [(item['view'], item['object_ref']) for item in exact_results] == [
+            ('insights', audience), ('session', prep['body']['draft_ref']),
+            ('overview', prep['body']['asset_checklist_ref']), ('scripts', prep['body']['script_refs'][0]),
+            ('scripts', prep['body']['playlist_ref']), ('scripts', prep['body']['audio_manifest_ref']),
+            ('scripts', prep['body']['candidate_publication_ref']),
+        ]
+        assert [item['room_section'] for item in exact_results] == ['insights', 'session', 'overview', 'scripts', 'scripts', 'scripts', 'scripts']
         bundle = await service.query('read_context', {'ref': prep['body']['bundle_ref']})
         assert len(bundle['body']['analysis_refs']) == 3
         assert len(bundle['body']['records']) >= 5
@@ -772,7 +816,73 @@ async def test_full_prelive_parallel_human_approval_audio_candidate_closed_loop(
         ended = [event for event in events if event['type'] == 'branch.prepared']
         assert len(started) == len(ended) == 3
         assert max(event['timestamp'] for event in started) < min(event['timestamp'] for event in ended), 'three branch lifetimes actually overlap'
+        auto = [e for e in events if e['type'] == 'analysis.handoff']
+        manual = [e for e in events if e['type'] == 'tool.completed' and e['data'].get('tool_name') == 'accept_analysis_reports']
+        assert (len(auto), len(manual)) == ((1, 0) if join == 'accept_clean' else (0, 1))
+        assert not any(e['type'] == 'branch.failed' for e in events)
+        print('PARALLEL_REPLAY', json.dumps({'join': join, 'main_intent': model_calls.count(('intent', 'main')),
+            'main_execute': model_calls.count(('execute', 'main')),
+            'branch_calls': sum(role != 'main' for _, role in model_calls),
+            'script_adapter_calls': adapter.generated,
+            'elapsed_seconds': round(asyncio.get_running_loop().time() - started_at, 3)}))
         assert any(event['type'] == 'tool.completed' and event['data'].get('tool_name') == 'prepare_required_audio' for event in events)
         assert all(not str(path).endswith('.env') for path in tmp_path.rglob('*'))
     finally:
         await engine.stop()
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("action", ["create", "update"])
+async def test_catalog_document_entry_cannot_cross_write_boundary(env, action):
+    engine, service = env
+    target = await product(service, "待更新商品")
+    unrelated = await product(service, "其他商品")
+    target_id = target["id"] if action == "update" else None
+    conversation = engine.create_conversation({"scope": {"kind": "catalog"}})
+    upload = engine.accept_material(conversation["id"], "facts.txt", "text/plain", b"Isolated product data")
+    text = "从资料更新选中商品" if target_id else "从资料新增商品"
+    request = MessageRequest(
+        text=text, client_request_id="catalog-documents", intent_mode="new_task",
+        material_refs=[upload["material_ref"]],
+        view_context={"view": "products", "product_material_action": action, "product_id": target_id},
+        selection={"target": {"object_ref": target}} if target_id else None,
+        observed_versions=[target] if target_id else [],
+    )
+    with pytest.raises(ContractError, match="PRODUCT_MATERIAL_TARGET_INVALID"):
+        await engine.submit_message(conversation["id"], request.model_copy(update={
+            "view_context": {**request.view_context, "product_id": unrelated["id"]}}))
+    assert not engine.store.list("run")
+    accepted = await engine.submit_message(conversation["id"], request)
+    assert await engine.submit_message(conversation["id"], request) == accepted
+    run = engine.store.get("run", accepted["run"]["id"])
+    assess = IntentAssessment(objective="catalog_update", summary=text, authorization_quote=text)
+    invalid_assess = assess.model_copy(update={"target_product_ids": [unrelated["id"]]})
+    with pytest.raises(ContractError, match="PRODUCT_MATERIAL_INTENT_DENIED"):
+        engine.save_assessment(RunScope(run["id"], "catalog-docs-intent", "intent"), invalid_assess.model_dump())
+    run = engine.store.update("run", run["id"], intent_assessment=assess.model_dump())
+    await engine._freeze_goal(run)
+    scope = RunScope(run["id"], "catalog-docs-write", "execute")
+    args = {"fields": Product(name="全新商品", price=39).model_dump(),
+            "schema_hash": service.schema()["schema_hash"], "patches": []}
+    if action == "create":
+        with pytest.raises(ContractError, match="PRODUCT_MATERIAL_CREATE_ONLY"):
+            await engine.business_command(scope, "save_product", {
+                **args, "product_id": target["id"], "expected_revision": target["revision"]}, "wrong-write")
+        result = await engine.business_command(scope, "save_product", args, "right-write")
+        assert result["data"]["created"]
+    else:
+        with pytest.raises(ContractError, match="PRODUCT_MATERIAL_UPDATE_ONLY"):
+            await engine.business_command(scope, "save_product", args, "wrong-create")
+        with pytest.raises(ContractError, match="PRODUCT_MATERIAL_UPDATE_ONLY"):
+            await engine.business_command(scope, "save_product", {
+                **args, "product_id": unrelated["id"], "expected_revision": unrelated["revision"]}, "wrong-product")
+        body = (await service.query("read_product", {"product_id": target_id}))["body"]
+        fields = {key: body[key] for key in Product.model_fields if key in body}
+        fields["price"] = 49
+        result = await engine.business_command(scope, "save_product", {
+            **args, "fields": fields, "product_id": target_id, "expected_revision": target["revision"],
+            "patches": [{"path": "/price", "op": "set", "value": 49}]}, "right-write")
+        assert result["data"]["product_ref"]["id"] == target_id
+        assert result["data"]["product_ref"]["revision"] == target["revision"] + 1
+    assert (await service.query("read_product", {"product_id": unrelated["id"]}))["ref"] == unrelated
+

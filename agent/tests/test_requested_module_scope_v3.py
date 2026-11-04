@@ -145,6 +145,44 @@ async def test_explicit_campaign_scope_can_patch_campaign_and_preserves_other_te
 
 
 @pytest.mark.asyncio
+async def test_explicit_campaign_scope_keeps_module_writer_available(env):
+    engine, service = env
+    target, room, prep, before = await baseline(service)
+    _, scope = await freeze(engine, target, room, prep, before)
+    actions = []
+    for key, ref in before['body']['module_refs'].items():
+        if key == 'campaign':
+            actions.append({'key': key, 'action': 'generate', 'instruction': '用本次明确要求的新活动文案。'})
+        elif ref:
+            actions.append({'key': key, 'action': 'reuse', 'base_module_ref': ref})
+        else:
+            actions.append({'key': key, 'action': 'disable'})
+    calls = []
+
+    async def generate_module(context, key, product, previous):
+        calls.append(key)
+        return ['本次选定活动模块的隔离测试正文。']
+
+    service.adapter.generate_module = generate_module
+    saved = await engine.business_command(scope, 'save_script_plan', {'preparation_id': prep['ref']['id'],
+        'expected_revision': prep['ref']['revision'], 'bundle_ref': prep['body']['bundle_ref'],
+        'items': [{'product_ref': target, 'variant_id': before['body']['variant_id'], 'base_script_ref': before['ref'],
+            'generation_mode': 'module', 'modules': actions}]}, 'local-campaign-plan')
+    submitted = await engine.business_command(scope, 'submit_script_change', {'preparation_id': prep['ref']['id'],
+        'expected_revision': saved['data']['preparation_ref']['revision'], 'plan_ref': saved['data']['script_plan_ref'],
+        'context_bundle_ref': prep['body']['bundle_ref'], 'expected_generation_epoch': saved['data']['generation_epoch']},
+        'local-campaign-submit')
+    await service.drain_jobs()
+    job = await service.query('read_job', {'job_id': submitted['data']['job_id']})
+    assert job['body']['status'] == 'succeeded', job
+    current = await service.query('read_preparation', {'preparation_id': prep['ref']['id']})
+    after = await service.query('read_script', {'ref': current['body']['script_refs'][0]})
+    assert calls == ['campaign']
+    assert after['body']['parent_ref'] == before['ref']
+    assert_untouched_modules(before, after)
+
+
+@pytest.mark.asyncio
 async def test_exact_ui_module_remains_narrower_than_requested_modules_and_grant(env):
     engine, service = env
     target, room, prep, before = await baseline(service)

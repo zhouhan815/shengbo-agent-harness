@@ -2056,6 +2056,85 @@
           ],
           "title": "ScriptPlanItem",
           "type": "object"
+        },
+        "ScriptRecapDisposition": {
+          "additionalProperties": false,
+          "properties": {
+            "recap_ref": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/RecordRef"
+                },
+                {
+                  "$ref": "#/$defs/ArtifactRef"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "description": "所采用或处置的精确复盘引用；同名意见有多份时必填。",
+              "title": "Recap Ref"
+            },
+            "finding_id": {
+              "maxLength": 200,
+              "minLength": 1,
+              "title": "Finding Id",
+              "type": "string"
+            },
+            "action": {
+              "enum": [
+                "apply",
+                "partial",
+                "reject",
+                "defer",
+                "already_covered"
+              ],
+              "title": "Action",
+              "type": "string"
+            },
+            "reason": {
+              "description": "处置理由；部分采用时写清只采用什么。",
+              "maxLength": 2000,
+              "minLength": 1,
+              "title": "Reason",
+              "type": "string"
+            },
+            "target_modules": {
+              "description": "采用或部分采用时填本次计划里确实生成或修改的模块。",
+              "items": {
+                "enum": [
+                  "opening_long",
+                  "opening_short",
+                  "product_intro",
+                  "selling_points",
+                  "campaign",
+                  "cta",
+                  "transition"
+                ],
+                "type": "string"
+              },
+              "maxItems": 7,
+              "title": "Target Modules",
+              "type": "array"
+            },
+            "target_product_ids": {
+              "description": "只适用于部分本次商品时填写真实ID；未填写时作用于本次计划中所列模块。",
+              "items": {
+                "type": "string"
+              },
+              "maxItems": 64,
+              "title": "Target Product Ids",
+              "type": "array"
+            }
+          },
+          "required": [
+            "finding_id",
+            "action",
+            "reason"
+          ],
+          "title": "ScriptRecapDisposition",
+          "type": "object"
         }
       },
       "additionalProperties": false,
@@ -2096,8 +2175,7 @@
         },
         "recap_dispositions": {
           "items": {
-            "additionalProperties": true,
-            "type": "object"
+            "$ref": "#/$defs/ScriptRecapDisposition"
           },
           "title": "Recap Dispositions",
           "type": "array"
@@ -3130,6 +3208,194 @@
       "title": "PreviewAudioArgs",
       "type": "object"
     },
+    "approve_missing_audio_reissue": {
+      "$defs": {
+        "ArtifactRef": {
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "title": "Kind",
+              "type": "string"
+            },
+            "id": {
+              "title": "Id",
+              "type": "string"
+            },
+            "revision": {
+              "minimum": 1,
+              "title": "Revision",
+              "type": "integer"
+            },
+            "content_hash": {
+              "title": "Content Hash",
+              "type": "string"
+            },
+            "schema_version": {
+              "default": "PRELIVE-2.3",
+              "title": "Schema Version",
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind",
+            "id",
+            "revision",
+            "content_hash"
+          ],
+          "title": "ArtifactRef",
+          "type": "object"
+        },
+        "RecordRef": {
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "title": "Kind",
+              "type": "string"
+            },
+            "id": {
+              "title": "Id",
+              "type": "string"
+            },
+            "revision": {
+              "minimum": 1,
+              "title": "Revision",
+              "type": "integer"
+            },
+            "content_hash": {
+              "title": "Content Hash",
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind",
+            "id",
+            "revision",
+            "content_hash"
+          ],
+          "title": "RecordRef",
+          "type": "object"
+        },
+        "UnknownAudioItem": {
+          "additionalProperties": false,
+          "properties": {
+            "item_id": {
+              "maxLength": 200,
+              "minLength": 1,
+              "title": "Item Id",
+              "type": "string"
+            },
+            "requirement_id": {
+              "maxLength": 200,
+              "minLength": 1,
+              "title": "Requirement Id",
+              "type": "string"
+            },
+            "unknown_attempt_ids": {
+              "items": {
+                "type": "string"
+              },
+              "maxItems": 20,
+              "minItems": 1,
+              "title": "Unknown Attempt Ids",
+              "type": "array"
+            }
+          },
+          "required": [
+            "item_id",
+            "requirement_id",
+            "unknown_attempt_ids"
+          ],
+          "title": "UnknownAudioItem",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "description": "Human accepts possible extra billing for these exact lost requests only.",
+      "properties": {
+        "preparation_id": {
+          "title": "Preparation Id",
+          "type": "string"
+        },
+        "expected_revision": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Expected Revision"
+        },
+        "approval_ref": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/RecordRef"
+            },
+            {
+              "$ref": "#/$defs/ArtifactRef"
+            }
+          ],
+          "title": "Approval Ref"
+        },
+        "review_hash": {
+          "title": "Review Hash",
+          "type": "string"
+        },
+        "expected_generation_epoch": {
+          "title": "Expected Generation Epoch",
+          "type": "integer"
+        },
+        "source_job_ref": {
+          "$ref": "#/$defs/RecordRef"
+        },
+        "requirements_ref": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/RecordRef"
+            },
+            {
+              "$ref": "#/$defs/ArtifactRef"
+            }
+          ],
+          "title": "Requirements Ref"
+        },
+        "unknown_items": {
+          "items": {
+            "$ref": "#/$defs/UnknownAudioItem"
+          },
+          "maxItems": 10,
+          "minItems": 1,
+          "title": "Unknown Items",
+          "type": "array"
+        },
+        "binding_hash": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Binding Hash",
+          "type": "string"
+        },
+        "authorization_quote": {
+          "maxLength": 6000,
+          "minLength": 1,
+          "title": "Authorization Quote",
+          "type": "string"
+        }
+      },
+      "required": [
+        "preparation_id",
+        "approval_ref",
+        "review_hash",
+        "expected_generation_epoch",
+        "source_job_ref",
+        "requirements_ref",
+        "unknown_items",
+        "binding_hash",
+        "authorization_quote"
+      ],
+      "title": "ApproveMissingAudioReissueArgs",
+      "type": "object"
+    },
     "approve_script_audio_preview": {
       "$defs": {
         "ArtifactRef": {
@@ -4119,6 +4385,123 @@
           "summary"
         ],
         "title": "AnalysisReport",
+        "type": "object"
+      },
+      "ApproveMissingAudioReissueArgs": {
+        "additionalProperties": false,
+        "description": "Human accepts possible extra billing for these exact lost requests only.",
+        "properties": {
+          "preparation_id": {
+            "title": "Preparation Id",
+            "type": "string"
+          },
+          "expected_revision": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Expected Revision"
+          },
+          "approval_ref": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/RecordRef"
+              },
+              {
+                "$ref": "#/$defs/ArtifactRef"
+              }
+            ],
+            "title": "Approval Ref"
+          },
+          "review_hash": {
+            "title": "Review Hash",
+            "type": "string"
+          },
+          "expected_generation_epoch": {
+            "title": "Expected Generation Epoch",
+            "type": "integer"
+          },
+          "source_job_ref": {
+            "$ref": "#/$defs/RecordRef"
+          },
+          "requirements_ref": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/RecordRef"
+              },
+              {
+                "$ref": "#/$defs/ArtifactRef"
+              }
+            ],
+            "title": "Requirements Ref"
+          },
+          "unknown_items": {
+            "items": {
+              "$ref": "#/$defs/UnknownAudioItem"
+            },
+            "maxItems": 10,
+            "minItems": 1,
+            "title": "Unknown Items",
+            "type": "array"
+          },
+          "binding_hash": {
+            "pattern": "^sha256:[0-9a-f]{64}$",
+            "title": "Binding Hash",
+            "type": "string"
+          },
+          "authorization_quote": {
+            "maxLength": 6000,
+            "minLength": 1,
+            "title": "Authorization Quote",
+            "type": "string"
+          }
+        },
+        "required": [
+          "preparation_id",
+          "approval_ref",
+          "review_hash",
+          "expected_generation_epoch",
+          "source_job_ref",
+          "requirements_ref",
+          "unknown_items",
+          "binding_hash",
+          "authorization_quote"
+        ],
+        "title": "ApproveMissingAudioReissueArgs",
+        "type": "object"
+      },
+      "ApproveMissingAudioReissueCommand": {
+        "additionalProperties": false,
+        "properties": {
+          "contract_version": {
+            "const": "PRELIVE-2.3",
+            "default": "PRELIVE-2.3",
+            "title": "Contract Version",
+            "type": "string"
+          },
+          "command": {
+            "const": "approve_missing_audio_reissue",
+            "title": "Command",
+            "type": "string"
+          },
+          "args": {
+            "$ref": "#/$defs/ApproveMissingAudioReissueArgs"
+          },
+          "mutation": {
+            "$ref": "#/$defs/MutationContext"
+          }
+        },
+        "required": [
+          "command",
+          "args",
+          "mutation"
+        ],
+        "title": "ApproveMissingAudioReissueCommand",
         "type": "object"
       },
       "ApproveScriptAudioPreviewArgs": {
@@ -6622,8 +7005,7 @@
           },
           "recap_dispositions": {
             "items": {
-              "additionalProperties": true,
-              "type": "object"
+              "$ref": "#/$defs/ScriptRecapDisposition"
             },
             "title": "Recap Dispositions",
             "type": "array"
@@ -6776,6 +7158,85 @@
           "modules"
         ],
         "title": "ScriptPlanItem",
+        "type": "object"
+      },
+      "ScriptRecapDisposition": {
+        "additionalProperties": false,
+        "properties": {
+          "recap_ref": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/RecordRef"
+              },
+              {
+                "$ref": "#/$defs/ArtifactRef"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "所采用或处置的精确复盘引用；同名意见有多份时必填。",
+            "title": "Recap Ref"
+          },
+          "finding_id": {
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Finding Id",
+            "type": "string"
+          },
+          "action": {
+            "enum": [
+              "apply",
+              "partial",
+              "reject",
+              "defer",
+              "already_covered"
+            ],
+            "title": "Action",
+            "type": "string"
+          },
+          "reason": {
+            "description": "处置理由；部分采用时写清只采用什么。",
+            "maxLength": 2000,
+            "minLength": 1,
+            "title": "Reason",
+            "type": "string"
+          },
+          "target_modules": {
+            "description": "采用或部分采用时填本次计划里确实生成或修改的模块。",
+            "items": {
+              "enum": [
+                "opening_long",
+                "opening_short",
+                "product_intro",
+                "selling_points",
+                "campaign",
+                "cta",
+                "transition"
+              ],
+              "type": "string"
+            },
+            "maxItems": 7,
+            "title": "Target Modules",
+            "type": "array"
+          },
+          "target_product_ids": {
+            "description": "只适用于部分本次商品时填写真实ID；未填写时作用于本次计划中所列模块。",
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 64,
+            "title": "Target Product Ids",
+            "type": "array"
+          }
+        },
+        "required": [
+          "finding_id",
+          "action",
+          "reason"
+        ],
+        "title": "ScriptRecapDisposition",
         "type": "object"
       },
       "SourceManifestImport": {
@@ -7000,6 +7461,39 @@
         "title": "UndoMutationCommand",
         "type": "object"
       },
+      "UnknownAudioItem": {
+        "additionalProperties": false,
+        "properties": {
+          "item_id": {
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Item Id",
+            "type": "string"
+          },
+          "requirement_id": {
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Requirement Id",
+            "type": "string"
+          },
+          "unknown_attempt_ids": {
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 20,
+            "minItems": 1,
+            "title": "Unknown Attempt Ids",
+            "type": "array"
+          }
+        },
+        "required": [
+          "item_id",
+          "requirement_id",
+          "unknown_attempt_ids"
+        ],
+        "title": "UnknownAudioItem",
+        "type": "object"
+      },
       "UpdatePreparationProductsCommand": {
         "additionalProperties": false,
         "properties": {
@@ -7105,6 +7599,7 @@
       "mapping": {
         "accept_analysis_report": "#/$defs/AcceptAnalysisReportCommand",
         "adopt_snapshot": "#/$defs/AdoptSnapshotCommand",
+        "approve_missing_audio_reissue": "#/$defs/ApproveMissingAudioReissueCommand",
         "approve_script_audio_preview": "#/$defs/ApproveScriptAudioPreviewCommand",
         "approve_text_for_audio": "#/$defs/ApproveTextForAudioCommand",
         "cancel_job": "#/$defs/CancelJobCommand",
@@ -7208,6 +7703,9 @@
       },
       {
         "$ref": "#/$defs/PreviewAudioCommand"
+      },
+      {
+        "$ref": "#/$defs/ApproveMissingAudioReissueCommand"
       },
       {
         "$ref": "#/$defs/ApproveScriptAudioPreviewCommand"
@@ -8483,6 +8981,25 @@
       "title": "ReadAudioReadinessQueryArgs",
       "type": "object"
     },
+    "inspect_missing_audio_reissue": {
+      "additionalProperties": false,
+      "properties": {
+        "preparation_id": {
+          "title": "Preparation Id",
+          "type": "string"
+        },
+        "job_id": {
+          "title": "Job Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "preparation_id",
+        "job_id"
+      ],
+      "title": "InspectMissingAudioReissueQueryArgs",
+      "type": "object"
+    },
     "read_context": {
       "$defs": {
         "ArtifactRef": {
@@ -8665,6 +9182,42 @@
           },
           "title": "Sections",
           "type": "array"
+        },
+        "module_key": {
+          "anyOf": [
+            {
+              "enum": [
+                "opening_long",
+                "opening_short",
+                "product_intro",
+                "selling_points",
+                "campaign",
+                "cta",
+                "transition"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Module Key"
+        },
+        "sentence_ids": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Sentence Ids"
         }
       },
       "required": [
@@ -8961,6 +9514,20 @@
         }
       },
       "title": "CreateReviewQueryArgs",
+      "type": "object"
+    },
+    "read_start_readiness": {
+      "additionalProperties": false,
+      "properties": {
+        "preparation_id": {
+          "title": "Preparation Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "preparation_id"
+      ],
+      "title": "ReadStartReadinessQueryArgs",
       "type": "object"
     },
     "read_operation_receipt": {

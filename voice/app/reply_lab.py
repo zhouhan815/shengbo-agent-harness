@@ -15,10 +15,12 @@ import math
 import os
 import re
 import time
+from typing import Annotated, Literal
 import urllib.error
 import urllib.request
 
 from fastapi import HTTPException
+from pydantic import BaseModel, ConfigDict, Field, StringConstraints, ValidationError
 from .commerce_config import active_product_fields
 from .consumer_catalog import consumer_context_view
 
@@ -39,6 +41,23 @@ TOPICS = {
 }
 
 
+class ReplyCitation(BaseModel):
+    model_config = ConfigDict(strict=True, extra="forbid")
+    chunk_id: str = Field(min_length=1)
+    quote: str = Field(min_length=1)
+
+
+class ReplyOutput(BaseModel):
+    model_config = ConfigDict(strict=True, extra="forbid")
+    answer: Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=1000)]
+    status: Literal["answered", "needs_confirmation", "chat"]
+    citations: list[ReplyCitation] = Field(max_length=12)
+    missing_information: list[str] = Field(default_factory=list, max_length=8)
+
+
+REPLY_OUTPUT_SCHEMA = json.dumps(ReplyOutput.model_json_schema(), ensure_ascii=False, separators=(",", ":"))
+
+
 def srv():
     from . import server
     return server
@@ -49,7 +68,8 @@ def digest(value):
 
 
 def prompt():
-    return (srv().ROOT / "prompts/评论回复_当前.txt").read_text(encoding="utf-8")
+    guidance = (srv().ROOT / "prompts/评论回复_当前.txt").read_text(encoding="utf-8")
+    return guidance.rstrip() + "\n\n输出结构约束（JSON Schema）：\n" + REPLY_OUTPUT_SCHEMA
 
 
 def room_products(identity):
@@ -245,6 +265,19 @@ def choose_product(products, requested, text, history):
     return None
 
 
+def _unique_json_object(pairs):
+    result = {}
+    for key, value in pairs:
+        if key in result:
+            raise ValueError("duplicate JSON key")
+        result[key] = value
+    return result
+
+
+def _reject_json_constant(_value):
+    raise ValueError("non-finite JSON constant")
+
+
 def complete_remote(context, *, max_tokens=1800, timeout=65):
     key = os.environ.get("DEEPSEEK_API_KEY", "")
     if not key:
@@ -258,8 +291,9 @@ def complete_remote(context, *, max_tokens=1800, timeout=65):
               headers={"Authorization": "Bearer " + key, "Content-Type": "application/json"})
     try:
         with urllib.request.urlopen(request, timeout=timeout) as response:
-            data = json.load(response)
-        raw = json.loads(data["choices"][0]["message"]["content"])
+            data = json.load(response, object_pairs_hook=_unique_json_object, parse_constant=_reject_json_constant)
+        raw = json.loads(data["choices"][0]["message"]["content"],
+                         object_pairs_hook=_unique_json_object, parse_constant=_reject_json_constant)
     except urllib.error.HTTPError as e:
         raise RuntimeError(f"DeepSeek 请求失败（HTTP {e.code}）；请检查服务或账户后重试。") from None
     except Exception:
@@ -272,29 +306,24 @@ def compact(text):
 
 
 def validate_answer(raw, retrieval):
-    if not isinstance(raw, dict) or not isinstance(raw.get("answer"), str) or not 1 <= len(raw["answer"].strip()) <= 1000:
-        raise RuntimeError("模型回复格式不完整，请重试。")
-    status = raw.get("status")
-    if status not in {"answered", "needs_confirmation", "chat"} or not isinstance(raw.get("citations"), list):
-        raise RuntimeError("模型回复缺少状态或依据，请重试。")
+    try:
+        output = ReplyOutput.model_validate(raw)
+    except ValidationError:
+        raise RuntimeError("模型回复结构不符合要求；本次回答未发布，请重试。") from None
     allowed = {c["id"]: c for c in retrieval["chunks"]}
-    citations = []
-    for entry in raw["citations"][:12]:
-        if not isinstance(entry, dict) or entry.get("chunk_id") not in allowed:
+    for entry in output.citations:
+        if entry.chunk_id not in allowed:
             raise RuntimeError("模型引用了未检索到的来源；本次回答未发布，请重试。")
-        quote = entry.get("quote", "")
-        if not isinstance(quote, str) or len(compact(quote)) < 2 or compact(quote) not in compact(allowed[entry["chunk_id"]]["text"]):
+        quote = compact(entry.quote)
+        if len(quote) < 2 or quote not in compact(allowed[entry.chunk_id]["text"]):
             raise RuntimeError("模型引用原文无法核对；本次回答未发布，请重试。")
-        citations.append({"chunk_id": entry["chunk_id"], "quote": quote})
-    if status == "answered" and not citations:
+    if output.status == "answered" and not output.citations:
         raise RuntimeError("模型给出了商品结论但没有原文依据；请重试。")
-    if status == "chat" and not citations and re.search(r"\d+\s*(元|新台币|台币)|EVA|防滑|保温|包邮|一体成型", raw["answer"], re.I):
+    if output.status == "chat" and not output.citations and re.search(r"\d+\s*(元|新台币|台币)|EVA|防滑|保温|包邮|一体成型", output.answer, re.I):
         raise RuntimeError("模型在闲聊回复中加入了无引用的商品特点；请重试。")
-    missing = raw.get("missing_information", [])
-    if not isinstance(missing, list) or any(not isinstance(x, str) for x in missing):
-        raise RuntimeError("模型待确认信息格式错误，请重试。")
-    return {"answer": srv().SIMPLIFY(raw["answer"].strip()), "answer_status": status,
-            "citations": citations, "missing_information": missing[:8]}
+    return {"answer": srv().SIMPLIFY(output.answer), "answer_status": output.status,
+            "citations": [citation.model_dump() for citation in output.citations],
+            "missing_information": output.missing_information}
 
 
 def list_sessions(identity):

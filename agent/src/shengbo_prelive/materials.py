@@ -6,6 +6,8 @@ import csv
 import hashlib
 from io import BytesIO, StringIO
 import json
+import os
+from tempfile import NamedTemporaryFile
 from pathlib import Path
 import time
 import warnings
@@ -185,6 +187,11 @@ class MaterialStore:
         row, path = self._record(ref, conversation_id)
         manifest = json.loads(json.dumps(row["manifest"], ensure_ascii=False))
         text = manifest["text"]
+        if row["mime"] == "text/markdown" and section != "text:1":
+            from .material_markdown import markdown_locators
+
+            if projection := markdown_locators(text):
+                manifest.update(locators=projection, markdown_span_projection=True)
         if manifest.get("content_hints", {}).get("allowed_roles") is not None:
             from .material_roles import CONTENT_ROLES
             if manifest["content_hints"]["allowed_roles"] != list(CONTENT_ROLES):
@@ -241,10 +248,10 @@ class MaterialStore:
         return {"material_ref": row["artifact_ref"], "name": row["name"], "manifest": manifest, "text": text,
                 "file_ref": {"material_id": row["id"], "original_sha256": row["manifest"]["original_sha256"]}}
 
-    def validate_locators(self, ref, conversation_id, locators):
+    def validate_locators(self, ref, conversation_id, locators, *, quote_checks=None):
         """Validate source evidence positions with one ownership/hash check.
 
-        This checks coordinates only, not whether a quote supports a claim.
+        Optional quote checks verify exact text, without interpreting a claim.
         Reader control views (full/overview/index pages) are never evidence.
         """
         row, _ = self._record(ref, conversation_id)
@@ -255,15 +262,33 @@ class MaterialStore:
         if any(x in reserved or x == "visual_workset" or x.startswith(("image_index:", "locator_index:", "visual_workset:", "ocr:")) for x in requested):
             _fail("MATERIAL_SECTION_NOT_FOUND", "概览、全文控制项和索引页不能作为事实证据位置", status=404)
         existing = set()
-        for item in row["manifest"].get("locators", []):
-            existing.add(item["id"])
-            for key in ("sheet_id", "table_id"):
-                if item.get(key):
-                    existing.add(item[key])
+        quoted_locations = {locator: [] for locator, _ in quote_checks or ()}
+        manifest = row["manifest"]
+        available = manifest.get("locators", [])
+        if row["mime"] == "text/markdown" and any(position.startswith("md:") for position in requested):
+            from .material_markdown import markdown_locators
+
+            available = [*available, *markdown_locators(manifest["text"])]
+        for item in available:
+            positions = {item[key] for key in ("id", "sheet_id", "table_id") if item.get(key)}
+            existing.update(positions)
+            for position in positions & quoted_locations.keys():
+                quoted_locations[position].append(item)
         if requested - existing:
             _fail("MATERIAL_SECTION_NOT_FOUND", "未找到对应原文定位", status=404)
-        return {"material_ref": row["artifact_ref"], "locator_count": len(requested),
+        result = {"material_ref": row["artifact_ref"], "locator_count": len(requested),
                 "requested_locator_count": len(locators), "semantic_support_verified": False}
+        if quote_checks is not None:
+            texts = {}
+            for locator, items in quoted_locations.items():
+                text = "\n".join(item.get("text", "") for item in items)
+                # Images or scanned pages can carry visual evidence. There is
+                # no text match to claim when the immutable manifest has none.
+                visual_only = bool(items) and all(item.get("kind") in {"image", "page"} for item in items) and not text.strip()
+                texts[locator] = None if visual_only else text
+            result["quote_mismatch_indexes"] = [index for index, (locator, quote) in enumerate(quote_checks)
+                if texts[locator] is not None and quote not in texts[locator]]
+        return result
 
     def _overview(self, row, manifest):
         """Bounded index with exact next-read arguments, never the entire body."""
@@ -321,6 +346,37 @@ class MaterialStore:
         if "sha256:" + hashlib.sha256(data).hexdigest() != row["manifest"]["original_sha256"]:
             _fail("MATERIAL_BLOB_INTEGRITY_FAILED")
         return data
+
+    def restore_same_original(self, original, uploaded, conversation_id):
+        """Restore exact bytes behind the frozen manifest; never change the reference."""
+        ref = ArtifactRef.model_validate(original).model_dump(mode="json")
+        row = self.store.get("material", ref["id"])
+        if (row["conversation_id"] != conversation_id or row["artifact_ref"] != ref
+                or canonical_hash(row["manifest"]) != ref["content_hash"]):
+            _fail("MATERIAL_REVISION_MISMATCH")
+        data = self.blob_bytes(uploaded, conversation_id)
+        digest = "sha256:" + hashlib.sha256(data).hexdigest()
+        if digest != row["manifest"]["original_sha256"]:
+            _fail("RECOVERY_SOURCE_MISMATCH", "重新上传的文件与锁定原件不同。")
+        path = Path(row["path"]).resolve()
+        if path.parent != self.root or path.stem != row["id"]:
+            _fail("MATERIAL_STORAGE_INVALID")
+        if path.is_file() and "sha256:" + hashlib.sha256(path.read_bytes()).hexdigest() == digest:
+            return
+        with NamedTemporaryFile(dir=self.root, prefix=".restore-", delete=False) as handle:
+            staged = Path(handle.name)
+            try:
+                handle.write(data)
+                handle.flush()
+                os.fsync(handle.fileno())
+            except Exception:
+                handle.close()
+                staged.unlink(missing_ok=True)
+                raise
+        try:
+            os.replace(staged, path)
+        finally:
+            staged.unlink(missing_ok=True)
 
     def image_messages(self, ref, conversation_id, section=None):
         row, path = self._record(ref, conversation_id)
