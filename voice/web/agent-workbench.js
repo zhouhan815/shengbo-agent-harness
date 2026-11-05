@@ -993,12 +993,27 @@
   }
   $('execution-editor').addEventListener('input', heading);
   $('execution-editor').addEventListener('change', heading);
+  async function welcomeAction(action) {
+    if (action === 'catalog') {
+      await navigate({ view: 'products', product_id: null, preparation_id: null, room_id: null });
+      document.querySelector('[data-open-product-upload]')?.click();
+      return;
+    }
+    if (context.room_id && context.preparation_id) {
+      await navigate({ view: action === 'session' ? 'session' : 'scripts',
+        room_id: context.room_id, preparation_id: context.preparation_id, product_id: null,
+        action: action === 'scripts' ? 'script_generation' : null });
+      return;
+    }
+    await navigate({ view: 'rooms', room_id: null, preparation_id: null, product_id: null });
+    if (action === 'scripts') notice('先进入一个直播间，再到「话术与排序」选择商品并生成。');
+  }
   assistant = global.ShengboAssistant.mount({
-    container: $('assistant-container'), title: '播前 Agent', subtitle: '整理资料、修改内容、查看保存结果',
+    container: $('assistant-container'), subtitle: '整理资料、修改内容、查看保存结果',
     storageKey: 'shengbo-agent-workbench-v2', getViewContext: () => clone(context),
     onNavigate: dest => navigate({ ...dest, refresh: true }).catch(e => notice(e.message)),
     onResult: dest => openArtifact(dest),
-    beforeSend, getObservedVersions: observed, onState: assistantState
+    beforeSend, getObservedVersions: observed, onState: assistantState, onWelcomeAction: welcomeAction
   });
   const toRoomList = () => navigate({ view: 'rooms', room_id: null, preparation_id: null, product_id: null }).catch(e => notice(e.message));
   $('room-back-list').addEventListener('click', toRoomList);

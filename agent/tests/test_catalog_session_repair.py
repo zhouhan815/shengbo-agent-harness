@@ -1,4 +1,4 @@
-"""Ensure a rejected session field does not cause accepted products to be extracted again."""
+"""Session import retains source-proved fields in the initial extraction."""
 import asyncio
 import json
 from io import BytesIO
@@ -17,14 +17,12 @@ from test_runtime_business import env
 
 
 @pytest.mark.asyncio
-@pytest.mark.parametrize("patch_valid", [True, False])
-async def test_catalog_session_repairs_window_without_regenerating_products(env, patch_valid):
+@pytest.mark.parametrize("model_supplied_wrong_window", [True, False])
+async def test_catalog_session_projects_window_without_regenerating_products(env, model_supplied_wrong_window):
     engine, service = env
     await engine.start()
     heading = "直播活动"
     window = "2026 年 11 月 11 日 20:00 至 23:59，北京时间。"
-    initial = {}
-
     class SessionModel:
         calls = []
 
@@ -35,21 +33,11 @@ async def test_catalog_session_repairs_window_without_regenerating_products(env,
         async def ainvoke(self, messages):
             inputs = json.loads(messages[-1].content)
             self.calls.append(self.tool)
-            if self.tool == TOOL_NAME:
-                source = next(row for row in inputs["source_material"] if window in row["text"])
-                title = next(row for row in inputs["source_material"] if heading in row["text"])
-                initial.update(location=source["location"], quote=window,
-                               start="2026-11-11T10:00:00+08:00", end="2026-11-11T23:59:00+08:00")
-                result = {**report_json(inputs), "session": {
-                    "theme": {"location": title["location"], "quote": heading}, "window": initial}}
-            else:
-                assert self.tool == "repair_catalog_session"
-                assert "existing_products" not in inputs and "products" not in inputs
-                assert inputs["allowed_fields"] == ["window"]
-                assert inputs["issues"][0]["path"] == ["window", "start"]
-                result = {"session": {"window": {**initial, "start": "2026-11-11T20:00:00+08:00"}}}
-                if not patch_valid:
-                    result["session"]["theme"] = None
+            assert self.tool == TOOL_NAME
+            session = {"theme": heading}
+            if model_supplied_wrong_window:
+                session["window"] = {"start": "2026-11-11T10:00:00+08:00", "end": "2026-11-11T23:59:00+08:00"}
+            result = {**report_json(inputs), "session": session}
             return SimpleNamespace(tool_calls=[{"name": self.tool, "args": result}])
 
     engine.model = SessionModel()
@@ -76,13 +64,10 @@ async def test_catalog_session_repairs_window_without_regenerating_products(env,
             await asyncio.sleep(.05)
     assert current["status"] == "COMPLETED", current.get("error")
     result = current["document_import_result"]
-    assert engine.model.calls == [TOOL_NAME, "repair_catalog_session"]
+    assert engine.model.calls == [TOOL_NAME]
     products = (await service.query("search_products", {}))["items"]
     assert len(products) == 1 and products[0]["sku_id"] == "RECOVER-SKU-1"
     saved = await _draft(service, result)
     assert saved["theme"] == heading
-    if patch_valid:
-        assert saved["campaign_starts_at"] == "2026-11-11T20:00:00+08:00"
-    else:
-        assert not saved.get("campaign_starts_at")
-        assert any("活动起止" in gap for gap in result["missing_fields"])
+    assert saved["campaign_starts_at"] == "2026-11-11T20:00:00+08:00"
+    assert saved["campaign_ends_at"] == "2026-11-11T23:59:00+08:00"

@@ -50,7 +50,7 @@ _PROMOTION_SECTION = re.compile(
     r"(?:本场|当场|限时|双十一|双十二)(?:活动|优惠|促销)|促销(?:活动|优惠)?|活动与促销)"
     r"(?:信息|规则|说明)?$")
 _SESSION_SECTION = re.compile(
-    r"^(?:#{1,6}\s*)?本场(?:知识文档|口播|播放|话术|演示|配置|直播设置|直播排期)"
+    r"^(?:#{1,6}\s*)?(?:直播间)?本场(?:知识文档|口播|播放|话术|演示|配置|直播设置|直播排期)"
     r"(?:(?:与|及|和)(?:知识文档|口播|播放|话术|演示|配置|直播设置|直播排期))?(?:安排|说明|要求)?$")
 SESSION_SOURCE_REASONS = {"session_promotion", "session_configuration"}
 _MARKDOWN_SECTION = re.compile(r"^#{1,6}\s+\S")

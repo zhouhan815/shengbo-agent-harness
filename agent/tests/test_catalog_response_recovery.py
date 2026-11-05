@@ -11,7 +11,6 @@ from shengbo_prelive.api import create_app
 from shengbo_prelive.catalog_extract import TOOL_NAME
 from shengbo_prelive.catalog_intake import BASIC_CREATE_REQUEST
 from shengbo_prelive.models import AnswerRequest, MessageRequest
-from shengbo_prelive.providers.chatgpt import ModelProviderError
 from shengbo_prelive.providers.deepseek import DeepSeekAgentModel
 from shengbo_prelive.store import TERMINAL
 from test_runtime_business import env, human_command
@@ -32,13 +31,33 @@ def report_json(inputs):
     }
 
 
-async def submit_and_wait(engine, content, *, filename="source.txt", mime="text/plain"):
+def facts_json(**fields):
+    return {"products": [{**FIELDS, **fields}], "questions": []}
+
+
+def json_stream(index, value, *, tool=None):
+    if tool:
+        delta = {"tool_calls": [{"index": 0, "id": f"fixture-tool-{index}", "type": "function",
+                  "function": {"name": tool, "arguments": json.dumps(value, ensure_ascii=False)}}]}
+    else:
+        delta = {"content": value if isinstance(value, str) else json.dumps(value, ensure_ascii=False)}
+    events = [{"id": f"fixture-{index}", "choices": [{"delta": delta}]},
+              {"choices": [{"delta": {}, "finish_reason": "tool_calls" if tool else "stop"}]},
+              {"choices": [], "usage": {"prompt_tokens": 30, "completion_tokens": 40, "total_tokens": 70}}]
+    return httpx.Response(200, headers={"content-type": "text/event-stream"},
+        text="".join("data: " + json.dumps(event) + "\n\n" for event in events) + "data: [DONE]\n\n")
+
+
+async def submit_and_wait(engine, content, *, filename="source.txt", mime="text/plain", create_room=False):
     conversation = engine.create_conversation({"scope": {"kind": "catalog"}})
     data = content.encode() if isinstance(content, str) else content
     source = engine.accept_material(conversation["id"], filename, mime, data)["material_ref"]
+    view = {"view": "products", "product_material_action": "create"}
+    if create_room:
+        view["catalog_create_room"] = True
     result = await engine.submit_message(conversation["id"], MessageRequest(
         text=BASIC_CREATE_REQUEST, client_request_id="catalog-response-recovery", intent_mode="new_task",
-        material_refs=[source], view_context={"view": "products", "product_material_action": "create"}))
+        material_refs=[source], view_context=view))
     identity = result["run"]["id"]
     async with asyncio.timeout(8):
         while True:
@@ -61,11 +80,7 @@ async def test_catalog_resumes_initial_extract_after_provider_error_with_human_c
             if unknown:
                 raise httpx.ReadError("fixture connection interrupted", request=request)
             return httpx.Response(402, json={"error": {"message": "Insufficient Balance"}})
-        content = json.dumps(report_json(inputs), ensure_ascii=False)
-        events = [{"id": "recharged", "choices": [{"delta": {"content": content}}]},
-                  {"choices": [{"delta": {}, "finish_reason": "stop"}]}]
-        return httpx.Response(200, headers={"content-type": "text/event-stream"},
-            text="".join("data: " + json.dumps(event) + "\n\n" for event in events) + "data: [DONE]\n\n")
+        return json_stream(len(requests), facts_json())
 
     await engine.start()
     engine.model = DeepSeekAgentModel(async_transport=httpx.MockTransport(respond), key_reader=lambda: "fixture",
@@ -102,8 +117,8 @@ async def test_missing_currency_pauses_then_reuses_exact_draft_without_new_model
 
         async def ainvoke(self, messages):
             sends.append(1)
-            result = report_json(json.loads(messages[-1].content))
-            result["products"][0]["fields"] = {key: value for key, value in FIELDS.items() if key != "currency"}
+            result = facts_json()
+            result["products"][0].pop("currency")
             return SimpleNamespace(tool_calls=[{"name": TOOL_NAME, "args": result}])
 
     await engine.start()
@@ -136,60 +151,77 @@ async def test_missing_currency_pauses_then_reuses_exact_draft_without_new_model
 
 
 @pytest.mark.asyncio
-@pytest.mark.parametrize("needs_hint", [False, True])
-async def test_evidence_recovery_only_patches_failed_links_and_can_resume_after_hint(env, needs_hint):
-    from shengbo_prelive.catalog_extract import EVIDENCE_REPAIR_TOOL
-
+@pytest.mark.parametrize("legacy", [False, True])
+async def test_citation_or_coverage_gaps_do_not_trigger_a_second_request(env, legacy):
     engine, service = env
     sends = []
 
     class Model:
         def bind_tools(self, tools, **kwargs):
-            self.tool, = [item["function"]["name"] for item in tools]
-            assert self.tool in {TOOL_NAME, EVIDENCE_REPAIR_TOOL}
+            assert [item["function"]["name"] for item in tools] == [TOOL_NAME]
             return self
 
         async def ainvoke(self, messages):
-            inputs = json.loads(messages[-1].content)
-            sends.append(self.tool)
-            if self.tool == TOOL_NAME:
-                result = report_json(inputs)
-                row = result["products"][0]
-                row["evidence"] = [link for link in row["evidence"] if "name" not in link["fields"]]
-            else:
-                scope, = inputs["candidates_needing_evidence"].values()
-                assert scope["fields"] == {"name": FIELDS["name"]}
-                assert "source_material" not in inputs
-                if needs_hint and "user_location_hint" not in inputs:
-                    result = {"evidence": {}}
-                else:
-                    location = next(key for key, excerpts in scope["originals"].items()
-                                    if any(FIELDS["name"] in excerpt for excerpt in excerpts))
-                    result = {"evidence": {"0": [{"location": location, "quote": FIELDS["name"], "fields": ["name"]}]}}
-            return SimpleNamespace(tool_calls=[{"name": self.tool, "args": result}])
+            sends.append(TOOL_NAME)
+            result = facts_json()
+            if legacy:
+                result["products"] = [{"fields": FIELDS, "evidence": [{"location": "no-longer-required"}]}]
+                result["coverage"] = {"old-invalid-identifier": "missing"}
+            return SimpleNamespace(tool_calls=[{"name": TOOL_NAME, "args": result}])
 
     await engine.start()
     engine.model = Model()
-    rid, run = await submit_and_wait(engine, SOURCE_TEXT)
+    _, run = await submit_and_wait(engine, SOURCE_TEXT + "\n" + EXTRA + "。")
     question, = run["questions"]
-    if needs_hint:
-        assert question["kind"] == "catalog_evidence_clarification"
-        assert question["allow_text"] is True
-        assert not (await service.query("search_products", {}))["items"]
-        await engine.answer(question["id"], AnswerRequest(question_revision=question["revision"],
-            answer={"text": "请核对原文件第一行"}, client_request_id="evidence-location-hint"))
-        async with asyncio.timeout(8):
-            while True:
-                run = engine.get_run(rid)
-                pending = [item for item in run["questions"] if item["status"] == "OPEN"]
-                if pending or run["status"] in TERMINAL:
-                    break
-                await asyncio.sleep(.025)
-        question, = pending
     assert question["kind"] == "catalog_intake_approval"
+    assert not (await service.query("search_products", {}))["items"]
     candidate, = question["preview"]["items"]
     assert all(candidate["fields"][key] == value for key, value in FIELDS.items())
-    assert sends == [TOOL_NAME, *([EVIDENCE_REPAIR_TOOL] * (3 if needs_hint else 1))]
+    assert sends == [TOOL_NAME]
+
+
+@pytest.mark.asyncio
+async def test_mixed_document_saves_catalog_and_session_from_one_facts_only_request(env):
+    engine, service = env
+    theme = "桌面收纳"
+    activity = "直播活动价：RECOVER-SKU-1 每件 24.90 元人民币。"
+    sends = []
+
+    def respond(request):
+        wire = json.loads(request.content)
+        assert not wire.get("tools")
+        inputs = json.loads(wire["messages"][-1]["content"])
+        schema = inputs["output_schema"]
+        assert set(schema["required"]) == {"products", "questions", "session"}
+        assert "evidence" not in schema["properties"]["products"]["items"]["properties"]
+        assert "coverage" not in schema["properties"]
+        session = {"theme": theme, "prices": [{"sku": FIELDS["sku_id"], "amount": 24.9}]}
+        sends.append(inputs)
+        return json_stream(len(sends), {**facts_json(), "session": session})
+
+    await engine.start()
+    engine.model = DeepSeekAgentModel(async_transport=httpx.MockTransport(respond), key_reader=lambda: "fixture",
+        before_send=engine._before_send, observer=engine._model_event, on_request=engine._model_request,
+        on_response=engine._model_response)
+    identity, current = await submit_and_wait(engine, f"{SOURCE_TEXT}\n本场主题：{theme}。\n{activity}", create_room=True)
+    question, = current["questions"]
+    assert question["kind"] == "catalog_intake_approval", current.get("error")
+    assert not (await service.query("search_products", {}))["items"]
+    await engine.answer(question["id"], AnswerRequest(question_revision=question["revision"],
+        answer="save_all", client_request_id="mixed-facts-save"))
+    async with asyncio.timeout(8):
+        while (current := engine.get_run(identity))["status"] not in TERMINAL:
+            await asyncio.sleep(.025)
+    assert current["status"] == "COMPLETED", current.get("error")
+    saved, = current["catalog_intake_result"]["products"]
+    product = (await service.query("read_product", {"ref": saved["product_ref"]}))["body"]
+    result = current["document_import_result"]
+    assert result["product_ids"] == [product["id"]]
+    draft = (await service.query("read_context", {"ref": result["draft_ref"], "sections": ["draft"]}))["body"]["draft"]
+    assert draft["theme"] == theme
+    assert draft["commerce"]["product_overrides"][product["id"]]["price"] == 24.9
+    assert product["price"] == 29.9 and product["promo_price"] is None
+    assert len(sends) == 1
 
 
 @pytest.mark.asyncio
@@ -203,13 +235,7 @@ async def test_catalog_completion_reports_actual_field_names_after_user_approval
             return self
 
         async def ainvoke(self, messages):
-            inputs = json.loads(messages[-1].content)
-            draft = report_json(inputs)
-            unit, = [unit for unit in inputs["source_units"] if unit["text"] == specification]
-            candidate, = draft["products"]
-            candidate["fields"] = {**candidate["fields"], "specifications": [{"name": "最大承重", "value": "8千克"}]}
-            candidate["evidence"].append({"location": unit["location"], "fields": ["specifications"]})
-            draft["coverage"][unit["id"]] = "*|specifications"
+            draft = facts_json(specifications=[{"name": "最大承重", "value": "8千克"}])
             return SimpleNamespace(tool_calls=[{"name": TOOL_NAME, "args": draft}])
 
     engine.model = Model()
@@ -263,126 +289,66 @@ async def test_catalog_completion_reports_actual_field_names_after_user_approval
 
 
 @pytest.mark.asyncio
-@pytest.mark.parametrize(("responses", "expected_calls", "expected_error"), [
-    (("valid",), 1, None),
-    (("malformed_call", "valid"), 2, None),
-    (("missing_keys", "valid"), 2, None),
-    (("malformed_call", "missing_keys", "valid"), 3, None),
-    (("unknown_send",), 1, "model_tool_call_invalid"),
-])
-async def test_standard_catalog_bounds_response_correction_and_recovers_known_exhaustion(env, responses, expected_calls, expected_error):
+@pytest.mark.parametrize("first_result", ["normal", "blank", "malformed_json", "malformed_shape"])
+async def test_deepseek_catalog_json_uses_one_request_except_for_unusable_extraction(env, first_result):
     engine, service = env
     await engine.start()
-    calls = []
-
-    class Model:
-        def bind_tools(self, tools, **kwargs):
-            self.tool, = (item["function"]["name"] for item in tools)
-            assert self.tool == TOOL_NAME
-            return self
-
-        async def ainvoke(self, messages):
-            inputs = json.loads(messages[-1].content)
-            outcome = responses[len(calls)]
-            calls.append((inputs, messages[0].content))
-            assert self.tool == TOOL_NAME
-            if outcome in {"malformed_call", "unknown_send"}:
-                raise ModelProviderError("model_tool_call_invalid", outcome_unknown=outcome == "unknown_send")
-            args = {"products": []} if outcome == "missing_keys" else report_json(inputs)
-            return SimpleNamespace(tool_calls=[{"name": TOOL_NAME, "args": args}])
-
-    engine.model = Model()
-    _, current = await submit_and_wait(engine, SOURCE_TEXT)
-    assert len(calls) == expected_calls
-    assert not (await service.query("search_products", {}))["items"]
-    if expected_error:
-        assert current["error"]["code"] == expected_error
-        assert current["status"] == "WAITING_USER"
-        question, = current["questions"]
-        assert question["kind"] == "runtime_recovery" and question["allow_text"]
-        assert expected_error not in question["prompt"] and TOOL_NAME not in question["prompt"]
-    else:
-        question, = current["questions"]
-        assert question["kind"] == "catalog_intake_approval"
-        candidate, = question["preview"]["items"]
-        assert candidate["sku_id"] == FIELDS["sku_id"]
-    if expected_calls >= 2:
-        inputs, prompt = calls[1]
-        feedback = inputs["previous_validation_feedback"]
-        if responses[0] == "missing_keys":
-            assert feedback["details"]["missing_keys"] == ["coverage", "questions"]
-        else:
-            assert feedback["code"] == "model_tool_call_invalid"
-        assert "顶层字段必须且只能" in prompt
-    if expected_calls == 3:
-        assert calls[-1][0]["rechecked_source_evidence"]
-
-
-@pytest.mark.asyncio
-@pytest.mark.parametrize("recovery", ["normal", "blank", "mapping"])
-async def test_deepseek_catalog_json_wire_preserves_ledger_and_coverage(env, recovery):
-    engine, service = env
-    await engine.start()
-    sent = []
+    sends = []
+    planner_tool = "choose_fixed_step_recovery"
 
     def handle(request):
         wire = json.loads(request.content)
         assert request.headers["authorization"] == "Bearer fixture-credential"
+        tools = [item["function"]["name"] for item in wire.get("tools", [])]
+        if tools:
+            assert tools == [planner_tool]
+            sends.append("plan")
+            return json_stream(len(sends), {"strategy": "structured_source_layout"}, tool=planner_tool)
+
         assert wire["response_format"] == {"type": "json_object"}
         assert wire["thinking"] == {"type": "disabled"}
-        assert "tools" not in wire and "tool_choice" not in wire
-        assert "JSON" in wire["messages"][0]["content"]
         inputs = json.loads(wire["messages"][-1]["content"])
-        sent.append(inputs)
+        sends.append("alternate" if "source_layout" in inputs else "extract")
         schema = inputs["output_schema"]
-        if recovery == "blank" and len(sent) == 1:
-            content = "   "
-        elif schema["required"] == ["coverage"]:
-            assert recovery == "mapping" and len(sent) == 2
-            unit, = inputs["source_units"]
-            assert unit["text"] == EXTRA
-            content = json.dumps({"coverage": {unit["id"]: "+*"}}, ensure_ascii=False)
-        else:
-            assert set(schema["required"]) == {"products", "questions", "coverage"}
-            content = json.dumps(report_json(inputs), ensure_ascii=False)
-        mid = len(content) // 2
-        chunks = [{"id": f"fixture-{len(sent)}", "choices": [{"delta": {"content": fragment}}]}
-                  for fragment in (content[:mid], content[mid:])]
-        chunks.extend([
-            {"choices": [{"delta": {}, "finish_reason": "stop"}]},
-            {"choices": [], "usage": {"prompt_tokens": 30, "completion_tokens": 40, "total_tokens": 70}},
-        ])
-        return httpx.Response(200, headers={"content-type": "text/event-stream"},
-            text="".join("data: " + json.dumps(chunk) + "\n\n" for chunk in chunks) + "data: [DONE]\n\n")
+        assert set(schema["required"]) == {"products", "questions"}
+        assert "evidence" not in schema["properties"]["products"]["items"]["properties"]
+        assert "coverage" not in schema["properties"]
+        invalid = {"blank": "   ", "malformed_json": "not JSON", "malformed_shape": {"products": None}}
+        reply = invalid.get(first_result, facts_json()) if len(sends) == 1 else facts_json()
+        return json_stream(len(sends), reply)
 
     engine.model = DeepSeekAgentModel(async_transport=httpx.MockTransport(handle), key_reader=lambda: "fixture-credential",
         before_send=engine._before_send, observer=engine._model_event, on_request=engine._model_request,
         on_response=engine._model_response)
-    identity, current = await submit_and_wait(engine, SOURCE_TEXT + ("\n" + EXTRA + "。" if recovery == "mapping" else ""))
+    identity, current = await submit_and_wait(engine, SOURCE_TEXT + "\n" + EXTRA + "。")
+    assert sends == (["extract"] if first_result == "normal" else ["extract", "plan", "alternate"]), current.get("error")
     question, = current["questions"]
+    assert question["kind"] == "catalog_intake_approval"
     candidate, = question["preview"]["items"]
     assert candidate["sku_id"] == FIELDS["sku_id"]
     assert not (await service.query("search_products", {}))["items"]
-    if recovery == "mapping":
-        assert candidate["fields"]["knowledge_documents"][0]["content"] == EXTRA
+
     with engine.store.tx() as db:
-        attempts = [json.loads(row[0]) for row in db.execute("SELECT body FROM attempts WHERE run_id=? ORDER BY rowid", (identity,))]
-    expected = {"normal": ["succeeded"], "blank": ["known_failed", "succeeded"], "mapping": ["succeeded", "succeeded"]}
-    assert [attempt["state"] for attempt in attempts] == expected[recovery]
-    assert len(sent) == len(attempts) and all(attempt["usage"]["total_tokens"] == 70 for attempt in attempts)
+        attempts = [json.loads(row[0]) for row in db.execute(
+            "SELECT body FROM attempts WHERE run_id=? ORDER BY rowid", (identity,))]
+    expected_roles = ["product_facts"] if first_result == "normal" else ["product_facts", "main", "product_facts"]
+    assert [attempt["role"] for attempt in attempts] == expected_roles
+    expected_first = "known_failed" if first_result in {"blank", "malformed_json"} else "succeeded"
+    assert [attempt["state"] for attempt in attempts] == [expected_first] + ["succeeded"] * (len(sends) - 1)
+    assert all(attempt["usage"]["total_tokens"] == 70 for attempt in attempts)
+
     events = engine.events(identity, 0, 100)["events"]
     request = next(event for event in events if event["type"] == "model.request")
     safe = engine.trace.read_payload(identity, request["data"]["payload_ref"])
     assert safe["payload"]["provider_options"]["response_format"] == {"type": "json_object"}
     assert "fixture-credential" not in json.dumps(safe)
-    response = next(event for event in events if event["type"] == "model.response")
-    safe = engine.trace.read_payload(identity, response["data"]["payload_ref"])
+    last_response = [event for event in events if event["type"] == "model.response"][-1]
+    safe = engine.trace.read_payload(identity, last_response["data"]["payload_ref"])
     assert list(safe["output"]) == ["json"]
 
 
 @pytest.mark.asyncio
-@pytest.mark.parametrize("successful_recovery", [True, False], ids=["writes-after-approval", "resumes-after-user-hint"])
-async def test_catalog_changes_layout_after_two_known_sku_price_mismatches(env, successful_recovery):
+async def test_catalog_corrects_unambiguous_sku_prices_in_one_request_then_requires_approval(env):
     from docx import Document
 
     engine, service = env
@@ -394,41 +360,20 @@ async def test_catalog_changes_layout_after_two_known_sku_price_mismatches(env, 
                ("日常售价", "49.90 元", "69.90 元"), ("直播活动价", "39.90 元", "59.90 元")]
     table = document.add_table(rows=len(entries), cols=len(entries[0]))
     for row, record in zip(table.rows, entries):
-        for cell, text in zip(row.cells, record):
-            cell.text = text
+        for cell, value in zip(row.cells, record):
+            cell.text = value
     stream = BytesIO()
     document.save(stream)
-
     sent = []
-    confirmed_resume = False
-
-    def sse_response(sequence, delta, reason):
-        chunks = [{"id": f"layout-{sequence}", "choices": [{"delta": delta}]},
-                  {"choices": [{"delta": {}, "finish_reason": reason}]},
-                  {"choices": [], "usage": {"prompt_tokens": 40, "completion_tokens": 60, "total_tokens": 100}}]
-        return httpx.Response(200, headers={"content-type": "text/event-stream"},
-            text="".join("data: " + json.dumps(chunk) + "\n\n" for chunk in chunks) + "data: [DONE]\n\n")
 
     def handle(request):
         wire = json.loads(request.content)
-        inputs = json.loads(wire["messages"][-1]["content"])
         assert not wire.get("tools")
-        sent.append(inputs)
-        by_text = {unit["text"]: unit for unit in inputs["source_units"]}
-        products = []
-        for sku, name, daily, price in (("CY-KS1", "精细款", "49.90 元", 49.9),
-                                         ("CY-KS5", "大称量款", "69.90 元", 69.9)):
-            if sku == "CY-KS1" and (len(sent) < 3 or (not successful_recovery and not confirmed_resume)):
-                daily, price = "69.90 元", 69.9
-            references = {"name": name, "sku_id": sku, "price": daily, "currency": "以上金额均为人民币"}
-            products.append({"fields": {"name": name, "sku_id": sku, "price": price, "currency": "CNY"},
-                             "evidence": [{"location": by_text[quote]["location"], "quote": quote, "fields": [field]}
-                                          for field, quote in references.items()]})
-        fields = {"款式": "name", "SKU": "sku_id", "日常售价": "price"}
-        coverage = {unit["id"]: (f"{unit['sku_id']}|{fields[unit['column']]}" if "sku_id" in unit else "*|currency")
-                    for unit in by_text.values()}
-        content = json.dumps({"products": products, "questions": [], "coverage": coverage}, ensure_ascii=False)
-        return sse_response(len(sent), {"content": content}, "stop")
+        sent.append(json.loads(wire["messages"][-1]["content"]))
+        return json_stream(len(sent), {"products": [
+            {"name": "精细款", "sku_id": "cy-ks1", "price": 69.9, "currency": "CNY"},
+            {"name": "大称量款", "sku_id": "CY-KS5", "price": 59.9, "currency": "CNY"},
+        ], "questions": []})
 
     await engine.start()
     engine.model = DeepSeekAgentModel(async_transport=httpx.MockTransport(handle), key_reader=lambda: "fixture-credential",
@@ -436,57 +381,21 @@ async def test_catalog_changes_layout_after_two_known_sku_price_mismatches(env, 
         on_response=engine._model_response)
     identity, current = await submit_and_wait(engine, stream.getvalue(), filename="source.docx",
         mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document")
-    assert len(sent) == (3 if successful_recovery else 4), current.get("error")
-    assert "source_material" in sent[0] and "source_material" in sent[1]
-    assert "source_material" not in sent[2]
-    title, heading, grouped_table = sent[2]["source_layout"][0]["blocks"]
-    assert title["lines"] == [f"{family} 商品资料"]
-    assert heading["lines"] == ["以上金额均为人民币。"]
-    assert [[cell["text"] for cell in row["cells"]] for row in grouped_table["rows"]] == [list(row) for row in entries]
-    assert [cell["grid_column"] for cell in grouped_table["rows"][2]["cells"]] == [1, 2, 3]
-    assert sent[2]["source_units"] == sent[0]["source_units"]
-    assert engine.store.get("run", identity)["catalog_recovery_active"] is True
+    assert len(sent) == 1, current.get("error")
+    assert not engine.store.get("run", identity).get("fixed_step_recovery")
     assert not (await service.query("search_products", {}))["items"]
-    events = engine.events(identity, 0, 100)["events"]
-    limits = [event["data"]["model_call_limit"] for event in events if event["type"] == "model.window_checked"]
-    assert limits == ([2, 2, 3] if successful_recovery else [2, 2, 3, 4])
-    recovery_events = [event["data"] for event in events if event["type"] == "catalog_intake.recovery"]
-    assert [data["state"] for data in recovery_events] == ["started", "succeeded" if successful_recovery else "handed_off"]
-    assert recovery_events[0]["trigger_codes"] == ["CATALOG_FACTS_INVALID", "CATALOG_FACTS_INVALID"]
-    if not successful_recovery:
-        selected, = [event["data"] for event in events if event["type"] == "fixed_step_recovery.selected"]
-        assert selected["selected_by"] == "program" and selected["strategy"] == "reread_source"
-        assert sent[3]["previous_validation_feedback"]["details"]["fields"] == ["price"]
-        assert sent[3]["rechecked_source_evidence"]
-        assert any(event["type"] == "fixed_step_recovery.failed" for event in events)
-        assert current["error"]["code"] == "CATALOG_FACTS_INVALID"
-        assert current["status"] == "WAITING_USER"
-        question, = current["questions"]
-        assert question["kind"] == "runtime_recovery" and question["allow_text"]
-        assert "CATALOG_FACTS_INVALID" not in question["prompt"] and TOOL_NAME not in question["prompt"]
-        assert not any(operation["key"] == "save_product" for operation in engine.store.list("operation"))
-        confirmed_resume = True
-        hint = "精细款对应原表左侧，日常售价见第三行。"
-        await engine.answer(question["id"], AnswerRequest(question_revision=question["revision"],
-            answer={"text": hint}, client_request_id="resume-with-catalog-location"))
-        async with asyncio.timeout(8):
-            while not ((current := engine.get_run(identity))["questions"] or current["status"] in TERMINAL):
-                await asyncio.sleep(.025)
-        assert len(sent) == 5, current.get("error")
-        assert sent[-1]["user_location_hint"] == hint and sent[-1]["rechecked_source_evidence"]
-        assert not (await service.query("search_products", {}))["items"]
     question, = current["questions"]
     assert question["kind"] == "catalog_intake_approval"
-    assert [(item["sku_id"], item["fields"]["price"]) for item in question["preview"]["items"]] == [
-        ("CY-KS1", 49.9), ("CY-KS5", 69.9)]
-    assert [item["fields"]["name"] for item in question["preview"]["items"]] == [f"{family} 精细款", f"{family} 大称量款"]
+    expected = [("CY-KS1", 49.9, f"{family} 精细款"), ("CY-KS5", 69.9, f"{family} 大称量款")]
+    assert [(item["sku_id"], item["fields"]["price"], item["fields"]["name"])
+            for item in question["preview"]["items"]] == expected
     await engine.answer(question["id"], AnswerRequest(
-        question_revision=question["revision"], answer="save_all", client_request_id="save-recovered-catalog"))
+        question_revision=question["revision"], answer="save_all", client_request_id="save-verified-catalog"))
     async with asyncio.timeout(8):
         while (current := engine.get_run(identity))["status"] not in TERMINAL:
             await asyncio.sleep(.025)
     assert current["status"] == "COMPLETED", current.get("error")
     products = [await service.query("read_product", {"ref": item["product_ref"]})
                 for item in current["catalog_intake_result"]["products"]]
-    assert [(item["body"]["sku_id"], item["body"]["price"]) for item in products] == [("CY-KS1", 49.9), ("CY-KS5", 69.9)]
-    assert [item["body"]["name"] for item in products] == [f"{family} 精细款", f"{family} 大称量款"]
+    assert [(item["body"]["sku_id"], item["body"]["price"], item["body"]["name"]) for item in products] == expected
+    assert len(sent) == 1

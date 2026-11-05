@@ -38,7 +38,7 @@ fact_verdict=pass 时保留事实通过的原稿。只有确有必要才给可�
 
 _SERVICE_FIELDS = {"/shipping_origin", "/shipping_time", "/return_policy"}
 _DRAFT_MODEL = "deepseek-flash"
-_REVIEW_MODEL = "deepseek-v4-pro"
+_REVIEW_MODEL = "deepseek-flash"
 _REVIEW_TIMEOUT_SECONDS = 75
 _DEEP_REVIEW_TIMEOUT_SECONDS = 120
 _REJECTION_LABELS = {

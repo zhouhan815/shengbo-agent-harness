@@ -31,7 +31,6 @@ from contextvars import ContextVar
 from copy import deepcopy
 import json
 import os
-from pathlib import Path
 import time
 from typing import Any
 from uuid import uuid4
@@ -47,11 +46,12 @@ from .chatgpt import (ModelProviderError, _CONNECT_RETRY_DELAY_SECONDS, _async_h
                       _image_data_url, _sync_http_error, _text, _transport_exception_name, preview_request_payload,
                       safe_transport_diagnostic)
 from .credentials import CredentialError
+from .deepseek_key import read_api_key
 from .tool_arguments import parse_tool_arguments
 
 ENDPOINT = "https://api.deepseek.com/chat/completions"
 HARNESS_PROVIDER_KEY = "shengbo_deepseek"
-DEFAULT_REASONING_MODEL = "deepseek-v4-pro"
+DEFAULT_REASONING_MODEL = "deepseek-flash"
 DEFAULT_VISION_MODEL = "deepseek-flash"
 DEFAULT_SUMMARY_MODEL = "deepseek-flash"
 VALID_EFFORTS = {"low", "high", "max"}
@@ -81,31 +81,6 @@ def note_stream_activity():
     beat = STREAM_ACTIVITY.get()
     if beat is not None:
         beat()
-
-
-def _voice_env_path() -> Path:
-    override = os.environ.get("SHENGBO_DEEPSEEK_ENV_FILE")
-    if override:
-        return Path(override)
-    return Path(__file__).resolve().parents[4] / "ecommerce-voice-agent" / ".env"
-
-
-def read_api_key() -> str:
-    """Key from the environment or the voice service's local .env; never logged."""
-    value = os.environ.get("DEEPSEEK_API_KEY", "").strip()
-    if value:
-        return value
-    path = _voice_env_path()
-    try:
-        for line in path.read_text(encoding="utf-8").splitlines():
-            if line.strip().startswith("DEEPSEEK_API_KEY="):
-                value = line.split("=", 1)[1].strip().strip('"').strip("'")
-                break
-    except OSError:
-        value = ""
-    if not value:
-        raise CredentialError("deepseek_api_key_missing")
-    return value
 
 
 def agent_model_settings() -> dict:

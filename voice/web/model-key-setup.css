@@ -1,0 +1,52 @@
+.wb-key-open, .wb-key-close, .wb-key-connect {
+  font: inherit;
+  cursor: pointer;
+  border-radius: 8px;
+  padding: 8px 12px;
+}
+.wb-key-open {
+  border: 1px solid #cad6e7;
+  background: #fff;
+  color: #24466e;
+  font-size: 13px;
+  white-space: nowrap;
+}
+.wb-key-dialog {
+  box-sizing: border-box;
+  width: min(460px, calc(100vw - 32px));
+  max-height: calc(100vh - 32px);
+  overflow: auto;
+  padding: 24px;
+  border: 1px solid #d7e0ed;
+  border-radius: 16px;
+  color: #203047;
+  background: #fff;
+  font: 14px/1.55 "Microsoft YaHei", system-ui, sans-serif;
+  box-shadow: 0 18px 70px #1f32522d;
+}
+.wb-key-dialog::backdrop { background: #14233b55; }
+.wb-key-dialog h2 { margin: 0; font-size: 21px; }
+.wb-key-description { margin: 12px 0 18px; color: #506176; }
+.wb-key-form { display: grid; gap: 14px; }
+.wb-key-label { display: grid; gap: 6px; font-weight: 650; }
+.wb-key-input {
+  box-sizing: border-box;
+  width: 100%;
+  border: 1px solid #c7d3e4;
+  border-radius: 8px;
+  padding: 9px 10px;
+  font: inherit;
+  font-weight: 400;
+}
+.wb-key-actions { display: flex; flex-wrap: wrap; gap: 10px; justify-content: flex-end; }
+.wb-key-close { border: 1px solid #c8d5e6; background: #fff; color: #34475d; }
+.wb-key-connect { border: 1px solid #204aa1; background: #204aa1; color: #fff; font-weight: 650; }
+.wb-key-status { margin: 0; font-size: 13px; }
+.wb-key-status[hidden] { display: none; }
+.wb-key-status[data-kind="error"] { color: #9b2335; font-weight: 650; }
+.wb-key-status[data-kind="pending"] { color: #365c88; }
+.wb-key-connect:disabled { opacity: .55; cursor: default; }
+.wb-key-dialog button:focus-visible, .wb-key-open:focus-visible, .wb-key-input:focus-visible {
+  outline: 2px solid #2056bf;
+  outline-offset: 2px;
+}

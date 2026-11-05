@@ -266,23 +266,33 @@ assert.deepEqual({text:legacyMetrics.text,characters:legacyMetrics.characters,pl
     await search.fill('SKU-24');
     assert.equal(await rows.count(),1);checks++;
     assert.equal(await rows.first().locator('.wb-catalog-thumbnail img').count(),1,'safe local thumbnail renders');checks++;
-    assert.match(await rows.first().locator('.wb-catalog-product-info').textContent(),/抖音.*2 项规格/);checks++;
-    assert.deepEqual(await rows.first().locator('.wb-catalog-selling-point').allTextContents(),['可堆叠收纳','透明可视','方便归类']);checks++;
-    assert.deepEqual(await rows.first().locator('.wb-catalog-fulfillment dd').allTextContents(),['满两件送隔板','付款后 48 小时内发货']);checks++;
-    assert.deepEqual(await page.locator('.wb-catalog-columns > span:visible').allTextContents(),['商品与资料','日常售价','在售状态','操作']);checks++;
+    assert.equal(await rows.first().locator('.wb-catalog-product-info').textContent(),'2 项规格 · 1 份文档');checks++;
+    assert.equal(await rows.first().locator('.wb-catalog-selling-point dd').textContent(),'可堆叠收纳');checks++;
+    assert.equal(await rows.first().locator('.wb-catalog-product-text .wb-catalog-selling-point').count(),0);checks++;
+    assert.deepEqual(await rows.first().locator('.wb-catalog-promotion dd, .wb-catalog-shipping dd').allTextContents(),['满两件送隔板','付款后 48 小时内发货']);checks++;
+    assert.deepEqual(await page.locator('.wb-catalog-columns > span:visible').allTextContents(),['商品名称','日常售价','在售状态','操作']);checks++;
     assert.equal(await rows.first().evaluate(row=>row.querySelector('.wb-catalog-price').getBoundingClientRect().right<row.querySelector('.wb-catalog-status').getBoundingClientRect().left),true,'price and status occupy different columns');checks++;
     await page.evaluate(()=>document.getElementById('editor').style.width='900px');
-    assert.deepEqual(await page.locator('.wb-catalog-columns > span:visible').allTextContents(),['商品与资料','促销 / 物流','日常售价','在售状态','操作']);checks++;
+    await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
+    assert.deepEqual(await page.locator('.wb-catalog-columns > span:visible').allTextContents(),['商品名称','核心卖点','促销','物流','日常售价','在售状态','操作']);checks++;
     const wideCatalog=await rows.first().evaluate(row=>{
       const bounds=selector=>row.querySelector(selector).getBoundingClientRect();
       return {height:row.getBoundingClientRect().height,productRight:bounds('.wb-catalog-product-text').right,
-        logisticsLeft:bounds('.wb-catalog-fulfillment').left,logisticsRight:bounds('.wb-catalog-fulfillment').right,
+        pointLeft:bounds('.wb-catalog-selling-point').left,pointRight:bounds('.wb-catalog-selling-point').right,
+        promoLeft:bounds('.wb-catalog-promotion').left,promoRight:bounds('.wb-catalog-promotion').right,
+        logisticsLeft:bounds('.wb-catalog-shipping').left,logisticsRight:bounds('.wb-catalog-shipping').right,
         priceLeft:bounds('.wb-catalog-price').left,overflow:row.scrollHeight>row.clientHeight+1||row.scrollWidth>row.clientWidth};
     });
-    assert.ok(wideCatalog.height>=90&&wideCatalog.height<=101,'wide product rows are compact');checks++;
-    assert.ok(wideCatalog.productRight<wideCatalog.logisticsLeft&&wideCatalog.logisticsRight<wideCatalog.priceLeft,'fulfillment sits between product data and price');checks++;
+    assert.ok(wideCatalog.height>=90&&wideCatalog.height<=101,'wide product rows are compact '+JSON.stringify(wideCatalog));checks++;
+    assert.ok(wideCatalog.productRight<wideCatalog.pointLeft&&wideCatalog.pointRight<wideCatalog.promoLeft&&
+      wideCatalog.promoRight<wideCatalog.logisticsLeft&&wideCatalog.logisticsRight<wideCatalog.priceLeft,
+      'selling point, promotion and shipping have independent columns');checks++;
     assert.equal(wideCatalog.overflow,false);checks++;
     await page.evaluate(()=>document.getElementById('editor').style.width='390px');
+    await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
+    assert.deepEqual(await rows.first().locator('.wb-catalog-field dt:visible').allTextContents(),['核心卖点','促销','物流']);checks++;
+    assert.equal(await rows.first().evaluate(row=>row.querySelector('.wb-catalog-promotion').getBoundingClientRect().right<
+      row.querySelector('.wb-catalog-shipping').getBoundingClientRect().left),true,'promotion and shipping remain side by side');checks++;
     assert.equal(await rows.first().locator('.wb-catalog-price .wb-catalog-cell-label').isVisible(),true);checks++;
     assert.equal(await rows.first().locator('.wb-catalog-status .wb-catalog-cell-label').isVisible(),true);checks++;
     assert.equal(await rows.first().evaluate(row=>row.scrollWidth<=row.clientWidth&&row.scrollHeight<=row.clientHeight+1),true,'narrow list rows fit every action and detail');checks++;

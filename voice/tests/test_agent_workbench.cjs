@@ -103,7 +103,7 @@ const server = http.createServer(async (req, res) => {
   try {
     const url = new URL(req.url, 'http://localhost');
     if (url.pathname === '/' || url.pathname === '/agent' || url.pathname === '/agent-workbench') { res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' }); res.end(fs.readFileSync(path.join(WEB, 'agent-workbench.html'))); return; }
-    if (url.pathname.startsWith('/assets/')) { const file = path.join(WEB, path.basename(url.pathname)); if (!fs.existsSync(file)) return json({ error: { message: 'Missing asset ' + path.basename(file) } }, 404); res.writeHead(200, { 'Content-Type': file.endsWith('.css') ? 'text/css' : file.endsWith('.svg') ? 'image/svg+xml' : 'application/javascript' }); res.end(fs.readFileSync(file)); return; }
+    if (url.pathname.startsWith('/assets/')) { const file = path.join(WEB, path.basename(url.pathname)); if (!fs.existsSync(file)) return json({ error: { message: 'Missing asset ' + path.basename(file) } }, 404); res.writeHead(200, { 'Content-Type': file.endsWith('.css') ? 'text/css' : file.endsWith('.svg') ? 'image/svg+xml' : file.endsWith('.png') ? 'image/png' : 'application/javascript' }); res.end(fs.readFileSync(file)); return; }
     if (url.pathname.endsWith('favicon.ico')) { res.writeHead(204); res.end(); return; }
     let raw = ''; for await (const chunk of req) raw += chunk; const body = raw ? JSON.parse(raw) : null;
     state.calls.push({ path: url.pathname, method: req.method, body: clone(body), csrf: req.headers['x-csrf-token'] });
@@ -118,6 +118,7 @@ const server = http.createServer(async (req, res) => {
     }
     if (url.pathname === '/api/assistant/v2/editor-locks') return json({schema_version:VERSION,locks:state.editorLocks||[]});
     if (url.pathname === '/api/assistant/v2/session') return json({ csrf_token: state.csrf });
+    if (url.pathname === '/api/assistant/v2/model-key') return json({ status: 'configured' });
     if (url.pathname === '/api/assistant/v2/conversations' && req.method === 'GET') return json({ items: [state.conversation] });
     if (url.pathname === '/api/assistant/v2/conversations' && req.method === 'POST') return json({ ...state.conversation, ...body, conversation_id: 'conversation-' + crypto.randomUUID(), messages: [], runs: [] });
     if (url.pathname === '/api/assistant/v2/conversations/conversation-A') return json({ ...state.conversation, messages: [...state.conversation.messages, ...state.messages], runs: [state.run] });

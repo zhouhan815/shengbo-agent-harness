@@ -156,6 +156,10 @@ def create_app(engine, service_token: str) -> FastAPI:
     async def get_conversation(conversation_id: str):
         return _response(await _call(engine.get_conversation, _require_id(conversation_id)))
 
+    @app.delete(base + "/conversations/{conversation_id}", dependencies=protected)
+    async def delete_conversation(conversation_id: str):
+        return _response(await _call(engine.delete_conversation, _require_id(conversation_id)))
+
     @app.post(base + "/conversations/{conversation_id}/messages", dependencies=protected)
     async def submit_message(conversation_id: str, body: MessageRequest):
         _require_local_scope(body.scope)

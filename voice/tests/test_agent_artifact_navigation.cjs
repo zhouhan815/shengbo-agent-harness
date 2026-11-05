@@ -82,6 +82,7 @@ async function run() {
         if (setup) await setup(page, state);
         await page.goto(base);
         await page.evaluate(() => shengboWorkbench.ready);
+        await page.locator('.sb-a-tab[tabindex="0"]').click();
         const navigate = (productId, prep = null) => page.evaluate(
           ({ productId, prep }) => shengboWorkbench.navigate({
             view: 'products',
@@ -214,14 +215,14 @@ async function run() {
       async ({ page, productA, productB, navigate, publish, row, content, located, waitProduct }) => {
         await navigate(productB.ref.id, 'prep-A');
         await publish(result('当前会话 B 的成果', productB));
-        const conversations = page.getByLabel('选择已有对话');
+        const conversations = page.getByRole('tablist', { name: '切换对话' });
         const input = page.getByLabel('发送给播前助手的要求');
         const selections = page.locator('.sb-a-selection-chip');
         await page.locator('[data-select-field="faq"]').click();
         await input.fill('当前会话的待发草稿。');
         assert.equal(await selections.count(), 1);
 
-        await conversations.selectOption('conversation-history');
+        await conversations.locator('[data-conversation-id="conversation-history"]').click();
         await page.getByRole('button', { name: '历史会话 A 的知识文档', exact: true }).waitFor();
         assert.equal(await input.inputValue(), '');
         assert.equal(await selections.count(), 0);
@@ -230,18 +231,18 @@ async function run() {
         await waitProduct(productA.ref.id);
         await row(sharedDocumentId).and(located).waitFor();
         assert.equal(await content(sharedDocumentId).inputValue(), 'A 的目标文档旧正文。');
-        assert.equal(await conversations.inputValue(), 'conversation-history');
+        assert.equal(await conversations.locator('[aria-selected="true"]').getAttribute('data-conversation-id'), 'conversation-history');
         assert.equal(await input.inputValue(), '历史会话自己的草稿。');
         const selected = await page.evaluate(() => shengboWorkbench.assistant.getState().conversation);
         assert.equal(selected.conversation_id, 'conversation-history');
         assert.equal(selected.preparation_id, 'prep-history');
         await page.locator('[data-scope-mismatch="true"]').waitFor();
 
-        await conversations.selectOption('conversation-A');
+        await conversations.locator('[data-conversation-id="conversation-A"]').click();
         await page.getByRole('button', { name: '当前会话 B 的成果', exact: true }).waitFor();
         assert.equal(await input.inputValue(), '当前会话的待发草稿。');
         assert.equal(await selections.count(), 1);
-        await conversations.selectOption('conversation-history');
+        await conversations.locator('[data-conversation-id="conversation-history"]').click();
         await page.getByRole('button', { name: '历史会话 A 的知识文档', exact: true }).waitFor();
         assert.equal(await input.inputValue(), '历史会话自己的草稿。');
         assert.equal(await selections.count(), 0);
@@ -396,6 +397,7 @@ async function run() {
         state.preparation.ref = ref('preparation', state.preparation.ref.id, 2);
         await page.reload();
         await page.evaluate(() => shengboWorkbench.ready);
+        await page.locator('.sb-a-tab[tabindex="0"]').click();
         await configureRoom();
         assert.equal(await page.locator('#prep-next').count(), 0);
         assert.equal(await start.isVisible(), false);

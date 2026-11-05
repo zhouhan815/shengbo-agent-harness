@@ -25,7 +25,7 @@ def _response(sequence, value):
 
 
 def _use_wire(engine, responder):
-    engine.model = DeepSeekAgentModel(model_name="deepseek-v4-pro", async_transport=httpx.MockTransport(responder),
+    engine.model = DeepSeekAgentModel(model_name="deepseek-flash", async_transport=httpx.MockTransport(responder),
         key_reader=lambda: "offline-fixture", before_send=engine._before_send, observer=engine._model_event,
         on_request=engine._model_request, on_response=engine._model_response)
 
@@ -115,9 +115,9 @@ async def test_fast_selling_points_routes_models_and_keeps_fact_gate(env, case):
     run = await _submit(engine, ref)
     assert run["status"] == "COMPLETED", run.get("error")
     actual = [(wire["model"], wire["thinking"]["type"], wire.get("reasoning_effort")) for wire, _ in requests]
-    expected = [("deepseek-flash", "disabled", None), ("deepseek-v4-pro", "disabled", None)]
+    expected = [("deepseek-flash", "disabled", None), ("deepseek-flash", "disabled", None)]
     if case not in {"normal", "style_fallback"}:
-        expected.append(("deepseek-v4-pro", "enabled", "low"))
+        expected.append(("deepseek-flash", "enabled", "low"))
     assert actual == expected
     saved = await service.query("read_product", {"product_id": ref["id"]})
     expected_texts = texts[:1] if case == "unsafe" else texts

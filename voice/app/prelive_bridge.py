@@ -432,6 +432,9 @@ def install(app, server_module):
         except BusinessError as error:
             return JSONResponse({"schema_version": "PRELIVE-2.3", "error": error.payload()}, status_code=error.status)
 
+    from .model_key_setup import install_model_key_setup
+    install_model_key_setup(app, server_module, browser_identity)
+
     @app.api_route("/api/assistant/v2/{path:path}", methods=["GET", "POST", "PUT", "PATCH", "DELETE"])
     async def proxy(path: str, request: Request):
         client = response = None

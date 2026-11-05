@@ -24,11 +24,6 @@ BASIC_CREATE_REQUEST = (
     "禁止修改已有商品。本次只整理并保存基础商品资料（基础信息、规格、商品知识库和常见问答），"
     "暂不开展顾客研究，不生成直播话术或语音。"
 )
-_EVIDENCE_FIELD_LABELS = {"name": "商品名称", "sku_id": "款式编号", "currency": "币种",
-    "price": "日常售价", "core_selling_points": "核心卖点", "selling_points": "核心卖点",
-    "specifications": "规格参数", "knowledge": "商品知识", "knowledge_documents": "知识文档",
-    "faq": "常见问答", "material": "材质", "shipping_origin": "发货地",
-    "shipping_time": "发货时效", "return_policy": "退换货政策"}
 
 
 def explicit_intent(run):
@@ -65,10 +60,6 @@ class CatalogState(TypedDict, total=False):
     currency_decision_ids: list[str]
     price_deferred: bool
     recovery_failure: dict
-    recovery_draft: dict | None
-    recovery_draft_kind: str | None
-    session_failure: dict
-    session_draft: dict
 
 
 def _source_fingerprint(prepared):
@@ -116,7 +107,7 @@ def _archived_catalog_submissions(engine, worker, attempts, fingerprint, *, allo
             calls = _archived_calls(engine, worker, item)
             if len(calls) == 1 and calls[0].get("name") == TOOL_NAME:
                 args = calls[0].get("args")
-        if isinstance(args, dict) and {"products", "questions"} <= args.keys():
+        if isinstance(args, dict) and ("products" in args or "session" in args):
             yield item, args
 
 
@@ -160,21 +151,25 @@ def build_catalog_graph(engine):
         if any("price" not in row for row in report["fields"]["products"]):
             engine.store.update("branch", worker.branch_task_id, catalog_intake_price_draft=report)
             return "price"
-        engine.submit_report(worker, report, strict_evidence=True)
+        engine.submit_report(worker, report)
         return "prepare"
 
-    def session_repair_state(worker, error, prepared):
-        failure = {"workflow": "catalog_intake", "step": "session_validation", "branch_id": worker.branch_task_id,
-                   "code": error.code, "message": error.message, "status": error.status,
-                   "details": error.details, "known_no_commit": True,
-                   "evidence_hash": _source_fingerprint(prepared), "disposition": "field_repair"}
-        record_validation(worker, error, strategy="repair_session", step="session_validation")
-        return {"branch_id": worker.branch_task_id, "step": "session_repair", "session_failure": failure,
-                "session_draft": error.draft}
+    def next_extraction_step(worker, report):
+        if report.get("document_session_only"):
+            engine.store.update("branch", worker.branch_task_id, status="CANCELLED",
+                                summary="资料只包含本场配置，无商品需要入库。")
+            return "document"
+        if report.get("conflicts") or not report.get("fields", {}).get("products"):
+            from .catalog_extract import CatalogResponseRejection
+            raise CatalogResponseRejection("CATALOG_RECOVERY_UNRESOLVED",
+                "未得到可保存的商品或本场配置。", status=422,
+                details={"major_extraction_failure": True})
+        return accept_extraction(worker, report)
 
     async def extract(state: CatalogState, runtime: Runtime[RunScope]):
-        from .catalog_extract import (CatalogResponseRejection, SessionCorrection, extract_catalog_report,
-                                      validate_catalog_submission)
+        from .catalog_extract import CatalogResponseRejection, extract_catalog_report, validate_catalog_submission
+        from .runtime_recovery import step_model_attempts, step_request_pending
+
         scope = runtime.context
         run = await engine.assert_scope(scope)
         progress(scope, "extract", "正在读取商品资料")
@@ -184,6 +179,7 @@ def build_catalog_graph(engine):
             engine.save_assessment(scope, {"summary": "整理资料、确认候选、逐款入库",
                 "capabilities": ["product_facts"], "steps": ["读取附件", "整理事实", "确认并保存"]})
         sources = run["input"]["material_refs"]
+        # Keep the persisted dispatch identity stable across recovery.
         task = {"role": "product_facts", "instruction": "从同一份资料提取各款商品与原文证据", "source_refs": sources}
         batch = await engine.dispatch(scope, [task], "基础入库的事实提取", "catalog-intake-facts", inline_catalog=True)
         branch_id = batch["branch_task_ids"][0]
@@ -200,335 +196,76 @@ def build_catalog_graph(engine):
             invocation_id = "invoke_catalog_resume_" + canonical_hash([scope.run_id, branch_id, incident["id"]])[7:]
         worker = RunScope(scope.run_id, invocation_id, "execute", "product_facts", branch_id)
         started = time.perf_counter()
-        recovery = None
-        recovered = False
-        handed_off = False
         prepared = None
         try:
             async with asyncio.timeout(110):
                 prepared = await prepared_source(worker, sources)
                 if prepared is None:
-                    raise ContractError("CATALOG_SOURCE_LAYOUT_UNSUPPORTED",
-                        "当前资料未能读出完整的商品内容。请检查原件是否可打开，或分批上传后继续整理。", status=422)
+                    raise CatalogResponseRejection("CATALOG_SOURCE_LAYOUT_UNSUPPORTED",
+                        "当前读取方式没有读出可整理的商品资料。", status=422,
+                        details={"major_extraction_failure": True})
                 if any(item["kind"] == "image" and not item["text"].strip() for item in prepared["locations"]):
                     progress(scope, "extract", "照片没有文字，正在结合正文和原图继续整理")
-                from .runtime_recovery import step_model_attempts, step_request_pending
                 attempts = step_model_attempts(engine, worker)
-                # Only adopt an archive tied to this unchanged source snapshot.
-                old_source = branch.get("catalog_prepared_source")
-                archived, arguments = (None, None)
-                if old_source and _source_fingerprint(old_source) == _source_fingerprint(prepared):
-                    archived, arguments = next(_archived_catalog_submissions(engine, worker, attempts,
-                        _source_fingerprint(prepared), allow_legacy=not branch.get("catalog_source_reprepared")),
-                        (None, None))
+                archived, arguments = next(_archived_catalog_submissions(engine, worker, attempts,
+                    _source_fingerprint(prepared), allow_legacy=not branch.get("catalog_source_reprepared")),
+                    (None, None))
                 adopted = archived["id"] if archived else None
                 if step_request_pending(attempts, worker, incident, adopted=adopted):
                     raise ContractError("CATALOG_EXTRACTION_INTERRUPTED",
-                        "当前资料核对仍有未能确认的请求结果。", status=409)
+                        "上一笔提取请求仍未确认结果，已保留本次资料。", status=409)
                 if archived:
                     engine.store.update("branch", branch_id, catalog_adopted_attempt_id=adopted)
-                    progress(scope, "extract", "已找回这份原件的模型回复，正在复核已有草稿", status="RECOVERING")
                     engine._emit(scope.run_id, "catalog_intake.recovery", {
                         "title": "已沿用原任务已收到的提取结果", "status": "RECOVERING",
                         "method": "reuse_archived_response", "attempt_id": adopted}, worker)
-                feedback = None
-                for attempt in range(2):
-                    remaining = 110 - (time.perf_counter() - started)
-                    if remaining <= 5:
-                        raise ContractError("CATALOG_EXTRACTION_TIMEOUT", "商品资料对账超时，请缩小资料范围后重试。", status=408)
-                    alternate_layout = attempt == 1
-                    if alternate_layout:
-                        recovery = {"method": "structured_source_layout",
-                                    "trigger_codes": [feedback["code"]],
-                                    "title": "按原表格与段落结构重新核对资料"}
-                        engine._emit(scope.run_id, "catalog_intake.recovery",
-                            {**recovery, "state": "started", "status": "RECOVERING"}, worker)
-                    try:
-                        if attempt == 0 and archived:
-                            report = await validate_catalog_submission(engine, worker, run, prepared, arguments)
-                        else:
-                            report = await extract_catalog_report(engine, worker, prepared, feedback=feedback,
-                                                                  alternate_layout=alternate_layout,
-                                                                  user_hint=_resume_hint(incident),
-                                                                  timeout_seconds=min(104, remaining - 2))
-                    except SessionCorrection as error:
-                        return session_repair_state(worker, error, prepared)
-                    except CatalogResponseRejection as error:
-                        rejection = error
-                    else:
-                        if report.get("document_session_only"):
-                            engine.store.update("branch", branch_id, status="CANCELLED",
-                                                summary="资料只包含本场配置，无商品需要入库。")
-                            return {"branch_id": branch_id, "step": "document"}
-                        if report.get("conflicts") or not report.get("fields", {}).get("products"):
-                            rejection = CatalogResponseRejection("CATALOG_RECOVERY_UNRESOLVED",
-                                "资料中有商品信息待确认。", status=422,
-                                details={"unresolved": report.get("conflicts", [])})
-                        else:
-                            rejection = None
-                    if rejection is None:
-                        try:
-                            step = accept_extraction(worker, report)
-                        except ContractError as error:
-                            current = engine.store.get("branch", branch_id)
-                            if (error.status != 422 or error.code.endswith("_DENIED")
-                                    or current.get("report") or current.get("catalog_intake_price_draft")
-                                    or current.get("catalog_intake_currency_draft")):
-                                raise
-                            rejection = error
-                        else:
-                            recovered = alternate_layout
-                            return {"branch_id": branch_id, "step": step}
-
-                    severe = rejection.details.get("major_extraction_failure") is True or rejection.code in {
-                        "model_tool_call_invalid", "model_empty_completed_response", "model_json_output_invalid",
-                    }
-                    record_validation(worker, rejection, strategy="structured_source_layout" if alternate_layout
-                                      else "extract", public=severe)
-                    if attempt or not severe:
-                        handed_off = True
-                        raise rejection
-                    feedback = {"code": rejection.code, "details": rejection.details}
+                    report = await validate_catalog_submission(engine, worker, run, prepared, arguments)
+                else:
+                    report = await extract_catalog_report(engine, worker, prepared, user_hint=_resume_hint(incident),
+                                                         timeout_seconds=104)
+                return {"branch_id": branch_id, "step": next_extraction_step(worker, report)}
         except (TimeoutError, ContractError) as error:
-            if isinstance(error, ContractError) and error.code not in {"CATALOG_EXTRACTION_TIMEOUT", "MODEL_TIMEOUT"}:
+            code = getattr(error, "code", "CATALOG_EXTRACTION_TIMEOUT")
+            details = getattr(error, "details", {})
+            severe = details.get("major_extraction_failure") is True or code in {
+                "CATALOG_EXTRACTION_TIMEOUT", "MODEL_TIMEOUT", "model_tool_call_invalid",
+                "model_empty_completed_response", "model_json_output_invalid",
+            }
+            if not severe:
                 raise
-            failure = {"workflow": "catalog_intake", "step": "extract", "branch_id": branch_id,
-                       "code": "CATALOG_EXTRACTION_TIMEOUT", "message": "读取或提取商品资料超时。",
-                       "status": 408, "details": {}, "known_no_commit": True,
-                       "evidence_hash": _source_fingerprint(prepared) if prepared else None}
-            handed_off = True
-            return {"branch_id": branch_id, "step": "needs_recovery", "recovery_failure": failure}
+            if isinstance(error, CatalogResponseRejection):
+                record_validation(worker, error, strategy="extract", public=False)
+            return {"branch_id": branch_id, "step": "needs_recovery", "recovery_failure": {
+                "workflow": "catalog_intake", "step": "extract", "branch_id": branch_id,
+                "code": code, "message": getattr(error, "message", "读取或提取商品资料超时。"),
+                "status": getattr(error, "status", 408), "details": details, "known_no_commit": True,
+                "evidence_hash": _source_fingerprint(prepared) if prepared else None}}
         finally:
-            if recovery:
-                outcome = "succeeded" if recovered else "handed_off" if handed_off else "failed"
-                engine.trace.try_emit(scope.run_id, "catalog_intake.recovery", {**recovery, "state": outcome,
-                    "status": "SUCCEEDED" if recovered else "RECOVERING" if handed_off else "FAILED",
-                    "title": "已重新核对商品资料" if recovered else
-                             "按原文结构核对后仍有疑点，继续处理当前步骤" if handed_off else "重新核对后仍未确认全部商品资料"},
-                    invocation_id=worker.invocation_id, branch_task_id=worker.branch_task_id)
             engine._emit(scope.run_id, "catalog_intake.extraction", {"title": "整理商品资料",
                 "duration_ms": round((time.perf_counter() - started) * 1000, 3)}, scope)
 
-    async def prepared_source(worker, sources):
+    async def prepared_source(worker, sources, *, full_source=False):
         from .catalog_extract import prepare_catalog_extraction
 
         branch = engine.store.get("branch", worker.branch_task_id)
         snapshot = branch.get("catalog_prepared_source")
-        if snapshot and snapshot.get("sources") == sources:
+        if not full_source and snapshot and snapshot.get("sources") == sources:
             schema = await engine.business_query(worker, "get_business_schema", {})
             if schema["schema_hash"] == snapshot["schema_hash"]:
                 return snapshot
-        prepared = await prepare_catalog_extraction(engine, worker, sources)
+        if full_source:
+            prepared = await prepare_catalog_extraction(engine, worker, sources, full_source=True)
+        else:
+            prepared = await prepare_catalog_extraction(engine, worker, sources)
         if prepared:
+            changed = bool(snapshot and not _same_source(prepared, _source_fingerprint(snapshot)))
             engine.store.update("branch", worker.branch_task_id, catalog_prepared_source=prepared,
-                                catalog_source_reprepared=bool(snapshot))
+                catalog_source_reprepared=changed or bool(branch.get("catalog_source_reprepared")))
         return prepared
 
     async def recover(state: CatalogState, runtime: Runtime[RunScope]):
-        from .catalog_extract import (CoverageCorrection, EvidenceCorrection, SessionCorrection,
-                                      extract_catalog_report, reread_catalog_evidence)
-
-        scope = runtime.context
-        run = await engine.assert_scope(scope)
-        branch_id = state["branch_id"]
-        branch = engine.store.get("branch", branch_id)
-        if branch["status"] in {"PREPARED", "ACCEPTED"}:
-            return {"step": "prepare", "recovery_draft": None}
-        if branch.get("catalog_intake_price_draft"):
-            return {"step": "price", "recovery_draft": None}
-        if branch.get("catalog_intake_currency_draft"):
-            return {"step": "currency", "recovery_draft": None}
-
-        failure = state["recovery_failure"]
-        progress(scope, "extract", "正在换一种方法核对商品资料", status="RECOVERING")
-        original = ContractError(failure["code"], failure["message"], status=failure["status"], details=failure["details"])
-        draft = state.get("recovery_draft")
-        evidence_only = state.get("recovery_draft_kind") == "evidence" and draft is not None
-        strategies = {"reread_source": "用原文定位重新读取被校验指出的材料，再重新核对候选。"}
-        if evidence_only:
-            strategies = {"repair_evidence": "重读涉及的原文，仅核对未通过的来源引用。"}
-        elif draft is not None:
-            strategies = {"repair_candidate": "保留已核对的候选，仅重读和修正未通过的原文去向。"}
-
-        incident = _active_runtime_resume(run)
-        invocation_key = [scope.run_id, branch_id, failure["step"]]
-        if incident:
-            invocation_key.append(incident["id"])
-        invocation_id = "invoke_catalog_recovery_" + canonical_hash(invocation_key)[7:]
-        worker = RunScope(scope.run_id, invocation_id, "execute", "product_facts", branch_id)
+        from .catalog_extract import CatalogResponseRejection, extract_catalog_report, validate_catalog_submission
         from .runtime_recovery import step_model_attempts, step_request_pending
-        attempts = step_model_attempts(engine, worker)
-        if incident:
-            prepared = await prepared_source(worker, run["input"]["material_refs"])
-            if prepared and failure["evidence_hash"] and _same_source(prepared, failure["evidence_hash"]):
-                adopted = await adopt_archived_extraction(worker, run, prepared, branch, attempts, incident)
-                if adopted:
-                    return adopted
-        if step_request_pending(attempts, worker, incident, adopted=branch.get("catalog_adopted_attempt_id")):
-            raise ContractError("CATALOG_EXTRACTION_INTERRUPTED", "当前资料核对仍有未能确认的请求结果。", status=409)
-
-        # A timed-out read or extraction has one known safe next action.
-        if failure["code"] == "CATALOG_EXTRACTION_TIMEOUT":
-            engine.store.update("run", scope.run_id, catalog_timeout_retry=True)
-            strategy = "reread_source"
-        elif incident:
-            # The durable runtime decision already authorized this exact failed step.
-            strategy = next(iter(strategies))
-        else:
-            strategy = await engine.recover_fixed_step(worker, failure, strategies=strategies, automatic_if_single=True)
-        if strategy not in strategies:
-            raise original
-        recovery_event = {"workflow": failure["workflow"], "step": failure["step"], "strategy": strategy}
-        try:
-            async with asyncio.timeout(75):
-                prepared = await prepared_source(worker, run["input"]["material_refs"])
-                if prepared is None or (failure["evidence_hash"] and not _same_source(prepared, failure["evidence_hash"])):
-                    raise ContractError("CATALOG_RECOVERY_SOURCE_CHANGED", "资料或商品字段规则已变化，请重新提交资料。", status=409)
-                options = {"feedback": {"code": original.code, "details": original.details}, "alternate_layout": True}
-                if strategy == "repair_candidate":
-                    options = {"feedback": CoverageCorrection(original, draft),
-                               "reread_evidence": await reread_catalog_evidence(engine, worker, prepared, original.details)}
-                elif strategy == "repair_evidence":
-                    options = {"feedback": EvidenceCorrection(original, draft),
-                               "reread_evidence": await reread_catalog_evidence(engine, worker, prepared, original.details)}
-                elif strategy == "reread_source" and failure["code"] != "CATALOG_EXTRACTION_TIMEOUT":
-                    options["reread_evidence"] = await reread_catalog_evidence(engine, worker, prepared, original.details)
-                if incident:
-                    options["user_hint"] = _resume_hint(incident)
-                try:
-                    report = await extract_catalog_report(engine, worker, prepared, timeout_seconds=70, **options)
-                except SessionCorrection as error:
-                    return session_repair_state(worker, error, prepared)
-                if report.get("document_session_only"):
-                    engine.store.update("branch", branch_id, status="CANCELLED",
-                                        summary="资料只包含本场配置，无商品需要入库。")
-                    return {"step": "document", "recovery_draft": None}
-                if report.get("conflicts") or not report.get("fields", {}).get("products"):
-                    raise ContractError("CATALOG_RECOVERY_UNRESOLVED",
-                        "重新核对后仍无法确认可保存的商品。请核对资料中的商品型号、日常售价和款式归属。", status=422)
-                step = accept_extraction(worker, report)
-        except TimeoutError:
-            engine.trace.try_emit(scope.run_id, "fixed_step_recovery.failed", {**recovery_event,
-                "status": "FAILED", "error_code": "CATALOG_EXTRACTION_TIMEOUT", "title": "重新核对商品资料超时"},
-                invocation_id=worker.invocation_id, branch_task_id=branch_id)
-            raise ContractError("CATALOG_EXTRACTION_TIMEOUT", "资料重新核对超时，请缩小资料范围后重试。", status=408) from None
-        except Exception as error:
-            engine.trace.try_emit(scope.run_id, "fixed_step_recovery.failed", {**recovery_event,
-                "status": "FAILED", "error_code": getattr(error, "code", type(error).__name__),
-                "title": "补救后仍有商品资料未通过核对"}, invocation_id=worker.invocation_id, branch_task_id=branch_id)
-            if evidence_only and isinstance(error, CoverageCorrection):
-                record_validation(worker, error, strategy="repair_coverage")
-                return {"step": "needs_recovery", "recovery_failure": {**failure, "step": "coverage_validation",
-                        "code": error.code, "message": error.message, "status": error.status,
-                        "details": error.details, "disposition": "field_repair"},
-                        "recovery_draft": error.draft, "recovery_draft_kind": "coverage"}
-            if evidence_only and isinstance(error, EvidenceCorrection):
-                record_validation(worker, error, strategy="repair_evidence", status="needs_input")
-                return {"step": "evidence_wait", "recovery_failure": {**failure, "details": error.details},
-                        "recovery_draft": error.draft}
-            raise
-        engine.trace.try_emit(scope.run_id, "fixed_step_recovery.completed", {**recovery_event,
-            "status": "SUCCEEDED", "title": "商品资料重新核对通过，继续入库确认"},
-            invocation_id=worker.invocation_id, branch_task_id=branch_id)
-        return {"step": step, "recovery_draft": None}
-
-    async def session_repair(state: CatalogState, runtime: Runtime[RunScope]):
-        from .catalog_extract import (keep_verified_session_fields, request_catalog_session_patch,
-                                      verify_catalog_session_patch)
-        from .fixed_step_recovery import _archived_calls, _sent_attempt
-        from .providers.chatgpt import ModelProviderError
-
-        scope = runtime.context
-        run = await engine.assert_scope(scope)
-        branch_id, failure, draft = state["branch_id"], state["session_failure"], state["session_draft"]
-        branch = engine.store.get("branch", branch_id)
-        if branch["status"] in {"PREPARED", "ACCEPTED"}:
-            return {"step": "prepare"}
-        if branch.get("catalog_intake_price_draft"):
-            return {"step": "price"}
-        if branch.get("catalog_intake_currency_draft"):
-            return {"step": "currency"}
-        incident = _active_runtime_resume(run)
-        identity = canonical_hash([scope.run_id, branch_id, failure["evidence_hash"],
-                                   (incident or {}).get("id")])[7:]
-        worker = RunScope(scope.run_id, "invoke_session_repair_" + identity, "execute", "product_facts", branch_id)
-        prepared = await prepared_source(worker, run["input"]["material_refs"])
-        if not prepared or not _same_source(prepared, failure["evidence_hash"]):
-            raise ContractError("CATALOG_RECOVERY_SOURCE_CHANGED", "原资料或本场核对规则已变化。", status=409)
-        original = ContractError(failure["code"], failure["message"], status=failure["status"], details=failure["details"])
-        progress(scope, "session_validation", "已保留商品结果，正在单独核对本场配置", status="RECOVERING")
-        attempt = _sent_attempt(engine, worker)
-        try:
-            if attempt and attempt.get("state") == "succeeded" and attempt.get("response_payload_ref"):
-                archived = engine.trace.read_payload(scope.run_id, attempt["response_payload_ref"])
-                output = archived.get("output")
-                raw = output.get("json") if isinstance(output, dict) else None
-                if raw is None:
-                    calls = _archived_calls(engine, worker, attempt)
-                    raw = calls[0].get("args") if len(calls) == 1 and calls[0].get("name") == "repair_catalog_session" else None
-            elif attempt:
-                raw = None
-            else:
-                await engine.recover_fixed_step(worker, failure,
-                    strategies={"repair_session": "仅核对本场未通过的字段，沿用已经通过的商品资料。"},
-                    automatic_if_single=True)
-                async with asyncio.timeout(55):
-                    raw = await request_catalog_session_patch(engine, worker, prepared, failure, draft["session"])
-            session = verify_catalog_session_patch(raw, draft["session"], failure, prepared)
-            if session is None and draft["report"].get("document_session_only"):
-                raise original
-        except (ContractError, TimeoutError, ModelProviderError) as error:
-            if (isinstance(error, ModelProviderError) and (error.outcome_unknown or error.code not in {
-                    "model_tool_call_invalid", "model_empty_completed_response", "model_json_output_invalid"})
-                    or isinstance(error, ContractError) and (error.status in {401, 403} or error.code.endswith("_DENIED"))):
-                raise
-            issue = error if isinstance(error, ContractError) and error.code == original.code else original
-            record_validation(worker, issue, strategy="repair_session", status="needs_input", step="session_validation")
-            session = keep_verified_session_fields(draft["session"], original, prepared)
-            progress(scope, "session_validation", "已保留本场已核实内容，未核对的字段标为待补充", status="SUCCEEDED")
-        else:
-            progress(scope, "session_validation", "本场配置已单独核对通过", status="SUCCEEDED")
-        engine.store.update("branch", branch_id, document_session=session,
-                            document_session_source_hash=failure["evidence_hash"])
-        report = draft["report"]
-        if report.get("document_session_only"):
-            engine.store.update("branch", branch_id, status="CANCELLED", summary="资料只包含本场配置。")
-            return {"step": "document"}
-        if report.get("conflicts") or not report.get("fields", {}).get("products"):
-            raise ContractError("CATALOG_RECOVERY_UNRESOLVED", "仍有商品信息需要核对。", status=422,
-                                details={"unresolved": report.get("conflicts", [])})
-        return {"step": accept_extraction(worker, report)}
-
-    async def adopt_archived_extraction(worker, run, prepared, branch, attempts, incident=None):
-        from .catalog_extract import CatalogResponseRejection, SessionCorrection, validate_catalog_submission
-        from .runtime_recovery import step_request_pending
-
-        for item, args in _archived_catalog_submissions(engine, worker, attempts, _source_fingerprint(prepared),
-                allow_legacy=not branch.get("catalog_source_reprepared")):
-            if step_request_pending(attempts, worker, incident, adopted=item["id"]):
-                continue
-            try:
-                report = await validate_catalog_submission(engine, worker, run, prepared, args)
-            except SessionCorrection as error:
-                return session_repair_state(worker, error, prepared)
-            except CatalogResponseRejection as error:
-                record_validation(worker, error, strategy="extract")
-                continue
-            if report.get("document_session_only"):
-                engine.store.update("branch", worker.branch_task_id, status="CANCELLED", summary="资料只包含本场配置。")
-                return {"step": "document", "recovery_draft": None}
-            if report.get("conflicts") or not report.get("fields", {}).get("products"):
-                continue
-            step = accept_extraction(worker, report)
-            engine.store.update("branch", worker.branch_task_id, catalog_adopted_attempt_id=item["id"])
-            engine._emit(worker.run_id, "catalog_intake.recovery", {
-                "title": "已沿用原任务已收到的提取结果", "status": "RECOVERING",
-                "method": "reuse_archived_response", "attempt_id": item["id"]}, worker)
-            return {"step": step, "recovery_draft": None}
-        return None
-
-    async def evidence_wait(state: CatalogState, runtime: Runtime[RunScope]):
-        from .catalog_extract import EvidenceCorrection, extract_catalog_report
 
         scope = runtime.context
         run = await engine.assert_scope(scope)
@@ -536,57 +273,88 @@ def build_catalog_graph(engine):
         branch = engine.store.get("branch", branch_id)
         if branch["status"] in {"PREPARED", "ACCEPTED"}:
             return {"step": "prepare"}
-        if branch.get("catalog_intake_currency_draft"):
-            return {"step": "currency"}
         if branch.get("catalog_intake_price_draft"):
             return {"step": "price"}
+        if branch.get("catalog_intake_currency_draft"):
+            return {"step": "currency"}
+
         failure = state["recovery_failure"]
-        draft = state["recovery_draft"]
-        draft_hash = canonical_hash(draft)
-        progress(scope, "extract", "已保留提取结果，等待补充原文线索", status="WAITING")
-        affected = []
-        for issue in failure["details"]["issues"]:
-            product = draft["products"][issue["candidate_index"]]["fields"]
-            fields = "、".join(dict.fromkeys(_EVIDENCE_FIELD_LABELS.get(key, "其他商品资料")
-                                           for key in issue["fields"]))
-            affected.append(f"「{product['name'][:80]}」的{fields}")
-        pending = "；".join(affected[:8])
-        result = await engine.request_decision(scope, {"kind": "catalog_evidence_clarification",
-            "prompt": f"还需要确认{pending}的出处。请指出原文件里的页码、表格或段落，系统会只核对这些内容。",
-            "options": [{"value": "skip", "label": "暂不入库"}]}, f"catalog-evidence-{draft_hash}")
-        answer = result.get("answer")
-        if answer == "skip":
-            return {"step": "cancelled", "decision": "skip"}
-        hint = answer.get("text") if isinstance(answer, dict) else None
-        if not isinstance(hint, str) or not hint.strip():
-            raise ContractError("CATALOG_EVIDENCE_HINT_INVALID", "缺少可核对的原文线索。", status=422)
-        invocation_id = "invoke_catalog_evidence_" + canonical_hash([scope.run_id, draft_hash])[7:39]
+        sources = run["input"]["material_refs"]
+        incident = _active_runtime_resume(run)
+        invocation_id = "invoke_catalog_recovery_" + canonical_hash([scope.run_id, branch_id, failure["step"]])[7:]
         worker = RunScope(scope.run_id, invocation_id, "execute", "product_facts", branch_id)
-        with engine.store.tx() as db:
-            sent = db.execute("""SELECT 1 FROM attempts WHERE run_id=?
-                AND json_extract(body,'$.invocation_id')=? AND json_extract(body,'$.sent_at') IS NOT NULL LIMIT 1""",
-                (scope.run_id, invocation_id)).fetchone()
-        if sent:
-            raise ContractError("CATALOG_EXTRACTION_INTERRUPTED", "补充线索的核对已发出，请查看原有执行记录。", status=409)
-        prepared = await prepared_source(worker, run["input"]["material_refs"])
-        if prepared is None or not _same_source(prepared, failure["evidence_hash"]):
-            raise ContractError("CATALOG_RECOVERY_SOURCE_CHANGED", "原始资料或字段规则已变化，请重新核对。", status=409)
-        from .runtime_recovery import step_model_attempts
-        adopted = await adopt_archived_extraction(worker, run, prepared, branch, step_model_attempts(engine, worker),
-                                                   _active_runtime_resume(run))
-        if adopted:
-            return adopted
-        engine.store.update("run", scope.run_id, catalog_evidence_hint_retry=True)
-        progress(scope, "extract", "正在根据补充线索核对原文", status="RECOVERING")
-        original = ContractError(failure["code"], failure["message"], status=failure["status"], details=failure["details"])
+        attempts = step_model_attempts(engine, worker)
+        snapshot = branch.get("catalog_prepared_source")
+        original_attempts = [item for item in attempts if item.get("invocation_id") != invocation_id]
+        original_archive = next(_archived_catalog_submissions(engine, worker, original_attempts,
+            _source_fingerprint(snapshot), allow_legacy=not branch.get("catalog_source_reprepared")),
+            (None, None)) if snapshot else (None, None)
+
+        if not (failure["details"].get("major_extraction_failure") is True or failure["code"] in {
+                "CATALOG_EXTRACTION_TIMEOUT", "MODEL_TIMEOUT", "model_tool_call_invalid",
+                "model_empty_completed_response", "model_json_output_invalid"}):
+            # Older graph checkpoints may be waiting on a retired citation or coverage gate.
+            return await reuse_legacy_result(state, runtime)
+
+        strategies = {"reread_full_source": "重新打开完整原件，用完整正文和原始顺序提取，绕开首次的读取视图。"}
+        if snapshot:
+            strategies["structured_source_layout"] = "沿用同一原件，改用带行列和段落顺序的表格结构提取。"
+        strategy = await engine.recover_fixed_step(worker, failure, strategies=strategies)
+        progress(scope, "extract", "主 Agent 已选择另一种读取方式，正在重新提取", status="RECOVERING")
         try:
-            report = await extract_catalog_report(engine, worker, prepared, feedback=EvidenceCorrection(original, draft),
-                                                  user_hint=hint[:1200], timeout_seconds=70)
-        except EvidenceCorrection as error:
-            record_validation(worker, error, strategy="verify_user_source_hint")
-            raise ContractError("CATALOG_EVIDENCE_UNCONFIRMED",
-                                "补充线索未能核实待处理信息，草稿已保留。请补充可核对的原始资料。", status=422) from error
-        return {"step": accept_extraction(worker, report), "recovery_draft": None}
+            async with asyncio.timeout(110):
+                prepared = await prepared_source(worker, sources, full_source=strategy == "reread_full_source")
+                if prepared is None:
+                    raise CatalogResponseRejection("CATALOG_SOURCE_LAYOUT_UNSUPPORTED",
+                        "换一种方式读取后，仍未能读出商品资料。", status=422)
+                attempts = step_model_attempts(engine, worker)
+                retried = [item for item in attempts if item.get("invocation_id") == invocation_id]
+                archived, arguments = next(_archived_catalog_submissions(engine, worker, retried,
+                    _source_fingerprint(prepared), allow_legacy=False), (None, None))
+                if step_request_pending(attempts, worker, incident, adopted=archived["id"] if archived else None):
+                    raise ContractError("CATALOG_EXTRACTION_INTERRUPTED",
+                        "换一种方式读取的请求仍未确认结果，已保留本次资料。", status=409)
+                if archived:
+                    report = await validate_catalog_submission(engine, worker, run, prepared, arguments, allow_partial=True)
+                else:
+                    report = await extract_catalog_report(engine, worker, prepared,
+                        alternate_layout=strategy == "structured_source_layout", allow_partial=True, timeout_seconds=104)
+                step = next_extraction_step(worker, report)
+        except (TimeoutError, ContractError) as error:
+            if (original_archive[0] is None or not (isinstance(error, (TimeoutError, CatalogResponseRejection))
+                    or error.code in {"CATALOG_EXTRACTION_TIMEOUT", "MODEL_TIMEOUT"})):
+                raise
+            # A failed alternate read must not erase usable facts in the original response.
+            report = await validate_catalog_submission(engine, worker, run, snapshot, original_archive[1], allow_partial=True)
+            step = next_extraction_step(worker, report)
+        engine._emit(scope.run_id, "fixed_step_recovery.completed", {"workflow": "catalog_intake",
+            "step": "extract", "strategy": strategy, "status": "SUCCEEDED", "title": "已完成替代读取，继续导入"}, worker)
+        return {"step": step}
+
+    async def reuse_legacy_result(state: CatalogState, runtime: Runtime[RunScope]):
+        from .catalog_extract import validate_catalog_submission
+        from .runtime_recovery import step_model_attempts
+
+        scope = runtime.context
+        run = await engine.assert_scope(scope)
+        branch_id = state["branch_id"]
+        branch = engine.store.get("branch", branch_id)
+        if branch["status"] in {"PREPARED", "ACCEPTED"}:
+            return {"step": "prepare"}
+        if branch.get("catalog_intake_price_draft"):
+            return {"step": "price"}
+        if branch.get("catalog_intake_currency_draft"):
+            return {"step": "currency"}
+        worker = RunScope(scope.run_id, scope.invocation_id, "execute", "product_facts", branch_id)
+        prepared = await prepared_source(worker, run["input"]["material_refs"])
+        if prepared:
+            archive = next(_archived_catalog_submissions(engine, worker, step_model_attempts(engine, worker),
+                _source_fingerprint(prepared), allow_legacy=not branch.get("catalog_source_reprepared")), None)
+            if archive:
+                report = await validate_catalog_submission(engine, worker, run, prepared, archive[1], allow_partial=True)
+                engine.store.update("branch", branch_id, catalog_adopted_attempt_id=archive[0]["id"])
+                return {"step": next_extraction_step(worker, report)}
+        raise ContractError("CATALOG_EXTRACTION_INTERRUPTED", "没有找到本次导入的可用回复，已保留原资料。", status=409)
 
     async def currency(state: CatalogState, runtime: Runtime[RunScope]):
         scope = runtime.context
@@ -664,7 +432,7 @@ def build_catalog_graph(engine):
                 row["price"] = prices[row["sku_id"]]
         report.setdefault("insights", []).extend({"kind": "catalog_human_daily_price", **receipt} for receipt in receipts)
         worker = RunScope(scope.run_id, scope.invocation_id, "execute", "product_facts", branch_id)
-        engine.submit_report(worker, report, strict_evidence=True)
+        engine.submit_report(worker, report)
         return {"step": "prepare"}
 
     async def prepare(state: CatalogState, runtime: Runtime[RunScope]):
@@ -794,8 +562,8 @@ def build_catalog_graph(engine):
     graph = StateGraph(CatalogState, context_schema=RunScope)
     graph.add_node("extract", extract)
     graph.add_node("recover", recover)
-    graph.add_node("session_repair", session_repair)
-    graph.add_node("evidence_wait", evidence_wait)
+    graph.add_node("session_repair", reuse_legacy_result)
+    graph.add_node("evidence_wait", reuse_legacy_result)
     graph.add_node("currency", currency)
     graph.add_node("price", price)
     graph.add_node("prepare", prepare)
@@ -804,12 +572,10 @@ def build_catalog_graph(engine):
     graph.add_node("document", document)
     graph.add_edge(START, "extract")
     next_steps = {"currency": "currency", "price": "price", "prepare": "prepare", "document": "document"}
-    graph.add_conditional_edges("extract", lambda s: s["step"], {**next_steps, "needs_recovery": "recover", "session_repair": "session_repair"})
-    graph.add_conditional_edges("recover", lambda s: s["step"], {**next_steps, "evidence_wait": "evidence_wait", "session_repair": "session_repair",
-                                                                            "needs_recovery": "recover"})
+    graph.add_conditional_edges("extract", lambda s: s["step"], {**next_steps, "needs_recovery": "recover"})
+    graph.add_conditional_edges("recover", lambda s: s["step"], next_steps)
     graph.add_conditional_edges("session_repair", lambda s: s["step"], next_steps)
-    graph.add_conditional_edges("evidence_wait", lambda s: s["step"], {**next_steps, "cancelled": END,
-                                                                          "session_repair": "session_repair"})
+    graph.add_conditional_edges("evidence_wait", lambda s: s["step"], next_steps)
     graph.add_conditional_edges("currency", lambda s: s["step"], next_steps)
     graph.add_conditional_edges("price", lambda s: s["step"], {"price": "price", "prepare": "prepare"})
     graph.add_edge("prepare", "confirm")

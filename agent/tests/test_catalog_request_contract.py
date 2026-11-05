@@ -6,7 +6,7 @@ import pytest
 
 from shengbo_prelive.catalog_extract import extract_catalog_report
 from shengbo_prelive.catalog_intake import BASIC_CREATE_REQUEST
-from shengbo_prelive.document_import import SessionImport
+from shengbo_prelive.document_import import SessionFacts
 from shengbo_prelive.providers.chatgpt import ModelProviderError
 from shengbo_prelive.providers.deepseek import DeepSeekAgentModel
 from test_catalog_coverage import prepared
@@ -49,11 +49,18 @@ async def test_mixed_import_has_both_contracts_and_keeps_mixed_table_rows_in_cat
         "cell_text": "79 元", "resolved_by_program": True}]
     assert any(unit["location"] == "L2" and unit["text"] == "99 元" for unit in inputs["source_units"])
     assert not any(unit["text"] in {"79 元", "12 件"} for unit in inputs["source_units"])
-    assert "商品部分" in system and "本场部分" in system
-    assert "U 编号仅用于 coverage" in system and "勿在 session.prices 重复输出" in system
+    assert "products 直接放商品字段" in system and "独立的 session 输出" in system
+    assert "勿在 session.prices 重复输出" in system
 
     example = json.loads(system.rsplit("\n", 1)[-1])
-    parsed = SessionImport.model_validate(example["session"])
-    assert parsed.prices[0].sku == "BOX-A" and parsed.prices[0].amount == 79
-    assert parsed.rules and parsed.scene == [] and example["products"][0]["fields"]["price"] == 99
-    assert example["products"][0]["evidence"][-1]["fields"] == ["currency"]
+    assert set(example) == {"products", "questions", "session"} and example["session"] is None
+    assert example["products"][0]["price"] == 99
+    schema = inputs["output_schema"]
+    assert set(schema["properties"]) == {"products", "questions", "session"}
+    assert {"evidence", "fields", "quote", "coverage"}.isdisjoint(schema["properties"]["products"]["items"]["properties"])
+    assert {"sku", "amount"} == set(schema["$defs"]["SessionFactsPrice"]["properties"])
+    assert {"start", "end"} == set(schema["$defs"]["SessionFactsWindow"]["properties"])
+    assert {"location", "quote"}.isdisjoint(schema["$defs"]["SessionFactsCoupon"]["properties"])
+    parsed = SessionFacts.model_validate({"schedule": {"start": "2026-11-12T19:30:00+08:00"},
+                                          "rules": ["每账号限购 2 件。"]})
+    assert parsed.schedule.end is None and parsed.prices == [] and parsed.coupon is None

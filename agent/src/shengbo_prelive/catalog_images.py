@@ -112,7 +112,7 @@ def _product_image_data_url(mime, original):
     return f"data:{mime};base64," + base64.b64encode(original).decode("ascii")
 
 
-async def attach_catalog_photos(engine, scope, conversation_id, report, links):
+async def attach_catalog_photos(engine, scope, conversation_id, report, links, *, record_evidence=True):
     rows = {row["sku_id"]: row for row in report["fields"]["products"]}
     for link in links:
         sku = link["sku_id"]
@@ -123,6 +123,7 @@ async def attach_catalog_photos(engine, scope, conversation_id, report, links):
         if "sha256:" + sha256(original).hexdigest() != link["original_sha256"]:
             raise ContractError("MATERIAL_BLOB_INTEGRITY_FAILED", "商品图无法与原始附件的精确位置核对。", status=409)
         rows[sku]["image"] = await asyncio.to_thread(_product_image_data_url, mime, original)
-        report["evidence"].append({"id": "image_caption_" + canonical_hash(link)[7:39], "sku_id": sku, "fields": ["image"],
-            "source_ref": link["source_ref"], "locator": link["caption_locator"], "quote": link["caption_quote"]})
+        if record_evidence:
+            report["evidence"].append({"id": "image_caption_" + canonical_hash(link)[7:39], "sku_id": sku, "fields": ["image"],
+                "source_ref": link["source_ref"], "locator": link["caption_locator"], "quote": link["caption_quote"]})
         report.setdefault("insights", []).append({"kind": "catalog_product_image", **link})

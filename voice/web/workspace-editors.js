@@ -65,6 +65,7 @@
     if(!api)throw Error('业务工作区 API 尚未初始化');
     const container=options.container;const storage=options.storage===null?null:(options.storage||global.localStorage);const prefix='shengbo.workbench.buffer.v2:';
     const buffers=new Map(),cache=new Map(),replacements=new Map(),operations=new Map(),productMaterialFlows=new Map(),catalogViewStates=new Map();
+    const catalogThumbnailReads=new Map();
     const pendingRoomCreations=new Map(), roomMaterialFlows=new Map();
     let unknownOperation=null;try{const pending=JSON.parse(storage?.getItem(prefix+'pending-operation')||'null');if(pending?.operationId&&pending?.fingerprint)unknownOperation=pending;}catch{}
     let current={view:'overview'},snapshot=null,schema=null,voiceOptions=null,openGeneration=0,busy=false,disposed=false,scriptReader=null,productDialog=null;
@@ -735,7 +736,8 @@
       footer.append(count,pager);
       const columns=E('div',undefined,'wb-catalog-columns');
       if(pid)columns.dataset.hasSelection='';
-      columns.append(E('span','商品与资料'),E('span','促销 / 物流','wb-catalog-fulfillment-heading'),
+      columns.append(E('span','商品名称'),E('span','核心卖点','wb-catalog-field-heading'),
+        E('span','促销','wb-catalog-field-heading'),E('span','物流','wb-catalog-field-heading'),
         E('span','日常售价','wb-catalog-price-heading'),E('span','在售状态','wb-catalog-status-heading'),E('span','操作','wb-catalog-actions-heading'));
       inventory.append(inventoryHead,columns,window,footer);
       node.append(add,inventory);
@@ -758,18 +760,43 @@
         const frame=E('span',undefined,'wb-catalog-thumbnail');
         const placeholder=E('span','无图');
         placeholder.setAttribute('aria-hidden','true');
-        const source=product.thumbnail_url;
-        const raster=typeof source==='string'&&source.length<=16464&&/^data:image\/(?:png|jpeg|webp);base64,[A-Za-z0-9+/]+={0,2}$/i.test(source);
-        const local=typeof source==='string'&&/^\/(?:assets\/(?:product-images|product-thumbnails)|product-images|api\/prelive\/v2\/product-thumbnail)\/[a-zA-Z0-9_-]+\.(?:png|jpe?g|webp)$/i.test(source);
-        if(raster||local){
+        const raster=source=>typeof source==='string'&&source.length<=4500000
+          &&/^data:image\/(?:png|jpeg|webp);base64,[A-Za-z0-9+/]+={0,2}$/i.test(source);
+        const local=source=>typeof source==='string'
+          &&/^\/(?:assets\/(?:product-images|product-thumbnails)|product-images|api\/prelive\/v2\/product-thumbnail)\/[a-zA-Z0-9_-]+\.(?:png|jpe?g|webp)$/i.test(source);
+        const show=(source,onError)=>{
           const image=E('img');
           image.alt='';
           image.loading='lazy';
           image.decoding='async';
-          image.addEventListener('error',()=>frame.replaceChildren(placeholder),{once:true});
+          image.addEventListener('error',onError,{once:true});
           image.src=source;
-          frame.append(image);
-        }else frame.append(placeholder);
+          frame.replaceChildren(image);
+        };
+        function loadSavedImage(){
+          frame.replaceChildren(placeholder);
+          const ref=product.ref;
+          if(product.has_image===false||!ref?.id)return;
+          const key=JSON.stringify([ref.id,ref.revision,ref.content_hash]);
+          let pending=catalogThumbnailReads.get(key);
+          if(!pending){
+            pending=api.query('read_product',{ref}).then(record=>{
+              if(!equal(ref,record.ref)||!raster(record.body?.image))return '';
+              return record.body.image;
+            }).catch(()=>{
+              if(catalogThumbnailReads.get(key)===pending)catalogThumbnailReads.delete(key);
+              return '';
+            });
+            catalogThumbnailReads.set(key,pending);
+            if(catalogThumbnailReads.size>32)catalogThumbnailReads.delete(catalogThumbnailReads.keys().next().value);
+          }
+          void pending.then(image=>{
+            if(image)show(image,()=>frame.replaceChildren(placeholder));
+          });
+        }
+        const source=product.thumbnail_url;
+        if((raster(source)&&source.length<=16464)||local(source))show(source,loadSavedImage);
+        else loadSavedImage();
         return frame;
       }
       function productRow(product){
@@ -794,34 +821,25 @@
         const name=E('strong',product.name);
         name.title=product.name;
         const retained=picked.has(product.ref.id)&&!equal(picked.get(product.ref.id),product.ref);
-        const platform=product.sales_platform!=='unspecified'&&PLATFORM_LABELS[product.sales_platform];
         const specs=Number.isInteger(product.specification_count)?product.specification_count+' 项规格':null;
-        const knowledge=product.knowledge_document_count>0?product.knowledge_document_count+' 份知识文档':product.has_knowledge||product.has_faq?'有知识资料':null;
-        const info=[retained?'本场引用旧修订':null,platform,specs,knowledge].filter(Boolean).join(' · ');
-        const caption=info||[product.sku_id?'SKU '+product.sku_id:null,product.display_number?'编号 '+product.display_number:null].filter(Boolean).join(' · ');
+        const knowledge=Number.isInteger(product.knowledge_document_count)?product.knowledge_document_count+' 份文档':null;
+        const caption=[specs,knowledge].filter(Boolean).join(' · ');
         text.append(name);
-        if(caption){
-          const metadata=E('span',caption,'wb-catalog-product-info');
-          metadata.title=caption;
-          text.append(metadata);
-        }
-        const points=Array.isArray(product.selling_points_preview)?product.selling_points_preview.filter(point=>typeof point==='string'&&point.trim()).slice(0,3):[];
-        if(!points.length&&typeof product.selling_point_preview==='string'&&product.selling_point_preview.trim())points.push(product.selling_point_preview);
-        if(points.length){
-          const highlights=E('ul',undefined,'wb-catalog-selling-points');
-          highlights.setAttribute('aria-label','核心卖点');
-          for(const point of points){
-            const item=E('li',point,'wb-catalog-selling-point');
-            item.title=point;
-            highlights.append(item);
-          }
-          text.append(highlights);
-        }
-        const details=E('dl',undefined,'wb-catalog-fulfillment');
-        for(const [label,value] of [['商品库促销',product.promotion_preview],['发货时效',product.shipping_time_preview]]){
-          const description=E('dd',value||'未填写');
-          if(value)description.title=value;
-          details.append(E('dt',label),description);
+        if(caption)text.append(E('span',caption,'wb-catalog-product-info'));
+
+        const point=(Array.isArray(product.selling_points_preview)&&product.selling_points_preview.find(value=>typeof value==='string'&&value.trim()))||
+          (typeof product.selling_point_preview==='string'&&product.selling_point_preview.trim())||'';
+        const details=E('div',undefined,'wb-catalog-details');
+        for(const [label,value,kind] of [
+          ['核心卖点',point,'selling-point'],['促销',product.promotion_preview,'promotion'],['物流',product.shipping_time_preview,'shipping']
+        ]){
+          const field=E('dl',undefined,'wb-catalog-field wb-catalog-'+kind);
+          const original=typeof value==='string'?value.replace(/\s+/g,' ').trim():'';
+          const preview=[...original];
+          const description=E('dd',preview.length>52?preview.slice(0,52).join('')+'…':original||'未填写');
+          if(original)description.title=original;
+          field.append(E('dt',label),description);
+          details.append(field);
         }
         const summary=E('div',undefined,'wb-catalog-summary');
         summary.append(text,details);
@@ -832,6 +850,11 @@
         const badge=E('span',available?'在售':'停售','wb-catalog-status-value');
         badge.dataset.available=String(available);
         status.append(E('span','状态','wb-catalog-cell-label'),badge);
+        if(retained){
+          const revision=E('span','引用旧版','wb-catalog-revision');
+          revision.title='本场仍引用该商品的旧修订';
+          status.append(revision);
+        }
         const actions=E('div',undefined,'wb-catalog-row-actions');
         actions.append(button('编辑',()=>navigate({view:'products',product_id:product.ref.id,action:null}),false,{openProduct:''}));
         if(!pid){
@@ -2440,7 +2463,7 @@
       async function load(){const page=await api.query('read_events',{cursor,limit:50,scope_id:pid,include_catalog:true,order:'desc'});for(const event of page.events||page.items||[]){const id=event.event_id||event.sequence||JSON.stringify(event);if(seen.has(id))continue;seen.add(id);list.append(jsonDetails((event.type||event.event_type||'业务变更')+' · '+(event.timestamp||event.occurred_at||''),event));}cursor=page.next_cursor;more.hidden=!page.has_more;if(!seen.size&&!list.childElementCount)list.append(E('p','当前本场和共享商品库暂无变更记录。','wb-muted'));}
       await load();
     }
-    function dispose(){closeProductDialog({restoreFocus:false,keepDraft:true});closeScriptReader({restoreFocus:false,force:true});document.removeEventListener('keydown',readerKeydown);disposed=true;lockObserver.disconnect();lockedControls.clear();cache.clear();productMaterialFlows.clear();roomMaterialFlows.clear();catalogViewStates.clear();catalogResizeObserver?.disconnect();}
+    function dispose(){closeProductDialog({restoreFocus:false,keepDraft:true});closeScriptReader({restoreFocus:false,force:true});document.removeEventListener('keydown',readerKeydown);disposed=true;lockObserver.disconnect();lockedControls.clear();cache.clear();productMaterialFlows.clear();roomMaterialFlows.clear();catalogViewStates.clear();catalogThumbnailReads.clear();catalogResizeObserver?.disconnect();}
     return {open,renderRoomOverlay,showRoomProductDetail,openSessionProductConfig,closeCatalogImportDialog,getContext,hasOpenProductDialog:()=>!!productDialog,hasOpenScriptReader:()=>!!scriptReader,hasOpenSessionProductConfig:()=>!!content.querySelector('dialog[data-session-product-id][open]'),setEditorLocks,setSelected,hasDirty,getDirtySummary,saveDirty,discardDirty,resolveSelection,refresh,createPreparation,resolveDefaultRoomPreparation,saveRoomProductSelection,refreshRoomProductReference,verifyUnknownOperation,dispose,_inspect:()=>({current:copy(current),dirty:getDirtySummary(),cache:cache.size,disposed,unknownOperation:copy(unknownOperation)})};
   }
   global.ShengboWorkspaceEditors={mount,preparationTitle,preparationAdopted,_test:{schemaDefault,effectiveSchema,safeUrl,reusableDraft,trimCommerceReferences,matchingLocks,newVariantModuleKeys,scriptTextMetrics,currentScriptVariants,playbackSummary,activeProductFields,applyOptionalProductVisibility,unpackCorePoint,packCorePoint,preparationTitle,preparationAdopted,preparationStateLabel}};

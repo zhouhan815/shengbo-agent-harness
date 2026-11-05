@@ -6,9 +6,9 @@
   <meta name="color-scheme" content="light">
   <title>声播 · 播前 Agent 工作台</title>
   <link rel="icon" href="/assets/favicon.svg">
-  <link rel="stylesheet" href="/assets/assistant.css?v=20261104-workflow-progress-v1">
+  <link rel="stylesheet" href="/assets/assistant.css?v=20261105-tab-delete-v1">
   <link rel="stylesheet" href="/assets/agent-workbench.css?v=20261104-room-console-v2">
-  <link rel="stylesheet" href="/assets/catalog-layout.css?v=20261104-product-close">
+  <link rel="stylesheet" href="/assets/catalog-layout.css?v=20261105-columns-v1">
   <link rel="stylesheet" href="/assets/rooms-layout.css?v=20261103-inline-room-v1">
   <link rel="stylesheet" href="/assets/room-dashboard.css?v=20261104-room-console-v2">
   <link rel="stylesheet" href="/assets/room-product-picker.css?v=20261103-blue-workbench-v1">
@@ -18,6 +18,7 @@
   <link rel="stylesheet" href="/assets/room-canvas.css?v=20261104-room-product-revision-v1">
   <link rel="stylesheet" href="/assets/room-live-history.css?v=20261104-room-console-v2">
   <link rel="stylesheet" href="/assets/session-layout.css?v=20261104-compact-room-v3">
+  <link rel="stylesheet" href="/assets/model-key-setup.css?v=20261105-agent-panel-v2">
 </head>
 <body class="wb-app" data-focus-mode="chat" data-mobile-panel="chat">
   <a class="wb-skip" href="#assistant-container">跳转到 Agent 对话</a>
@@ -167,7 +168,7 @@
         <footer class="wb-panel-footer"><button type="button" class="wb-button wb-button--quiet" id="return-from-result" hidden>返回查看成果前的位置</button></footer>
       </section>
 
-      <section class="wb-chat-panel" id="chat-panel" tabindex="-1" aria-label="播前 Agent 主对话">
+      <section class="wb-chat-panel" id="chat-panel" tabindex="-1" aria-label="声波 Agent 主对话">
         <div id="assistant-container" class="wb-assistant-container" tabindex="-1"></div>
       </section>
     </div>
@@ -175,14 +176,15 @@
   <div class="wb-sr-only" id="workbench-live" role="status" aria-live="polite"></div>
   <noscript><p class="wb-noscript">请启用 JavaScript 后使用播前 Agent 工作台。</p></noscript>
   <script src="/assets/assistant-decision-copy.js?v=20261103-catalog-report-v1"></script>
-  <script src="/assets/assistant.js?v=20261104-document-report-v2"></script>
+  <script src="/assets/assistant.js?v=20261105-tab-delete-v1"></script>
   <script src="/assets/continuous-player.js"></script><script src="/assets/audio-player.js"></script>
   <script src="/assets/audio-output.js"></script>
   <script src="/assets/audio-routing.js?v=20261104-room-console-v2"></script>
   <script src="/assets/workbench-api.js"></script>
-  <script src="/assets/workspace-editors.js?v=20261104-room-product-revision-v1"></script>
+  <script src="/assets/workspace-editors.js?v=20261105-columns-v2"></script>
   <script src="/assets/workbench-execution.js?v=20261104-room-console-v2"></script>
   <script src="/assets/room-live-history.js?v=20261104-room-console-v2"></script>
-  <script src="/assets/agent-workbench.js?v=20261104-room-product-revision-v1"></script>
+  <script src="/assets/agent-workbench.js?v=20261105-agent-panel-v2"></script>
+  <script src="/assets/model-key-setup.js?v=20261105-agent-panel-v2"></script>
 </body>
 </html>

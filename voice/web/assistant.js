@@ -172,6 +172,15 @@
     let sessionPromise = null;
     let nextProgressPollAt = 0;
     let preflighting = false;
+    let showWelcome = true;
+    let highlightedMessageId = null;
+    let historySignature = null;
+    let deletingConversation = false;
+    let deletionTarget = null;
+    const messageTime = new Intl.DateTimeFormat('zh-CN', {
+      year: 'numeric', month: '2-digit', day: '2-digit',
+      hour: '2-digit', minute: '2-digit', second: '2-digit', hourCycle: 'h23'
+    });
     const pointRequestStorageKey = prefix + ':catalog-point-requests';
     const storedPointRequests = readStore(storage, pointRequestStorageKey, []);
     const catalogPointRequests = new Map((Array.isArray(storedPointRequests) ? storedPointRequests : [])
@@ -192,29 +201,94 @@
     const catalogDeferrals = new Set(Array.isArray(storedCatalogDeferrals) ? storedCatalogDeferrals : []);
     const node = (tag, cls, text) => { const n = doc.createElement(tag); if (cls) n.className = cls; if (text !== undefined) n.textContent = safeText(text); return n; };
     const button = (text, fn, cls = '') => { const b = node('button', cls, text); b.type = 'button'; b.addEventListener('click', fn); return b; };
-    const root = node('section', 'sb-assistant'); root.setAttribute('aria-label', '播前 Agent 对话'); container.append(root);
+    const root = node('section', 'sb-assistant'); root.setAttribute('aria-label', '声波 Agent 对话'); container.append(root);
     const head = node('div', 'sb-a-header');
-    const identity = node('div', 'sb-a-identity'); identity.append(node('span', 'sb-a-mark', '声'), node('div', '', ''));
-    identity.lastChild.append(node('strong', '', options.title || '播前助手'), node('small', '', options.subtitle || '资料、场景、本场配置与话术'));
-    const newTask = button('新对话', () => { if (!preflighting) createConversation(); }, 'sb-a-new'); head.append(identity, newTask);
-    const tools = node('div', 'sb-a-toolbar');
-    const picker = node('select', 'sb-a-picker'); picker.setAttribute('aria-label', '选择已有对话'); picker.addEventListener('change', () => {
-      if (preflighting || state.sending || state.uploading || state.preparingTask) {
-        picker.value = state.conversation?.conversation_id || '';
+    function avatar(className) {
+      const mark = node('span', className);
+      mark.setAttribute('aria-hidden', 'true');
+      const img = node('img', 'sb-a-avatar');
+      img.src = '/assets/shengbo-agent-avatar.png';
+      img.alt = '';
+      mark.append(img);
+      return mark;
+    }
+    const identity = node('div', 'sb-a-identity');
+    const title = node('div');
+    title.append(node('strong', '', '声波 Agent'), node('small', '', options.subtitle || '整理资料、修改内容、查看保存结果'));
+    identity.append(avatar('sb-a-mark'), title);
+    const newTask = button('新对话', () => { if (!preflighting) createConversation(); }, 'sb-a-new');
+    head.append(identity, newTask);
+    const tabbar = node('div', 'sb-a-tabbar');
+    const tabs = node('div', 'sb-a-tabs');
+    tabs.setAttribute('role', 'tablist');
+    tabs.setAttribute('aria-label', '切换对话');
+    tabbar.append(tabs);
+    tabs.addEventListener('keydown', event => {
+      const choices = tabChoices().filter(tab => !tab.disabled);
+      const index = choices.indexOf(doc.activeElement);
+      if (index < 0) return;
+      if (event.key === 'Delete') {
+        event.preventDefault();
+        showDeleteConversation(choices[index].dataset.conversationId);
         return;
       }
-      loadConversation(picker.value);
+      if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+      const next = event.key === 'Home' ? 0 : event.key === 'End' ? choices.length - 1 :
+        (index + (event.key === 'ArrowRight' ? 1 : choices.length - 1)) % choices.length;
+      event.preventDefault();
+      choices.forEach((tab, position) => { tab.tabIndex = position === next ? 0 : -1; });
+      choices[next].focus({ preventScroll: true });
+      revealTab(choices[next]);
     });
-    const toggleLabel = node('label', 'sb-a-switch'); const toggle = node('input'); toggle.type = 'checkbox'; toggle.checked = state.showProcess; toggle.setAttribute('role', 'switch'); toggle.setAttribute('aria-label', '显示执行过程'); const track = node('span', 'sb-a-switch-track'); track.setAttribute('aria-hidden', 'true'); toggleLabel.append(toggle, track, node('span', '', '执行过程')); toggle.addEventListener('change', () => { state.showProcess = toggle.checked; writeStore(storage, prefix + ':process', toggle.checked); renderConversation(); }); tools.append(picker, toggleLabel);
+    const tools = node('div', 'sb-a-toolbar');
+    const history = node('details', 'sb-a-history');
+    const historyToggle = node('summary', 'sb-a-history-toggle', '对话记录 · 0 条');
+    const historyMenu = node('div', 'sb-a-history-menu');
+    history.append(historyToggle, historyMenu);
+    history.addEventListener('keydown', event => {
+      if (event.key !== 'Escape' || !history.open) return;
+      event.preventDefault();
+      history.open = false;
+      historyToggle.focus();
+    });
+    const dismissHistory = event => {
+      if (history.open && !history.contains(event.target)) history.open = false;
+    };
+    doc.addEventListener('pointerdown', dismissHistory);
+    const toggleLabel = node('label', 'sb-a-switch');
+    const toggle = node('input');
+    toggle.type = 'checkbox';
+    toggle.checked = state.showProcess;
+    toggle.setAttribute('role', 'switch');
+    toggle.setAttribute('aria-label', '显示执行过程');
+    const track = node('span', 'sb-a-switch-track');
+    track.setAttribute('aria-hidden', 'true');
+    toggleLabel.append(toggle, track, node('span', '', '执行过程'));
+    toggle.addEventListener('change', () => {
+      state.showProcess = toggle.checked;
+      writeStore(storage, prefix + ':process', toggle.checked);
+      revealConversation();
+      renderConversation();
+    });
+    tools.append(history, toggleLabel);
     const context = node('div', 'sb-a-context');
     const errorBox = node('div', 'sb-a-error'); errorBox.hidden = true; errorBox.setAttribute('role', 'status');
-    const transcript = node('div', 'sb-a-transcript'); transcript.setAttribute('role', 'region'); transcript.setAttribute('aria-label', '对话及任务过程'); transcript.tabIndex = 0;
+    const transcript = node('div', 'sb-a-transcript');
+    transcript.id = 'sb-transcript-' + uuid();
+    transcript.setAttribute('role', 'region');
+    transcript.setAttribute('aria-label', '对话及任务过程');
+    transcript.tabIndex = 0;
     const liveNotice = node('div', 'sb-a-sr'); liveNotice.setAttribute('aria-live', 'polite'); liveNotice.setAttribute('role', 'status');
     const decisionBar = node('div', 'sb-a-decision-bar'); decisionBar.hidden = true;
     const decisionLabel = node('span', '', '');
     const showDecisions = button('查看待确认', () => {
       const next = pendingQuestions()[0];
-      if (next) { activeDecision = next.key; renderDecisionPanel(); decisionTitle.focus(); }
+      if (next) {
+        revealConversation();
+        activeDecision = next.key;
+        renderDecisionPanel();
+        decisionTitle.focus();
+      }
     });
     showDecisions.setAttribute('aria-haspopup', 'dialog');
     decisionBar.append(decisionLabel, showDecisions);
@@ -240,16 +314,33 @@
     const auditBody = node('div', 'sb-a-decision-body');
     auditDialog.append(auditHeader, auditBody);
     auditDialog.addEventListener('keydown', e => { if (e.key === 'Escape') { e.preventDefault(); auditDialog.close(); } });
+    const deleteDialog = node('dialog', 'sb-a-decision-dialog sb-a-delete-conversation');
+    const deleteTitle = node('h2', '', '删除这段对话？');
+    deleteTitle.id = 'sb-delete-conversation-' + uuid();
+    deleteDialog.setAttribute('aria-labelledby', deleteTitle.id);
+    const deleteCopy = node('p', 'sb-a-delete-description');
+    const deleteError = node('p', 'sb-a-decision-error');
+    deleteError.setAttribute('role', 'alert');
+    deleteError.hidden = true;
+    const deleteActions = node('div', 'sb-a-delete-actions');
+    const cancelDelete = button('取消', () => deleteDialog.close());
+    const confirmDelete = button('删除对话', deleteConversation, 'sb-a-delete-confirm');
+    deleteActions.append(cancelDelete, confirmDelete);
+    deleteDialog.append(deleteTitle, deleteCopy, deleteError, deleteActions);
+    deleteDialog.addEventListener('cancel', event => {
+      if (deletingConversation) event.preventDefault();
+    });
     const form = node('form', 'sb-a-composer'); const attachments = node('div', 'sb-a-attachments');
     const target = node('div', 'sb-a-selection'); target.hidden = true;
     const input = node('textarea', 'sb-a-input'); input.rows = 3; input.maxLength = 16000; input.placeholder = '告诉我这次需要准备什么…'; input.setAttribute('aria-label', '发送给播前助手的要求');
+    input.addEventListener('focus', revealConversation);
     const bottom = node('div', 'sb-a-compose-bottom'); const upload = node('input', 'sb-a-file'); upload.type = 'file'; upload.multiple = true; upload.accept = '.txt,.md,.doc,.docx,.rtf,.xlsx,.pdf,.json,.csv,.png,.jpg,.jpeg,.webp'; upload.hidden = true;
-    const attach = button('＋ 添加资料', () => upload.click(), 'sb-a-attach');
+    const attach = button('＋ 添加资料', () => { revealConversation(); upload.click(); }, 'sb-a-attach');
     const mode = node('select', 'sb-a-mode'); mode.setAttribute('aria-label', '任务提交方式'); [['new_task', '新任务'], ['follow_up', '接着当前任务'], ['replace', '停止原任务并重做']].forEach(([v, t]) => { const o = node('option', '', t); o.value = v; mode.append(o); });
     const send = node('button', 'sb-a-send', '发送'); send.type = 'submit'; bottom.append(attach, mode, send);
     const hint = node('p', 'sb-a-hint', 'Enter 发送 · Shift + Enter 换行。执行过程关闭时，后台仍保存安全记录。');
     form.append(context, target, attachments, input, bottom, upload, hint);
-    root.append(head, tools, errorBox, transcript, liveNotice, decisionBar, form, decisionDialog, auditDialog);
+    root.append(head, tabbar, tools, errorBox, transcript, liveNotice, decisionBar, form, decisionDialog, auditDialog, deleteDialog);
     function setError(text) { state.error = safeText(text); errorBox.replaceChildren(); errorBox.hidden = !text; if (text) errorBox.append(node('span', '', state.error), button('重试连接', () => refresh(), 'sb-a-link')); }
     function viewContext() { const raw = options.getViewContext ? options.getViewContext() || {} : {}; return { ...raw, ...state.context }; }
     function scopeNow() { const c = viewContext(); return c.preparation_id ? { kind: 'preparation', preparation_id: c.preparation_id, account_id: 'local' } : { kind: 'catalog', account_id: 'local' }; }
@@ -273,8 +364,166 @@
           button(action, () => { if (!preflighting) createConversation(); }, 'sb-a-link'));
       }
     }
-    function renderPicker() { picker.replaceChildren(); if (!state.conversations.length) { const o = node('option', '', '尚无对话'); o.value = ''; picker.append(o); } state.conversations.forEach(c => { const o = node('option', '', c.title || '播前准备对话'); o.value = c.conversation_id; picker.append(o); }); if (state.conversation) picker.value = state.conversation.conversation_id; }
-    function setBusy() { send.disabled = state.sending || state.uploading || state.preparingTask || state.hydrating || state.creatingConversation; send.textContent = state.sending ? '正在提交…' : state.preparingTask ? '正在绑定本场…' : '发送'; const materialTask = !!activeProductMaterialBatch(); attach.disabled = send.disabled || preflighting || materialTask || !!state.scriptGeneration; mode.disabled = materialTask || !!state.scriptGeneration; newTask.disabled = send.disabled; picker.disabled = newTask.disabled || preflighting; }
+    function revealConversation() {
+      if (!showWelcome) return;
+      showWelcome = false;
+      renderTabs();
+      renderConversation();
+    }
+    function canSwitchConversation() {
+      return !(preflighting || state.sending || state.uploading || state.preparingTask || state.creatingConversation || deletingConversation);
+    }
+    function tabChoices() { return [...tabs.querySelectorAll('.sb-a-tab')]; }
+    function revealTab(tab) {
+      if (!tab || !tabs.clientWidth) return;
+      const rail = tabs.getBoundingClientRect();
+      const item = tab.parentElement.getBoundingClientRect();
+      if (item.left < rail.left) tabs.scrollLeft += item.left - rail.left;
+      else if (item.right > rail.right) tabs.scrollLeft += item.right - rail.right;
+    }
+    function renderTabs() {
+      const focused = tabs.contains(doc.activeElement) ? doc.activeElement?.dataset.conversationId : null;
+      const current = state.conversation?.conversation_id;
+      tabs.replaceChildren();
+      for (const conversation of state.conversations) {
+        const id = conversation.conversation_id;
+        const tab = button(conversation.title || '播前准备对话', () => {
+          if (!canSwitchConversation()) return;
+          if (id === state.conversation?.conversation_id && !state.hydrating) revealConversation();
+          else loadConversation(id);
+        }, 'sb-a-tab');
+        tab.dataset.conversationId = id;
+        tab.title = tab.textContent;
+        tab.setAttribute('role', 'tab');
+        tab.setAttribute('aria-selected', String(!showWelcome && id === current));
+        tab.setAttribute('aria-controls', transcript.id);
+        tab.tabIndex = id === (focused || current || state.conversations[0]?.conversation_id) ? 0 : -1;
+        tab.disabled = !canSwitchConversation();
+        const slot = node('div', 'sb-a-tab-slot');
+        slot.setAttribute('role', 'presentation');
+        const remove = button('×', () => showDeleteConversation(id), 'sb-a-tab-delete');
+        remove.setAttribute('aria-label', '删除对话「' + tab.textContent + '」');
+        remove.title = '删除对话';
+        remove.tabIndex = -1;
+        remove.disabled = !canSwitchConversation();
+        slot.append(tab, remove);
+        tabs.append(slot);
+      }
+      tabbar.hidden = !state.conversations.length;
+      const focusedTab = tabChoices().find(tab => tab.dataset.conversationId === focused);
+      if (focusedTab && !focusedTab.disabled) focusedTab.focus({ preventScroll: true });
+      revealTab(focusedTab || tabChoices().find(tab => tab.dataset.conversationId === current));
+    }
+    function setBusy() {
+      send.disabled = state.sending || state.uploading || state.preparingTask || state.hydrating || state.creatingConversation;
+      send.textContent = state.sending ? '正在提交…' : state.preparingTask ? '正在绑定本场…' : '发送';
+      const materialTask = !!activeProductMaterialBatch();
+      attach.disabled = send.disabled || preflighting || materialTask || !!state.scriptGeneration;
+      mode.disabled = materialTask || !!state.scriptGeneration;
+      newTask.disabled = send.disabled || preflighting;
+      for (const control of tabs.querySelectorAll('button')) control.disabled = !canSwitchConversation();
+    }
+    function messageId(message) { return message.message_id || message.id; }
+    function messageSummary(message) {
+      const content = safeText(message.text ?? message.content).replace(/\s+/g, ' ').trim();
+      if (!content) return '上传资料';
+      const characters = [...content];
+      return characters.length > 38 ? characters.slice(0, 38).join('') + '…' : content;
+    }
+    function sentTime(message) {
+      const raw = message.created_at ?? message.sent_at ?? message.timestamp;
+      if (!raw) return null;
+      const time = new Date(raw);
+      return Number.isNaN(time.getTime()) ? null : time;
+    }
+    function locateMessage(id) {
+      const targetMessage = [...transcript.querySelectorAll('[data-message-id]')]
+        .find(article => article.dataset.messageId === id);
+      if (!targetMessage) return;
+      const offset = targetMessage.getBoundingClientRect().top - transcript.getBoundingClientRect().top;
+      transcript.scrollTop += offset - 12;
+      targetMessage.focus({ preventScroll: true });
+    }
+    function renderHistory() {
+      const prompts = state.messages.filter(message => message.role === 'user' && messageId(message));
+      const signature = JSON.stringify([state.conversation?.conversation_id,
+        prompts.map(message => [messageId(message), messageSummary(message), sentTime(message)?.getTime()])]);
+      if (signature === historySignature) return;
+      historySignature = signature;
+      historyToggle.textContent = '对话记录 · ' + prompts.length + ' 条';
+      historyMenu.replaceChildren();
+      if (!prompts.length) {
+        historyMenu.append(node('p', 'sb-a-history-empty', '当前对话还没有发送过提示词。'));
+        return;
+      }
+      for (const message of prompts) {
+        const id = messageId(message);
+        const entry = button('', () => {
+          history.open = false;
+          highlightedMessageId = id;
+          if (showWelcome) revealConversation();
+          else renderConversation();
+          locateMessage(id);
+        }, 'sb-a-history-entry');
+        entry.dataset.targetMessageId = id;
+        const time = sentTime(message);
+        const stamp = node('time', 'sb-a-history-time', time ? messageTime.format(time) : '发送时间不可用');
+        if (time) stamp.dateTime = time.toISOString();
+        entry.append(node('span', 'sb-a-history-summary', messageSummary(message)), stamp);
+        historyMenu.append(entry);
+      }
+    }
+    function showDeleteConversation(id) {
+      if (!canSwitchConversation() || state.hydrating || deleteDialog.open) return;
+      deletionTarget = state.conversations.find(item => item.conversation_id === id);
+      if (!deletionTarget) return;
+      deleteCopy.textContent = '删除「' + (deletionTarget.title || '播前准备对话') +
+        '」及该对话的未发送草稿。已保存的商品、本场配置和话术会保留。';
+      deleteError.hidden = true;
+      deleteError.textContent = '';
+      deleteDialog.showModal();
+      cancelDelete.focus();
+    }
+    async function deleteConversation() {
+      if (!deletionTarget || deletingConversation) return;
+      const id = deletionTarget.conversation_id;
+      deletingConversation = true;
+      cancelDelete.disabled = true;
+      confirmDelete.disabled = true;
+      confirmDelete.textContent = '正在删除…';
+      deleteError.hidden = true;
+      setBusy();
+      try {
+        const reply = await api('/conversations/' + encodeURIComponent(id), { method: 'DELETE' });
+        if (!reply.deleted || reply.conversation_id !== id) throw Error('暂未确认对话是否已删除，请重试。');
+        const position = state.conversations.findIndex(item => item.conversation_id === id);
+        state.conversations = state.conversations.filter(item => item.conversation_id !== id);
+        state.drafts.delete(id);
+        productMaterialBatches.delete(id);
+        if (state.conversation?.conversation_id === id) {
+          const next = state.conversations[Math.max(0, position)] || state.conversations.at(-1);
+          await loadConversation(next?.conversation_id || null, undefined, { moveDraft: true, reset: !next });
+          if (state.conversation?.conversation_id === id) {
+            await loadConversation(null, undefined, { moveDraft: true, reset: true });
+          }
+        } else {
+          renderTabs();
+        }
+        deleteDialog.close();
+        deletionTarget = null;
+        liveNotice.textContent = '对话已删除';
+      } catch (error) {
+        deleteError.textContent = safeText(error.message || '删除失败，请重试。');
+        deleteError.hidden = false;
+      } finally {
+        deletingConversation = false;
+        cancelDelete.disabled = false;
+        confirmDelete.disabled = false;
+        confirmDelete.textContent = '删除对话';
+        setBusy();
+        if (!deleteDialog.open) (tabChoices().find(tab => tab.tabIndex === 0) || newTask).focus({ preventScroll: true });
+      }
+    }
     function csrfToken() { const el = doc.querySelector('meta[name="csrf-token"]'); return state.csrf || (el ? el.content : ''); }
     async function ensureSession() { if (state.csrf) return; if (!sessionPromise) sessionPromise = api('/session').then(value => { if (!value.csrf_token) throw Error('本机会话未返回请求校验信息'); state.csrf = value.csrf_token; }).finally(() => { sessionPromise = null; }); await sessionPromise; }
     async function api(path, { method = 'GET', body, multipart = false } = {}) {
@@ -302,7 +551,7 @@
       return { pendingRequests: structuredClone(pendingRequests), pendingDecisionCount: pendingQuestions().length, conversation: state.conversation ? structuredClone(state.conversation) : null, runs: Array.from(state.runs.values()).map(r => structuredClone(r)), selected: !materialTask && state.selected ? structuredClone(state.selected) : null, pendingRequest: structuredClone(pendingRequest), reconciledCatalogPointRunId, inputText: input.value, materials: structuredClone(materials), hasPendingInput: !!input.value.trim() || materials.length > 0 || !!state.scriptGeneration, showProcess: state.showProcess, sending: state.sending, hydrating: state.hydrating }; }
     function announceState() { if (options.onState) options.onState(publicState()); }
     function currentRun() { return Array.from(state.runs.values()).at(-1); }
-    async function initialize() { try { await ensureSession(); const list = await api('/conversations'); if (state.destroyed) return; state.conversations = list.items || list.conversations || []; renderPicker(); const saved = readStore(storage, prefix + ':conversation', null); const first = state.conversations.find(x => x.conversation_id === saved) || state.conversations[0]; if (first) await loadConversation(first.conversation_id); else renderConversation(); } catch (e) { if (!state.destroyed) setError('助手暂未连接：' + e.message); } }
+    async function initialize() { try { await ensureSession(); const list = await api('/conversations'); if (state.destroyed) return; state.conversations = list.items || list.conversations || []; renderTabs(); const saved = readStore(storage, prefix + ':conversation', null); const first = state.conversations.find(x => x.conversation_id === saved) || state.conversations[0]; if (first) await loadConversation(first.conversation_id, undefined, { keepWelcome: true }); else renderConversation(); } catch (e) { if (!state.destroyed) setError('助手暂未连接：' + e.message); } }
     function composerDraft() {
       return {
         text: input.value, mode: mode.value, materials: state.materials, selected: state.selected,
@@ -339,13 +588,13 @@
       } catch (e) { setError(e.message); return null; }
       finally { state.creatingConversation = false; setBusy(); }
     }
-    async function loadConversation(id, supplied, { moveDraft = false } = {}) {
-      if (!id) return;
+    async function loadConversation(id, supplied, { moveDraft = false, keepWelcome = false, reset = false } = {}) {
+      if (!id && !reset) return;
       const generation = ++state.generation;
       state.hydrating = true;
       setBusy();
       try {
-        const c = supplied || await api('/conversations/' + encodeURIComponent(id));
+        const c = id ? supplied || await api('/conversations/' + encodeURIComponent(id)) : {};
         if (generation !== state.generation || state.destroyed) return;
         const oldId = state.conversation?.conversation_id;
         if (oldId) {
@@ -353,8 +602,13 @@
           else state.drafts.set(oldId, composerDraft());
         }
         const saved = state.drafts.get(id);
-        state.conversation = c.conversation || c;
-        state.messages = c.messages || state.conversation.messages || [];
+        state.conversation = id ? c.conversation || c : null;
+        if (!id || !keepWelcome) showWelcome = !id;
+        if (oldId !== id) {
+          highlightedMessageId = null;
+          history.open = false;
+        }
+        state.messages = c.messages || state.conversation?.messages || [];
         state.runs.clear();
         state.events.clear();
         state.cursors.clear();
@@ -369,17 +623,17 @@
         state.scriptGeneration = saved?.scriptGeneration || null;
         for (const r of c.runs || []) addRun(r);
         writeStore(storage, prefix + ':conversation', id);
-        renderPicker();
+        renderTabs();
         renderContext();
         renderSelection();
         renderAttachments();
         setError('');
         renderConversation();
         announceState();
-        await pollRuns(generation, true);
+        if (id) await pollRuns(generation, true);
       } catch (e) {
         if (generation === state.generation) {
-          renderPicker();
+          renderTabs();
           setError(e.message);
         }
       } finally {
@@ -866,8 +1120,8 @@
       decisionBar.hidden = !pending.length;
       const label = pending.length ? pending.length + ' 项需要你确认' : '';
       if (decisionLabel.textContent !== label) decisionLabel.textContent = label;
-      let current = pending.find(entry => entry.key === activeDecision);
-      if (!current) current = pending.find(entry => !seenDecisions.has(entry.key));
+      let current = showWelcome ? null : pending.find(entry => entry.key === activeDecision);
+      if (!current && !showWelcome) current = pending.find(entry => !seenDecisions.has(entry.key));
       activeDecision = current?.key || null;
       if (!current) {
         if (decisionDialog.open) {
@@ -1179,26 +1433,87 @@
       for (const option of run.continuation_options || []) { const box = node('div', 'sb-a-continuation'); box.append(node('strong', '', option.label || '下一步'), node('p', '', option.summary || (option.mode === 'resume_remaining' ? '可以继续处理这项任务。' : '展开执行过程查看详情。'))); if (option.mode === 'resume_remaining') box.append(button('继续未完成部分', () => { state.relatedRunOverride = run.run_id; mode.value = 'follow_up'; input.value = '继续完成这项任务的未完成部分'; input.focus(); }, 'sb-a-link')); card.append(box); }
       if (state.showProcess) card.append(processPanel(run)); return card;
     }
-    function renderConversation() { if (state.destroyed) return; const nearEnd = transcript.scrollHeight - transcript.scrollTop - transcript.clientHeight < 90; const oldScroll = transcript.scrollTop; transcript.replaceChildren(); if (!state.messages.length && !state.runs.size) {
-        const empty = node('div', 'sb-a-welcome');
-        empty.append(node('span', 'sb-a-welcome-icon', '声'));
+    function welcomeCover() {
+      const cover = node('div', 'sb-a-welcome sb-a-welcome-cover');
+      cover.append(avatar('sb-a-welcome-icon'), node('p', 'sb-a-welcome-eyebrow', '直播准备工作台'),
+        node('h3', '', '今天准备哪一场直播？'),
+        node('p', '', '从一份商品资料、一个直播间，或一版话术开始。'));
+      const actions = node('div', 'sb-a-welcome-actions');
+      const entries = [
+        ['catalog', '库', '导入商品知识库', '上传资料，按商品整理规格、价格和问答。'],
+        ['session', '播', '准备直播间和本场配置', '选择直播间，核对选品、排期和本场优惠。'],
+        ['scripts', '稿', '生成直播话术', '从已选商品和本场规则开始，生成可编辑的稿件。']
+      ];
+      for (const [action, icon, label, detail] of entries) {
+        const item = button('', () => {
+          if (options.onWelcomeAction) Promise.resolve(options.onWelcomeAction(action)).catch(error => setError(error.message));
+          else { revealConversation(); input.value = label; input.focus(); }
+        }, 'sb-a-welcome-action');
+        const mark = node('span', 'sb-a-welcome-action-icon', icon);
+        mark.setAttribute('aria-hidden', 'true');
+        const words = node('span');
+        words.append(node('strong', 'sb-a-welcome-action-title', label), node('span', 'sb-a-welcome-action-detail', detail));
+        item.append(mark, words);
+        actions.append(item);
+      }
+      cover.append(actions);
+      if (showWelcome && state.conversation && (state.messages.length || state.runs.size)) {
+        cover.append(button('继续上次对话', revealConversation, 'sb-a-welcome-return'));
+      }
+      return cover;
+    }
+    function renderConversation() {
+      if (state.destroyed) return;
+      renderHistory();
+      const nearEnd = transcript.scrollHeight - transcript.scrollTop - transcript.clientHeight < 90;
+      const oldScroll = transcript.scrollTop;
+      const focusedId = doc.activeElement?.dataset.messageId;
+      transcript.replaceChildren();
+      if (showWelcome) {
+        transcript.append(welcomeCover());
+        transcript.scrollTop = 0;
+        renderDecisionPanel();
+        return;
+      }
+      if (!state.messages.length && !state.runs.size) {
         const batch = productMaterialBatches.get(state.conversation?.conversation_id);
         if (batch?.materials.length) {
+          const empty = node('div', 'sb-a-welcome');
           const guidance = batch.compose
             ? (batch.productId ? '这批资料仅更新已选商品。' : '这批资料仅用于新增商品。需要更新已有商品时，请从该商品详情提交资料。') + '可在下方补充要求并发送。'
             : '从左侧提交商品整理任务后，执行进度会显示在这里。';
-          empty.append(node('h3', '', '已加入 ' + batch.materials.length + ' 份资料'), node('p', '', guidance));
+          empty.append(avatar('sb-a-welcome-icon'), node('h3', '', '已加入 ' + batch.materials.length + ' 份资料'), node('p', '', guidance));
+          transcript.append(empty);
         } else {
-          empty.append(node('h3', '', '从商品资料开始准备'), node('p', '', '上传商品信息、指定本场活动，或让我先分析顾客与使用场景。'));
-          const suggestions = node('div', 'sb-a-suggestions');
-          ['整理上传的商品资料，先列缺项与冲突', '分析这个商品的顾客与使用场景', '检查本场配置和已有话术的差异'].forEach(t => suggestions.append(button(t, () => { input.value = t; input.focus(); })));
-          empty.append(suggestions);
+          transcript.append(welcomeCover());
         }
-        transcript.append(empty);
       }
-      const renderedRuns = new Set(); for (const m of state.messages) { const role = m.role === 'user' ? 'user' : 'assistant'; if (role === 'user' || !catalogIntakeProducts(state.runs.get(m.run_id)).length) { const el = node('article', 'sb-a-message sb-a-message-' + role); el.append(node('small', '', role === 'user' ? '你' : '播前助手')); const content = m.text ?? m.content ?? ''; safeAppendText(el, typeof content === 'string' ? content : jsonText(content), 'sb-a-message-text'); transcript.append(el); } if (m.run_id && state.runs.has(m.run_id) && !renderedRuns.has(m.run_id)) { transcript.append(runCard(state.runs.get(m.run_id))); renderedRuns.add(m.run_id); } }
+      const renderedRuns = new Set();
+      let focusedMessage = null;
+      for (const message of state.messages) {
+        const role = message.role === 'user' ? 'user' : 'assistant';
+        if (role === 'user' || !catalogIntakeProducts(state.runs.get(message.run_id)).length) {
+          const id = messageId(message);
+          const article = node('article', 'sb-a-message sb-a-message-' + role);
+          if (id) {
+            article.dataset.messageId = id;
+            article.tabIndex = -1;
+            if (id === highlightedMessageId) article.classList.add('sb-a-message-target');
+            if (id === focusedId) focusedMessage = article;
+          }
+          article.append(node('small', '', role === 'user' ? '你' : '声波 Agent'));
+          const content = message.text ?? message.content ?? '';
+          safeAppendText(article, typeof content === 'string' ? content : jsonText(content), 'sb-a-message-text');
+          transcript.append(article);
+        }
+        if (message.run_id && state.runs.has(message.run_id) && !renderedRuns.has(message.run_id)) {
+          transcript.append(runCard(state.runs.get(message.run_id)));
+          renderedRuns.add(message.run_id);
+        }
+      }
       for (const run of state.runs.values()) if (!renderedRuns.has(run.run_id)) transcript.append(runCard(run));
       transcript.scrollTop = !state.messages.length && !state.runs.size ? 0 : nearEnd ? transcript.scrollHeight : oldScroll;
+      focusedMessage?.focus({ preventScroll: true });
       renderDecisionPanel();
     }
     function renderAttachments() {
@@ -1253,6 +1568,7 @@
         return;
       }
       preflighting = true;
+      revealConversation();
       try { return await performSendMessage(); } finally { preflighting = false; setBusy(); }
     }
     async function performSendMessage(e) { if (e) e.preventDefault(); const notes = input.value.trim(); const script = state.scriptGeneration;
@@ -1560,7 +1876,7 @@
       if (!state.destroyed && !doc.hidden && Date.now() >= nextProgressPollAt) pollRuns();
     }, options.pollInterval || 1800);
     const visibility = () => { if (!doc.hidden) refresh(); }; doc.addEventListener('visibilitychange', visibility);
-    renderPicker(); renderContext(); renderConversation(); const ready = initialize();
+    renderTabs(); renderContext(); renderConversation(); const ready = initialize();
     input.addEventListener('input', announceState);
     async function prepareTask(text,taskContext={},selection=null) {
       if(state.destroyed)throw Error('对话界面已关闭，请刷新后重试');
@@ -1671,7 +1987,7 @@
       renderContext();
       announceState();
     }
-    return { ready, refresh, refreshCatalogRequirement, uploadFiles, uploadProductMaterials, submitProductMaterials, newConversation: createConversation, prepareTask, showStartAudit, getState: publicState, toggleSelection, setContext, setSelection(value, selectionOptions = {}) { const items=selectionItems(value);if(items.length>20)throw Error('一次最多选择20项');state.selected=packSelection(items); renderSelection(); announceState(); if (selectionOptions.focus !== false) input.focus(); }, focusInput() { input.focus(); }, setInput(value, { replace = false } = {}) { const text=String(value||'');if(replace||!input.value.trim())input.value=text;else if(!input.value.includes(text))input.value=input.value.replace(/\s+$/,'')+'\n\n'+text;announceState(); }, destroy() { state.destroyed = true; clearInterval(timer); state.controllers.forEach(c => c.abort()); doc.removeEventListener('visibilitychange', visibility); root.remove(); }, version: VERSION, _inspect() { return { conversation_id: state.conversation && state.conversation.conversation_id, runs: state.runs.size, events: Array.from(state.events.values()).reduce((n, m) => n + m.size, 0), cursors: Object.fromEntries(state.cursors), showProcess: state.showProcess }; } };
+    return { ready, refresh, refreshCatalogRequirement, uploadFiles, uploadProductMaterials, submitProductMaterials, newConversation: createConversation, prepareTask, showStartAudit, getState: publicState, toggleSelection, setContext, setSelection(value, selectionOptions = {}) { const items=selectionItems(value);if(items.length>20)throw Error('一次最多选择20项');state.selected=packSelection(items); renderSelection(); announceState(); if (selectionOptions.focus !== false) input.focus(); }, focusInput() { input.focus(); }, setInput(value, { replace = false } = {}) { const text=String(value||'');if(replace||!input.value.trim())input.value=text;else if(!input.value.includes(text))input.value=input.value.replace(/\s+$/,'')+'\n\n'+text;announceState(); }, destroy() { state.destroyed = true; clearInterval(timer); state.controllers.forEach(c => c.abort()); doc.removeEventListener('visibilitychange', visibility); doc.removeEventListener('pointerdown', dismissHistory); root.remove(); }, version: VERSION, _inspect() { return { conversation_id: state.conversation && state.conversation.conversation_id, runs: state.runs.size, events: Array.from(state.events.values()).reduce((n, m) => n + m.size, 0), cursors: Object.fromEntries(state.cursors), showProcess: state.showProcess }; } };
   }
   const exported = { mount, version: VERSION, _test: { redact, safeText, eventKind, eventTitle, normalizedRun, statusName } }; global.ShengboAssistant = exported; if (typeof module !== 'undefined' && module.exports) module.exports = exported;
 })(typeof window !== 'undefined' ? window : globalThis);

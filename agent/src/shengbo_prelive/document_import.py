@@ -98,17 +98,51 @@ class SessionImport(BaseModel):
     gaps: list[str] = Field(default_factory=list, max_length=8)
 
 
+class SessionFactsPrice(BaseModel):
+    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
+    sku: str = Field(min_length=1, max_length=80)
+    amount: float = Field(ge=0, le=10_000_000)
+
+
+class SessionFactsCoupon(BaseModel):
+    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
+    amount: float = Field(gt=0, le=10_000_000)
+    minimum_spend: float = Field(ge=0, le=10_000_000)
+    currency: str = Field(pattern="^(CNY|TWD|USD|AUD)$")
+    skus: list[str] = Field(default_factory=list, max_length=8)
+
+
+class SessionFactsWindow(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    start: str | None = None
+    end: str | None = None
+
+
+class SessionFacts(BaseModel):
+    """Model-facing document session values; audit provenance is program-owned."""
+    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
+    theme: str | None = None
+    objective: str | None = None
+    scene: list[str] = Field(default_factory=list, max_length=8)
+    schedule: SessionFactsWindow | None = None
+    window: SessionFactsWindow | None = None
+    rules: list[str] = Field(default_factory=list, max_length=15)
+    prices: list[SessionFactsPrice] = Field(default_factory=list, max_length=8)
+    coupon: SessionFactsCoupon | None = None
+    stacks_with_coupon: bool | None = None
+    gaps: list[str] = Field(default_factory=list, max_length=8)
+
+
 SESSION_PROMPT = """
 本次还有独立的 session 输出。只从原文提取明确属于本场直播的设置或活动。普通售价、常态运费、跨场通用政策仍留在商品资料；
-直播活动价、券、限购、活动付款渠道和起止窗口放到 session，不得写进商品。每项用原文 L 代号和逐字引句。
+直播活动价、券、限购、活动付款渠道和起止窗口放到 session，不得写进商品。只给业务字段和值。
 没有本场内容返回 session:null。仅本场文档 products:[]、questions:[]，不编造商品或日常价。
-有商品也有活动时，同一次提交两部分。规则 rules 要完整引用限购、叠加、领用次数、门槛口径、渠道和逾期条件。
-prices 仅列明能从同一出处核对 SKU 和本场价格的项目。coupon 仅结构化明确的满减券，写面额、门槛、币种和适用 SKU；
+有商品也有活动时，同一次提交两部分。规则 rules 用文字保留限购、叠加、领用次数、门槛口径、渠道和逾期条件。
+prices 只填明确属于本场的 SKU 和活动价。coupon 仅结构化明确的满减券，写面额、门槛、币种和适用 SKU；
 原文只写通用“元”且同文件未明确币种时，不猜。活动窗口 window 和直播排期 schedule 是独立信息，
-仅在原文明确直播开播/结束计划时填写 schedule。时间转换为带时区的 ISO 8601，不补年份或时区。
-theme、objective、scene 使用原文短引句。用户说明只用来缩小本次导入范围，不能作为未写入文件的价格或促销依据。
-只把原文确实缺失或相互冲突的必要项列入 gaps；所有已明确的条件放 rules。空数组写 []，可选对象无值写 null。
-如有 session_source_locations，逐项核对这些本场段落，完整提取明确的时间、价格、券和条件。演示顺序、口播和播放安排属于内部设置，不写进公开活动规则。
+仅在原文明确直播开播或结束计划时填写 schedule，原文只提供开播时保留 start、end 留空。时间用带时区的 ISO 8601，不补年份、时区或结束时间。
+theme、objective、scene 给简洁文字。用户说明只用来缩小本次导入范围。可选字段缺失就省略；真实冲突可留待核对。
+演示顺序、口播和播放安排属于内部设置，不写进公开活动规则。
 """
 
 
@@ -137,7 +171,7 @@ def _check_time(raw, source, quote, offsets):
     return supplied
 
 
-_SESSION_PRICE_COLUMN = re.compile(r"^(?:本场(?:直播)?|直播间?)(?:活动|优惠|专享)?(?:售)?价(?:格)?$")
+_SESSION_PRICE_COLUMN = re.compile(r"^(?:(?:本场(?:直播)?|直播间?)(?:活动|优惠|专享)?|活动|促销)(?:售)?价(?:格)?$")
 _PERMANENT_PRICE_LABEL = re.compile(r"(?:日常|常规|原|建议零售|供货|进货)(?:零售|售)?价(?:格)?")
 _PROMOTIONAL_PRICE_LABEL = re.compile(r"(?:本场|活动|直播间?|促销|优惠|专享)(?:活动|优惠|专享)?(?:售)?价(?:格)?")
 _NO_ACTIVITY_GAP = "文档没有本场活动信息，可在本场配置补填。"
@@ -153,6 +187,9 @@ _SESSION_TIME_RANGE = re.compile(
     rf"(?:至|到|—|–|~|～|-)\s*(?:(?P<end_date>{_SESSION_DATE})\s*[日号T]?\s*)?"
     rf"(?P<end_clock>{_SESSION_CLOCK})(?!\d)"
 )
+_SESSION_DATED_CLOCK = re.compile(rf"(?<!\d)({_SESSION_DATE})\s*[日号T]?\s*({_SESSION_CLOCK})(?!\d)")
+_SCHEDULE_HINT = re.compile(r"(?:计划(?:于|直播)?[^。；]{0,72}开播|直播(?:排期|时间|时段)|(?:计划)?开播(?:时间|于|为))")
+_WINDOW_HINT = re.compile(r"(?:本场)?(?:活动|促销)(?:开始|截止|结束|时段|时间|有效期|窗口)")
 _SESSION_LABELS = {
     "theme": re.compile(r"^\s*(?:本场主题|直播主题)\s*[:：|\t\u3000]+\s*\S"),
     "objective": re.compile(r"^\s*(?:本场目标|直播目标)\s*[:：|	　]+\s*\S"),
@@ -161,7 +198,8 @@ _SESSION_LABELS = {
     "window": re.compile(r"^\s*(?:活动时间与入口|活动时间|活动窗口|促销时间|活动有效期)\s*[:：|\t\u3000]+.*\d{1,2}:\d{2}"),
 }
 _SKU_TOKEN = r"(?=[A-Za-z0-9_-]*[A-Za-z])(?=[A-Za-z0-9_-]*\d)[A-Za-z0-9][A-Za-z0-9_-]*"
-_COUPON_SKUS = re.compile(r"(?:本券|该券|优惠券)?\s*(?:仅适用(?:于)?|仅限(?:于)?|适用(?:商品|款式|型号|SKU)\s*[:：]?)\s*(?:SKU\s*[:：]?\s*)?("
+_COUPON_SKUS = re.compile(r"(?:本券|该券|优惠券)?\s*(?:仅适用(?:于)?|仅限(?:于)?|适用(?:商品|款式|型号|SKU)\s*[:：]?)\s*(?:SKU\s*[:：]?\s*)?"
+                         r"(?:[\u4e00-\u9fff]{1,16}(?:款|版|型号|套装)\s*)?("
                          + _SKU_TOKEN + r"(?:\s*(?:、|[，,／/]|或|及|和)\s*" + _SKU_TOKEN + r")*)", re.I)
 _NAMED_COUPON_SCOPE = re.compile(r"(?:本券|该券|优惠券)?\s*(?:仅适用(?:于)?|仅限(?:于)?|适用(?:款式|型号)\s*[:：])\s*([^。；;\n]{1,80})")
 
@@ -290,8 +328,10 @@ def _project_default_session(raw, locations, labeled, scope_by_location):
 
 
 def _coupon_sku_scopes(quote, source_text):
+    quote = _plain_session_text(quote)
+    source_text = _plain_session_text(source_text)
     matches = list(_COUPON_SKUS.finditer(quote))
-    if not matches:
+    if not matches and quote in source_text:
         continuation = source_text.split(quote, 1)[1].lstrip("。；;，, \t")
         if match := _COUPON_SKUS.match(continuation):
             matches.append(match)
@@ -299,8 +339,10 @@ def _coupon_sku_scopes(quote, source_text):
 
 
 def _named_coupon_sku_scope(quote, source_text, source_ref, prepared):
+    quote = _plain_session_text(quote)
+    source_text = _plain_session_text(source_text)
     matches = list(_NAMED_COUPON_SCOPE.finditer(quote))
-    if not matches:
+    if not matches and quote in source_text:
         continuation = source_text.split(quote, 1)[1].lstrip("。；;，, \t")
         if match := _NAMED_COUPON_SCOPE.match(continuation):
             matches.append(match)
@@ -320,6 +362,89 @@ def _named_coupon_sku_scope(quote, source_text, source_ref, prepared):
     return True, sorted({next(iter(known[name])) for name in names})
 
 
+def _plain_session_text(text):
+    """Remove Markdown emphasis around conditions without touching SKU underscores."""
+    return re.sub(r"(?<!\w)__(\S.*?\S)__(?!\w)", r"\1", text.replace("**", ""))
+
+
+def _time_facts(text, field, *, activity_section=False):
+    pattern = _SCHEDULE_HINT if field == "schedule" else _WINDOW_HINT
+    if (_session_source_role(text) != field and not pattern.search(text)
+            and not (field == "window" and activity_section and not _SCHEDULE_HINT.search(text))):
+        return None
+    offsets = _time_offsets(text, text)
+    if len(offsets) != 1:
+        return None
+    zone = timezone(next(iter(offsets)))
+    bounds = _explicit_time_bounds(text)
+    if bounds and all(day is not None for day, _ in bounds):
+        start, end = (datetime.combine(day, clock, zone) for day, clock in bounds)
+        return {"start": start.isoformat(), "end": end.isoformat()} if start < end else None
+    dated = list(_SESSION_DATED_CLOCK.finditer(text))
+    if len(dated) != 1:
+        return None
+    match, = dated
+    clause = re.split(r"[。；;]", text[:match.start()])[-1] + match[0] + re.split(r"[。；;]", text[match.end():])[0]
+    start_cue = r"开播" if field == "schedule" else r"(?:活动|促销)(?:开始|生效)|起开始|起生效"
+    end_cue = r"下播|直播结束" if field == "schedule" else r"(?:活动|促销)(?:截止|结束)|有效至"
+    start, end = bool(re.search(start_cue, clause)), bool(re.search(end_cue, clause))
+    if start == end:
+        return None
+    try:
+        point = datetime.combine(date(*map(int, re.findall(r"\d+", match[1]))),
+                                 time(*map(int, match[2].split(":"))), zone).isoformat()
+    except ValueError:
+        return None
+    return {"start": point if start else None, "end": point if end else None}
+
+
+def _source_coupon_facts(locations, prepared):
+    """Project an unambiguous commercial offer and its scope from original data."""
+    from .catalog_extract import _explicit_currencies
+
+    found = {}
+    scope_by_location = _session_scope_by_location(prepared)
+    for location, row in locations.items():
+        quote = row["text"].strip()
+        text = _plain_session_text(quote)
+        if ("券" not in text or len(quote) > 1000
+                or "session_promotion" not in scope_by_location.get(location, ())
+                and not re.search(r"直播间|本场|活动期间|活动券|直播券", text)):
+            continue
+        matches = list(_COUPON_TERMS.finditer(text))
+        if len(matches) != 1:
+            continue
+        match, = matches
+        values = [value.replace(",", "") for value in match.groups()]
+        if any(not re.fullmatch(r"\d+(?:\.\d+)?", value) for value in values):
+            continue
+        currency = _explicit_currencies(quote) or _explicit_currencies(" ".join(
+            entry["text"] for entry in locations.values() if entry["source_ref"] == row["source_ref"]))
+        if len(currency) != 1:
+            continue
+        # Restriction after the coupon terms belongs to this offer. Ignore
+        # clauses about other member/shop coupons before the actual offer.
+        scoped = text[match.start():]
+        scope = _coupon_sku_scopes(scoped, text)
+        if len(scope) > 1:
+            continue
+        if scope:
+            identifiers = next(iter(scope))
+            skus = list(dict.fromkeys(sku for sku in re.findall(_SKU_TOKEN, scoped) if sku.casefold() in identifiers))
+        else:
+            restricted, skus = _named_coupon_sku_scope(scoped, text, row["source_ref"], prepared)
+            if restricted and not skus:
+                continue
+        threshold, amount = map(float, values)
+        code, = currency
+        if not 0 < amount <= 10_000_000 or not 0 <= threshold <= 10_000_000:
+            continue
+        key = threshold, amount, code, frozenset(sku.casefold() for sku in skus)
+        found.setdefault(key, {"location": location, "quote": quote, "minimum_spend": threshold,
+                               "amount": amount, "currency": code, "skus": skus})
+    return next(iter(found.values())) if len(found) == 1 else None
+
+
 def _session_issue(path, reason, location=None):
     return {"path": list(path), "field": path[0] if path else None, "reason": reason,
             **({"location": location} if location else {})}
@@ -334,6 +459,29 @@ def _session_error(issues, correction):
                  "repair_fields": repair_fields})
 
 
+def _session_table_cells(locations):
+    """Read explicit SKU and activity-price axes even inside a settings section."""
+    from .catalog_coverage import _table_layout
+
+    tables = {}
+    for row in locations.values():
+        if row.get("cells"):
+            tables.setdefault((row["source_ref"]["id"], row["table_id"]), []).append(row)
+    for rows in tables.values():
+        layout = _table_layout(rows)
+        if not layout:
+            continue
+        direction, anchor, axis, labels, _ = layout
+        for row in rows[anchor + 1:]:
+            cells = {cell["grid_column"]: cell for cell in row["cells"]
+                     if cell.get("column_span", 1) == 1 and not cell.get("vertical_merge")}
+            leading = cells.get(axis, {}).get("text", "").strip()
+            for index, cell in cells.items():
+                sku, label = (leading, labels.get(index, "")) if direction == "rows" else (labels.get(index, ""), leading)
+                if re.fullmatch(_SKU_TOKEN, sku) and _SESSION_PRICE_COLUMN.fullmatch(label):
+                    yield {"location": row["location"], "sku_id": sku, "column": label, "text": cell["text"].strip()}
+
+
 def _table_activity_prices(prepared, locations):
     """Take explicit per-SKU live prices from the actual table cell."""
     from .catalog_extract import _explicit_currencies, _price_amounts
@@ -343,7 +491,7 @@ def _table_activity_prices(prepared, locations):
     for row in locations.values():
         currencies.setdefault(row["source_ref"]["id"], set()).update(_explicit_currencies(row["text"]))
     prices, gaps, conflicting = {}, [], set()
-    for unit in prepared.get("source_units", []):
+    for unit in [*prepared.get("source_units", []), *_session_table_cells(locations)]:
         sku, column = unit.get("sku_id"), unit.get("column", "")
         row = locations.get(unit["location"])
         if not sku or not row or row["kind"] != "table_row" or not _SESSION_PRICE_COLUMN.fullmatch(column.strip()):
@@ -366,10 +514,105 @@ def _table_activity_prices(prepared, locations):
     return {key: price for key, price in prices.items() if key not in conflicting}, gaps, conflicting
 
 
+def _explicit_activity_text(text):
+    return bool(_WINDOW_HINT.search(text) or _PROMOTIONAL_PRICE_LABEL.search(text)
+                or re.search(r"活动期间|直播间可领取|本场直播商品卡", text)
+                or "券" in text and _COUPON_TERMS.search(_plain_session_text(text)))
+
+
 def _session_source_context(prepared):
     locations = {row["location"]: row for row in prepared["locations"] if row["kind"] != "image"}
     labeled = {key: role for key, row in locations.items() if (role := _session_source_role(row["text"]))}
     return locations, labeled, _session_scope_by_location(prepared)
+
+
+def _session_text_fact(value, field, locations, labeled, scope_by_location):
+    if not isinstance(value, str) or not value.strip():
+        return value
+    candidates = []
+    for location, row in locations.items():
+        if labeled.get(location) not in {None, field}:
+            continue
+        if field == "rules" and "session_promotion" not in scope_by_location.get(location, ()) and not re.search(
+                r"活动|直播间|限购|券|叠加", row["text"]):
+            continue
+        if excerpt := _source_excerpt(value.strip(), row["text"]):
+            candidates.append((location, excerpt))
+    if len(candidates) != 1:
+        return value
+    location, quote = candidates[0]
+    return {"location": location, "quote": quote}
+
+
+def _session_price_fact(value, locations, table_prices):
+    from .catalog_extract import _price_amounts
+
+    if (not isinstance(value, dict) or value.get("location") and value.get("quote")
+            or not isinstance(value.get("sku"), str) or type(value.get("amount")) not in {int, float}):
+        return value
+    if parsed := table_prices.get(value["sku"].casefold()):
+        return parsed.model_dump(mode="json")
+    candidates = []
+    for location, row in locations.items():
+        if row["kind"] == "table_row":
+            continue
+        for clause in re.split(r"[，,。；;\n]", row["text"]):
+            match = re.search(r"(?<![\w-])" + re.escape(value["sku"]) + r"(?![\w-])", clause, re.I)
+            if (match and _PROMOTIONAL_PRICE_LABEL.search(clause)
+                    and not _PERMANENT_PRICE_LABEL.search(clause)
+                    and _price_amounts(clause[match.end():]) == {Decimal(str(value["amount"]))}):
+                candidates.append((location, clause.strip()))
+    if len(candidates) != 1:
+        return value
+    location, quote = candidates[0]
+    return {"sku": value["sku"], "amount": value["amount"], "location": location, "quote": quote}
+
+
+def _anchor_session_facts(raw, prepared, *, allow_default_projection):
+    """Add internal proof to submitted values using the trusted source snapshot."""
+    if raw is not None and not isinstance(raw, dict):
+        return raw
+    locations, labeled, scope_by_location = _session_source_context(prepared)
+    candidate = deepcopy(raw or {})
+    for field in ("theme", "objective"):
+        if field in candidate:
+            candidate[field] = _session_text_fact(candidate[field], field, locations, labeled, scope_by_location)
+    for field in ("scene", "rules"):
+        if isinstance(candidate.get(field), list):
+            candidate[field] = [_session_text_fact(value, field, locations, labeled, scope_by_location)
+                                for value in candidate[field]]
+    if isinstance(candidate.get("prices"), list):
+        table_prices, _, _ = _table_activity_prices(prepared, locations)
+        candidate["prices"] = [_session_price_fact(value, locations, table_prices) for value in candidate["prices"]]
+    for field in ("schedule", "window"):
+        if not candidate.get(field) and not allow_default_projection:
+            continue
+        values = {}
+        for location, row in locations.items():
+            quote = row["text"].strip()
+            if len(quote) <= 1000 and (facts := _time_facts(quote, field,
+                    activity_section="session_promotion" in scope_by_location.get(location, ()))):
+                values.setdefault(tuple(facts.values()), {**facts, "location": location, "quote": quote})
+        if len(values) == 1:
+            candidate[field] = next(iter(values.values()))
+    if candidate.get("coupon") or allow_default_projection:
+        if coupon := _source_coupon_facts(locations, prepared):
+            candidate["coupon"] = coupon
+    if allow_default_projection:
+        rules = candidate.get("rules")
+        if rules is None or isinstance(rules, list):
+            commercial = {row.get("location") for field in ("window", "coupon")
+                          if isinstance((row := candidate.get(field)), dict)}
+            originals = [{"location": key, "quote": row["text"].strip()} for key, row in locations.items()
+                         if row["kind"] != "table_row" and len(row["text"].strip()) <= 1000
+                         and _explicit_activity_text(row["text"])
+                         and (key in commercial or scope_by_location.get(key, set()) & {"session_configuration", "session_promotion"})]
+            if originals:
+                present = {row["location"] for row in originals}
+                candidate["rules"] = (originals + [value for value in (rules or [])
+                    if not isinstance(value, dict) or value.get("location") not in present])[:15]
+        return _project_default_session(candidate, locations, labeled, scope_by_location)
+    return candidate or None
 
 
 def checked_session(raw, prepared, *, require_complete=True, allow_default_projection=False):
@@ -413,6 +656,8 @@ def checked_session(raw, prepared, *, require_complete=True, allow_default_proje
         value = SessionImport.model_validate(raw)
         configuration_ids = {unit["location"] for unit in prepared.get("source_units", [])
                              if unit.get("excluded_reason") == "session_configuration"}
+        configuration_ids -= {row.location for row in table_prices.values()} | {
+            key for key in configuration_ids if key in locations and _explicit_activity_text(locations[key]["text"])}
         parts_by_path = [((field,), getattr(value, field)) for field in ("theme", "objective", "schedule", "window", "coupon")]
         for field in ("scene", "rules", "prices"):
             indexes = row_indexes.get(field)
@@ -515,7 +760,7 @@ def checked_session(raw, prepared, *, require_complete=True, allow_default_proje
             if amount not in amounts or terms and (threshold, amount) not in terms:
                 issues.append(_session_issue(("coupon", "amount"), "coupon_discount_not_grounded", row.location))
             scopes = _coupon_sku_scopes(row.quote, locations[row.location]["text"])
-            if len(scopes) == 1 and {sku.casefold() for sku in row.skus} != next(iter(scopes)):
+            if len(scopes) > 1 or len(scopes) == 1 and {sku.casefold() for sku in row.skus} != next(iter(scopes)):
                 issues.append(_session_issue(("coupon", "skus"), "coupon_sku_scope_not_grounded", row.location))
             if not scopes:
                 restricted, matched_skus = _named_coupon_sku_scope(row.quote, source_text, source, prepared)
@@ -581,7 +826,7 @@ def checked_session(raw, prepared, *, require_complete=True, allow_default_proje
             # Distinguish the expressly allowed combination from exclusions
             # concerning unrelated coupons in the same sentence.
             allowed = denied = False
-            for rule in out["rules"]:
+            for rule in [out["coupon"], *out["rules"]]:
                 for clause in re.split(r"[，,；;。\n]", rule["quote"]):
                     if not re.search(r"活动价|促销价|直播价|优惠价|商品价", clause):
                         continue
@@ -639,13 +884,11 @@ def _omit_unverified_session_values(candidate, issues):
 
 def checked_session_soft(raw, prepared, *, allow_default_projection=False):
     """Return a source-checked subset and developer diagnostics without a model retry."""
-    candidate = raw
-    if allow_default_projection and (raw is None or isinstance(raw, dict)):
-        candidate = _project_default_session(raw, *_session_source_context(prepared))
+    candidate = _anchor_session_facts(raw, prepared, allow_default_projection=allow_default_projection)
     diagnostics = []
     for attempt in range(5):
         try:
-            result = checked_session(candidate, prepared, require_complete=attempt == 0)
+            result = checked_session(candidate, prepared, require_complete=False)
             return result, diagnostics
         except ContractError as error:
             if error.status != 422 or error.code != "DOCUMENT_SESSION_EVIDENCE_INVALID":
@@ -723,6 +966,8 @@ def _configuration(session, sku_to_id):
         schedule = session["schedule"]
         if schedule["start"] and schedule["end"]:
             config["scheduled_at"] = {"start": schedule["start"], "end": schedule["end"]}
+        elif schedule["start"]:
+            config["scheduled_at"] = schedule["start"]
         else:
             gaps.append(f"直播排期仍待补全。原文「{schedule['quote']}」")
     window = session["window"]

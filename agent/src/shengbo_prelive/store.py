@@ -70,6 +70,30 @@ class RuntimeStore:
             return [json.loads(r[0]) for r in db.execute("SELECT body FROM objects WHERE kind=? ORDER BY rowid", (kind,))]
 
     @staticmethod
+    def _require_conversation(db, identity, *, include_deleted=False):
+        row = db.execute("SELECT body FROM objects WHERE kind='conversation' AND id=?", (identity,)).fetchone()
+        conversation = json.loads(row[0]) if row else None
+        if not conversation or (conversation.get("deleted_at") and not include_deleted):
+            raise ContractError("CONVERSATION_NOT_FOUND", "找不到这个对话。", status=404)
+        return conversation
+
+    def get_open_conversation(self, identity):
+        with self.tx() as db:
+            return self._require_conversation(db, identity)
+
+    def delete_conversation(self, identity):
+        with self.tx() as db:
+            conversation = self._require_conversation(db, identity, include_deleted=True)
+            if conversation.get("deleted_at"):
+                return
+            runs = db.execute("SELECT json_extract(body, '$.status') FROM objects "
+                              "WHERE kind='run' AND json_extract(body, '$.conversation_id')=?", (identity,))
+            if any(row[0] not in TERMINAL for row in runs):
+                raise ContractError("CONVERSATION_HAS_ACTIVE_RUN",
+                    "此对话还有进行中或等待确认的任务。请先完成或停止任务，再删除对话。", status=409)
+            self._put(db, "conversation", {**conversation, "deleted_at": now_iso()})
+
+    @staticmethod
     def _put(db, kind, body):
         identity = body.get("id") or body.get(f"{kind}_id")
         if not identity:
@@ -155,6 +179,7 @@ class RuntimeStore:
 
     def accept_message(self, conversation_id, request_id, request_hash, message, run):
         with self.tx() as db:
+            self._require_conversation(db, conversation_id)
             row = db.execute("SELECT result,request_hash FROM dedup WHERE owner=? AND request_id=?",
                              (conversation_id, request_id)).fetchone()
             if row:

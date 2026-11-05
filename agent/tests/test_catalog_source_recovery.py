@@ -147,9 +147,9 @@ def test_shared_scene_is_rebuilt_from_a_single_mapped_literal_not_from_unrelated
             "evidence": links})
     draft = {"products": products, "questions": [], "coverage": coverage}
     if not exact_scene_proof:
-        with pytest.raises(ContractError) as rejected:
-            _catalog_report(draft, source)
-        assert rejected.value.details["fields"] == ["target_audience"]
+        report = _catalog_report(draft, source)
+        assert all("target_audience" not in row for row in report["fields"]["products"])
+        assert all("target_audience" not in entry["fields"] for entry in report["evidence"])
         return
     report = _catalog_report(draft, source)
     for row, quantity in zip(report["fields"]["products"], ("6 枚", "12 枚"), strict=True):

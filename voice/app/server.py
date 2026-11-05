@@ -306,7 +306,7 @@ def _generate_remote_once(product, count, prior_versions=None, revision_feedback
             "stream": False, "max_tokens": min(26000, count*6000), "response_format": {"type": "json_object"},
             "thinking": {"type": "disabled"}}
     request = urllib.request.Request("https://api.deepseek.com/chat/completions", data=json.dumps(body).encode(),
-                                     headers={"Authorization": "Bearer " + key, "Content-Type": "application/json"})
+              headers={"Authorization": "Bearer " + key, "Content-Type": "application/json"})
     try:
         with urllib.request.urlopen(request, timeout=120) as response:
             result = json.load(response)

@@ -118,11 +118,11 @@ async function setRightDraft(page) {
 }
 
 async function restoreRightDraft(page, input) {
-  const picker = page.getByLabel('选择已有对话');
-  await picker.selectOption('conversation-A');
+  const picker = page.getByRole('tablist', { name: '切换对话' });
+  await picker.locator('[data-conversation-id="conversation-A"]').click();
   await page.locator('.sb-a-attachments').getByText('相同文件名.txt').waitFor();
   assert.equal(await input.inputValue(), rightDraft);
-  assert.equal(await picker.inputValue(), 'conversation-A');
+  assert.equal(await picker.locator('[aria-selected="true"]').getAttribute('data-conversation-id'), 'conversation-A');
 }
 
 function assertTask(mock, index, mode, target) {
@@ -182,6 +182,7 @@ async function main() {
         const mock = await mockAgentUploads(page, state);
         await page.goto(base);
         await page.evaluate(() => shengboWorkbench.ready);
+        await page.locator('.sb-a-tab[tabindex="0"]').click();
         await verify({ page, state, mock });
         assert.deepEqual(blocked, [], 'UI made no off-origin requests');
         assert.deepEqual(state.failures, [], 'no unexpected fixture requests');
@@ -207,7 +208,7 @@ async function main() {
     await check('商品库进入详情与返回只更换左侧，保留右侧对话、草稿、附件及输入控件',
       async ({ page, state, mock }) => {
         const input = await setRightDraft(page);
-        const picker = page.getByLabel('选择已有对话');
+        const picker = page.getByRole('tablist', { name: '切换对话' });
         await input.evaluate(el => { window.fixtureComposer = el; });
         await page.evaluate(() => shengboWorkbench.navigate({view:'products',room_id:'room-A',preparation_id:'prep-A'}));
         const roomProducts = page.locator('#room-sheet[open]');
@@ -229,7 +230,7 @@ async function main() {
         await openedProduct(page, product.body.name).waitFor();
         assert.equal(await input.inputValue(), rightDraft);
         assert.equal(await input.evaluate(el => el === window.fixtureComposer), true);
-        assert.equal(await picker.inputValue(), 'conversation-A');
+        assert.equal(await picker.locator('[aria-selected="true"]').getAttribute('data-conversation-id'), 'conversation-A');
         assert.deepEqual(await page.evaluate(() => shengboWorkbench.assistant.getState().selected), selection);
         assert.equal(await page.locator('.sb-a-attachments .sb-a-attachment').count(), 1);
         assert.equal(mock.conversations.size, 1);
@@ -599,6 +600,7 @@ async function main() {
       Object.assign(state.conversation, { scope: { kind: 'catalog', account_id: 'local' }, room_id: null, preparation_id: null });
       await page.reload();
       await page.evaluate(() => shengboWorkbench.ready);
+      await page.locator('.sb-a-tab[tabindex="0"]').click();
       const [a, b] = state.products;
       state.run.status = 'WAITING_USER';
       state.run.questions = [{ decision_id:'price-fixture', kind:'catalog_intake_price', status:'OPEN', allow_text:true,
@@ -734,6 +736,7 @@ async function main() {
       Object.assign(state.conversation, {scope:{kind:'catalog',account_id:'local'},room_id:null,preparation_id:null});
       await page.reload();
       await page.evaluate(() => shengboWorkbench.ready);
+      await page.locator('.sb-a-tab[tabindex="0"]').click();
       const [first, second] = state.products;
       const configured = structuredClone(first);
       configured.ref = fixture.ref('product','product-C',1);
@@ -775,6 +778,7 @@ async function main() {
 
       await page.reload();
       await page.evaluate(() => shengboWorkbench.ready);
+      await page.locator('.sb-a-tab[tabindex="0"]').click();
       await Promise.all([page.waitForResponse(response => response.url().endsWith('/messages')), retry.click()]);
       await retry.waitFor({state:'detached'});
       assert.equal(mock.messages.length,2);

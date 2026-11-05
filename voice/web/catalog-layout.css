@@ -105,7 +105,7 @@
   border-bottom: 1px solid var(--wb-line);
 }
 .wb-catalog-columns[data-has-selection] { padding-left: 87px; }
-.wb-catalog-fulfillment-heading { display: none; }
+.wb-catalog-field-heading { display: none; }
 .wb-catalog-price-heading, .wb-catalog-actions-heading { text-align: right; }
 .wb-catalog-status-heading { text-align: center; }
 .wb-catalog-row {
@@ -132,32 +132,39 @@
   gap: 2px;
   line-height: 1.22;
 }
-.wb-catalog-product-text > :is(strong, .wb-catalog-product-info), .wb-catalog-selling-point, .wb-catalog-fulfillment dd {
+.wb-catalog-product-text > :is(strong, .wb-catalog-product-info) {
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
 }
 .wb-catalog-product-info { color: #53657c; font-size: .75rem; }
-.wb-catalog-selling-points {
+.wb-catalog-details {
   display: grid;
-  gap: 1px;
-  margin: 1px 0;
-  padding: 0;
-  list-style: none;
+  grid-template-columns: minmax(0,1.28fr) repeat(2,minmax(0,1fr));
+  gap: 8px;
+  min-inline-size: 0;
+  margin-block-start: 4px;
 }
-.wb-catalog-selling-point { color: #344c6a; font-size: .75rem; }
-.wb-catalog-selling-point::before { content: '•'; margin-inline-end: 6px; color: #496483; }
-.wb-catalog-fulfillment {
-  display: grid;
-  grid-template-columns: auto minmax(0,1fr);
-  gap: 1px 7px;
-  margin: 1px 0 0;
-  color: #374f6b;
+.wb-catalog-field {
+  min-inline-size: 0;
+  margin: 0;
+  padding-inline-start: 7px;
+  border-inline-start: 1px solid #e3eaf4;
   font-size: .75rem;
-  line-height: 1.22;
+  line-height: 1.35;
 }
-.wb-catalog-fulfillment dt { color: #53657c; white-space: nowrap; }
-.wb-catalog-fulfillment dd { min-inline-size: 0; margin: 0; }
+.wb-catalog-field dt { margin-block-end: 2px; color: #52657e; font-weight: 600; }
+.wb-catalog-field dd {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  min-inline-size: 0;
+  margin: 0;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+  color: #293f5e;
+}
+.wb-catalog-revision { color: #53657c; font-size: .625rem; white-space: nowrap; }
 .wb-catalog-thumbnail {
   display: grid;
   place-items: center;
@@ -270,34 +277,17 @@
   padding: 4px 8px;
   font-size: .75rem;
 }
-@container (min-width: 720px) {
+@container (min-width: 820px) {
   .wb-catalog-list-window { --wb-catalog-row-height: 6.25rem; }
-  .wb-catalog-columns {
-    grid-template-columns: minmax(0,1.65fr) minmax(132px,1fr) var(--wb-catalog-price-width) var(--wb-catalog-status-width) var(--wb-catalog-actions-width);
+  .wb-catalog-columns, .wb-catalog-row {
+    --wb-catalog-data-columns: minmax(0,1.6fr) minmax(0,1.15fr) repeat(2,minmax(0,1fr)) var(--wb-catalog-price-width) var(--wb-catalog-status-width) var(--wb-catalog-actions-width);
   }
-  .wb-catalog-fulfillment-heading { display: block; padding-inline-start: 10px; }
-  .wb-catalog-row {
-    grid-template-columns: auto minmax(0,1.65fr) minmax(132px,1fr) var(--wb-catalog-price-width) var(--wb-catalog-status-width) var(--wb-catalog-actions-width);
-  }
-  .wb-catalog-row:has(.wb-catalog-checkbox) {
-    grid-template-columns: auto auto minmax(0,1.65fr) minmax(132px,1fr) var(--wb-catalog-price-width) var(--wb-catalog-status-width) var(--wb-catalog-actions-width);
-  }
-  .wb-catalog-summary { display: contents; }
-  .wb-catalog-fulfillment {
-    grid-template-columns: minmax(0,1fr);
-    margin: 0;
-    padding-inline-start: 9px;
-    border-inline-start: 1px solid var(--wb-line, #dfe5ee);
-    line-height: 1.16;
-  }
-  .wb-catalog-fulfillment dd {
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 2;
-    white-space: normal;
-    overflow-wrap: anywhere;
-  }
-  .wb-catalog-fulfillment dd:first-of-type { margin-block-end: 3px; }
+  .wb-catalog-columns { grid-template-columns: var(--wb-catalog-data-columns); }
+  .wb-catalog-row { grid-template-columns: auto var(--wb-catalog-data-columns); }
+  .wb-catalog-row:has(.wb-catalog-checkbox) { grid-template-columns: auto auto var(--wb-catalog-data-columns); }
+  .wb-catalog-field-heading { display: block; padding-inline-start: 7px; }
+  .wb-catalog-summary, .wb-catalog-details { display: contents; }
+  .wb-catalog-field dt { position: absolute; inline-size: 1px; block-size: 1px; overflow: hidden; clip-path: inset(50%); }
 }
 @container (max-width: 600px) {
   .wb-catalog-columns { display: none; }

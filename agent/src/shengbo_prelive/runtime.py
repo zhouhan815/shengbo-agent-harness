@@ -678,10 +678,10 @@ M3以外尚未正式保存且影响下一步的关键信息须保留，不能因
 
     def health(self):
         return {"service": "shengbo-prelive-agent", "started": self.started, "framework": "Deep Agents",
-                "schema_version": "PRELIVE-2.3", "provider": "chatgpt_plan", "model": self.model_name,
+                "schema_version": "PRELIVE-2.3", "provider": self.model_settings["provider"], "model": self.model_name,
                 "observability": self.trace.health(), "workflow_contract": "optional-flows-v1",
-                "catalog_workflow_contract": "fact-first-single-pass-v1",
-                "document_import_contract": "dual-entry-fact-first-v4",
+                "catalog_workflow_contract": "facts-only-severe-recovery-v2",
+                "document_import_contract": "dual-entry-facts-only-v5",
                 "runtime_recovery_contract": "scoped-model-step-resume-v2",
                 "typed_script_delivery_version": 5,
                 "markdown_material_projection_version": 1,
@@ -723,22 +723,28 @@ M3以外尚未正式保存且影响下一步的关键信息须保留，不能因
             return saved
 
     def list_conversations(self, room_id=None, preparation_id=None):
-        items = [v for v in self.store.list("conversation") if (not room_id or v.get("room_id") == room_id)
+        items = [v for v in self.store.list("conversation") if not v.get("deleted_at")
+                 and (not room_id or v.get("room_id") == room_id)
                  and (not preparation_id or v.get("preparation_id") == preparation_id)]
         return {"items": items[-100:], "next_cursor": None}
+
+    async def delete_conversation(self, identity):
+        async with self.action_lock("conversation-submit:" + identity):
+            self.store.delete_conversation(identity)
+        return {"conversation_id": identity, "deleted": True}
 
     def editor_locks(self):
         from .editor_locks import project_editor_locks
         return project_editor_locks(self.store, self.graphs.status())
 
     def get_conversation(self, identity):
-        conversation = self.store.get("conversation", identity)
+        conversation = self.store.get_open_conversation(identity)
         return {**conversation, "messages": [v for v in self.store.list("message") if v["conversation_id"] == identity],
                 "runs": [self.get_run(v["id"]) for v in self.store.list("run") if v["conversation_id"] == identity]}
 
     async def submit_message(self, conversation_id, request):
         async with self.action_lock("conversation-submit:" + conversation_id):
-            conversation = self.store.get("conversation", conversation_id)
+            conversation = self.store.get_open_conversation(conversation_id)
             if not request.text.strip() and not request.material_refs:
                 raise ContractError("EMPTY_MESSAGE", "请输入需求或上传资料", status=422)
             value = sanitize(request.model_dump(mode="json"))
@@ -856,7 +862,7 @@ M3以外尚未正式保存且影响下一步的关键信息须保留，不能因
             return result
 
     def accept_material(self, conversation_id, filename, content_type, data):
-        self.store.get("conversation", conversation_id)
+        self.store.get_open_conversation(conversation_id)
         return self.materials.accept(conversation_id, filename, content_type, data)
 
     def get_run(self, identity):
@@ -1817,9 +1823,7 @@ M3以外尚未正式保存且影响下一步的关键信息须保留，不能因
             call_limit += fixed_step_recovery_call_allowance(run, "selling_points")
         elif run.get("catalog_intake_enabled"):
             from .fixed_step_recovery import fixed_step_recovery_call_allowance
-            call_limit = 2 + int(bool(run.get("catalog_recovery_active"))) + int(bool(run.get("catalog_timeout_retry")))
-            call_limit += fixed_step_recovery_call_allowance(run, "catalog_intake")
-            call_limit += int(bool(run.get("catalog_evidence_hint_retry")))
+            call_limit = 1 + fixed_step_recovery_call_allowance(run, "catalog_intake")
         else:
             call_limit = MODEL_CALL_LIMIT
         call_limit += min(run.get("runtime_recovery_plan_budget", 0), 20)

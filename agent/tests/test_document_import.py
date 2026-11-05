@@ -276,3 +276,68 @@ def test_checked_session_requires_both_explicit_time_bounds():
     assert result.value.details["issues"] == [
         {"path": ["schedule", "end"], "field": "schedule", "reason": "time_not_grounded", "location": "L1"}]
     assert checked_session(raw, prepared, require_complete=False)["schedule"]["end"] is None
+
+
+def test_facts_only_session_recovers_single_sku_coupon_and_keeps_one_sided_schedule():
+    from shengbo_prelive.catalog_coverage import build_source_units
+    from shengbo_prelive.catalog_extract import _located_text
+    from shengbo_prelive.document_import import SessionFacts, _configuration, checked_session_soft
+    from shengbo_prelive.material_markdown import markdown_locators
+
+    text = """# 栖序桌面线材收纳盒
+
+币种为人民币（CNY）。
+
+| 款式 | SKU | 日常售价 |
+| --- | --- | --- |
+| 紧凑款 | QX-CB01 | 49.00 元 |
+| 加长款 | QX-CB02 | 69.00 元 |
+
+## 直播间本场配置
+
+本场主题为「栖序桌面收纳专场」，计划于 2026 年 11 月 12 日 19:30（北京时间）开播。
+
+口播用简体中文。先展示桌面，再提醒用户量尺寸。
+
+本场活动时段为 2026 年 11 月 12 日 20:00 至 22:30（北京时间）。活动时段内付款。
+
+| 本场活动商品 | SKU | 本场活动价 |
+| --- | --- | --- |
+| 紧凑款 | QX-CB01 | 39.00 元 |
+| 加长款 | QX-CB02 | 59.00 元 |
+
+活动期间每个账号两款合计限购 2 件。直播间可领取满 55 元减 6 元券，**仅适用于加长款 QX-CB02**。紧凑款不参与凑单。每账号限领用 1 张，可叠加本场活动价，不与其他店铺优惠券同用。
+"""
+    parsed = _located_text({"text": text, "manifest": {"markdown_span_projection": True, "locators": markdown_locators(text)}})
+    rows = [{**row, "source_ref": {"id": "document"}, "location": f"L{index}"} for index, row in enumerate(parsed, 1)]
+    prepared = {"locations": rows, "source_units": build_source_units(rows)}
+    raw = SessionFacts.model_validate({"theme": "栖序桌面收纳专场",
+        "schedule": {"start": "2026-11-12T19:30:00+08:00", "end": "2026-11-12T22:30:00+08:00"},
+        "prices": [{"sku": "QX-CB01", "amount": 49}],
+        "coupon": {"amount": 6, "minimum_spend": 55, "currency": "CNY", "skus": []}}).model_dump()
+    checked, diagnostics = checked_session_soft(raw, prepared, allow_default_projection=True)
+    assert not diagnostics and checked["schedule"]["end"] is None
+    config, gaps = _configuration(checked, {"qx-cb01": "compact", "qx-cb02": "long"})
+    assert config["theme"] == "栖序桌面收纳专场"
+    assert config["scheduled_at"] == "2026-11-12T19:30:00+08:00"
+    assert config["campaign_starts_at"] == "2026-11-12T20:00:00+08:00"
+    assert config["campaign_ends_at"] == "2026-11-12T22:30:00+08:00"
+    commerce = config["commerce"]
+    assert commerce["coupon"]["product_ids"] == ["long"]
+    assert commerce["coupon"]["scope"] == "selected"
+    assert commerce["coupon"]["amount"] == 6 and commerce["coupon"]["minimum_spend"] == 55
+    assert commerce["product_overrides"]["compact"] == {"mode": "price", "price": 39, "exclusive": True}
+    assert commerce["product_overrides"]["long"] == {"mode": "price", "price": 59, "exclusive": False}
+    assert "限购 2 件" in commerce["promotion"] and "口播用简体中文" not in commerce["promotion"]
+    assert not gaps
+
+
+def test_facts_only_session_omits_unconfirmed_optional_values_without_rejecting_real_sibling():
+    from shengbo_prelive.document_import import checked_session_soft
+
+    text = "本场主题：办公桌收纳"
+    prepared = {"locations": [{"location": "L1", "locator": "paragraph:1", "kind": "paragraph",
+                               "text": text, "source_ref": {"id": "one"}}]}
+    session, diagnostics = checked_session_soft({"theme": "办公桌收纳", "objective": "保证卖出一千件"}, prepared)
+    assert session["theme"]["quote"] == "办公桌收纳" and session["objective"] is None
+    assert [issue["field"] for issue in diagnostics] == ["objective"]

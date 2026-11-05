@@ -29,15 +29,29 @@ def test_defaults_follow_user_decision(monkeypatch):
         monkeypatch.delenv(name, raising=False)
     for name in ("SHENGBO_INTENT_REASONING_EFFORT", "SHENGBO_BRANCH_REASONING_EFFORT"):
         monkeypatch.delenv(name, raising=False)
-    assert agent_model_settings() == {"provider": "deepseek", "model": "deepseek-v4-pro", "vision_model": "deepseek-flash",
+    assert agent_model_settings() == {"provider": "deepseek", "model": "deepseek-flash", "vision_model": "deepseek-flash",
                                       "summary_model": "deepseek-flash", "effort": "high",
                                       "intent_effort": "low", "branch_effort": "low"}
     main = build_agent_model(model="gpt-6.1-sol")
     summary = build_agent_model(purpose="summary")
-    assert isinstance(main, DeepSeekAgentModel) and main.model_name == "deepseek-v4-pro" and main.thinking
+    assert isinstance(main, DeepSeekAgentModel) and main.model_name == "deepseek-flash" and main.thinking
     assert summary.model_name == "deepseek-flash" and summary.thinking is False
+    # The canonical Flash model covers unseen image requests and later text
+    # without changing existing thinking settings for either purpose.
+    image_message = HumanMessage(content=[{"type": "image_url", "image_url": {"url": PNG}}])
+    assert main._payload([HumanMessage("普通任务")])["model"] == "deepseek-flash"
+    assert main._payload([image_message])["model"] == "deepseek-flash"
+    assert main._payload([image_message])["thinking"] == {"type": "enabled"}
+    assert summary._payload([HumanMessage("摘要")])["thinking"] == {"type": "disabled"}
     monkeypatch.setenv("SHENGBO_AGENT_MODEL_PROVIDER", "chatgpt_plan")
     assert build_agent_model(purpose="summary") is None
+
+
+def test_blank_model_overrides_fall_back_to_canonical_flash(monkeypatch):
+    for name in ("SHENGBO_AGENT_MODEL", "SHENGBO_AGENT_VISION_MODEL", "SHENGBO_SUMMARY_MODEL"):
+        monkeypatch.setenv(name, "   ")
+    settings = agent_model_settings()
+    assert {settings[key] for key in ("model", "vision_model", "summary_model")} == {"deepseek-flash"}
 
 
 def test_messages_route_unseen_images_to_vision_and_keep_reasoning():

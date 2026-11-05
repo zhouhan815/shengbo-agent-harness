@@ -150,6 +150,7 @@ async function main() {
         const writes = await mockRoomBusiness(page, state);
         await page.goto(base);
         await page.evaluate(() => shengboWorkbench.ready);
+        await page.locator('.sb-a-tab[tabindex="0"]').click();
         const board = page.locator('#room-dashboard');
         const sheet = page.locator('#room-sheet');
         const rows = page.locator('#workspace-editor .wb-room-list [data-room-id]');
@@ -176,7 +177,7 @@ async function main() {
         assert.deepEqual(state.failures, [], 'no unexpected mock API calls');
         assert.deepEqual(errors, [], 'no browser errors');
         assert.equal(await input.inputValue(), rightDraft);
-        assert.equal(await page.getByLabel('选择已有对话').inputValue(), 'conversation-A');
+        assert.equal(await page.locator('.sb-a-tabs .sb-a-tab[aria-selected="true"]').getAttribute('data-conversation-id'), 'conversation-A');
         assert.equal(state.calls.filter(call => call.path.endsWith('/messages') || call.path.endsWith('/control')).length, 0);
         console.log('PASS ' + name);
       } finally {
@@ -400,11 +401,22 @@ async function main() {
         const input = page.locator('.sb-a-input');
         assert.equal(await input.inputValue(), rightDraft);
         await input.fill('');
+        await page.evaluate(() => {
+          const assistant = shengboWorkbench.assistant;
+          const prepare = assistant.prepareTask;
+          assistant.prepareTask = (text, context) => {
+            window.fixtureScriptRequest = context.script_generation;
+            return prepare(text, context);
+          };
+        });
         await scripts.getByRole('button', { name: '将新增要求交给 Agent', exact: true }).click();
-        await page.waitForFunction(() => document.querySelector('.sb-a-input')?.value?.includes('"draft_ref"'));
-        const manifest = JSON.parse((await input.inputValue()).split('当前明确范围与已有稿引用：\n').at(-1));
+        const attachment = page.locator('.sb-a-attachments').getByText(product.body.name + ' · 4 版', { exact: false });
+        await attachment.waitFor();
+        const manifest = await page.evaluate(() => window.fixtureScriptRequest);
+        assert.equal(await input.inputValue(), '');
         assert.deepEqual(manifest.draft_ref, draft);
         assert.equal(manifest.product_counts.find(item => item.product_ref.id === product.ref.id).count, 4);
+        await page.getByRole('button', { name: '取消新增', exact: true }).click();
         await input.fill(rightDraft);
         assert.deepEqual(writes, []);
       });

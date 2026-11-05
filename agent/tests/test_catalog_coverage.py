@@ -445,7 +445,7 @@ def test_arbitrary_source_table_attribute_is_recovered_in_its_own_sku():
 
 
 @pytest.mark.asyncio
-async def test_minor_optional_source_gap_is_logged_without_a_second_call():
+async def test_legacy_optional_coverage_gap_does_not_require_a_second_call():
     from shengbo_prelive.catalog_extract import TOOL_NAME, extract_catalog_report
 
     row = product()
@@ -481,8 +481,7 @@ async def test_minor_optional_source_gap_is_logged_without_a_second_call():
     assert [[u["id"] for u in sent["source_units"]] for sent in calls] == [["U1", "U2", "U3", "U4", "U5"]]
     saved, = result["fields"]["products"]
     assert saved == row
-    assert diagnostics["catalog_validation_diagnostics"]["products"]["optional_gaps"] == [
-        {"unit": "U5", "reason": "missing_disposition"}]
+    assert not result["evidence"] and not diagnostics
 
 
 @pytest.mark.parametrize("shortened", ["可申请退货", "签收后 7 天内可申请退货"])
