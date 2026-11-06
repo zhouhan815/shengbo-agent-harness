@@ -42,21 +42,6 @@ def uncommitted_input_error(code, message, *, status=409, details=None):
     return ContractError(code, message, status=status, details={**(details or {}), "commit_state": "not_committed"})
 
 
-def recoverable_read_error(code, message, *, details=None):
-    """Declare an already authorized read that can use a different view."""
-    return uncommitted_input_error(code, message, status=422, details=details)
-
-
-def tool_argument_error(tool, error, *, prefix=()):
-    issues = error.errors(include_input=False, include_context=False, include_url=False)[:24]
-    if prefix:
-        issues = [{**issue, "loc": (*prefix, *issue["loc"])} for issue in issues]
-    return uncommitted_input_error(
-        "TOOL_ARGUMENTS_INVALID", "工具参数格式未通过校验，本次业务操作未执行", status=422,
-        details={"tool": tool, "issues": issues},
-    )
-
-
 def capability_manifest():
     """Mechanical reachability ledger; no automatic exposure or permission."""
     from .policy import EFFECTS
@@ -72,27 +57,22 @@ def capability_manifest():
 
 
 REPORT_CORRECTABLE_ERRORS = frozenset({
-    "ANALYSIS_REPORT_INVALID", "MATERIAL_ASSESSMENT_INVALID", "MATERIAL_SECTION_NOT_FOUND", "MATERIAL_EVIDENCE_MISSING", "MATERIAL_EVIDENCE_QUOTE_MISMATCH",
+    "MATERIAL_ASSESSMENT_INVALID", "MATERIAL_SECTION_NOT_FOUND", "MATERIAL_EVIDENCE_MISSING",
     "MATERIAL_VISUAL_EVIDENCE_MISMATCH", "MATERIAL_VISUAL_READ_NOT_OBSERVED", "MATERIAL_VISUAL_REUSE_BASIS_REQUIRED",
 })
 
 PREWRITE_CORRECTABLE_ERRORS = frozenset({
-    "INVALID_CAMPAIGN_EXPIRY",
-    "TOOL_ARGUMENTS_INVALID", "MATERIAL_READ_ROUTE_INVALID",
     "PATCH_SCOPE_COLLAPSE_REQUIRES_EXPLICIT_INTENT",
     "INTENT_RESEARCH_REUSE_INVALID", "REQUIRED_ANALYSIS_BINDING_MISSING", "ANALYSIS_BINDING_INVALID",
     "MATERIAL_VISUAL_PLAN_SCOPE_UNVERIFIED", "MATERIAL_CRITICAL_VISUAL_UNREAD", "TARGET_SCOPE_UNVERIFIED",
     "BINDING_REVIEW_REQUIRED", "BINDING_REPORT_REQUIRED", "BINDING_REQUIRES_REPLAN",
     "FACTS_SAVE_REF_INVALID", "FACTS_SAVE_OVERRIDE_INVALID", "FACTS_SAVE_FIELDS_INVALID",
-    "FACTS_SAVE_SELLING_POINTS_AUTH_REQUIRED", "FACTS_SAVE_SELLING_POINTS_SCOPE_INVALID",
-    "FACTS_SAVE_RESEARCH_NOT_COMPATIBLE", "FACTS_SAVE_SELLING_POINTS_NEEDS_REVIEW",
     "FACTS_SAVE_CLEAR_DEFAULT_UNAVAILABLE", "FIELD_CANNOT_CLEAR", "DUPLICATE_PRODUCT_SELECTION",
     "WAIT_DEPENDENCIES_INVALID", "REPORT_MODE_INVALID", "IDENTITY_NAME_REQUIRED",
     "IDENTITY_CANDIDATES_EMPTY", "DECISION_INPUT_INVALID", "INTENT_CATALOG_SCOPE_INVALID", "INTENT_PRODUCT_FIELD_SCOPE_INVALID",
     "SELLING_POINTS_INPUT_INVALID", "SELLING_POINTS_PRODUCT_STALE", "SELLING_POINTS_PRODUCT_UNAVAILABLE",
     "SELLING_POINTS_EVIDENCE_INVALID", "SELLING_POINTS_RESEARCH_INVALID", "SELLING_POINTS_PROPOSAL_CLOSED",
     "SELLING_POINTS_GENERATION_CHOICE_REQUIRED", "SELLING_POINTS_CONFIRMATION_REQUIRED", "PRODUCT_CONSUMER_CONTENT_INVALID",
-    "SELLING_POINTS_RESEARCH_SCOPE_INVALID",
 })
 
 CORRECTABLE_INPUT_ERRORS = {

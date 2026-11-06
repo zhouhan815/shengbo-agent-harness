@@ -202,48 +202,6 @@ async def test_source_only_facts_bind_through_complete_sources_and_real_current_
 
 
 @pytest.mark.asyncio
-@pytest.mark.parametrize("wrong_second_sku", [False, True])
-async def test_one_facts_report_reconciles_each_saved_sku(env, wrong_second_sku):
-    engine, service = env
-    run = await new_run(engine, "新增本次资料中的两款商品")
-    scope = RunScope(run["id"], "multi-facts-main", "execute")
-    source = engine.materials.accept(run["conversation_id"], "facts.txt", "text/plain",
-        b"SKU-A 100; SKU-B 120")["material_ref"]
-    effects = ["import_blob", "accept_analysis_report", "save_product"]
-    grant = await engine.client.command("issue_grant", {"run_id": run["id"], "scope": run["scope"],
-        "capabilities": effects, "target_constraints": []}, MutationContext(operation_id="multi-facts-grant"),
-        run_id=run["id"], controller=True)
-    engine.store.update("run", run["id"], input={**run["input"], "material_refs": [source]},
-        phase="execute", status="RUNNING", allowed_effects=effects,
-        goal={"objective": "catalog_update", "scope": run["scope"], "catalog_delivery": "basic_facts_only",
-              "required_analyses": ["product_facts"]},
-        grant_id=grant["data"]["grant_id"], write_generation=grant["data"]["write_generation"])
-    branch_id = "multi-facts-branch"
-    engine.store.put("branch", {"id": branch_id, "branch_task_id": branch_id, "run_id": run["id"],
-        "role": "product_facts", "status": "RUNNING", "task": {"role": "product_facts",
-            "instruction": "读取两款", "product_ids": [], "source_refs": [source], "input_refs": [], "prior_report_refs": []}})
-    candidates = [{"name": f"保冷袋 {sku}", "sku_id": sku, "price": price, "currency": "CNY"}
-                  for sku, price in [("SKU-A", 100), ("SKU-B", 120)]]
-    engine.submit_report(RunScope(run["id"], "multi-facts-worker", "execute", "product_facts", branch_id),
-        {"summary": "两款各有独立资料", "product_ids": [], "fields": {"products": candidates}})
-    ref, = (await engine.accept_reports(scope, [branch_id], "multi-facts-accept"))["accepted_refs"]
-    report = await service.query("read_analysis_report", {"ref": ref})
-    saved = []
-    for index, fields in enumerate(candidates):
-        if index == 1 and wrong_second_sku:
-            fields = {**fields, "sku_id": "SKU-C"}
-        receipt = await engine.business_command(scope, "save_product",
-            {"schema_hash": service.schema()["schema_hash"], "fields": fields, "patches": [],
-             "source_manifest_refs": report["body"]["report"]["source_refs"]}, f"save-candidate-{index}")
-        saved.append(receipt["data"]["product_ref"]["id"])
-    engine.store.update("run", run["id"], finish={"outcome": "COMPLETED", "summary": "逐款核对"})
-    result = await engine.verify_finish(scope)
-    assert result["ok"] is (not wrong_second_sku), result["missing"]
-    assert {entry["product_ref"]["id"] for entry in result["analysis_source_bindings"]} == set(
-        saved[:1] if wrong_second_sku else saved)
-
-
-@pytest.mark.asyncio
 @pytest.mark.parametrize('invalid', ['partial_sources', 'no_sources', 'prior_run', 'missing_remote_receipt',
     'audience_role', 'different_pinned_revision', 'tampered_local_sources', 'legacy_remote_reader', 'unfrozen_owner'])
 async def test_source_only_binding_rejects_incomplete_or_unproven_product_link(env, invalid):

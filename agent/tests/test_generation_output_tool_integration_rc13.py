@@ -88,9 +88,7 @@ async def test_native_activation_then_stable_read_is_read_only_and_preserves_unk
             CURRENT_SCOPE.reset(token)
     normal = [value for value in sent if value.get("tools")]
     assert len(normal) == 3
-    # A known pending unknown outcome now exposes its read-only recovery tools
-    # immediately; the scripted explicit activation remains safe/idempotent.
-    assert READER in schemas(normal[0]) and "activate_tools" in schemas(normal[0])
+    assert READER not in schemas(normal[0]) and "activate_tools" in schemas(normal[0])
     assert READER in schemas(normal[1]) and READER in schemas(normal[2])
     assert READER in expanded_names(engine, scope)
     outputs = [m for m in result["messages"] if isinstance(m, ToolMessage) and m.tool_call_id == "read-stable-generation"]

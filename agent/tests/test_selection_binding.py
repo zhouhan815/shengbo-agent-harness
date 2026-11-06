@@ -174,38 +174,6 @@ async def test_session_field_selection_compares_full_draft_not_only_label(env):
 
 
 @pytest.mark.asyncio
-async def test_selected_session_product_settings_cannot_write_sibling_or_voice(env):
-    engine, service = env
-    room, prep, _ = await prepared_text(service)
-    snapshot = await service.query("get_workspace_snapshot", {"preparation_id": prep["id"]})
-    first = snapshot["preparation"]["body"]["selected_product_refs"][0]
-    second = await product(service, "第二个商品")
-    prep = (await human_command(service, "update_preparation_products", {"preparation_id": prep["id"],
-        "expected_revision": prep["revision"], "selected_product_refs": [first, second]}))["data"]["preparation_ref"]
-    path = "/draft/commerce/product_overrides/" + first["id"]
-    _, scope = await freeze(engine, "只更新选中商品的本场活动价", select(prep, field=path, prep=prep),
-                            "session_config", prep=prep, room=room)
-    draft = snapshot["preparation_details"]["draft"]["body"]["draft"]
-    proposed = deepcopy(draft)
-    proposed["commerce"]["product_overrides"] = {first["id"]: {"mode": "price", "price": 89},
-                                                   second["id"]: {"mode": "price", "price": 69}}
-    args = {"preparation_id": prep["id"], "expected_revision": prep["revision"], "draft": proposed}
-    with pytest.raises(ContractError, match="FIELD_SCOPE_DENIED"):
-        await engine.business_command(scope, "save_session_draft", args, "outside-product")
-    proposed["commerce"]["product_overrides"].pop(second["id"])
-    proposed["tts_selection"] = {**draft["tts_selection"], "voice": "not-selected"}
-    with pytest.raises(ContractError, match="FIELD_SCOPE_DENIED"):
-        await engine.business_command(scope, "save_session_draft", args, "outside-voice")
-    proposed["tts_selection"] = draft["tts_selection"]
-    receipt = await engine.business_command(scope, "save_session_draft", args, "selected-override")
-    assert receipt["data"]["changed_product_override_ids"] == [first["id"]]
-    snapshot = await service.query("get_workspace_snapshot", {"preparation_id": prep["id"]})
-    saved = snapshot["preparation_details"]["draft"]["body"]["draft"]
-    assert saved["tts_selection"] == draft["tts_selection"]
-    assert list(saved["commerce"]["product_overrides"]) == [first["id"]]
-
-
-@pytest.mark.asyncio
 async def test_selected_audience_report_is_readable_and_only_revises_same_research(env):
     engine, service = env
     room, prep, script = await prepared_text(service)

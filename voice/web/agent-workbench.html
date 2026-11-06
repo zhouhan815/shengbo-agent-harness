@@ -6,19 +6,8 @@
   <meta name="color-scheme" content="light">
   <title>声播 · 播前 Agent 工作台</title>
   <link rel="icon" href="/assets/favicon.svg">
-  <link rel="stylesheet" href="/assets/assistant.css?v=20261105-tab-delete-v1">
-  <link rel="stylesheet" href="/assets/agent-workbench.css?v=20261104-room-console-v2">
-  <link rel="stylesheet" href="/assets/catalog-layout.css?v=20261105-columns-v1">
-  <link rel="stylesheet" href="/assets/rooms-layout.css?v=20261103-inline-room-v1">
-  <link rel="stylesheet" href="/assets/room-dashboard.css?v=20261104-room-console-v2">
-  <link rel="stylesheet" href="/assets/room-product-picker.css?v=20261103-blue-workbench-v1">
-  <link rel="stylesheet" href="/assets/workbench-theme.css?v=20261103-blue-workbench-v2">
-  <link rel="stylesheet" href="/assets/scripts-layout.css?v=20261104-room-console-v2">
-  <link rel="stylesheet" href="/assets/room-diagnostics.css?v=20261104-room-canvas-v1">
-  <link rel="stylesheet" href="/assets/room-canvas.css?v=20261104-room-product-revision-v1">
-  <link rel="stylesheet" href="/assets/room-live-history.css?v=20261104-room-console-v2">
-  <link rel="stylesheet" href="/assets/session-layout.css?v=20261104-compact-room-v3">
-  <link rel="stylesheet" href="/assets/model-key-setup.css?v=20261105-agent-panel-v2">
+  <link rel="stylesheet" href="/assets/assistant.css?v=20261020-script-cards-v4">
+  <link rel="stylesheet" href="/assets/agent-workbench.css?v=20261021-sentence-edit-v1">
 </head>
 <body class="wb-app" data-focus-mode="chat" data-mobile-panel="chat">
   <a class="wb-skip" href="#assistant-container">跳转到 Agent 对话</a>
@@ -28,6 +17,11 @@
         <span class="wb-brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M5 10v4m4-8v12m4-15v18m4-14v10m4-7v4" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></span>
         <span>声播<small>直播工作笔记</small></span>
       </a>
+      <nav class="wb-global-nav" aria-label="全局业务入口">
+        <button type="button" id="open-catalog" data-global-view="catalog">商品库</button>
+        <button type="button" id="open-rooms" data-global-view="rooms">直播间</button>
+      </nav>
+      <div class="wb-context-trail" aria-label="当前工作范围"><span id="context-room">全部工作区</span><span aria-hidden="true">/</span><strong id="context-preparation">尚未选择本场</strong></div>
       <div class="wb-header-end">
         <span class="wb-connection" id="service-status" role="status">正在连接服务</span>
         <span class="wb-local-mark" title="资料和执行记录保存在本机">本机工作区</span>
@@ -37,7 +31,7 @@
 
   <main class="wb-shell" id="agent-workbench">
     <div class="wb-workspace-bar">
-      <div class="wb-workspace-intro"><h1>直播工作台</h1><p>在右侧交代任务，保存后在左侧查看具体成果。</p></div>
+      <div class="wb-workspace-intro"><span class="wb-notebook-tag">WORKSPACE</span><h1>从资料到一场准备充分的直播</h1><p>右侧沟通，左侧检查、微调与执行。</p></div>
       <div class="wb-focus-switch" role="group" aria-label="调整工作区布局">
         <button type="button" id="focus-work" aria-pressed="false" aria-controls="work-panel">看成果</button>
         <button type="button" id="focus-chat" aria-pressed="true" aria-controls="chat-panel">与 Agent 沟通</button>
@@ -51,140 +45,60 @@
 
     <div class="wb-panels">
       <section class="wb-work-panel" id="work-panel" tabindex="-1" aria-labelledby="workspace-title">
-        <div class="wb-workspace-navigation">
-          <nav class="wb-global-nav" aria-label="左侧工作区">
-            <button type="button" id="open-catalog" aria-controls="workspace-editor" data-global-view="catalog">商品知识库</button>
-            <button type="button" id="open-rooms" aria-controls="workspace-editor" data-global-view="rooms">直播间</button>
-          </nav>
-          <div class="wb-context-trail" aria-label="当前工作范围"><span id="context-room">全部工作区</span><span aria-hidden="true">/</span><strong id="context-preparation">尚未选择本场</strong></div>
-        </div>
         <header class="wb-panel-heading">
-          <div><h2 id="workspace-title">准备概览</h2><p id="workspace-subtitle">检查本场状态，继续下一步。</p></div>
-          <div class="wb-heading-actions"><button type="button" class="wb-button wb-button--quiet" id="room-back-list" hidden>‹ 返回直播间列表</button><span class="wb-badge" id="workspace-status">正在读取</span><button type="button" class="wb-button wb-button--primary wb-start-preparation" id="pause-preparation" title="暂停或继续声播语音，保留播放位置" hidden>暂停播出</button><button type="button" class="wb-button" id="restart-version-preparation" title="回到当前话术版本的第一句话，后续按原队列播放" hidden>当前版本从头播放</button><button type="button" class="wb-button" id="stop-preparation" title="结束声播语音输出，不会替你关闭抖音直播" hidden>停止声播声音</button><button type="button" class="wb-button" id="review-preparation" hidden>检查采用内容</button></div>
+          <div><span class="wb-eyebrow">资料与工作台</span><h2 id="workspace-title">准备概览</h2><p id="workspace-subtitle">已保存资料、准备进度与待处理事项。</p></div>
+          <div class="wb-heading-actions"><span class="wb-badge" id="workspace-status">正在读取</span><button type="button" class="wb-button wb-button--primary wb-start-preparation" id="start-preparation" title="通过所选设备播放声播声音，不会自动在抖音开播" hidden>▶ 开始播出</button><button type="button" class="wb-button wb-button--primary wb-start-preparation" id="pause-preparation" title="暂停或继续声播语音，保留播放位置" hidden>⏸ 暂停播出</button><button type="button" class="wb-button" id="restart-version-preparation" title="回到当前话术版本的第一句话，后续按原队列播放" hidden>↻ 当前版本从头播放</button><button type="button" class="wb-button" id="stop-preparation" title="结束声播语音输出，不会替你关闭抖音直播" hidden>■ 结束直播</button><button type="button" class="wb-button" id="review-preparation" hidden>检查并采用</button></div>
         </header>
         <section id="playback-strip" class="wb-playback-strip" aria-label="当前播放与输出设备" hidden>
           <div class="wb-row wb-playback-summary"><strong id="audio-playback-status">等待播出</strong><span id="audio-local-status" class="wb-muted"></span></div>
           <p id="audio-current-meta" class="wb-muted"></p>
           <p id="audio-current-text" class="wb-now-speaking"></p>
           <p id="audio-output-warning" class="wb-audio-warning" role="status" hidden></p>
-          <div id="audio-settings" class="wb-audio-settings">
-            <div id="audio-route-controls" class="wb-audio-routing" aria-label="播放设备设置"></div>
-            <details class="wb-output-diagnostic">
-              <summary>设备检测详情</summary>
-              <p class="wb-output-device"><strong id="audio-output-device">正在检测…</strong></p>
+          <div id="audio-route-controls" class="wb-audio-routing" aria-label="播放设备设置"></div>
+          <details id="audio-settings" class="wb-audio-settings"><summary>声音设置 · <strong id="audio-output-device">正在检测…</strong></summary>
+            <div class="wb-audio-settings-body">
               <div class="wb-output-device"><small id="audio-output-advice"></small></div>
               <div class="wb-audio-signal"><meter id="audio-output-meter" min="0" max="1" value="0" aria-label="电脑端浏览器声音采样电平"></meter><small id="audio-output-signal"></small></div>
-              <pre id="audio-output-details"></pre>
-            </details>
-          </div>
+              <details class="wb-output-diagnostic"><summary>设备检测详情</summary><pre id="audio-output-details"></pre></details>
+            </div>
+          </details>
         </section>
-        <section class="wb-room-board" id="room-dashboard" aria-label="直播间配置面板" hidden>
-          <div class="wb-room-topbar">
-            <section class="wb-room-utilities" id="room-extra-tools" aria-labelledby="room-tools-title">
-              <h3 id="room-tools-title">常用工具</h3>
-              <div class="wb-room-utility-actions">
-                <button type="button" class="wb-button" id="room-open-live-history" aria-haspopup="dialog">直播历史</button>
-                <button type="button" class="wb-button" data-room-section="preparations" aria-haspopup="dialog">准备记录</button>
-                <button type="button" class="wb-button" data-room-section="insights" data-needs-preparation aria-haspopup="dialog">顾客与卖点</button>
-                <button type="button" class="wb-button" data-room-section="comments" aria-haspopup="dialog">测试与评测</button>
-                <button type="button" class="wb-button" data-room-section="changes" data-needs-preparation aria-haspopup="dialog">变更记录</button>
-              </div>
-            </section>
-          </div>
-          <div class="wb-room-board-grid">
-            <div id="room-defaults-editor" class="wb-room-inline-slot"></div>
-            <section class="wb-room-tile" id="room-products-tile">
-              <h3>本场商品</h3>
-              <p id="room-board-content">正在读取商品…</p>
-              <ul id="room-selected-products" class="wb-room-product-rows" aria-label="本场已选商品" hidden></ul>
-              <nav id="room-selected-pager" class="wb-room-selected-pager" aria-label="已选商品分页" hidden>
-                <button type="button" class="wb-button" id="room-selected-prev" aria-label="上一页已选商品">‹</button>
-                <span id="room-selected-page" aria-live="polite"></span>
-                <button type="button" class="wb-button" id="room-selected-next" aria-label="下一页已选商品">›</button>
-              </nav>
-              <div class="wb-room-tile-actions">
-                <button type="button" class="wb-button wb-button--primary" id="room-open-products" aria-haspopup="dialog" aria-controls="room-products-picker" disabled>选择商品</button>
-                <button type="button" class="wb-button" id="room-retry-products" hidden>重试保存</button>
-                <button type="button" class="wb-button" id="room-reload-products" hidden>重新读取选品</button>
-              </div>
-              <p id="room-products-feedback" role="status" hidden></p>
-              <dialog id="room-products-picker" class="wb-room-product-dialog" aria-labelledby="room-products-title">
-                <header>
-                  <h2 id="room-products-title">选择要讲解的商品</h2>
-                  <button type="button" class="wb-button" id="room-close-products">关闭</button>
-                </header>
-                <div class="wb-room-picker-search">
-                  <input id="room-search-products" type="search" placeholder="查找商品名称或 SKU" aria-label="查找商品名称或 SKU" autofocus>
-                  <label><input id="room-products-selected-only" type="checkbox">仅看已选</label>
-                </div>
-                <div id="room-product-options" class="wb-room-picker-options" role="group" aria-label="本页商品"></div>
-                <p id="room-product-options-status" role="status" hidden></p>
-                <button type="button" class="wb-button" id="room-retry-product-search" hidden>重试读取商品</button>
-                <nav class="wb-room-picker-pager" aria-label="选品分页">
-                  <button type="button" class="wb-button" id="room-products-prev">上一页</button>
-                  <span id="room-products-page" aria-live="polite"></span>
-                  <button type="button" class="wb-button" id="room-products-next">下一页</button>
-                </nav>
-                <footer>
-                  <span id="room-picker-count" aria-live="polite"></span>
-                  <button type="button" class="wb-button wb-button--primary" id="room-save-products" disabled>保存选品</button>
-                </footer>
-              </dialog>
-            </section>
-            <section class="wb-room-tile" id="room-platform-tile" data-inline-room-section="platform">
-              <h3>平台接入</h3>
-              <div id="room-platform-editor" class="wb-room-inline-slot"></div>
-            </section>
-            <section class="wb-room-tile" id="room-broadcast-tile" data-inline-room-section="broadcast">
-              <h3>声音与开播</h3>
-              <div id="room-audio-settings" class="wb-room-inline-slot"></div>
-              <div id="room-broadcast-editor" class="wb-room-inline-slot"></div>
-            </section>
-
-          </div>
-        </section>
-        <section id="room-monitor" class="wb-room-monitor" aria-label="播出监控" hidden>
-          <div class="wb-room-monitor-actions">
-            <button type="button" class="wb-button" id="room-monitor-back">‹ 返回直播间配置</button>
-            <button type="button" class="wb-button" id="room-monitor-live-history" aria-haspopup="dialog">直播历史</button>
-          </div>
-          <div id="room-monitor-editor"></div>
-          <div id="room-monitor-audio"></div>
-        </section>
-        <dialog class="wb-room-overlay" id="room-sheet" aria-labelledby="room-sheet-title">
-          <header class="wb-room-overlay-head">
-            <h2 id="room-sheet-title"></h2>
-            <button type="button" class="wb-button" id="room-close-section">关闭</button>
-          </header>
-          <p class="wb-inline-alert" id="room-overlay-status" data-room-overlay-status role="status" hidden></p>
-          <div class="wb-room-overlay-body" id="room-sheet-body"></div>
-        </dialog>
-        <div id="room-diagnostics-host"></div>
-        <div id="room-live-history-host"></div>
-        <div class="wb-editor" id="workspace-editor" role="region" aria-labelledby="workspace-title" tabindex="0">
+        <nav class="wb-view-tabs" role="tablist" aria-label="本场工作区视图">
+          <button type="button" id="tab-overview" role="tab" data-view="overview" aria-selected="true" aria-controls="workspace-editor">概览</button>
+          <button type="button" id="tab-products" role="tab" data-view="products" aria-selected="false" aria-controls="workspace-editor">本场商品</button>
+          <button type="button" id="tab-insights" role="tab" data-view="insights" aria-selected="false" aria-controls="workspace-editor">顾客与卖点</button>
+          <button type="button" id="tab-session" role="tab" data-view="session" aria-selected="false" aria-controls="workspace-editor">本场配置</button>
+          <button type="button" id="tab-scripts" role="tab" data-view="scripts" aria-selected="false" aria-controls="workspace-editor">话术与排序</button>
+          <button type="button" id="tab-changes" role="tab" data-view="changes" aria-selected="false" aria-controls="workspace-editor">变更记录</button>
+        </nav>
+        <nav class="wb-execution-tabs" aria-label="播出与调试">
+          <span>执行与调试</span>
+          <button type="button" data-execution-view="broadcast" aria-controls="execution-editor">播出监控</button>
+          <button type="button" data-execution-view="platform" aria-controls="execution-editor">平台接入</button>
+          <button type="button" data-execution-view="comments" aria-controls="execution-editor">评论测试</button>
+          <button type="button" data-execution-view="jobs" aria-controls="execution-editor">任务与评测</button>
+        </nav>
+        <div class="wb-editor" id="workspace-editor" role="tabpanel" aria-labelledby="tab-overview" tabindex="0">
           <div class="wb-empty wb-loading"><span class="wb-loading-mark" aria-hidden="true"></span><h3>正在读取工作区</h3><p>商品资料和本场成果将在这里展示。</p></div>
         </div>
         <div class="wb-editor" id="execution-editor" role="region" aria-label="播出与调试工作区" hidden></div>
-        <footer class="wb-panel-footer"><button type="button" class="wb-button wb-button--quiet" id="return-from-result" hidden>返回查看成果前的位置</button></footer>
+        <footer class="wb-panel-footer"><span><span class="wb-footer-dot" aria-hidden="true"></span>资料、草案和执行记录保存在本机</span></footer>
       </section>
 
-      <section class="wb-chat-panel" id="chat-panel" tabindex="-1" aria-label="声波 Agent 主对话">
+      <section class="wb-chat-panel" id="chat-panel" tabindex="-1" aria-label="播前 Agent 主对话">
         <div id="assistant-container" class="wb-assistant-container" tabindex="-1"></div>
       </section>
     </div>
   </main>
   <div class="wb-sr-only" id="workbench-live" role="status" aria-live="polite"></div>
   <noscript><p class="wb-noscript">请启用 JavaScript 后使用播前 Agent 工作台。</p></noscript>
-  <script src="/assets/assistant-decision-copy.js?v=20261103-catalog-report-v1"></script>
-  <script src="/assets/assistant.js?v=20261105-tab-delete-v1"></script>
+  <script src="/assets/assistant.js?v=20261020-script-cards-v4"></script>
   <script src="/assets/continuous-player.js"></script><script src="/assets/audio-player.js"></script>
   <script src="/assets/audio-output.js"></script>
-  <script src="/assets/audio-routing.js?v=20261104-room-console-v2"></script>
+  <script src="/assets/audio-routing.js"></script>
   <script src="/assets/workbench-api.js"></script>
-  <script src="/assets/workspace-editors.js?v=20261105-columns-v2"></script>
-  <script src="/assets/workbench-execution.js?v=20261104-room-console-v2"></script>
-  <script src="/assets/room-live-history.js?v=20261104-room-console-v2"></script>
-  <script src="/assets/agent-workbench.js?v=20261105-agent-panel-v2"></script>
-  <script src="/assets/model-key-setup.js?v=20261105-agent-panel-v2"></script>
+  <script src="/assets/workspace-editors.js?v=20261021-preparation-labels-v1"></script>
+  <script src="/assets/workbench-execution.js?v=20261020-script-cards-v4"></script>
+  <script src="/assets/agent-workbench.js?v=20261021-preparation-labels-v1"></script>
 </body>
 </html>

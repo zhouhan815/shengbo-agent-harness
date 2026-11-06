@@ -8,16 +8,12 @@ from unittest.mock import patch
 import httpx
 import pytest
 from langchain_core.messages import AIMessage, ToolMessage
-from langchain_core.utils.function_calling import convert_to_openai_tool
-from pydantic import ValidationError
 
 from shengbo_contracts.common import ContractError, WorkScope, canonical_hash
 from shengbo_prelive.api import create_app
-from shengbo_prelive.decision_presentation import project_decision
-from shengbo_prelive.models import AnswerRequest, DecisionRequest, RunScope
+from shengbo_prelive.models import AnswerRequest, RunScope
 from shengbo_prelive.runtime import RuntimeEngine
 from shengbo_prelive.store import RuntimeStore, TERMINAL
-from shengbo_prelive.tools import build_tools
 from test_runtime_business import BindableFakeModel, env, new_run, prepared_text, stop_at_interrupt
 
 
@@ -73,151 +69,6 @@ async def isolated(tmp_path):
         yield engine
     finally:
         await engine.stop()
-
-
-@pytest.mark.asyncio
-async def test_catalog_question_uses_business_labels_and_retains_reply_contract(isolated):
-    engine = isolated
-    run = saved_run(engine)
-    prompt = "【SKU结构】两个在售SKU。日常售价→price；直播售价→promo_price。缺少image，shelf_life/ingredients不适用。"
-    option = {"id": "split_skus", "label": "拆分为2个SKU商品，按日常价=price、直播价=promo_price保存"}
-    with patch("shengbo_prelive.runtime.interrupt", side_effect=DecisionOpened):
-        with pytest.raises(DecisionOpened):
-            await engine.request_decision(RunScope(run["id"], "audit", run["phase"]),
-                {"kind": "catalog_confirm", "prompt": prompt, "options": [option]}, "catalog-options")
-    view = engine.get_run(run["id"])
-    question = view["questions"][0]
-    assert question["allow_text"] is True
-    assert question["prompt"] == view["summary"]
-    assert "商品图片，保质期和配料不适用" in question["prompt"]
-    assert "本场活动价需在直播间单独设置" in question["prompt"]
-    assert question["options"] == [{"value": "split_skus", "label": "拆分为2个规格商品，按日常售价和促销参考价保存"}]
-    assert engine.store.get("question", question["id"])["prompt"] == prompt
-    custom = {"text": "先预览标准装的知识文档，暂不入库。"}
-    await engine.answer(question["id"], request(question, answer=custom))
-    assert engine.store.get("question", question["id"])["answer"] == custom
-    assert not engine.client.commands
-
-
-def test_decision_tool_advertises_required_label_and_value():
-    tool = next(tool for tool in build_tools(None) if tool.name == "request_user_decision")
-    items = convert_to_openai_tool(tool)["function"]["parameters"]["properties"]["options"]["items"]
-    assert set(items["properties"]) == set(items["required"]) == {"value", "label"}
-    request = DecisionRequest.model_validate({"kind": "catalog_confirm", "prompt": "确认入库方式",
-        "options": [{"save_both": "标准装与加量装分别入库"}, {"id": "save_standard", "label": "只保存标准装"},
-                    {"choice_id": "skip", "title": "暂不入库"}]})
-    assert request.options == [
-        {"value": "save_both", "label": "标准装与加量装分别入库"},
-        {"value": "save_standard", "label": "只保存标准装"}, {"value": "skip", "label": "暂不入库"}]
-
-
-@pytest.mark.asyncio
-async def test_historical_single_key_options_project_and_answer_without_rewriting(isolated):
-    engine = isolated
-    run = saved_run(engine, status="WAITING_USER")
-    raw = [{"save_both": "标准装与加量装分别入库"}, {"save_standard": "只保存标准装"}, {"skip": "暂不入库"}]
-    question = engine.store.put("question", {"id": "legacy-options", "run_id": run["id"], "status": "OPEN",
-        "kind": "catalog_confirm", "prompt": "确认入库方式", "options": raw})
-    public = engine.get_conversation(run["conversation_id"])["runs"][0]["questions"][0]
-    assert [option["value"] for option in public["options"]] == ["save_both", "save_standard", "skip"]
-    assert [option["label"] for option in public["options"]] == [next(iter(option.values())) for option in raw]
-    await engine.answer(question["id"], request(public, answer=public["options"][1]["value"]))
-    stored = engine.store.get("question", question["id"])
-    assert stored["options"] == raw and stored["answer"] == "save_standard"
-
-
-@pytest.mark.parametrize("options", [
-    [{"value": "one", "label": "标准装"}, {"value": "one", "label": "加量装"}],
-    [{"one": "标准装", "two": "加量装"}],
-    [{"choice_id": "只保存标准装"}],
-    [{"label": "只保存标准装"}],
-    [{"value": "one", "label": "选项 1"}],
-    [{"value": "one", "label": "Option 1"}],
-    [{"value": "one", "label": "1"}],
-    [{"value": "one", "label": "只保存标准装", "requires_human_action": "true"}],
-])
-def test_decision_tool_rejects_ambiguous_or_placeholder_options(options):
-    with pytest.raises(ValidationError):
-        DecisionRequest.model_validate({"kind": "catalog_confirm", "prompt": "确认入库方式", "options": options})
-
-
-@pytest.mark.asyncio
-async def test_visible_labels_must_remain_distinct_after_display_translation(isolated):
-    engine = isolated
-    run = saved_run(engine)
-    with pytest.raises(ContractError, match="DECISION_INPUT_INVALID"):
-        await engine.request_decision(RunScope(run["id"], "audit", run["phase"]),
-            {"kind": "catalog_confirm", "prompt": "选择报价", "options": [
-                {"value": "one", "label": "price"}, {"value": "two", "label": "日常售价"}]}, "ambiguous-options")
-    assert engine.store.list("question") == []
-
-
-def test_legacy_option_action_metadata_is_exposed_only_with_exact_server_binding():
-    action = {"command": {"command": "approve_text_for_audio", "args": {
-        "preparation_id": "prep-1", "review_hash": "hash-1"}, "mutation": {"operation_id": "op-1"}}}
-    binding = {"preparation_id": "prep-1", "review_hash": "hash-1", "operation_id": "op-1"}
-    question = {"kind": "text_audio_approval", "prompt": "确认生成语音", "approval_binding": binding,
-                "human_action": action, "options": [{"choice_id": "approve", "title": "确认生成语音"}]}
-    assert project_decision(question)["human_action"] == action
-    wrong = project_decision({**question, "approval_binding": {**binding, "operation_id": "wrong"}})
-    assert "human_action" not in wrong and wrong["options"][0]["requires_human_action"]
-    generic = project_decision({**question, "kind": "catalog_confirm", "options": [
-        {"value": "approve", "label": "只保存标准装", "human_action": action, "requires_human_action": True}]})
-    assert "human_action" not in generic
-    assert generic["options"] == [{"value": "approve", "label": "只保存标准装"}]
-
-
-@pytest.mark.asyncio
-@pytest.mark.parametrize("kind,choice", [
-    ("text_audio_approval", "edit_text"),
-    ("script_audio_preview_approval", "reject"),
-    ("playlist_order", "revise"),
-    ("product_identity", "revise"),
-    ("new_product_import", "revise"),
-    ("task_scope", "revise"),
-])
-async def test_fixed_decisions_accept_written_revisions_without_approval(isolated, kind, choice):
-    engine = isolated
-    controller_question = kind in {"new_product_import", "task_scope"}
-    run = saved_run(engine, status="WAITING_USER", phase="intent" if controller_question else "execute")
-    context = {}
-    if kind == "new_product_import":
-        context = engine._new_product_import_binding(run)
-    elif kind == "task_scope":
-        context = {"resolution_kind": "room_selection"}
-    question = engine.store.put("question", {"id": "edit-proposal", "run_id": run["id"], "status": "OPEN",
-        "kind": kind, "prompt": "请确认本次提案。", "context": context, "controller_question": controller_question})
-    public = engine.get_run(run["id"])["questions"][0]
-    assert public["allow_text"] is False
-    assert public["revision_text"]["choice"] == choice
-    with pytest.raises(ContractError, match="ANSWER_INVALID"):
-        await engine.answer(question["id"], request(question, answer={"choice": "approve", "text": "批一下"}))
-    comment = {"choice": choice, "text": "请调整后把新提案给我看看。"}
-    await engine.answer(question["id"], request(question, answer=comment))
-    answered = engine.store.get("question", question["id"])
-    assert answered["answer"] == comment and answered["verified_human_receipt"] is None
-    if kind == "task_scope":
-        engine.store.update("run", run["id"], status="WAITING_USER", resume_resolution=None)
-        await engine._recover_decision_waits(run_id=run["id"])
-        assert engine.get_run(run["id"])["status"] == "ASSESSING_INTENT"
-    assert not engine.client.queries and not engine.client.commands
-
-
-@pytest.mark.asyncio
-@pytest.mark.parametrize("legacy", [False, True])
-async def test_closed_run_cannot_project_or_resume_open_question(isolated, legacy):
-    engine = isolated
-    run = saved_run(engine)
-    question = await open_question(engine, run)
-    if legacy:
-        engine.store.update("run", run["id"], status="CANCELLED", dispatch_frozen=True)
-    else:
-        engine.store.close_run(run["id"], "CANCELLED", {})
-    assert engine.get_run(run["id"])["questions"] == []
-    assert engine.get_conversation(run["conversation_id"])["runs"][0]["questions"] == []
-    assert engine.store.get("question", question["id"])["status"] == ("OPEN" if legacy else "SUPERSEDED")
-    with pytest.raises(ContractError, match="DECISION_STALE|DECISION_CLOSED"):
-        await engine.answer(question["id"], request(question))
 
 
 @pytest.mark.asyncio

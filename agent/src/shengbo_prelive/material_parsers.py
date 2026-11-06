@@ -225,19 +225,16 @@ def parse_docx(data):
                 relations = _relationships(archive, part)
                 if any(r.get("TargetMode") == "External" for r in relations.values()):
                     unknowns.append("external_relationships_recorded_not_fetched")
-                pcount, tcount, image_position = 0, 0, 0
+                pcount, tcount = 0, 0
                 prefix = "" if part == "word/document.xml" else part + ":"
 
                 def anchor_images(element, locator_id):
-                    nonlocal image_position
                     for node in element.iter():
                         rid = node.get(_tag("r", "embed")) if node.tag == _tag("a", "blip") else node.get(_tag("r", "id")) if node.tag == _tag("v", "imagedata") else None
                         relation = relations.get(rid, {})
                         image = bypart.get(relation.get("resolved"))
                         if image is not None:
-                            image_position += 1
-                            image["anchors"].append({"locator_id": locator_id, "part": part,
-                                                     "document_order": image_position})
+                            image["anchors"].append({"locator_id": locator_id, "part": part})
 
                 # Body order is retained; paragraphs and tables are not collected in separate passes.
                 def walk(container):
@@ -247,13 +244,8 @@ def parse_docx(data):
                             pcount += 1
                             identity = prefix + f"paragraph:{pcount}"
                             text, text_reader = docx_paragraph(element, sdk_document, _word_text(element))
-                            location = {"id": identity, "kind": "paragraph", "text": text, "part": part,
-                                        "text_reader": text_reader}
-                            style = element.find("w:pPr/w:pStyle", NS)
-                            if style is not None and re.fullmatch(r"(?:Title|Subtitle|Heading[1-9])",
-                                                                  style.get(_tag("w", "val"), ""), re.I):
-                                location["section_label"] = True
-                            locators.append(location)
+                            locators.append({"id": identity, "kind": "paragraph", "text": text, "part": part,
+                                             "text_reader": text_reader})
                             anchor_images(element, identity)
                         elif element.tag == _tag("w", "tbl"):
                             tcount += 1

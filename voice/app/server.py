@@ -25,7 +25,7 @@ from pydantic import BaseModel, Field
 from opencc import OpenCC
 
 from .speech import POOL, render
-from . import production, reply_lab, live_source, live_history, commerce_config as commerce
+from . import production, reply_lab, live_source, commerce_config as commerce
 from .welcome import WelcomeRuntime, build_product_templates
 from .like_thanks import LikeThanksRuntime
 from .prosody import sentence_style, profile_catalog, interaction_style
@@ -306,7 +306,7 @@ def _generate_remote_once(product, count, prior_versions=None, revision_feedback
             "stream": False, "max_tokens": min(26000, count*6000), "response_format": {"type": "json_object"},
             "thinking": {"type": "disabled"}}
     request = urllib.request.Request("https://api.deepseek.com/chat/completions", data=json.dumps(body).encode(),
-              headers={"Authorization": "Bearer " + key, "Content-Type": "application/json"})
+                                     headers={"Authorization": "Bearer " + key, "Content-Type": "application/json"})
     try:
         with urllib.request.urlopen(request, timeout=120) as response:
             result = json.load(response)
@@ -458,7 +458,6 @@ class Room:
         self.player_sources = {}
         self.resume_item = None
         self.actions = {}
-        self.last_completed_session = None
         self.lock = asyncio.Lock()
         self.welcomes = WelcomeRuntime()
         self.likes = LikeThanksRuntime()
@@ -881,9 +880,6 @@ class Room:
         service = _active_prelive()
         if service:
             service.release_live_slot(self.state["room_id"])
-        if self.state["status"] == "completed" and self.last_completed_session != self.state["session_id"]:
-            self.log("playback_completed", {})
-            self.last_completed_session = self.state["session_id"]
 
     async def action(self, data):
         action_id = data.get("action_id") or uid("action")
@@ -1702,18 +1698,8 @@ async def reply_knowledge(identity: str):
 
 
 @app.get("/api/rooms/{identity}/live-source")
-async def get_live_source(identity: str, summary_only: bool = False):
-    return live_source.get_view(identity, summary_only=summary_only)
-
-
-@app.get("/api/rooms/{identity}/live-history")
-async def get_live_history(identity: str, cursor: int = 0):
-    return live_history.list_sessions(identity, cursor)
-
-
-@app.get("/api/rooms/{identity}/live-history/{session_id}")
-async def get_live_history_session(identity: str, session_id: str, before: int | None = None):
-    return live_history.read_session(identity, session_id, before)
+async def get_live_source(identity: str):
+    return live_source.get_view(identity)
 
 
 @app.put("/api/rooms/{identity}/live-source")

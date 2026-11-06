@@ -7,7 +7,7 @@ metadata:
 
 ## 编排、批准与交付
 
-生成作业完成后可选wf_script_execution(action='review',job_id=实际作业ID)，一次取得本次当前正式稿及原文；只有review_content_complete为真才表示本次所选文字已完整交付，仍须判断价格、优惠条件、必要限制与模块职责。缺项按返回的精确reader补读；原read_script/read_job仍可选。按prelive-script-plan核对实际正文，有具体缺项或用户明确要求才在授权内局改，轻微风格偏好随交付说明。若仍要继续工作，可在save_task_assessment中用reuse_refs和decision_basis记录计划与取舍；若原Goal已完成，直接在finish_turn.summary写完成范围、保存版本与查看入口、公开审阅结论及保留问题；除用户要求对话全文，不再复制已在界面保存的整稿，服务端以原完成检查绑定实际正式稿refs，无需仅为标记结束再单独更新一次计划。重新读取可用于版本变化、漏看章节或真实新问题。工具交付和模型结论均不构成人工批准，也不自动证明内容合格。
+主审是模型的内容判断，不是不断读取的阶段名称。生成作业完成后可选wf_script_execution(action='review',job_id=实际作业ID)，一次取得本次当前正式稿及原文；只有review_content_complete为真才表示本次所选文字已完整交付，仍须由你判断价格/优惠条件/必要限制与模块职责。缺项按返回的精确reader补读，不猜历史JSON路径；原read_script/read_job仍可选。已读当前精确稿件后，有具体阻断问题则制定受影响模块的局改计划；非阻断风格问题由你选择精简或保留。若仍要继续工作，可在save_task_assessment中用reuse_refs和decision_basis记录计划与取舍；若原Goal已完成，直接在finish_turn.summary写完成范围、保存版本与查看入口、公开审阅结论及保留问题；除用户要求对话全文，不再复制已在界面保存的整稿，服务端以原完成检查绑定实际正式稿refs，无需仅为标记结束再单独更新一次计划。不得把“主审未完成、可能要改”长期作为重读同hash全文的理由。重新读取仍可用于版本变化、漏看章节或真实新问题，不设读次数禁令。工具交付和模型结论均不构成人工批准，也不自动证明内容合格。
 
 长稿与断点审阅：原任务已保存的正式稿仍可作为后续任务的修改依据。显式承接且可核验的原run作业可由review返回正文，历史身份提示只说明来源，不能冒充本run新生成或人工批准；按各项content_complete判断正文是否已实际交付。审阅完整口播优先read_script(ref=实际精确引用,sections=["spoken_text"])，可加content_diagnostics取已存诊断；只缺具体段时加模块名，如["spoken_text","cta"]。需要原句对象或精确句局改时再按具体模块读取，正文已交付后直接做有依据的审阅/局改，不为找状态重复读旧作业全部上下文。外置单行JSON用read_file(limit=1/5/100)都会读回同一整包；这不是有效节选，优先已有模块reader或分页文件的真实offset，只补尚未看到的部分。若同hash未增加新信息，改变读取粒度或说明缺项，不继续反复读同一文件。
 
@@ -15,9 +15,8 @@ read_text_review是已完成编排和声音需求的整包审批预览，不是�
 
 局部试听是独立范围：用户明确只试听正式稿的指定模块时，intent选audio_preview并声明requested_modules，不为试听准备整包编排。read_script_audio_preview用ref或preparation_id+operation_id只读取得本run的真实人类授权，核对精确script/module引用、有序原文hash、单音色/style/model；current才可preview_script_audio一次连续合成已绑定全文、产出一个WAV。没有自由文本或扩大范围的参数。若人工回执尚未登记，用request_user_decision(kind='script_audio_preview_approval',context={operation_id:本次人工授权操作号})等待；真实入口按用户已经明确授予的同范围登记，不要求用户重新批准整包。只读list_script_audio_previews查看可播放结果；此路径不改变原稿、草案、编排、AudioManifest、整包批准、采用或开播。未知结果保留原操作并先对账，不能换操作号重发。
 
-1. 商品和版本仅取用户已选范围。首次编排或其他目标附带编排时，保存顺序前取得真实排序决定。支持人工拖动、同品连续、穿插、随机预览。
+1. 商品和版本仅取用户已选范围。保存顺序前取得真实排序决定。支持人工拖动、同品连续、穿插、随机预览；没有确认不擅自采用建议。
    首次队列可选wf_playback_review(action='prepare_order',parameters={ordered_script_refs:[由你明确选择的精确话术ref序列]})；它核验当前归属并装配occurrence_id、商品id和可直接使用的request_user_decision参数，保持输入顺序和重复项。它不审稿、不选序、不提问、不保存。你可改提案、用原工具自行装配、局改内容或补资料；选择请求排序后仍按真实答复返回的playlist_order_binding保存，不能把提案hash当批准。已有队列的算法重排继续使用原preview_playlist_reorder。
-   若本次目标为playlist_reorder且用户明确要求按同品连续、穿插或随机等算法重排已有队列，可调用wf_playback_review(action='reorder',reorder_spec={mode,product_group_order,within_product})。工具按当前版本预览、保存并编译，不需要模型抄写条目、版本和校验值。组序必须覆盖队列里的全部商品。首次编排或其他任务中附带的重排仍按精确提案和真实确认处理。
 2. 编译按保存队列原位置第1、6、11项长开场，其余短引入；A1/B1/A2各计一项。循环沿保存顺序从第一项重播，不展开超周期；跳播仍用原项开场。重排只补真实缺少的开场文字/音频，正文不重写；已有有效开场复用，不提前为所有版本生成双开场。
 3. 审阅当前稿件与编排后，可直接request_user_decision(kind='text_audio_approval',prompt=核对说明)：只需这两个字段，服务端自动读取当前完整review并生成预览、精确版本/声音/顺序绑定和人工批准命令。无需为构造批准参数重复读整稿、重建bundle或自行拼接review_hash。若你需要进一步核查内容，仍可先read_text_review。用户批准精确整包后才能prepare_required_audio；不声称模型的“同意”是人工回执。
 4. 只生成本场AudioRequirements需要且缓存缺失的句子。修改文案、声音或编排导致review变化时重新审核。

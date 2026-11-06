@@ -9,7 +9,7 @@ from typing import Literal
 from fastapi import Request, HTTPException
 from fastapi.responses import JSONResponse
 from pydantic import Field, ValidationError, field_validator
-from shengbo_contracts.business import DTO, Ref, VoiceSelection
+from shengbo_contracts.business import DTO, VoiceSelection
 from shengbo_contracts.common import RecordRef
 from .. import commerce_config as commerce
 from .storage import BusinessError, canonical, digest, now
@@ -38,13 +38,6 @@ class ArchiveInput(DTO):
     operation_id: str = Field(min_length=1, max_length=200)
 
 
-class DeleteScriptInput(DTO):
-    preparation_id: str = Field(min_length=1, max_length=200)
-    expected_revision: int = Field(ge=1)
-    script_ref: Ref
-    operation_id: str = Field(min_length=1, max_length=200)
-
-
 class PriceInput(DTO):
     preparation_id: str = Field(min_length=1, max_length=200)
     expected_revision: int = Field(ge=1)
@@ -60,7 +53,7 @@ class VoicePreviewInput(DTO):
 def install_human_workbench(app, server, service, browser_identity):
     """Mount same-origin CSRF guarded manual UI operations only."""
     previews = VoicePreviewService(service.store, server)
-    def mutate(value, command, actor_id, live_room_ids=()):
+    def mutate(value, command, actor_id):
         data = value.model_dump(mode="json")
         request_hash = digest({"command": command, "input": data})
         with service.store.transaction(write=True) as c:
@@ -79,14 +72,9 @@ def install_human_workbench(app, server, service, browser_identity):
                 name = value.name.strip()
                 if not name:
                     raise BusinessError("INVALID_NAME", "请输入直播间名称", status=422)
-                body.update(name=name, default_tts_selection=voice, version_count=value.version_count, loop=True, updated_at=now())
-                if not body.get("adopted_publication_ref"):
-                    body.update(tts_provider=voice["provider"], tts_voice=voice["voice"], tts_model=voice["model"])
+                body.update(name=name, tts_provider=voice["provider"], tts_voice=voice["voice"], tts_model=voice["model"], version_count=value.version_count, loop=True, updated_at=now())
                 result = {"room_ref": service.store.put(c, "config", value.room_id, body, expected=value.expected_revision)}
                 stream = value.room_id
-            elif command == "human.script-delete":
-                result = service.delete_script_version(c, value, live_room_ids=live_room_ids)
-                stream = value.preparation_id
             else:
                 if value.product_ref.kind != "product":
                     raise BusinessError("REF_KIND_MISMATCH", "归档目标必须是商品", status=422)
@@ -116,10 +104,6 @@ def install_human_workbench(app, server, service, browser_identity):
                 result = await asyncio.to_thread(price_preview, value)
             elif operation == "voice-preview":
                 result = await previews.preview(value, principal.actor_id)
-            elif operation == "script-delete":
-                live_room_ids = tuple(room_id for room_id, room in getattr(server, "rooms", {}).items()
-                    if room.state["status"] not in {"stopped", "completed"})
-                result = await asyncio.to_thread(mutate, value, "human." + operation, principal.actor_id, live_room_ids)
             else:
                 result = await asyncio.to_thread(mutate, value, "human." + operation, principal.actor_id)
             return JSONResponse(result)
@@ -142,10 +126,6 @@ def install_human_workbench(app, server, service, browser_identity):
     @app.post("/api/prelive/v2/human/product-archive")
     async def archive(request: Request):
         return await handle(request, ArchiveInput, "product-archive")
-
-    @app.post("/api/prelive/v2/human/script-delete")
-    async def delete_script(request: Request):
-        return await handle(request, DeleteScriptInput, "script-delete")
 
     @app.post("/api/prelive/v2/human/price-preview")
     async def price(request: Request):

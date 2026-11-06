@@ -38,7 +38,7 @@ async function main(){
     await page.evaluate(()=>document.querySelector('[data-select-field=core_selling_points]').click());
     state.run.status='COMPLETED';state.run.artifacts=[{label:'查看商品资料',destination:{view:'products',product_id:'product-A'}}];
     await page.evaluate(()=>shengboWorkbench.assistant.refresh());
-    const completionNotice=await page.locator('#workbench-notice-message').textContent();assert.match(completionNotice,/已保存(?:新)?成果/);
+    const completionNotice=await page.locator('#workbench-notice-message').textContent();assert.match(completionNotice,/已保存新成果/);
     await page.getByRole('button',{name:/^移除 .*核心卖点$/}).click();
     assert.equal(await page.locator('#workbench-notice-message').textContent(),completionNotice,'a later selection count change must not overwrite a completion notice');
     assert.equal(await page.getByRole('checkbox',{name:'商品知识库',exact:true}).count(),0,'unrelated applicability checkbox must have a distinct accessible name');

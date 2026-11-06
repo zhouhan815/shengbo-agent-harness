@@ -2,13 +2,12 @@
 from copy import deepcopy
 import pytest
 
-from shengbo_contracts.common import ContractError, MutationContext, canonical_hash
-from shengbo_prelive.action_contracts import recoverable_input_error
+from shengbo_contracts.common import ContractError, MutationContext
 from shengbo_prelive.models import RunScope
 from shengbo_prelive.tools import build_tools
 from shengbo_prelive.workflows import WORKFLOW_SCHEMAS, run_workflow
 from shengbo_prelive.runtime import CURRENT_SCOPE, CURRENT_ATTEMPT
-from test_runtime_business import env, human_command, new_run, prepared_text, product
+from test_runtime_business import env, human_command, new_run, prepared_text
 from test_source_alias_bridge import accepted_sources, Product
 
 
@@ -119,140 +118,7 @@ async def test_branch_views_deduplicate_delivery_but_allow_explicit_full_read(en
     assert 'report' not in second['items'][0]
     assert second['items'][0]['report_path']=='/report'
     assert second['items'][0]['full_ref']==first['items'][0]['full_ref']
-    assert second['next_actions'][0]['args']['branch_task_ids']==['fresh-report']
     assert engine.store.get('branch','fresh-report')['status']=='PREPARED'
-
-
-@pytest.mark.asyncio
-async def test_dispatch_reuses_exact_work_in_this_run_without_partial_batches(env):
-    engine, _ = env
-    run = await authorize(engine, await new_run(engine, '分派分析'), ['accept_analysis_report'])
-    scope = RunScope(run['id'], 'dispatch-main', 'execute')
-    task = {'role': 'product_facts', 'instruction': '整理当前商品事实'}
-    different = {**task, 'instruction': '有明确新依据后补查商品事实'}
-    first = await engine.dispatch(scope, [task, task], '共同依据', 'first-dispatch')
-    branch_id, = first['branch_task_ids']
-    assert [item['reused'] for item in first['items']] == [False]
-    again = await engine.dispatch(scope, [task], '不同备注不产生相同工作', 'second-dispatch')
-    assert again['branch_task_ids'] == [branch_id]
-    assert again['items'][0]['reused']
-    assert len(engine.store.list('branch')) == 1
-    with pytest.raises(ContractError, match='DISPATCH_REPLAY_MISMATCH'):
-        await engine.dispatch(scope, [task, different], '同一调用不能改参数', 'first-dispatch')
-    with pytest.raises(ContractError, match='BRANCH_TARGET_DENIED'):
-        await engine.dispatch(scope, [different, {**task, 'product_ids': ['foreign']}], '无效批次', 'invalid-dispatch')
-    assert len(engine.store.list('branch')) == 1
-    second = await engine.dispatch(scope, [different], '不同分析', 'refine')
-    assert second['branch_task_ids'] != first['branch_task_ids']
-    other = await authorize(engine, await new_run(engine, '另一项分析'), ['accept_analysis_report'])
-    other_result = await engine.dispatch(RunScope(other['id'], 'dispatch-main', 'execute'),
-        [task], '另一项分析', 'first-dispatch')
-    assert other_result['branch_task_ids'] != first['branch_task_ids']
-
-
-@pytest.mark.asyncio
-async def test_selling_points_research_uses_the_single_selected_product(env):
-    engine, service = env
-    selected = await product(service, "轻量款")
-    sibling = await product(service, "长续航款")
-    run = await authorize(engine, await new_run(engine, "整理所选商品的核心卖点"), ["accept_analysis_report"])
-    submitted = {**run["input"], "view_context": {"view": "products", "selling_points_action": "generate"},
-                 "selection": {"target": {"object_ref": selected, "field_path": "/core_selling_points"}},
-                 "observed_versions": [selected]}
-    engine.store.update("run", run["id"], input=submitted, target_product_ids=[selected["id"]],
-        goal={**run["goal"], "objective": "catalog_update", "target_product_ids": [selected["id"]],
-              "original_input_hash": canonical_hash(submitted)})
-    scope = RunScope(run["id"], "selling-points-scope", "execute")
-    task = {"role": "audience_scenes", "instruction": "分析系列共有的顾客需求",
-            "product_ids": [selected["id"], sibling["id"]], "input_refs": [selected, sibling]}
-    first = await engine.dispatch(scope, [task], "研究商品", "single-selection")
-    branch_id, = first["branch_task_ids"]
-    stored = engine.store.get("branch", branch_id)["task"]
-    assert stored["product_ids"] == [selected["id"]]
-    assert [ref["id"] for ref in stored["input_refs"]] == [selected["id"]]
-    for provided in ([], [sibling["id"]]):
-        replay = await engine.dispatch(scope, [{**task, "product_ids": provided}], "研究商品", "single-selection")
-        assert replay["branch_task_ids"] == [branch_id]
-    assert len(engine.store.list("branch")) == 1
-
-
-@pytest.mark.asyncio
-async def test_batched_selling_points_research_scopes_each_report_to_one_selected_product(env):
-    engine, service = env
-    selected = [await product(service, name) for name in ("轻量款", "长续航款")]
-    foreign = await product(service, "未选款")
-    ids = [ref["id"] for ref in selected]
-    run = await authorize(engine, await new_run(engine, "整理所选商品的核心卖点"), ["accept_analysis_report"])
-    submitted = {**run["input"], "view_context": {"view": "products", "selling_points_action": "generate"},
-                 "selection": {"items": [{"target": {"object_ref": ref, "field_path": "/core_selling_points"}}
-                                          for ref in selected]},
-                 "observed_versions": selected}
-    engine.store.update("run", run["id"], input=submitted, target_product_ids=ids,
-        goal={**run["goal"], "objective": "catalog_update", "target_product_ids": ids,
-              "original_input_hash": canonical_hash(submitted)})
-    scope = RunScope(run["id"], "selling-points-batch-scope", "execute")
-    task = {"role": "audience_scenes", "instruction": "分析系列共有的顾客需求", "product_ids": ids}
-    with pytest.raises(ContractError, match="SELLING_POINTS_RESEARCH_SCOPE_INVALID") as failed:
-        await engine.dispatch(scope, [task], "研究商品", "ambiguous-selection")
-    assert recoverable_input_error(failed.value)
-    assert set(failed.value.details["allowed_product_ids"]) == set(ids)
-    assert not engine.store.list("branch")
-    result = await engine.dispatch(scope, [{**task, "product_ids": [sku, foreign["id"]]} for sku in ids],
-                                   "研究商品", "one-report-per-product")
-    assert [engine.store.get("branch", branch_id)["task"]["product_ids"]
-            for branch_id in result["branch_task_ids"]] == [[sku] for sku in ids]
-
-
-@pytest.mark.asyncio
-async def test_dispatch_can_register_one_wait_and_wake_only_for_selected_branch(env):
-    engine, _ = env
-    run = await authorize(engine, await new_run(engine, '等待选中的资料分析'), ['accept_analysis_report'])
-    scope = RunScope(run['id'], 'dispatch-main', 'execute')
-    other = await engine.dispatch(scope, [{'role': 'session_config', 'instruction': '读取独立本场信息'}],
-        '并行的独立任务', 'other-branch')
-    wait = await engine.dispatch(scope, [{'role': 'product_facts', 'instruction': '整理商品资料'}],
-        '下一步需要事实', 'selected-branch', wait_for_results=True)
-    branch_id, = wait['branch_task_ids']
-    assert wait['waiting']
-    current = engine.store.get('run', run['id'])
-    assert current['finish']['outcome'] == 'WAITING_JOBS'
-    assert current['wait_for_branch_ids'] == [branch_id]
-
-    waiting = engine.store.update('run', run['id'], status='WAITING_JOBS')
-    engine.store.update('branch', other['branch_task_ids'][0], status='PREPARED')
-    await engine._wake_waiting(waiting)
-    assert engine.store.get('run', run['id'])['status'] == 'WAITING_JOBS'
-    engine.store.update('branch', branch_id, status='BLOCKED', error={'code': 'TEST'})
-    await engine._wake_waiting(waiting)
-    resumed = engine.store.get('run', run['id'])
-    assert resumed['status'] == 'RUNNING'
-    assert any(action['args']['branch_task_ids'] == [branch_id]
-               for action in resumed['append_event']['analysis_next_actions'])
-
-
-@pytest.mark.asyncio
-async def test_first_plan_and_dispatch_share_validation_and_replay(env):
-    engine, _ = env
-    run = await authorize(engine, await new_run(engine, '从已读资料分派分析'), ['accept_analysis_report'])
-    engine.store.update('run', run['id'], task_assessment=None)
-    scope = RunScope(run['id'], 'dispatch-main', 'execute')
-    task = {'role': 'product_facts', 'instruction': '整理当前商品事实'}
-    plan = {'summary': '据已读资料整理商品事实', 'capabilities': ['product_facts'], 'steps': ['分析资料']}
-    with pytest.raises(ContractError, match='PLAN_CAPABILITY_DENIED'):
-        await engine.dispatch(scope, [task], '同轮执行', 'bad-plan', assessment={**plan, 'capabilities': ['unknown']})
-    with pytest.raises(ContractError, match='BRANCH_TARGET_DENIED'):
-        await engine.dispatch(scope, [{**task, 'product_ids': ['foreign']}], '无效任务', 'bad-task', assessment=plan)
-    assert not engine.store.get('run', run['id'])['task_assessment']
-    assert not engine.store.list('branch')
-    first = await engine.dispatch(scope, [task], '首次派发', 'combined-plan', assessment=plan)
-    assert engine.store.get('run', run['id'])['task_assessment']['summary'] == plan['summary']
-    later = {**plan, 'summary': '单独保存的后续计划'}
-    engine.save_assessment(scope, later)
-    replay = await engine.dispatch(scope, [task], '首次派发', 'combined-plan', assessment=plan)
-    assert replay['branch_task_ids'] == first['branch_task_ids']
-    assert engine.store.get('run', run['id'])['task_assessment']['summary'] == later['summary']
-    with pytest.raises(ContractError, match='DISPATCH_REPLAY_MISMATCH'):
-        await engine.dispatch(scope, [task], '首次派发', 'combined-plan', assessment=later)
 
 
 @pytest.mark.asyncio

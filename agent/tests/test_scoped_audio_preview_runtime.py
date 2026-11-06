@@ -55,8 +55,6 @@ async def test_scoped_preview_normal_goal_human_receipt_and_business_tool(env, m
     with pytest.raises(GraphInterrupt):
         await engine.request_decision(scope, {"kind": "script_audio_preview_approval", "prompt": "登记当前已授权的两模块试听回执", "context": {"operation_id": "current-human-preview"}}, "wait-for-receipt")
     question = engine.get_run(run["id"])["questions"][0]
-    assert question["options"][0]["human_action"] == {
-        "kind": "verify_existing_receipt", "operation_id": "current-human-preview"}
     answer = AnswerRequest(question_revision=question["revision"], answer="approve", client_request_id="preview-answer",
         human_receipt={"operation_id": "current-human-preview"})
     with pytest.raises(ContractError, match="PREVIEW_HUMAN_RECEIPT_MISSING"):

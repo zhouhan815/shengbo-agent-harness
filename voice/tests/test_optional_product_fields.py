@@ -126,34 +126,6 @@ class OptionalFieldApiTests(unittest.IsolatedAsyncioTestCase):
         active = await self.save(values, restored["product_ref"], [{"path": "/material", "op": "set", "value": values["material"]}])
         self.assertEqual(active["product"]["material"], "重新填写材质")
 
-    async def test_saved_knowledge_destination_reports_only_changed_surviving_documents(self):
-        original = [
-            {"id": "same-title-a", "title": "使用说明", "content": "旧说明"},
-            {"id": "same-title-b", "title": "使用说明", "content": "保持此说明"},
-            {"id": "removed", "title": "旧补充", "content": "将移除的说明"},
-        ]
-        fields = Product(name="成果定位测试", price=100, knowledge_documents=original).model_dump()
-        created = await self.save(fields)
-        self.assertEqual(created["changed_knowledge_document_ids"], [d["id"] for d in original])
-
-        fields = {key: created["product"][key] for key in Product.model_fields}
-        updated = [
-            original[1],
-            {**original[0], "content": "已核对的新说明"},
-            {"id": "new", "title": "使用说明", "content": "新增说明"},
-        ]
-        fields["knowledge_documents"] = updated
-        saved = await self.save(fields, created["product_ref"],
-                                [{"path": "/knowledge_documents", "op": "set", "value": updated}])
-        self.assertEqual(saved["changed_knowledge_document_ids"], ["same-title-a", "new"])
-
-        fields = {key: saved["product"][key] for key in Product.model_fields}
-        fields["knowledge_documents"] = updated[:2]
-        deleted = await self.save(fields, saved["product_ref"],
-                                  [{"path": "/knowledge_documents", "op": "set", "value": updated[:2]}])
-        self.assertEqual(deleted["changed_knowledge_document_ids"], [])
-        self.assertIn("/knowledge_documents", deleted["changed_paths"])
-
     async def test_old_hidden_record_is_preserved_on_empty_patch_and_validation_is_only_a_view(self):
         old = Product(name="旧数据", price=100, material="旧材质").model_dump()
         old.update(id="old-record", sku_id="old-record", hidden_optional_fields=["material"])

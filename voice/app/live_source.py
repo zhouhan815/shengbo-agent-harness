@@ -112,9 +112,6 @@ def _schema(connection):
         UNIQUE(room_id,platform,external_room_id,event_key))""")
     connection.execute("CREATE INDEX IF NOT EXISTS live_source_room_seq ON live_source_events(room_id,external_room_id,seq)")
     connection.execute("CREATE INDEX IF NOT EXISTS live_source_room_kind_seq ON live_source_events(room_id,external_room_id,event_type,seq)")
-    connection.execute("""CREATE INDEX IF NOT EXISTS live_source_playback_seq
-        ON live_source_events(room_id,json_extract(body,'$.session_id'),seq)
-        WHERE json_extract(body,'$.session_id') IS NOT NULL""")
     totals_existed = connection.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='live_source_totals'").fetchone()
     connection.execute("""CREATE TABLE IF NOT EXISTS live_source_totals(
         room_id TEXT NOT NULL, external_room_id TEXT NOT NULL, event_type TEXT NOT NULL,
@@ -242,18 +239,10 @@ def _metrics(rows, active):
     return result
 
 
-def get_view(identity, after=0, *, summary_only=False):
+def get_view(identity, after=0):
     config = _config(identity)
     if type(after) is not int or after < 0 or after > 9223372036854775807:
         raise HTTPException(400, "事件游标必须是非负整数")
-    active = SESSIONS.get(identity)
-    state = active["state"] if active else ("reconnect_required" if config["enabled"] else "disabled")
-    connected = bool(active and active["connected"] and _running(identity))
-    message = active["message"] if active else (
-        "已保存采集开关；应用重启后请手动重新连接" if config["enabled"] else "采集已关闭")
-    if summary_only:
-        return {"config": config, "status": {"state": state, "connected": connected, "enabled": config["enabled"],
-                "message": message, "external_room_id": config["external_room_id"]}}
     with srv().db() as connection:
         _schema(connection)
         params = (identity, config["external_room_id"])
@@ -267,7 +256,11 @@ def get_view(identity, after=0, *, summary_only=False):
         metric_rows = []
         for kind in ("audience_snapshot", "stats_display", "like"):
             metric_rows += connection.execute("SELECT body FROM live_source_events WHERE room_id=? AND external_room_id=? AND event_type=? ORDER BY seq DESC LIMIT 1", (*params, kind)).fetchall()
-    status = {"state": state, "connected": connected, "enabled": config["enabled"], "message": message,
+    active = SESSIONS.get(identity)
+    state = active["state"] if active else ("reconnect_required" if config["enabled"] else "disabled")
+    status = {"state": state, "connected": bool(active and active["connected"] and _running(identity)),
+              "enabled": config["enabled"], "message": active["message"] if active else (
+                  "已保存采集开关；应用重启后请手动重新连接" if config["enabled"] else "采集已关闭"),
               "last_event_at": json.loads(last[0])["time"] if last else None,
               "last_event_stale": bool(last and (not active or not active.get("connected")
                   or json.loads(last[0]).get("capture_id") != active.get("capture_id"))),
@@ -368,9 +361,7 @@ async def _publish(identity, state, message):
         return
     event, event_key = normalized
     target = srv().room_instance(identity)
-    active = target.state["status"] not in {"stopped", "completed"}
-    event["session_id"] = target.state["session_id"] if active else None
-    event["during_playback"] = active
+    event["session_id"] = target.state["session_id"]
     persisted = _persist(event, event_key)
     state.update(connected=True, state="connected", message=("正在接收自己直播间的抖音消息" if state["config"]["purpose"] == "own_room" else "正在只读接收抖音直播消息"))
     if persisted is None:

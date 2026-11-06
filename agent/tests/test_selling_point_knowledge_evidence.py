@@ -2,7 +2,6 @@
 import pytest
 
 from shengbo_contracts.common import ContractError
-from shengbo_prelive.selling_point_evidence import build_evidence_catalog
 from shengbo_prelive.selling_points import _field
 
 
@@ -44,21 +43,3 @@ def test_hidden_or_empty_knowledge_does_not_become_an_asserted_fact(product):
     product["knowledge_documents"][0]["content"] = ""
     with pytest.raises(ContractError):
         _field(product, "/knowledge_documents/0/content")
-
-
-def test_evidence_catalog_resolves_exact_values_on_the_selected_revision(product):
-    product["specifications"] = [{"name": "电池容量", "value": "2400 mAh"},
-                                 {"name": "电源兼容", "value": "仅适用 5 V 电源"}]
-    product["hidden_optional_fields"] = ["target_audience"]
-    ref = {"id": "camp-lamp", "revision": 7, "content_hash": "rev-7"}
-    catalog = build_evidence_catalog(ref, product)
-    evidence = {item["product_field"]: item for item in catalog.values()}
-    assert evidence["/specifications/0/value"] == {
-        "product_field": "/specifications/0/value", "label": "电池容量", "fact": "2400 mAh",
-    }
-    assert evidence["/specifications/1/value"]["fact"] == "仅适用 5 V 电源"
-    assert "/target_audience" not in evidence
-    assert "/knowledge_documents/0/title" not in evidence
-    assert all(item["fact"] == _field(product, path) for path, item in evidence.items())
-    assert catalog == build_evidence_catalog(ref, product)
-    assert set(catalog).isdisjoint(build_evidence_catalog({**ref, "revision": 8}, product))

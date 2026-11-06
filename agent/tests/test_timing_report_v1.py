@@ -33,19 +33,6 @@ class TimingReportTests(unittest.TestCase):
         self.assertEqual(report["overall"]["human_blocking_wait_seconds"], 15)
         self.assertEqual(report["overall"]["machine_elapsed_seconds"], 85)
 
-    def test_new_and_legacy_graph_pause_end_the_tool_span(self):
-        for kind in ("tool.interrupted", "tool.failed"):
-            with self.subTest(kind=kind):
-                events = [event("tool.started", 8, {"tool_name": "request_user_decision"}),
-                          event("decision.opened", 10, {"question": {"id": "q", "kind": "catalog_confirm"}}),
-                          event(kind, 11, {"tool_name": "request_user_decision", "status": "INTERRUPTED"}),
-                          event("decision.answered", 40, {"decision_id": "q"})]
-                report = analyze(evidence(events))
-                self.assertEqual(report["tools"]["rows"][0]["status"], "INTERRUPTED")
-                self.assertEqual(report["tools"]["rows"][0]["stage"], "human_decision")
-                self.assertEqual(report["tools"]["rows"][0]["duration_seconds"], 3)
-                self.assertEqual(report["overall"]["human_blocking_wait_seconds"], 30)
-
     def test_parallel_analysis_union_not_sum(self):
         events = [event("branch.started", 10, {"role": "product_facts"}, branch="a"),
                   event("branch.started", 12, {"role": "audience_scenes"}, branch="b"),

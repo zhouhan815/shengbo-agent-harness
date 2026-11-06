@@ -10,7 +10,6 @@ from __future__ import annotations
 
 import json
 import os
-from time import perf_counter_ns
 
 VALID_EFFORTS = {"low", "high", "max"}
 
@@ -46,13 +45,12 @@ def streamed(body: dict) -> dict:
     return {**body, **STREAM_FIELDS}
 
 
-async def read_provider_body(response, max_bytes, too_large, *, stream_marks: dict[str, int] | None = None):
+async def read_provider_body(response, max_bytes, too_large):
     """Return (non-streaming body shape, counted bytes) from a JSON or SSE response.
 
     The size limit counts answer text, not SSE framing or reasoning, so a long
     thinking stream is not rejected for its wrapper bytes. A stream that ends
     without finish_reason yields no choices (an invalid, not a parsed, answer).
-    Optional marks record monotonic timestamps in nanoseconds for SSE events.
     """
     if not response.headers.get("content-type", "").startswith("text/event-stream"):
         chunks, size = [], 0
@@ -66,8 +64,6 @@ async def read_provider_body(response, max_bytes, too_large, *, stream_marks: di
         except (TypeError, ValueError, UnicodeError):
             return {}, size
         return (result if isinstance(result, dict) else {}), size
-    if stream_marks is not None:
-        stream_marks["response_headers"] = perf_counter_ns()
     body, content, finish, size, tool_calls = {}, [], None, 0, False
     async for line in response.aiter_lines():
         if not line.startswith("data:"):
@@ -87,13 +83,8 @@ async def read_provider_body(response, max_bytes, too_large, *, stream_marks: di
             body["usage"] = chunk["usage"]
         for choice in chunk.get("choices") or []:
             delta = choice.get("delta") or {}
-            if (stream_marks is not None and "first_reasoning_delta" not in stream_marks
-                    and delta.get("reasoning_content")):
-                stream_marks["first_reasoning_delta"] = perf_counter_ns()
             piece = delta.get("content") or ""
             if piece:
-                if stream_marks is not None and "first_text_delta" not in stream_marks:
-                    stream_marks["first_text_delta"] = perf_counter_ns()
                 size += len(piece.encode("utf-8"))
                 if size > max_bytes:
                     raise too_large()

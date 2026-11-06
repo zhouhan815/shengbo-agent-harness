@@ -70,30 +70,6 @@ class RuntimeStore:
             return [json.loads(r[0]) for r in db.execute("SELECT body FROM objects WHERE kind=? ORDER BY rowid", (kind,))]
 
     @staticmethod
-    def _require_conversation(db, identity, *, include_deleted=False):
-        row = db.execute("SELECT body FROM objects WHERE kind='conversation' AND id=?", (identity,)).fetchone()
-        conversation = json.loads(row[0]) if row else None
-        if not conversation or (conversation.get("deleted_at") and not include_deleted):
-            raise ContractError("CONVERSATION_NOT_FOUND", "找不到这个对话。", status=404)
-        return conversation
-
-    def get_open_conversation(self, identity):
-        with self.tx() as db:
-            return self._require_conversation(db, identity)
-
-    def delete_conversation(self, identity):
-        with self.tx() as db:
-            conversation = self._require_conversation(db, identity, include_deleted=True)
-            if conversation.get("deleted_at"):
-                return
-            runs = db.execute("SELECT json_extract(body, '$.status') FROM objects "
-                              "WHERE kind='run' AND json_extract(body, '$.conversation_id')=?", (identity,))
-            if any(row[0] not in TERMINAL for row in runs):
-                raise ContractError("CONVERSATION_HAS_ACTIVE_RUN",
-                    "此对话还有进行中或等待确认的任务。请先完成或停止任务，再删除对话。", status=409)
-            self._put(db, "conversation", {**conversation, "deleted_at": now_iso()})
-
-    @staticmethod
     def _put(db, kind, body):
         identity = body.get("id") or body.get(f"{kind}_id")
         if not identity:
@@ -120,23 +96,6 @@ class RuntimeStore:
             if not row:
                 raise ContractError("NOT_FOUND", "记录不存在", status=404)
             return self._put(db, kind, {**json.loads(row[0]), **changes})
-
-    def claim_tool_correction(self, run_id, key, limit):
-        """Reserve a correction without overwriting a concurrent branch's count."""
-        with self.tx() as db:
-            row = db.execute("SELECT body FROM objects WHERE kind='run' AND id=?", (run_id,)).fetchone()
-            if not row:
-                raise ContractError("NOT_FOUND", "记录不存在", status=404)
-            run = json.loads(row[0])
-            if run.get("pending_unknown_operation") or run["status"] in TERMINAL | {"FINALIZING", "CANCELLING"}:
-                return None
-            counters = dict(run.get("correctable_tool_errors") or {})
-            count = int(counters.get(key, 0))
-            if count >= limit:
-                return None
-            counters[key] = count + 1
-            self._put(db, "run", {**run, "correctable_tool_errors": counters})
-            return count + 1
 
     def commit_question_resolution(self, question, run_changes, *, expected_question_revision, expected_run_revision):
         """Commit a verified answer or stale-target result with its resume inbox."""
@@ -179,7 +138,6 @@ class RuntimeStore:
 
     def accept_message(self, conversation_id, request_id, request_hash, message, run):
         with self.tx() as db:
-            self._require_conversation(db, conversation_id)
             row = db.execute("SELECT result,request_hash FROM dedup WHERE owner=? AND request_id=?",
                              (conversation_id, request_id)).fetchone()
             if row:
@@ -210,18 +168,10 @@ class RuntimeStore:
                                                 "run_id": run_id, "actual_outcome": outcome, "closed_at": now_iso()})
             run = self._put(db, "run", {**run, "status": outcome, "closure_ref": receipt["id"],
                                        "closed_at": now_iso(), "dispatch_frozen": True})
-            questions = db.execute(
-                """SELECT body FROM objects WHERE kind='question'
-                   AND json_extract(body, '$.run_id')=? AND json_extract(body, '$.status')='OPEN'""",
-                (run_id,),
-            ).fetchall()
-            for question_row in questions:
-                question = json.loads(question_row[0])
-                self._put(db, "question", {**question, "status": "SUPERSEDED", "superseded_reason": "RUN_CLOSED"})
             db.execute("DELETE FROM slots WHERE run_id=?", (run_id,))
             return run
 
-    def reserve_attempt(self, run_id, invocation_id, role, limit=MODEL_CALL_LIMIT, *, branch_task_id=None, source_fingerprint=None):
+    def reserve_attempt(self, run_id, invocation_id, role, limit=MODEL_CALL_LIMIT):
         with self.tx() as db:
             row = db.execute("SELECT body FROM objects WHERE kind='run' AND id=?", (run_id,)).fetchone()
             run = json.loads(row[0]) if row else None
@@ -232,10 +182,6 @@ class RuntimeStore:
                 raise ContractError("BUDGET_EXHAUSTED", "本次任务模型调用预算已用尽")
             ticket = {"id": new_id("attempt"), "run_id": run_id, "invocation_id": invocation_id,
                       "role": role, "state": "reserved", "reserved_at": now_iso(), "usage": None}
-            if branch_task_id:
-                ticket["branch_task_id"] = branch_task_id
-            if source_fingerprint:
-                ticket["source_fingerprint"] = source_fingerprint
             db.execute("INSERT INTO attempts VALUES(?,?,?)", (ticket["id"], run_id, canonical_json(ticket)))
             return ticket
 

@@ -104,8 +104,6 @@ class BusinessTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(job["body"]["status"], "succeeded", job)
         prep = await self.state(prep)
         script = prep["body"]["script_refs"][0]
-        queue = (await self.service.query("get_workspace_snapshot", {"preparation_id": prep["ref"]["id"]}))["preparation_details"]["playlist"]
-        self.assertEqual([item["script_revision_ref"] for item in queue["body"]["items"]], [script])
         playlist = await self.cmd("save_playlist", {"preparation_id": prep["ref"]["id"], "expected_revision": prep["ref"]["revision"], "items": [{"occurrence_id": "occurrence-1", "product_id": product["id"], "script_revision_ref": script}], "loop_mode": loop_mode})
         prep = playlist["data"]["preparation_ref"]
         compiled = await self.cmd("compile_playback_plan", {"preparation_id": prep["id"], "expected_revision": prep["revision"], "playlist_ref": playlist["data"]["playlist_ref"]})
@@ -113,11 +111,10 @@ class BusinessTests(unittest.IsolatedAsyncioTestCase):
 
     async def test_registry_and_schema_are_strict(self):
         self.assertEqual(len(COMMAND_ARGS), 34)
-        self.assertEqual(len(QUERY_NAMES), 32)
+        self.assertEqual(len(QUERY_NAMES), 31)
         self.assertTrue({"approve_script_audio_preview", "preview_script_audio"} <= set(COMMAND_ARGS))
         self.assertTrue({"read_script_audio_preview", "list_script_audio_previews"} <= set(QUERY_NAMES))
         self.assertIn("read_audio_readiness", QUERY_NAMES)
-        self.assertIn("read_start_readiness", QUERY_NAMES)
         self.assertIn("approve_missing_audio_reissue", COMMAND_ARGS)
         self.assertIn("inspect_missing_audio_reissue", QUERY_NAMES)
         with self.assertRaises(Exception):
@@ -148,22 +145,6 @@ class BusinessTests(unittest.IsolatedAsyncioTestCase):
             await self.cmd("save_session_draft", {"preparation_id": prep["id"],
                 "expected_revision": saved["data"]["preparation_ref"]["revision"], "draft": {"ends_at": schedule["end"]}})
         self.assertEqual(error.exception.code, "UNKNOWN_DRAFT_FIELD")
-
-    async def test_campaign_expiry_is_checked_before_save_and_for_legacy_drafts(self):
-        _, prep = await self.prep()
-        for invalid in ({}, 0, "2027-02-14T23:59:00"):
-            with self.subTest(invalid=invalid):
-                with self.assertRaises(BusinessError) as error:
-                    await self.cmd("save_session_draft", {"preparation_id": prep["id"],
-                        "expected_revision": prep["revision"], "draft": {"campaign_ends_at": invalid}})
-                self.assertEqual(error.exception.code, "INVALID_CAMPAIGN_EXPIRY")
-                self.assertEqual(error.exception.details["field"], "/draft/campaign_ends_at")
-        self.assertEqual((await self.state(prep))["ref"], prep)
-        with self.service.store.transaction(write=True) as c:
-            legacy_ref = self.service.store.artifact(c, "draft",
-                {"preparation_id": prep["id"], "draft": {"campaign_ends_at": {"end": "2027-02-14"}}})
-            check = self.service._currentness(c, {"id": prep["id"], "selected_product_refs": [], "draft_ref": legacy_ref})
-        self.assertEqual(check["blockers"], [{"code": "INVALID_CAMPAIGN_EXPIRY"}])
 
     async def test_operation_receipt_exposes_original_command_args_and_scope_hash(self):
         args = {"schema_hash": self.service.schema()["schema_hash"], "patches": [],
@@ -225,16 +206,9 @@ class BusinessTests(unittest.IsolatedAsyncioTestCase):
         pub = publication["data"]["publication_ref"]
         self.assertFalse(self.adapter.starts)
         self.assertNotIn("adopted_publication_ref", (await self.service.query("read_room", {"room_id": room["id"]}))["body"])
-        pending = await self.service.query("read_start_readiness", {"preparation_id": prep["ref"]["id"]})
-        self.assertFalse(pending["ready"])
-        self.assertEqual(pending["blockers"], [{"code": "START_ADOPTION_REQUIRED"}])
         check = await self.service.query("create_review", {"ref": pub})
         adoption = await self.cmd("adopt_snapshot", {"publication_ref": pub, "review_hash": check["review_hash"], "expected_room_revision": room["revision"]})
         self.assertFalse(self.adapter.starts)
-        ready = await self.service.query("read_start_readiness", {"preparation_id": prep["ref"]["id"]})
-        self.assertTrue(ready["ready"])
-        self.assertEqual(ready["review_hash"], adoption["data"]["review_hash"])
-        self.assertEqual(ready["room_ref"], adoption["data"]["room_ref"])
         start_args = {"publication_ref": pub, "review_hash": adoption["data"]["review_hash"], "expected_room_revision": adoption["data"]["room_ref"]["revision"], "action_id": "start-once"}
         first = await self.cmd("start_prepared_room", start_args, operation="start-op")
         second = await self.cmd("start_prepared_room", start_args, operation="start-op")
@@ -301,42 +275,6 @@ class BusinessTests(unittest.IsolatedAsyncioTestCase):
         result = await self.cmd("save_playlist", {"preparation_id": prep["id"], "expected_revision": before["ref"]["revision"], "items": preview["proposed_items"], "loop_mode": "once", "reorder_spec": preview["resolved_spec"], "preview_hash": preview["preview_hash"]})
         self.assertTrue(result["data"]["unchanged"])
         self.assertEqual((await self.service.query("read_text_approval", {"preparation_id": prep["id"]}))["status"], "current")
-
-    async def test_generated_versions_extend_saved_queue_and_replay_does_not_append_again(self):
-        product, _, prep, script = await self.prepared_text()
-        before = await self.state(prep)
-        repeated = [{"occurrence_id": key, "product_id": product["id"], "script_revision_ref": script}
-                    for key in ["saved-first", "saved-again"]]
-        saved = await self.cmd("save_playlist", {"preparation_id": prep["id"], "expected_revision": before["ref"]["revision"],
-            "items": repeated, "loop_mode": "infinite"})
-        with self.service.store.transaction(write=True) as c:
-            current = self.service._prep(c, prep["id"])
-            script_body = self.service._artifact(c, script)["body"]
-            legacy = self.service.store.artifact(c, "script_revision", {**script_body, "variant_id": "old-unqueued", "version_number": 2})
-            self.service._save_prep(c, current, {**current["body"], "script_refs": [script, legacy]}, invalidate=False)
-        before = await self.state(prep)
-        modules = [{"key": key, "action": "disable" if key in {"campaign", "transition"} else "generate"} for key in MODULE_KEYS]
-        plan = await self.cmd("save_script_plan", {"preparation_id": prep["id"], "expected_revision": before["ref"]["revision"],
-            "bundle_ref": before["body"]["bundle_ref"], "items": [{"product_ref": product, "variant_id": key, "modules": modules}
-                for key in ["new-first", "new-next"]]})
-        request = {"preparation_id": prep["id"], "expected_revision": plan["data"]["preparation_ref"]["revision"],
-                   "plan_ref": plan["data"]["script_plan_ref"], "context_bundle_ref": before["body"]["bundle_ref"],
-                   "expected_generation_epoch": plan["data"]["generation_epoch"]}
-        first = await self.cmd("submit_script_change", request, operation="auto-append")
-        await self.service.drain_jobs()
-        job = await self.service.query("read_job", {"job_id": first["data"]["job_id"]})
-        self.assertEqual(job["body"]["status"], "succeeded", job)
-        result_refs = [item["output"]["script_ref"] for item in job["body"]["items"]]
-        after = await self.state(prep)
-        self.assertNotEqual(after["body"]["playlist_ref"], saved["data"]["playlist_ref"])
-        workspace = await self.service.query("get_workspace_snapshot", {"preparation_id": prep["id"]})
-        items = workspace["preparation_details"]["playlist"]["body"]["items"]
-        self.assertEqual(items[:2], repeated)
-        self.assertEqual([item["script_revision_ref"] for item in items[2:]], [legacy, *result_refs])
-        self.assertEqual(len({item["occurrence_id"] for item in items}), len(items))
-        self.assertEqual(await self.cmd("submit_script_change", request, operation="auto-append"), first)
-        await self.service.drain_jobs()
-        self.assertEqual(await self.state(prep), after)
 
     async def test_artifact_cross_preparation_read_is_rejected(self):
         product, room, prep, script = await self.prepared_text()

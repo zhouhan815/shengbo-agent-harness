@@ -14,7 +14,6 @@ from unittest.mock import patch
 import httpx
 
 from app import commerce_config
-from app.prelive.long_copy_profile import REVISION as LONG_COPY_PROFILE
 from app.prelive.service import PreliveService, Product
 from app.prelive.storage import BusinessError
 from app.prelive.whole_script_generation import (PROTOCOL, build_request, compact_context,
@@ -131,49 +130,6 @@ class WholeProtocolTests(unittest.IsolatedAsyncioTestCase):
         with self.assertRaises(BusinessError):
             build_request(self.product(), {}, [*actions(), {"key": "campaign", "action": "reuse"}], model="deepseek-flash")
 
-    def test_flash_low_routes_only_fresh_complete_long_copy(self):
-        def request(context, selected):
-            body, _ = build_request(self.product(), context, selected, model="deepseek-v4-pro")
-            return body, json.loads(body["messages"][1]["content"])["length_goal"]
-
-        with patch.dict("os.environ", {"DEEPSEEK_LONG_COPY_PROFILE": LONG_COPY_PROFILE,
-                "DEEPSEEK_SCRIPT_THINKING": "enabled", "DEEPSEEK_REASONING_EFFORT": "high"}):
-            body, goal = request({}, actions())
-            self.assertEqual((body["model"], body["thinking"], body["reasoning_effort"]),
-                ("deepseek-flash", {"type": "enabled"}, "low"))
-            self.assertEqual(goal["authoring_profile"], LONG_COPY_PROFILE)
-            self.assertEqual(goal["spoken_characters_range"], [1920, 2400])
-            with patch.dict("os.environ", {"DEEPSEEK_LONG_COPY_THINKING": "disabled"}):
-                fast, fast_goal = request({}, actions())
-                self.assertEqual(fast["model"], "deepseek-flash")
-                self.assertEqual(fast["thinking"], {"type": "disabled"})
-                self.assertNotIn("reasoning_effort", fast)
-                self.assertEqual(fast_goal, goal)
-
-            short = [{**row, "instruction": "整版控制在 400 至 600 个有效字。"} for row in actions()]
-            other_requests = {
-                "short_opening": ({}, actions(("opening_short", *KEYS[1:]))),
-                "partial": ({}, actions(KEYS[:-1])),
-                "campaign": ({}, actions((*KEYS, "campaign"))),
-                "short_word_count": ({}, short),
-                "exact_length": ({}, [{**row, "instruction": "整版约500字。"} for row in actions()]),
-                "rewrite": ({"writing_operation": {"kind": "rewrite_existing_version"}}, actions()),
-                "original_script": ({"original_script": {"ref": {"id": "existing"}}}, actions()),
-                "expansion": ({"expansion_expression": {"expression_direction": "动作叙事"}}, short),
-            }
-            for case, (context, selected) in other_requests.items():
-                with self.subTest(fallback=case):
-                    body, goal = request(context, selected)
-                    self.assertEqual((body["model"], body["reasoning_effort"]), ("deepseek-v4-pro", "high"))
-                    self.assertNotIn("authoring_profile", goal)
-                    if case == "expansion":
-                        self.assertEqual(goal["spoken_characters_range"], [400, 600])
-
-        with patch.dict("os.environ", {"DEEPSEEK_LONG_COPY_PROFILE": "", "DEEPSEEK_SCRIPT_THINKING": "disabled"}):
-            body, goal = request({}, actions())
-            self.assertEqual((body["model"], body["thinking"]), ("deepseek-v4-pro", {"type": "disabled"}))
-            self.assertNotIn("authoring_profile", goal)
-
 
 class WholeServiceTests(unittest.IsolatedAsyncioTestCase):
     async def asyncSetUp(self):
@@ -201,8 +157,8 @@ class WholeServiceTests(unittest.IsolatedAsyncioTestCase):
         self.count += 1
         return (await self.service.execute_command(command, args, MutationContext(operation_id="whole-" + str(self.count)), Principal(kind="human")))["data"]
 
-    async def setup_job(self, variants=1, *, product_name="测试口红", variant_prefix="whole-v"):
-        fields = Product(name=product_name, price=99, selling_points="红色。").model_dump()
+    async def setup_job(self, variants=1):
+        fields = Product(name="测试口红", price=99, selling_points="红色。").model_dump()
         product = (await self.cmd("save_product", {"schema_hash": self.service.schema()["schema_hash"], "fields": fields, "patches": []}))["product_ref"]
         room = (await self.cmd("create_room", {"name": "整版离线测试"}))["room_ref"]
         prep = (await self.cmd("create_preparation", {"room_id": room["id"], "room_revision": room["revision"]}))["preparation_ref"]
@@ -210,7 +166,7 @@ class WholeServiceTests(unittest.IsolatedAsyncioTestCase):
         draft = await self.cmd("save_session_draft", {"preparation_id": prep["id"], "expected_revision": selected["preparation_ref"]["revision"], "draft": {"theme": "情人节", "commerce": {}}})
         context = await self.cmd("save_context_bundle", {"preparation_id": prep["id"], "expected_revision": draft["preparation_ref"]["revision"], "product_refs": [product], "draft_ref": draft["draft_ref"]})
         plan = await self.cmd("save_script_plan", {"preparation_id": prep["id"], "expected_revision": context["preparation_ref"]["revision"], "bundle_ref": context["context_bundle_ref"],
-            "items": [{"product_ref": product, "variant_id": variant_prefix + str(n + 1), "modules": actions()} for n in range(variants)]})
+            "items": [{"product_ref": product, "variant_id": "whole-v" + str(n + 1), "modules": actions()} for n in range(variants)]})
         job = await self.cmd("submit_script_change", {"preparation_id": prep["id"], "expected_revision": plan["preparation_ref"]["revision"], "plan_ref": plan["script_plan_ref"], "context_bundle_ref": context["context_bundle_ref"], "expected_generation_epoch": plan["generation_epoch"]})
         return prep, job
 
@@ -246,82 +202,10 @@ class WholeServiceTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(len(self.sent), 1)
         self.assertEqual(item["provider_attempts"][0]["usage"]["total_tokens"], 300)
         self.assertEqual(item["provider_attempts"][0]["validation_state"], "rejected")
-        recovery = item["error"]["details"]["recovery"]
-        self.assertEqual((recovery["disposition"], recovery["affected_units"], recovery["model_requests"]),
-                         ("structure_repair", ["cta"], 0))
         self.assertFalse(item.get("module_results"))
         with self.service.store.transaction() as c:
             self.assertEqual(self.service.store.all(c, "module"), [])
         self.assertEqual((await self.service.query("read_preparation", {"preparation_id": prep["id"]}))["body"]["script_refs"], [])
-
-    async def test_flash_low_oversize_archives_rejected_attempt_and_commits_no_modules(self):
-        manuscript = {"modules": [{"module_key": key, "sentences": [
-            {"text": "愿" * 650 + "。", "kind": "engagement", "fact_ids": []},
-        ]} for key in KEYS]}
-
-        def handler(request):
-            body = json.loads(request.content)
-            self.sent.append(body)
-            return httpx.Response(200, json=envelope(raw=json.dumps(manuscript, ensure_ascii=False)))
-
-        self.service.adapter.module_transport = httpx.MockTransport(handler)
-        with patch.dict("os.environ", {"DEEPSEEK_LONG_COPY_PROFILE": LONG_COPY_PROFILE}):
-            prep, job = await self.setup_job()
-            await self.service.drain_jobs()
-        result = await self.read_job(job)
-        self.assertEqual(len(self.sent), 1)
-        self.assertEqual(self.sent[0]["reasoning_effort"], "low")
-        self.assertEqual(result["status"], "failed", result)
-        item = result["items"][0]
-        self.assertEqual(item["error"]["code"], "WHOLE_SCRIPT_LENGTH_OUT_OF_RANGE")
-        self.assertEqual(item["error"]["details"]["spoken_characters"], 2600)
-        self.assertEqual(len(item["provider_attempts"]), 1)
-        attempt = item["provider_attempts"][0]
-        self.assertEqual(attempt["validation_state"], "rejected")
-        self.assertEqual(attempt["usage"]["total_tokens"], 300)
-        self.assertTrue(attempt["provider_response_ref"])
-        self.assertFalse(item.get("module_results"))
-        with self.service.store.transaction() as c:
-            self.assertEqual(self.service.store.all(c, "module"), [])
-        state = await self.service.query("read_preparation", {"preparation_id": prep["id"]})
-        self.assertEqual(state["body"]["script_refs"], [])
-
-    async def test_new_whole_draft_accepts_uncited_marketing_and_rejects_wrong_confirmed_price(self):
-        line = "选好喜欢的颜色，想练就马上开练。"
-        changed_modules = {"selling_points"}
-
-        def handler(request):
-            task = json.loads(json.loads(request.content)["messages"][1]["content"])
-            self.assertEqual(task["fact_validation_policy"], "confirmed-fact-conflict-only-v1")
-            body = {"modules": [{"module_key": key, "sentences": [{"text": line if key in changed_modules else "来看看这款。",
-                "kind": "product_claim", "fact_ids": []}]} for key in task["requested_module_keys"]]}
-            return httpx.Response(200, json=envelope(raw=json.dumps(body, ensure_ascii=False)))
-
-        self.service.adapter.module_transport = httpx.MockTransport(handler)
-        prep, job = await self.setup_job()
-        await self.service.drain_jobs()
-        accepted = await self.read_job(job)
-        self.assertEqual(accepted["status"], "succeeded", accepted)
-        self.assertTrue((await self.service.query("read_preparation", {"preparation_id": prep["id"]}))["body"]["script_refs"])
-
-        line = "日常售价是一百零九元。"
-        changed_modules = {"product_intro", "selling_points"}
-        prep, job = await self.setup_job(product_name="测试唇膏", variant_prefix="wrong-price-v")
-        await self.service.drain_jobs()
-        rejected = await self.read_job(job)
-        self.assertEqual(rejected["status"], "failed", rejected)
-        item = rejected["items"][0]
-        details = item["error"]["details"]
-        self.assertIn("CONFIRMED_PRICE_CONFLICT", {finding["code"] for finding in details["sentence_findings"]})
-        self.assertEqual({failure["module_key"] for failure in details["module_validation_failures"]}, changed_modules)
-        self.assertEqual(set(details["content_validated_module_keys"]), {"opening_long", "cta"})
-        self.assertEqual(set(details["recovery"]["affected_units"]), changed_modules)
-        self.assertIn("CONFIRMED_PRICE_CONFLICT", details["recovery"]["issue_codes"])
-        self.assertEqual(details["recovery"]["model_requests"], 0)
-        self.assertEqual(len(item["provider_attempts"]), 1)
-        self.assertTrue(item["provider_attempts"][0]["provider_response_ref"])
-        self.assertFalse(item.get("module_results"))
-        self.assertFalse((await self.service.query("read_preparation", {"preparation_id": prep["id"]}))["body"]["script_refs"])
 
     async def test_whole_initial_then_one_module_patch_reuses_other_modules_and_keeps_variant_number(self):
         prep, initial_job = await self.setup_job()

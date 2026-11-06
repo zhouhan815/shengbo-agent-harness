@@ -208,16 +208,12 @@ def build_request(product, context, module_key, previous, *, model):
         raise BusinessError("INVALID_MODULE_CONTEXT", "模块上下文不能被安全序列化", status=422) from None
     if len(user.encode("utf-8")) > MAX_INPUT_BYTES:
         raise BusinessError("MODULE_CONTEXT_TOO_LARGE", "完整模块上下文过大，未发送供应商，请缩小本次材料范围", status=422)
-    system = SYSTEM
-    if "expansion_expression" in context:
-        from .expansion_expression import WRITING_INSTRUCTION
-        system += "\n" + WRITING_INSTRUCTION
-    return {"model": model, "messages": [{"role": "system", "content": system}, {"role": "user", "content": user}],
+    return {"model": model, "messages": [{"role": "system", "content": SYSTEM}, {"role": "user", "content": user}],
             "response_format": {"type": "json_object"}, "stream": False,
             **script_thinking_options(), "max_tokens": script_max_tokens(1000 if module_key in _SHORT else 6000)}
 
 
-def validate_output(raw, product, module_key, *, verify_usage_claims=False, verify_confirmed_contradictions=False):
+def validate_output(raw, product, module_key):
     product = active_product_fields(product)
     try:
         output = ModuleOutput.model_validate(raw)
@@ -232,14 +228,13 @@ def validate_output(raw, product, module_key, *, verify_usage_claims=False, veri
     valid = {fact["id"] for fact in fact_catalog(product)}
     issues = []
     reference_issues = []
-    sentence_findings = []
     for field in ("display_text", "spoken_text"):
         lines = [getattr(sentence, field) for sentence in output.sentences]
         if len(lines) != len(set(lines)):
             issues.append("本模块存在完全重复的句子")
     for index, sentence in enumerate(output.sentences):
         if (any(identity not in valid for identity in sentence.fact_ids)
-                or (sentence.kind == "product_claim" and not sentence.fact_ids and not verify_confirmed_contradictions)
+                or (sentence.kind == "product_claim" and not sentence.fact_ids)
                 or (sentence.kind == "engagement" and sentence.fact_ids)):
             issues.append("事实引用无效")
             reference_issues.append({"sentence_index": index,
@@ -247,21 +242,17 @@ def validate_output(raw, product, module_key, *, verify_usage_claims=False, veri
                 "kind": sentence.kind, "missing_claim_reference": sentence.kind == "product_claim" and not sentence.fact_ids,
                 "engagement_has_reference": sentence.kind == "engagement" and bool(sentence.fact_ids)})
         for text in {sentence.display_text, sentence.spoken_text}:
-            if not verify_confirmed_contradictions and re.search(r"零风险|绝对不会|站多久都不|不会滑倒|我(自己)?(穿了|用过)|库存(紧张|不多)|下播.*恢复", text):
+            if re.search(r"零风险|绝对不会|站多久都不|不会滑倒|我(自己)?(穿了|用过)|库存(紧张|不多)|下播.*恢复", text):
                 issues.append("存在未核实的保证、体验或促销承诺")
             if re.search(r"没有接入|未接入|API|接口|系统(未|没有)|页面.*未提供", text, re.I):
                 issues.append("含后台实现细节")
     # Both display and audible text are checked; no module-level all-feature or
     # whole-script minimum-length rule. Existing whole-script defaults unchanged.
     for key in ("display_text", "spoken_text"):
-        options = ({"verify_confirmed_contradictions": True} if verify_confirmed_contradictions else
-                   {"verify_usage_claims": verify_usage_claims})
-        issues.extend(content_issues(product, [{"sentences": [{"text": getattr(s, key)} for s in output.sentences]}],
-            require_coverage=False, sentence_findings=sentence_findings, **options))
+        issues.extend(content_issues(product, [{"sentences": [{"text": getattr(s, key)} for s in output.sentences]}], require_coverage=False))
     if issues:
         raise BusinessError("GENERATED_MODULE_NEEDS_REVIEW", "单模块内容未通过事实引用或表述检查，已有稿件保留",
-            details={"issues": sorted(set(issues)), "allowed_fact_ids": sorted(valid), "reference_issues": reference_issues[:100],
-                **({"sentence_findings": sentence_findings[:100]} if sentence_findings else {})})
+            details={"issues": sorted(set(issues)), "allowed_fact_ids": sorted(valid), "reference_issues": reference_issues[:100]})
     return [sentence.spoken_text for sentence in output.sentences]
 
 

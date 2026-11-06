@@ -17,9 +17,6 @@
   function preparationStateLabel(preparation,room){return preparationAdopted(preparation,room)?'当前直播间已采用（未代表开播）':STATES[preparation?.body?.status]||preparation?.body?.status||'准备中';}
   const copy=v=>v===undefined?undefined:JSON.parse(JSON.stringify(v));
   const equal=(a,b)=>JSON.stringify(a)===JSON.stringify(b);
-  const canonicalProductField=value=>JSON.stringify(value,(_,item)=>
-    item && typeof item==='object' && !Array.isArray(item)
-      ? Object.fromEntries(Object.keys(item).sort().map(key=>[key,item[key]])) : item);
   const E=(tag,text,cls)=>{const n=document.createElement(tag);if(text!==undefined)n.textContent=String(text);if(cls)n.className=cls;return n;};
   const uid=()=>global.ShengboWorkbenchApi?.uuid?.()||crypto.randomUUID();
   const jsonDetails=(label,value)=>{const d=E('details',undefined,'wb-evidence');d.append(E('summary',label),E('pre',JSON.stringify(value,null,2),'wb-mono'));return d;};
@@ -51,7 +48,6 @@
     const expiry=Date.parse(draft.campaign_ends_at||'');
     const campaignAllowed=options.includeCampaign===true&&Number.isFinite(expiry)&&expiry>(options.now||Date.now());
     draft.theme='';draft.objective=options.goal||'准备本场直播';draft.scheduled_at='';draft.loop_mode='infinite';
-    if(!campaignAllowed)delete draft.campaign_starts_at;
     draft.campaign_ends_at=campaignAllowed?draft.campaign_ends_at:'';
     const excludedDocuments=[];
     if(!campaignAllowed){commerce.coupon={mode:'none',currency:commerce.coupon?.currency||'CNY',scope:'all',product_ids:[]};commerce.promotion='';commerce.promotion_scope='all';commerce.promotion_product_ids=[];for(const[id,value]of Object.entries(commerce.product_overrides||{}))commerce.product_overrides[id]={...value,mode:'none',price:null,discount:null,promotion:'',gifts:''};commerce.knowledge_documents=(commerce.knowledge_documents||[]).filter(doc=>{const timed=/活动|限时|促销|折扣|赠品|今天|明天|本场|20\d{2}[-/年]|\d{1,2}月\d{1,2}日/.test((doc.title||'')+' '+(doc.content||''));if(timed)excludedDocuments.push({id:doc.id,title:doc.title});return !timed;});}
@@ -64,24 +60,20 @@
     const api=options.api||global.ShengboWorkbenchApi;
     if(!api)throw Error('业务工作区 API 尚未初始化');
     const container=options.container;const storage=options.storage===null?null:(options.storage||global.localStorage);const prefix='shengbo.workbench.buffer.v2:';
-    const buffers=new Map(),cache=new Map(),replacements=new Map(),operations=new Map(),productMaterialFlows=new Map(),catalogViewStates=new Map();
-    const catalogThumbnailReads=new Map();
-    const pendingRoomCreations=new Map(), roomMaterialFlows=new Map();
+    const buffers=new Map(),cache=new Map(),replacements=new Map(),operations=new Map(),materialItems=[],previewUrls=[];
     let unknownOperation=null;try{const pending=JSON.parse(storage?.getItem(prefix+'pending-operation')||'null');if(pending?.operationId&&pending?.fingerprint)unknownOperation=pending;}catch{}
-    let current={view:'overview'},snapshot=null,schema=null,voiceOptions=null,openGeneration=0,busy=false,disposed=false,scriptReader=null,productDialog=null;
+    let current={view:'overview'},snapshot=null,schema=null,voiceOptions=null,activeKey=null,busy=false,disposed=false,scriptReader=null;
     let editorLocks=[],selectedKeys=new Set();const lockedControls=new Map();
     const status=E('div',undefined,'wb-inline-alert');status.hidden=true;status.setAttribute('role','status');
     const content=E('div',undefined,'wb-editor-content');container.replaceChildren(status,content);
-    let catalogResizeObserver=null, activeRoomOverlay=null;
-    const editorTargets=selector=>new Set([...container.querySelectorAll(selector),...(options.roomOverlay?.querySelectorAll(selector)||[]),...(productDialog?.dialog.querySelectorAll(selector)||[])]);
     function routedAudio(node){Promise.resolve(options.onAudioElement?.(node)).catch(e=>notice(e.message||'试听输出设备未就绪，请重新选择播放设备。'));return node;}
     function region(host,descriptor){host.dataset.agentRegion=JSON.stringify(descriptor);return host;}
     function applyEditorLocks(){
       if(disposed)return;const desired=new Map();
-      for(const host of editorTargets('[data-agent-region]')){
+      for(const host of container.querySelectorAll('[data-agent-region]')){
         const descriptor=JSON.parse(host.dataset.agentRegion),matches=matchingLocks(editorLocks,descriptor);let count=0;
         for(const control of host.querySelectorAll('input,textarea,select,button,[draggable]')){
-          if(control.dataset.readOnlyAction==='true'||control.closest('[data-product-material-flow]'))continue;
+          if(control.dataset.readOnlyAction==='true')continue;
           const field=control.closest('[data-agent-field]')?.dataset.agentField;
           const blocked=matches.some(target=>!target.field_paths?.length||control.tagName==='BUTTON'&&!control.closest('[data-agent-field]')||field&&target.field_paths.some(path=>field===path||field.startsWith(path+'/')||path.startsWith(field+'/')));
           if(blocked){desired.set(control,matches[0]);count++;}
@@ -95,218 +87,19 @@
       for(const[control,lock]of desired){if(!lockedControls.has(control))lockedControls.set(control,{disabled:!!control.disabled,draggable:control.getAttribute('draggable')});control.disabled=true;if(control.hasAttribute('draggable'))control.draggable=false;control.setAttribute('aria-disabled','true');control.dataset.agentInputLocked=lock.run_id;}
     }
     function setEditorLocks(value){editorLocks=copy(value?.locks||value||[]);applyEditorLocks();}
-    function setSelected(value){selectedKeys=new Set(selectionItems(value).map(selectionKey));for(const n of editorTargets('[data-selection-key]')){const active=selectedKeys.has(n.dataset.selectionKey);n.classList.toggle('is-agent-selected',active);n.setAttribute('aria-pressed',String(active));}}
+    function setSelected(value){selectedKeys=new Set(selectionItems(value).map(selectionKey));for(const n of container.querySelectorAll('[data-selection-key]')){const active=selectedKeys.has(n.dataset.selectionKey);n.classList.toggle('is-agent-selected',active);n.setAttribute('aria-pressed',String(active));}}
     function selectable(node,fn,item){const key=selectionKey(item);node.classList.add('wb-select-target');node.dataset.selectionKey=key;if(node.tagName==='LABEL')node.removeAttribute('for');node.setAttribute('role','button');node.tabIndex=0;node.title='选中此项，在右侧说明修改要求；再次点击取消';const activate=event=>{event.preventDefault();event.stopPropagation();guard(fn);};node.addEventListener('click',activate);node.addEventListener('keydown',event=>{if(event.key==='Enter'||event.key===' '){activate(event);}});node.classList.toggle('is-agent-selected',selectedKeys.has(key));node.setAttribute('aria-pressed',String(selectedKeys.has(key)));return node;}
     const lockObserver=new MutationObserver(()=>applyEditorLocks());lockObserver.observe(content,{childList:true,subtree:true});
-    function preventLockedEdit(event){if(event.target.closest?.('[data-read-only-action="true"]'))return;if(event.target.closest?.('[data-agent-input-locked]')){event.preventDefault();event.stopImmediatePropagation();}}
-    container.addEventListener('click',preventLockedEdit,true);
-    options.roomOverlay?.addEventListener('click',preventLockedEdit,true);
+    container.addEventListener('click',e=>{if(e.target.closest?.('[data-read-only-action="true"]'))return;if(e.target.closest?.('[data-agent-input-locked]')){e.preventDefault();e.stopImmediatePropagation();}},true);
     function closeScriptReader({restoreFocus=true,force=false}={}){if(!scriptReader)return true;if(!force&&[...buffers.values()].some(b=>b.dirty&&scriptReader.contains(b.host))){readerNotice('请先保存或取消正在编辑的句子，再关闭或切换话术。','warning');return false;}const origin=scriptReader._origin,backScrollTop=scriptReader._backScrollTop||0;for(const item of scriptReader._underlay||[]){item.node.inert=item.inert;if(item.ariaHidden===null)item.node.removeAttribute('aria-hidden');else item.node.setAttribute('aria-hidden',item.ariaHidden);}scriptReader._panel?.classList.remove('wb-script-reader-open');scriptReader.remove();scriptReader=null;content.inert=false;content.removeAttribute('aria-hidden');container.classList.remove('wb-has-script-reader');container.scrollTop=backScrollTop;if(restoreFocus)(origin?.isConnected?origin:container).focus({preventScroll:true});return true;}
     function readerNotice(message,tone='info'){if(!scriptReader)return;let alert=scriptReader.querySelector('[data-sentence-save-status]');if(!alert){alert=E('p',undefined,'wb-inline-alert');alert.dataset.sentenceSaveStatus='';alert.setAttribute('role','status');scriptReader.querySelector('.wb-script-reader-heading')?.after(alert);}alert.textContent=message;alert.dataset.tone=tone;}
     function readerKeydown(event){if(event.key==='Escape'&&scriptReader){event.preventDefault();closeScriptReader();}}
     document.addEventListener('keydown',readerKeydown);
-    function showProductCloseConfirmation(state){
-      if(state.closeConfirmation?.open)return;
-      const {dialog,editFocus}=state;
-      const confirm=E('dialog',undefined,'wb-product-close-confirm');
-      const title=E('h3','关闭商品编辑？');
-      const explanation=E('p','此商品还有未保存修改。请选择如何处理草稿。');
-      title.id='wb-product-close-title-'+uid();
-      explanation.id=title.id+'-description';
-      confirm.setAttribute('aria-labelledby',title.id);
-      confirm.setAttribute('aria-describedby',explanation.id);
-      const resume=()=>{
-        confirm.close();
-        confirm.remove();
-        state.closeConfirmation=null;
-        if(editFocus?.isConnected)editFocus.focus({preventScroll:true});
-      };
-      const continueEditing=button('继续编辑',resume,false,{readOnlyAction:'true'});
-      const actions=E('div',undefined,'wb-product-close-actions');
-      actions.append(continueEditing);
-      if(unknownOperation?.command!=='save_product'){
-        const discard=button('放弃草稿并关闭',()=>dismissProductDialog({discardDraft:true}),false,{readOnlyAction:'true'});
-        discard.classList.add('wb-catalog-danger');
-        actions.append(discard);
-      }
-      actions.append(button('保留草稿并关闭',()=>dismissProductDialog({keepDraft:true}),true,{readOnlyAction:'true'}));
-      confirm.append(title,explanation,actions);
-      confirm.addEventListener('cancel',event=>{event.preventDefault();resume();});
-      dialog.append(confirm);
-      state.closeConfirmation=confirm;
-      confirm.showModal();
-      continueEditing.focus({preventScroll:true});
-    }
-    function closeProductDialog({restoreFocus=true,keepDraft=false,discardDraft=false}={}){
-      if(!productDialog)return true;
-      const {dialog,backdrop,origin,draftKey,productId}=productDialog;
-      const draft=draftKey&&buffers.get(draftKey);
-      if(draft?.dirty&&!keepDraft&&!discardDraft){
-        showProductCloseConfirmation(productDialog);
-        return false;
-      }
-      if(discardDraft&&draft)clearBuffer(draft);
-      if(productDialog.closeConfirmation?.open)productDialog.closeConfirmation.close();
-      productDialog=null;
-      dialog.close();
-      dialog.remove();
-      backdrop.remove();
-      lockObserver.disconnect();
-      lockObserver.observe(content,{childList:true,subtree:true});
-      content.inert=false;
-      applyEditorLocks();
-      if(restoreFocus){
-        const row=!origin?.isConnected&&productId?content.firstElementChild?._showCatalogProduct?.(productId,{clearSearch:false}):null;
-        const target=origin?.isConnected?origin:row?.querySelector('[data-open-product]')||content.querySelector(productId?'input[type="search"]':'[data-new-product]');
-        target?.focus({preventScroll:true});
-      }
-      return true;
-    }
-    function closeCatalogImportDialog(){
-      if(productDialog?.dialog.dataset.catalogDialog!=='upload')return false;
-      const flow=productMaterialFlows.get('create');
-      if(flow?.pending||flow?.batch||productDialog.dialog.querySelector('input[type=file]')?.files.length)return false;
-      return closeProductDialog({restoreFocus:false});
-    }
-    function dismissProductDialog(options){
-      const productId=productDialog?.productId;
-      if(!closeProductDialog(options))return;
-      if(productId&&current.product_id===productId)return navigate({view:'products',product_id:null,action:null});
-    }
-    async function openProductDialog(origin,{record=null,upload=false,copyFrom=null,archiveProduct=null,preserveFocus=false}={}){
-      if(productDialog)return;
-      const roomModal=options.roomOverlay?.open;
-      const panel=roomModal?options.roomOverlay:container.closest('.wb-work-panel')||container;
-      const previousFocus=document.activeElement;
-      const backdrop=E('div',undefined,'wb-product-dialog-backdrop');
-      backdrop.setAttribute('aria-hidden','true');
-      const dialog=E('dialog',undefined,'wb-product-dialog');
-      const productId=record?.ref.id||null;
-      dialog.dataset.catalogDialog=archiveProduct?'archive':upload?'upload':productId?'detail':'create';
-      const title=archiveProduct?'删除商品':upload?'上传资料新增商品':record?'编辑商品 · '+record.body.name:copyFrom?'复制为新商品':'新建商品';
-      const heading=E('h2',title);
-      heading.id='wb-product-dialog-title-'+uid();
-      dialog.setAttribute('aria-labelledby',heading.id);
-      dialog.setAttribute('aria-modal',String(!!roomModal));
-      if(roomModal)dialog.classList.add('wb-room-product-detail');
-      const head=E('div',undefined,'wb-product-dialog-head');
-      const headActions=E('div',undefined,'wb-product-dialog-head-actions');
-      headActions.append(button('关闭',()=>dismissProductDialog(),false,{readOnlyAction:'true'}));
-      head.append(heading,headActions);
-      const feedback=E('div',undefined,'wb-product-dialog-message wb-inline-alert');
-      feedback.setAttribute('role','status');
-      feedback.hidden=true;
-      const body=E('div',undefined,'wb-product-dialog-body');
-      body._productHeading=heading;
-      dialog.append(head,feedback,body);
-      const draftKey=upload||archiveProduct?null:copyFrom?'product:new:copy:'+copyFrom.ref.id:'product:'+(productId||'new');
-      const state=productDialog={dialog,backdrop,origin,body,productId,draftKey,status:feedback};
-      dialog.addEventListener('focusin',event=>{if(body.contains(event.target))state.editFocus=event.target;});
-      dialog.addEventListener('keydown',event=>{
-        if(event.key!=='Escape'||state.closeConfirmation?.open)return;
-        event.preventDefault();
-        if(!busy)guard(()=>dismissProductDialog());
-      });
-      dialog.addEventListener('click',preventLockedEdit,true);
-      content.inert=true;
-      if(!roomModal)panel.append(backdrop);
-      panel.append(dialog);
-      lockObserver.observe(dialog,{childList:true,subtree:true});
-      if(roomModal)dialog.showModal();else dialog.show();
-      if(preserveFocus&&previousFocus?.isConnected)previousFocus.focus({preventScroll:true});
-      try{
-        if(archiveProduct){
-          dialog.classList.add('wb-product-dialog--confirm');
-          const scroll=E('div',undefined,'wb-product-dialog-scroll');
-          scroll.append(E('p','将「'+archiveProduct.name+'」从商品知识库移除。历史商品资料和话术会保留。引用该商品的本场需要重新核对选品。'));
-          const actions=E('div',undefined,'wb-product-dialog-actions wb-form-actions');
-          const cancel=button('取消',()=>dismissProductDialog());
-          const confirm=button('确认删除',async()=>{
-            if(hasDirty())throw Error('请先保存或放弃未保存编辑，再删除商品。');
-            const result=await humanMutation('/api/prelive/v2/human/product-archive',{product_ref:archiveProduct.ref});
-            changedBusiness({data:result});
-            closeProductDialog({restoreFocus:false});
-            try{
-              await navigate({view:'products',product_id:null,action:null,refresh:true});
-              content.querySelector('input[type="search"]')?.focus({preventScroll:true});
-              notice('商品已从商品知识库移除，历史记录仍可查看。');
-            }catch(error){notice('商品已移除。请重新打开商品知识库刷新列表。','warning');}
-          },true);
-          confirm.classList.add('wb-catalog-danger');
-          actions.append(cancel,confirm);
-          body.append(scroll,actions);
-          cancel.focus({preventScroll:true});
-          return body;
-        }
-        if(upload){
-          const scroll=E('div',undefined,'wb-product-dialog-scroll');
-          body.append(scroll);
-          renderProductMaterials(scroll);
-          if(!preserveFocus)scroll.querySelector('input[type="file"]')?.focus({preventScroll:true});
-          return body;
-        }
-        await renderProduct(body,productId,record,{draftKey,copyFrom,onSaved:async (ref,{unchanged=false}={})=>{
-          if(productDialog?.dialog!==dialog){
-            if(!unchanged)cache.clear();
-            return;
-          }
-          closeProductDialog({restoreFocus:false});
-          const message=unchanged?'没有需要保存的修改。':productId?'商品已保存。':'商品已保存到商品知识库。';
-          try{
-            await navigate({view:'products',product_id:null,action:null,refresh:!unchanged});
-            const catalog=content.firstElementChild;
-            const row=catalog?._showCatalogProduct?.(ref?.id||productId,{highlight:true});
-            if(row)markLocation(content,row,row.querySelector('[data-open-product]'));
-            else content.querySelector(productId?'input[type="search"]':'[data-new-product]')?.focus({preventScroll:true});
-            notice(message);
-          }catch(error){
-            notice(unchanged?message:'商品已保存。请重新打开商品知识库查看最新资料。','warning');
-          }
-        }});
-      }catch(error){closeProductDialog();throw error;}
-      const form=body.querySelector('.wb-product-form');
-      const actions=form.querySelector('.wb-product-dialog-actions');
-      const scroll=E('div',undefined,'wb-product-dialog-scroll');
-      if(copyFrom)scroll.append(E('p','已复制「'+copyFrom.body.name+'」的商品资料。请核对名称和信息后保存为新商品。','wb-muted'));
-      scroll.append(...[...body.children].filter(child=>child!==form),...[...form.children].filter(child=>child!==actions));
-      form.prepend(scroll);
-      if(record){
-        const updatePane=E('div',undefined,'wb-product-dialog-scroll wb-product-update-pane');
-        updatePane.hidden=true;
-        body.append(updatePane);
-        const update=button('上传资料更新此商品',()=>{
-          if(!updatePane.childElementCount)renderProductMaterials(updatePane,record);
-          form.hidden=true;
-          updatePane.hidden=false;
-          heading.textContent='上传资料更新此商品';
-          update.hidden=true;
-          back.hidden=false;
-          updatePane.querySelector('input[type="file"]')?.focus({preventScroll:true});
-        },false,{openProductUpdate:''});
-        const showEditor=()=>{
-          updatePane.hidden=true;
-          form.hidden=false;
-          heading.textContent=title;
-          back.hidden=true;
-          update.hidden=false;
-        };
-        const back=button('返回编辑',()=>{showEditor();update.focus({preventScroll:true});});
-        back.hidden=true;
-        headActions.prepend(update,back);
-      }
-      applyEditorLocks();
-      if(!preserveFocus){
-        const name=form.querySelector('[data-field="name"]');
-        if(name&&!name.disabled)name.focus({preventScroll:true});
-      }
-      return body;
-    }
     function bufferRegion(key,baseRef){const[prefix,id,...parts]=key.split(':');if(prefix==='product')return{kind:id==='new'?'product_create':'product',id:id==='new'?'catalog':id};if(prefix==='room-defaults')return{kind:'room',id};if(prefix==='module'||prefix==='sentence'){const script=details().scripts?.find(s=>s.ref.id===baseRef?.id);return{kind:'scripts',id:prepId(),script_id:baseRef?.id,product_id:script?.body.product_id,module_key:prefix==='sentence'?parts[0]:parts.join(':')};}return{kind:({'session':'session','insight':'insights','assets':'assets','playlist':'playlist','product-selection':'product_selection'})[prefix]||prefix,id:prefix==='insight'?prepId()||'catalog':id};}
-    const activeStatus=()=>productDialog?.status||(options.roomOverlay?.open&&options.roomOverlay.querySelector('[data-room-overlay-status]'))||status;
-    function notice(message,tone='info',details){const output=activeStatus();output.replaceChildren(E('span',message));output.hidden=!message;output.dataset.tone=tone;if(details)output.append(jsonDetails('查看详情',details));}
+    function notice(message,tone='info',details){status.replaceChildren(E('span',message));status.hidden=!message;status.dataset.tone=tone;if(details)status.append(jsonDetails('查看详情',details));}
     function button(text,fn,primary=false,attrs={}){const b=E('button',text,'wb-button'+(primary?' wb-button--primary':''));b.type='button';for(const[k,v]of Object.entries(attrs))b.dataset[k]=v;b.addEventListener('click',()=>guard(()=>fn(b)));return b;}
-    async function guard(fn){if(busy)return;busy=true;container.setAttribute('aria-busy','true');try{return await fn();}catch(error){notice(error.message||'操作失败，输入已保留。','danger',error.details);if((error.unknown||error.code==='OUTCOME_UNKNOWN')&&unknownOperation){notice('提交结果暂不确定。请先核实原操作，勿重复提交。','warning',{operation_id:error.operationId});activeStatus().append(button('核实原操作结果',verifyUnknownOperation));}throwSafe(error);}finally{busy=false;container.removeAttribute('aria-busy');}}
-    async function verifyUnknownOperation(){if(!unknownOperation)return null;const result=await api.query('read_operation_receipt',{operation_id:unknownOperation.operationId});if(result.state!=='committed'){notice('原操作仍未查到确定回执。可能仍在处理中，输入与操作号已保留；暂不重发。','warning',{operation_id:unknownOperation.operationId});activeStatus().append(button('核实原操作结果',verifyUnknownOperation));return result;}operations.set(unknownOperation.signature||'fingerprint:'+unknownOperation.fingerprint,{operationId:unknownOperation.operationId,receipt:result.receipt});unknownOperation=null;storage?.removeItem(prefix+'pending-operation');notice('已核实原操作已提交。再次执行相同保存会读取该回执，不重复写入。');return result;}
+    async function guard(fn){if(busy)return;busy=true;container.setAttribute('aria-busy','true');try{return await fn();}catch(error){notice(error.message||'操作失败，输入已保留。','danger',error.details);if(error.unknown||error.code==='OUTCOME_UNKNOWN'){notice('提交结果暂不确定。请先核实原操作，勿重复提交。','warning',{operation_id:error.operationId});status.append(button('核实原操作结果',verifyUnknownOperation));}throwSafe(error);}finally{busy=false;container.removeAttribute('aria-busy');}}
+    async function verifyUnknownOperation(){if(!unknownOperation)return null;const result=await api.query('read_operation_receipt',{operation_id:unknownOperation.operationId});if(result.state!=='committed'){notice('原操作仍未查到确定回执。可能仍在处理中，输入与操作号已保留；暂不重发。','warning',{operation_id:unknownOperation.operationId});status.append(button('核实原操作结果',verifyUnknownOperation));return result;}operations.set(unknownOperation.signature||'fingerprint:'+unknownOperation.fingerprint,{operationId:unknownOperation.operationId,receipt:result.receipt});unknownOperation=null;storage?.removeItem(prefix+'pending-operation');notice('已核实原操作已提交。再次执行相同保存会读取该回执，不重复写入。');return result;}
     async function command(name,args){const signature=name+':'+JSON.stringify(args);const fingerprint=await api.hash({command:name,args});if(unknownOperation){await verifyUnknownOperation();if(unknownOperation)throw Object.assign(Error('请等待原操作结果确定后再提交修改。'),{code:'OUTCOME_UNKNOWN',unknown:true,operationId:unknownOperation.operationId});}let op=operations.get(signature)||operations.get('fingerprint:'+fingerprint);if(op?.receipt){operations.delete(signature);operations.delete('fingerprint:'+fingerprint);return copy(op.receipt);}if(!op){op={operationId:uid()};operations.set(signature,op);}try{const receipt=await api.command(name,args,{operationId:op.operationId});operations.delete(signature);return receipt;}catch(error){if(error.unknown||error.code==='OUTCOME_UNKNOWN'){unknownOperation={operationId:error.operationId||op.operationId,signature,fingerprint,command:name};try{storage?.setItem(prefix+'pending-operation',JSON.stringify({operationId:unknownOperation.operationId,fingerprint,command:name}));}catch{}error.operationId=unknownOperation.operationId;}else operations.delete(signature);throw error;}}
     function throwSafe(error){options.onError?.(error);}
     async function humanMutation(path,body){
@@ -337,127 +130,7 @@
     function header(title,subtitle,actions=[]){const box=E('div',undefined,'wb-card-header');const h=E('div');h.append(E('h2',title,'wb-card-title'));if(subtitle)h.append(E('p',subtitle,'wb-muted'));box.append(h,...actions);return box;}
     function section(title){const n=E('section',undefined,'wb-card');n.append(E('h3',title,'wb-section-heading'));return n;}
     function empty(title,message,actions=[]){const box=E('div',undefined,'wb-empty');box.append(E('h3',title),E('p',message),...actions);return box;}
-    function renderProductMaterials(node,record=null){
-      const updating=!!record;
-      const flowKey=updating?'update:'+record.ref.id:'create';
-      const flow=productMaterialFlows.get(flowKey)||{batch:null,product:null,pending:false,unknown:false};
-      productMaterialFlows.set(flowKey,flow);
-      const title=updating?'上传资料更新此商品':'上传资料新增商品';
-      const box=section(title);
-      box.classList.add('wb-product-material-flow');
-      box.dataset.productMaterialFlow=updating?'update':'create';
-      box.dataset.bufferIgnore='true';
-      box.append(E('p',updating
-        ?'目标商品：'+record.body.name+'。选好资料后可直接交给 Agent 更新这件商品。'
-        :'提交新商品的文档或截图后，Agent 会整理新增商品，并为这批商品新建直播间和本场。','wb-muted'));
-      box.append(E('p','需要补充特别要求时，可先上传并加入对话，再在右侧填写并发送。','wb-muted'));
-      const upload=E('input');
-      upload.type='file';
-      upload.multiple=true;
-      upload.accept='.txt,.md,.csv,.json,.pdf,.doc,.docx,.rtf,.xlsx,.png,.jpg,.jpeg,.webp';
-      upload.setAttribute('aria-label',title);
-      const feedback=E('p',undefined,'wb-muted');
-      feedback.setAttribute('aria-live','polite');
-      feedback.setAttribute('aria-atomic','true');
-      feedback.hidden=true;
-      const filesAdded=E('ul',undefined,'wb-product-material-files');
-      filesAdded.hidden=true;
-      function message(text){
-        flow.message=text;
-        updateFlow();
-      }
-      function targetChanged(){
-        return updating&&flow.product&&(flow.product.ref.revision!==record.ref.revision||
-          flow.product.ref.content_hash!==record.ref.content_hash);
-      }
-      function currentProduct(){return updating?{ref:copy(record.ref),name:record.body.name}:null;}
-      async function uploadBatch(files,compose){
-        if(!options.onUploadProductMaterials)throw Error('商品资料入口暂未连接，请刷新后重试。');
-        const product=flow.batch?flow.product:currentProduct();
-        message('正在上传资料…');
-        const batch=await options.onUploadProductMaterials({files,product,batch:flow.batch,compose});
-        flow.batch=batch;
-        flow.product=product;
-        if(batch.failed?.length){
-          throw Error('部分资料尚未上传成功：'+batch.failed.map(file=>file.name).join('、')+'。已保留成功的资料，可重试。');
-        }
-        if(!batch.materialRefs?.length)throw Error('尚未有资料上传成功，请检查文件后重试。');
-        upload.value='';
-        return batch;
-      }
-      function checkTarget(){
-        if(targetChanged())throw Error('该商品版本已更新。请清空这批资料后，按当前版本重新上传。');
-        if(updating&&buffers.get('product:'+record.ref.id)?.dirty)throw Error('请先保存或放弃这件商品的未保存修改，再交给 Agent。');
-      }
-      const add=button('上传并加入对话',async()=>{
-        const files=Array.from(upload.files||[]);
-        if((!files.length&&!flow.batch?.materialRefs?.length)||flow.pending||flow.unknown)return;
-        flow.pending=true;
-        paint();
-        try{
-          checkTarget();
-          const batch=await uploadBatch(files,true);
-          if(!batch.composeAttached)throw Error('资料已上传，请重试打开右侧对话。');
-          flow.batch=null;
-          flow.product=null;
-          message('已在右侧对话加入 '+batch.materialRefs.length+' 份资料。可补充要求后点击发送。');
-        }catch(error){
-          message(error.message||'资料上传未完成。请检查文件后重试。');
-        }finally{flow.pending=false;updateFlow();}
-      });
-      const submit=button(updating?'交给 Agent 更新此商品':'交给 Agent 新增商品',async()=>{
-        const files=Array.from(upload.files||[]);
-        if((!files.length&&!flow.batch?.materialRefs?.length)||flow.pending)return;
-        flow.pending=true;
-        paint();
-        try{
-          if(!options.onSubmitProductMaterials)throw Error('商品资料任务入口暂未连接，请刷新后重试。');
-          if(!flow.unknown)checkTarget();
-          if(!flow.unknown&&files.length)await uploadBatch(files,false);
-          if(!flow.unknown&&flow.batch?.failed?.length)throw Error('请先重试未上传成功的资料。');
-          message('正在提交给 Agent…');
-          await options.onSubmitProductMaterials({batch:flow.batch,product:flow.product});
-          flow.batch=null;
-          flow.product=null;
-          flow.unknown=false;
-          upload.value='';
-          message('Agent 已受理。可在右侧查看任务进度和保存成果。');
-        }catch(error){
-          flow.unknown=flow.unknown||!!error.unknown||error.code==='OUTCOME_UNKNOWN';
-          message(flow.unknown?'这批任务的受理结果待核实。再次点击同一按钮将核实这批请求。':error.message||'任务未受理，已保留本批资料。');
-        }finally{flow.pending=false;updateFlow();}
-      },true);
-      const reset=button('清空这批资料',()=>{
-        flow.batch=null;
-        flow.product=null;
-        upload.value='';
-        message('已清空待提交的这批资料。');
-      });
-      const actions=E('div',undefined,'wb-product-material-actions');
-      actions.append(submit,add,reset);
-      function paint(){
-        const stale=targetChanged();
-        const hasFiles=!!upload.files?.length;
-        const hasBatch=!!flow.batch?.materialRefs?.length&&!flow.batch?.failed?.length;
-        upload.disabled=flow.pending||flow.unknown||stale;
-        add.disabled=upload.disabled||(!hasFiles&&!hasBatch);
-        submit.disabled=flow.pending||(!hasFiles&&!hasBatch)||(stale&&!flow.unknown);
-        reset.hidden=(!flow.batch&&!hasFiles)||flow.unknown;
-        reset.disabled=flow.pending;
-        const text=stale&&!flow.unknown&&!flow.pending?'该商品版本已更新。请清空这批资料后重新上传。':flow.message||'';
-        feedback.textContent=text;
-        feedback.hidden=!text;
-        const names=(flow.batch?.materials||[]).map(material=>material.name).filter(Boolean);
-        filesAdded.hidden=!names.length;
-        filesAdded.replaceChildren(...names.map(name=>E('li',name)));
-      }
-      function updateFlow(){paint();if(flow.paint!==paint)flow.paint?.();}
-      node._refreshProductMaterials=()=>{flow.paint=paint;paint();};
-      upload.addEventListener('change',paint);
-      box.append(upload,actions,feedback,filesAdded);
-      node._refreshProductMaterials();
-      node.append(box);
-    }
+    function renderMaterials(node){const box=section('资料与依据');box.append(E('p','上传商品资料、文档或截图，加入当前对话供 Agent 整理；上传本身不会直接改写商品库。','wb-muted'));const upload=E('input');upload.type='file';upload.multiple=true;upload.accept='.txt,.md,.csv,.json,.pdf,.doc,.docx,.rtf,.xlsx,.png,.jpg,.jpeg,.webp';upload.setAttribute('aria-label','上传商品资料与截图');const list=E('div',undefined,'wb-list');const paint=()=>{list.replaceChildren();for(const item of materialItems){const row=E('article',undefined,'wb-list-item');const text=E('div');text.append(E('strong',item.name),E('p','已加入当前对话 · '+(item.status||'待整理'),'wb-muted'));if(item.preview)text.append(jsonDetails('预览文本',item.preview));if(item.previewUrl){const image=E('img');image.src=item.previewUrl;image.alt='商品资料图片预览';image.style.maxWidth='180px';image.style.maxHeight='180px';text.append(image);}row.append(text);list.append(row);}};paint();box.append(upload,button('上传并加入对话',async()=>{const files=Array.from(upload.files||[]);if(!files.length)throw Error('请先选择文件');if(files.some(f=>f.size>10*1024*1024))throw Error('单份资料不能超过10 MB');if(!options.onMaterialUpload)throw Error('当前宿主尚未连接资料入口，请使用右侧「添加资料」。');const uploaded=await options.onMaterialUpload(files);for(let i=0;i<files.length;i++){const file=files[i];const match=uploaded?.find(m=>m.name===file.name&&(m.material_ref||m.ref));if(!match)throw Error(file.name+' 未确认上传成功，已成功文件保留在对话附件中');const item={name:file.name,status:match.status||'已上传',material_ref:match.material_ref||match.ref};if(/^(text\/|application\/json)/.test(file.type)||/\.(txt|md|csv|json)$/i.test(file.name))item.preview=(await file.text()).slice(0,6000);else if(/^image\/(png|jpeg|webp)$/.test(file.type)){item.previewUrl=URL.createObjectURL(file);previewUrls.push(item.previewUrl);}materialItems.push(item);}upload.value='';paint();notice('资料已加入对话，尚未改写商品库。补充整理要求后发送即可。');}),button('请 Agent 整理这些资料',()=>{const text='请分析我上传的资料，区分新商品和已有商品，补全商品库配置；先展示缺项和需要确认的差异。';if(options.onPrepareMessage)options.onPrepareMessage(text);else options.onRequestAgent?.({text});notice('请在右侧补充要求并发送。');}),list);node.append(box);}
     async function importFile(file){if(!file||!file.size)throw Error('请选择非空资料文件');if(file.size>10*1024*1024)throw Error('单份资料不能超过10 MB');const bytes=new Uint8Array(await file.arrayBuffer());const hash=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',bytes)),b=>b.toString(16).padStart(2,'0')).join('');let binary='';for(let i=0;i<bytes.length;i+=32768)binary+=String.fromCharCode(...bytes.subarray(i,i+32768));const result=await command('import_blob',{content_base64:btoa(binary),expected_sha256:'sha256:'+hash,mime:file.type||'text/plain',filename:file.name});return result.data.blob_ref;}
     function field(label,control){const box=E('div',undefined,'wb-field');const id='wb-field-'+uid();const l=E('label',label);l.htmlFor=id;control.id=id;box.append(l,control);return box;}
     function control(type,value,label){const c=E(type==='textarea'?'textarea':'input');if(type!=='textarea')c.type=type;c.value=value??'';c.setAttribute('aria-label',label);if(type==='textarea')c.rows=3;return c;}
@@ -470,18 +143,10 @@
     }
     function localRead(key){try{const val=JSON.parse(storage?.getItem(prefix+key)||'null');return val?.value!==undefined?val:null;}catch{return null;}}
     function persist(buffer){try{if(buffer.dirty)storage?.setItem(prefix+buffer.key,JSON.stringify({base_ref:buffer.base_ref,value:buffer.read(),label:buffer.label,saved_at:new Date().toISOString()},(key,value)=>key==='image'?undefined:value));else storage?.removeItem(prefix+buffer.key);}catch{notice('本机恢复缓存不可用；当前输入仍保留在页面中。','warning');}}
-    function changed(buffer){
-      const baseline=buffer.cleanSnapshot;
-      const dirty=!baseline||!equal(buffer.base_ref,baseline.ref)||!equal(buffer.read(),baseline.value);
-      if(!dirty&&!buffer.dirty)return;
-      buffer.dirty=dirty;
-      buffer.host?.classList.toggle('wb-dirty',dirty);
-      persist(buffer);
-      options.onDirty?.(getDirtySummary());
-    }
-    function registerBuffer(key,label,baseRef,read,write,save,host,cleanSnapshot){
+    function changed(buffer){buffer.dirty=true;buffer.host?.classList.add('wb-dirty');persist(buffer);options.onDirty?.(getDirtySummary());}
+    function registerBuffer(key,label,baseRef,read,write,save,host){
       const old=buffers.get(key);if(old?.dirty){write(old.read());}
-      const buffer={key,label,base_ref:copy(old?.dirty?old.base_ref:baseRef),read,write,cleanSnapshot,save:()=>{if(matchingLocks(editorLocks,bufferRegion(key,baseRef)).length)throw Error('Agent 正在处理此区域，请等待任务完成后再保存。你的输入已保留。');return save();},host,dirty:old?.dirty||false};buffers.set(key,buffer);region(host,bufferRegion(key,baseRef));host.classList.toggle('wb-dirty',buffer.dirty);
+      const buffer={key,label,base_ref:copy(old?.dirty?old.base_ref:baseRef),read,write,save:()=>{if(matchingLocks(editorLocks,bufferRegion(key,baseRef)).length)throw Error('Agent 正在处理此区域，请等待任务完成后再保存。你的输入已保留。');return save();},host,dirty:old?.dirty||false};buffers.set(key,buffer);region(host,bufferRegion(key,baseRef));host.classList.toggle('wb-dirty',buffer.dirty);
       const stored=!old?.dirty?localRead(key):null;
       if(stored){const restore=E('div',undefined,'wb-inline-alert');restore.append(E('span','发现本机未保存内容'+(!equal(stored.base_ref,baseRef)?'；服务端基础版本已变化，请对比后再保存。':'。')),
         button('恢复本机未保存内容',()=>{write(stored.value);buffer.base_ref=stored.base_ref;changed(buffer);restore.remove();if(!equal(stored.base_ref,baseRef))notice('已恢复本机输入。服务端已有新版本，保存会进行版本检查；请先查看差异。','warning',{buffer_base:stored.base_ref,current:baseRef});}),
@@ -489,493 +154,38 @@
       const track=e=>{if(buffers.get(key)===buffer&&!e.target.closest?.('[data-buffer-ignore]'))changed(buffer);};host.addEventListener('input',track);host.addEventListener('change',track);return buffer;
     }
     function clearBuffer(buffer){buffer.dirty=false;buffer.host?.classList.remove('wb-dirty');storage?.removeItem(prefix+buffer.key);buffers.delete(buffer.key);options.onDirty?.(getDirtySummary());}
-    function matches(buffer,selection){if(!selection)return true;if(buffer.key.startsWith('product:new:copy:'))return false;return selectionItems(selection).some(item=>{const target=item.target?.object_ref;if(!target)return false;return buffer.base_ref?.id===target.id||buffer.key.includes(target.id);});}
+    function matches(buffer,selection){if(!selection)return true;return selectionItems(selection).some(item=>{const target=item.target?.object_ref;if(!target)return false;return buffer.base_ref?.id===target.id||buffer.key.includes(target.id);});}
     function hasDirty(selection){return [...buffers.values()].some(b=>b.dirty&&matches(b,selection));}
     function getDirtySummary(){return [...buffers.values()].filter(b=>b.dirty).map(b=>({key:b.key,label:b.label,base_ref:copy(b.base_ref)}));}
     async function saveDirty(selection){for(const b of [...buffers.values()])if(b.dirty&&matches(b,selection))await b.save();return !hasDirty(selection);}
     function discardDirty(selection){for(const b of [...buffers.values()])if(b.dirty&&matches(b,selection)){b.dirty=false;storage?.removeItem(prefix+b.key);buffers.delete(b.key);cache.clear();}options.onDirty?.(getDirtySummary());return refresh({force:true});}
-    function selected(label,target,destination,buffer){
-      const reader=scriptReader?.matches('dialog[open]')&&scriptReader.contains(document.activeElement);
-      const overlay=options.roomOverlay?.open&&!productDialog&&options.roomOverlay.contains(document.activeElement);
-      if(reader&&!closeScriptReader({restoreFocus:false}))return;
-      options.onSelect?.({label,scope:scope(),...(prepId()?{preparation_id:prepId()}:{}),
-        target:copy(target),destination:copy(destination),dirty:!!buffer?.dirty},{focusChat:reader||overlay});
-    }
+    function selected(label,target,destination,buffer){options.onSelect?.({label,scope:scope(),...(prepId()?{preparation_id:prepId()}:{}),target:copy(target),destination:copy(destination),dirty:!!buffer?.dirty});}
     function changedBusiness(receipt){options.onChange?.({receipt,context:getContext()});}
     async function readSnapshot(){const requested=prepId();const value=await api.query('get_workspace_snapshot',requested?{preparation_id:requested,limit:200}:{limit:200});if(prepId()!==requested)return value;snapshot=value;if(prep())current.room_id=prep().body.room_id;return value;}
     async function ensureSchema(){if(!schema)schema=await api.query('get_business_schema',{});return schema;}
     let lastLocation='';
-    function markLocation(node,target,focusTarget){
-      for(let ancestor=target.parentElement;ancestor&&ancestor!==node;ancestor=ancestor.parentElement)if(ancestor.tagName==='DETAILS')ancestor.open=true;
-      node.querySelectorAll('.wb-located').forEach(item=>item.classList.remove('wb-located'));
-      target.classList.add('wb-located');
-      if(focusTarget){
-        if(!focusTarget.matches('button,input,textarea,select,a[href],[tabindex]'))focusTarget.tabIndex=-1;
-        focusTarget.focus({preventScroll:true});
-      }
-      (focusTarget||target).scrollIntoView({block:'nearest'});
-    }
-    function locateProductResult(node,{object_ref:ref,field_path,knowledge_document_id:documentId,preserve_focus:preserveFocus}){
-      const rendered=node._productRef;
-      const heading=node._productHeading||node.querySelector('.wb-card-title');
-      const fieldPath=documentId?'/knowledge_documents':field_path;
-      const visible=element=>element&&!element.closest('[hidden],[inert]');
-      const field=[...node.querySelectorAll('[data-product-field]')].find(item=>item.dataset.productField===fieldPath);
-      const section=fieldPath==='/knowledge_documents'?node.querySelector('.wb-product-knowledge'):heading;
-      const matchingDocuments=documentId?[...node.querySelectorAll('[data-product-document-id]')].filter(item=>item.dataset.productDocumentId===documentId):[];
-      const target=documentId?(matchingDocuments.length===1?matchingDocuments[0]:null):fieldPath?field:heading;
-      const revisionChanged=ref.revision!==rendered.revision||ref.content_hash!==rendered.content_hash;
-      if(!visible(target)){
-        const fallback=visible(field)?field:section||heading;
-        markLocation(node,fallback,!preserveFocus&&(fallback.querySelector('h3')||fallback));
-        notice(documentId?'当前商品中找不到这份知识文档，已打开商品知识库。请核对最新资料。':'当前商品中无法定位此字段，已打开商品资料。','warning');
-        return;
-      }
-      const selector=documentId?'[data-field="content"]':fieldPath==='/core_selling_points'
-        ?'.wb-core-points textarea,[data-add-core-point]':'[data-field]';
-      const control=target.querySelector(selector);
-      markLocation(node,target,!preserveFocus&&(visible(control)&&!control.disabled?control:target));
-      if(revisionChanged)notice('已打开商品的当前版本。该版本与原成果记录的版本不同。','warning');
-    }
-    const preparationResults={
-      analysis:{view:'insights',label:'顾客与场景建议',buffer:'insight'},
-      draft:{view:'session',label:'本场配置',buffer:'session'},
-      playlist:{view:'scripts',label:'播放顺序',buffer:'playlist'},
-      audio_manifest:{view:'scripts',label:'本场语音'},
-      publication:{view:'scripts',label:'播出内容'},
-      asset_checklist:{view:'overview',label:'展示材料清单',buffer:'assets'}
-    };
-    function markResultSection(node,kind,ref){
-      node.dataset.resultSection=kind;
-      node._resultRef=ref;
-      return node;
-    }
-    function preparationResult(view,ref){
-      const descriptor=Object.hasOwn(preparationResults,ref?.kind)?preparationResults[ref.kind]:null;
-      return descriptor?.view===view?descriptor:null;
-    }
-    function locatePreparationResult(node,{object_ref:ref,preparation_id:preparationId,preserve_focus:preserveFocus,field_path:fieldPath},descriptor){
-      const samePreparation=preparationId&&prep()?.ref.id===preparationId;
-      const sections=samePreparation?[...node.querySelectorAll('[data-result-section]')].filter(item=>item.dataset.resultSection===ref.kind):[];
-      const target=sections.find(item=>{
-        const saved=item._resultRef;
-        return saved?.id===ref.id&&saved.revision===ref.revision&&saved.content_hash===ref.content_hash;
-      });
-      const section=target||(ref.kind==='analysis'?null:sections[0]);
-      const fallback=section||(samePreparation&&ref.kind==='publication'?node.querySelector('[data-audio-review]'):null);
-      const heading=fallback?.querySelector(':scope > h3')||node.querySelector('.wb-card-title');
-      if(!(ref.kind==='draft' && /^\/draft\/commerce\/product_overrides\//.test(fieldPath || '')))
-        markLocation(node,fallback||heading,!preserveFocus&&heading);
-      if(!target)notice(section?._resultRef?'已打开当前'+descriptor.label+'。该版本与原成果记录的版本不同。':'本场中找不到这份已保存的'+descriptor.label+'。请核对当前本场。','warning');
-    }
-    function locate(node,destination,effectiveView=current.view){
-      if(effectiveView==='products'&&destination.object_ref?.kind==='product'&&node._productRef){locateProductResult(node,destination);return;}
-      const descriptor=preparationResult(effectiveView,destination.object_ref);
-      if(descriptor){locatePreparationResult(node,destination,descriptor);return;}
-      if(effectiveView==='scripts'&&destination.action==='script_generation'){node._showScriptGeneration?.(!destination.preserve_focus);return;}
-      if(effectiveView==='scripts'&&destination.action==='review'){
-        const target=node.querySelector('[data-result-section="publication"]')||node.querySelector('[data-audio-review]');
-        if(target)markLocation(node,target,!destination.preserve_focus&&target.querySelector('h3'));
-        return;
-      }
-      const id=destination.script_id||destination.resource_id;
-      const key=[id||'',destination.module_key||'',destination.field_path||''].join(':');
-      if(key==='::'||key===lastLocation&&scriptReader)return;
-      let target=id?[...node.querySelectorAll('[data-script-id]')].find(n=>n.dataset.scriptId===id):null;
-      if(target?._openScriptReader&&effectiveView==='scripts'){
-        if(options.roomCanvas&&current.view==='room-config'&&destination.preserve_focus)markLocation(node,target);
-        else target._openScriptReader(destination.module_key,destination.preserve_focus);
-        lastLocation=key;return;
-      }
-      if(destination.module_key)target=(target||node).querySelector('[data-module="'+destination.module_key.replace(/[^a-z_]/g,'')+'"]')||target;
-      if(destination.field_path){const name=destination.field_path.split('/').pop();target=[...node.querySelectorAll('[data-field]')].find(n=>n.dataset.field===name)||target;}
-      if(target){markLocation(node,target);lastLocation=key;}
-    }
-    async function open(destination={}){
-      const resultRef=destination.object_ref;
-      const next={...current,...destination};
-      delete next.object_ref;
-      delete next.knowledge_document_id;
-      delete next.preserve_focus;
-      if(['script_generation','review','new_product'].includes(next.action))next.action=null;
-      next.view=({'product-detail':'products','product-list':'products',insights:'insights','session-config':'session',playlist:'scripts',audio:'scripts',adopted:'scripts',task:'overview'}[next.view]||next.view);
-      const productId=next.view==='products'?next.product_id:null;
-      const productResult=next.view==='products'&&resultRef?.kind==='product';
-      const preparationDescriptor=preparationResult(destination.inline_section||next.view,resultRef);
-      if(productResult&&resultRef.id!==productId)throw Error('成果的商品与打开目标不一致，请从商品知识库核对。');
-      if(productResult&&buffers.get('product:'+productId)?.dirty)throw Error('此商品有未保存编辑。请保存或放弃后再查看成果。');
-      if(productId&&productDialog?.productId===productId&&next.preparation_id===current.preparation_id&&next.room_id===current.room_id&&buffers.get('product:'+productId)?.dirty){
-        notice('当前商品有未保存编辑，已保留输入。请保存或放弃后刷新。','warning');
-        return getContext();
-      }
-      if(preparationDescriptor?.buffer){
-        const bufferId=resultRef.kind==='analysis'?resultRef.id:next.preparation_id;
-        if(buffers.get(preparationDescriptor.buffer+':'+bufferId)?.dirty)throw Error(preparationDescriptor.label+'有未保存编辑。请保存或放弃后再查看成果。');
-      }
-      if(!closeProductDialog({restoreFocus:false}))throw Error('请先处理商品弹窗中的未保存修改。');
-      if(!closeScriptReader({restoreFocus:false}))throw Error('请先保存或取消正在编辑的句子，再切换工作区。');
-      const generation=++openGeneration;
-      let productRecord;
-      if(productId){
-        notice('正在读取商品资料…');
-        try{productRecord=await api.query('read_product',{product_id:productId});}
-        catch(error){
-          if(openGeneration!==generation)return;
-          if(error.code!=='NOT_FOUND'){notice(error.message,'danger',error.details);throw error;}
-        }
-        if(openGeneration!==generation)return;
-        if(productResult&&buffers.get('product:'+productId)?.dirty){
-          const message='此商品有未保存编辑。请保存或放弃后再查看成果。';
-          notice(message,'warning');
-          throw Error(message);
-        }
-      }
-      current=next;
-      catalogResizeObserver?.disconnect();
-      const key=[current.view,current.preparation_id||'',current.room_id||'',current.action||'',current.view==='room-config'?current.room_section||'':''].join(':');
-      // A room has one editable defaults buffer across its preparations.
-      if(current.view==='room-config'&&current.room_id&&!current.room_section)cache.delete(key);
-      notice('');
-      let protectedEdits=false;
-      if((destination.refresh||preparationDescriptor)&&cache.has(key)){
-        const cached=cache.get(key);
-        protectedEdits=[...buffers.values()].some(b=>b.dirty&&cached.contains(b.host));
-        if(!protectedEdits)cache.delete(key);
-      }
-      async function present(node){
-        node._activateCatalog?.();
-        if(productId){
-          if(!productRecord||productRecord.ref.id!==productId||productRecord.body.archived){
-            current.product_id=null;
-            const heading=node.querySelector('.wb-card-title');
-            markLocation(node,heading,!destination.preserve_focus&&heading);
-            notice(productResult?'成果关联的商品已归档或无法找到，已打开商品知识库。':'该商品已归档或无法找到，已打开商品知识库。','warning');
-          }else{
-            const row=[...node.querySelectorAll('[data-catalog-product-id]')].find(item=>item.dataset.catalogProductId===productId)||
-              (productResult?node._showCatalogProduct?.(productId,{clearSearch:false}):null);
-            const body=await openProductDialog(row?.querySelector('[data-open-product]'),{record:productRecord,preserveFocus:destination.preserve_focus});
-            if(body)locate(body,destination);
-          }
-        }else{
-          const inline=destination.inline_section&&node.querySelector('[data-inline-room-section="'+destination.inline_section+'"]');
-          if(inline)locate(inline,destination,destination.inline_section);
-          else locate(node,destination);
-          const add=node.querySelector('[data-new-product]');
-          if(destination.action==='new_product'&&add)await openProductDialog(add);
-        }
-        if(protectedEdits&&!productDialog)notice([status.textContent,'当前页面有未保存编辑，已保留输入。请保存或放弃后刷新对比。'].filter(Boolean).join(' '),'warning');
-        return getContext();
-      }
-      try{
-        if(cache.has(key)){
-          const node=cache.get(key);
-          snapshot=copy(node._snapshot);
-          if(content.firstElementChild!==node)content.replaceChildren(node);
-          return await present(node);
-        }
-        notice('正在读取资料…');
-        await readSnapshot();
-        await ensureSchema();
-        if(openGeneration!==generation)return;
-        const node=E('div',undefined,'wb-view');
-        node.dataset.view=current.view;
-        content.replaceChildren(node);
-        await render(node,destination);
-        if(openGeneration!==generation)return;
-        node._snapshot=copy(snapshot);
-        cache.set(key,node);
-        notice('');
-        return await present(node);
-      }catch(e){if(openGeneration!==generation)return;notice(e.message,'danger',e.details);throw e;}
-    }
+    function locate(node,destination){const id=destination.script_id||destination.resource_id;const key=[id||'',destination.module_key||'',destination.field_path||''].join(':');if(key==='::'||key===lastLocation&&scriptReader)return;let target=id?[...node.querySelectorAll('[data-script-id]')].find(n=>n.dataset.scriptId===id):null;if(target?._openScriptReader&&current.view==='scripts'){target._openScriptReader(destination.module_key);lastLocation=key;return;}if(destination.module_key)target=(target||node).querySelector('[data-module="'+destination.module_key.replace(/[^a-z_]/g,'')+'"]')||target;if(destination.field_path){const name=destination.field_path.split('/').pop();target=[...node.querySelectorAll('[data-field]')].find(n=>n.dataset.field===name)||target;}if(target){for(let ancestor=target.parentElement;ancestor&&ancestor!==node;ancestor=ancestor.parentElement)if(ancestor.tagName==='DETAILS')ancestor.open=true;node.querySelectorAll('.wb-located').forEach(n=>n.classList.remove('wb-located'));target.classList.add('wb-located');target.scrollIntoView({block:'nearest'});lastLocation=key;}}
+    async function open(destination={}){if(!closeScriptReader({restoreFocus:false}))throw Error('请先保存或取消正在编辑的句子，再切换工作区。');current={...current,...destination};current.view=({'product-detail':'products','product-list':'products',insights:'insights','session-config':'session','room-config':'rooms',playlist:'scripts',audio:'scripts',adopted:'scripts',task:'overview'}[current.view]||current.view);const key=[current.view,current.product_id||'',current.preparation_id||'',current.room_id||'',current.action||''].join(':');activeKey=key;notice('');let protectedEdits=false;if(destination.refresh&&cache.has(key)){const cached=cache.get(key);protectedEdits=[...buffers.values()].some(b=>b.dirty&&cached.contains(b.host));if(!protectedEdits)cache.delete(key);}if(cache.has(key)){const node=cache.get(key);snapshot=copy(node._snapshot);content.replaceChildren(node);locate(node,destination);if(protectedEdits)notice('Agent 已产生新结果；当前目标存在未保存编辑，已保留输入。请保存或放弃后刷新对比。','warning');return getContext();}notice('正在读取资料…');try{await readSnapshot();await ensureSchema();if(activeKey!==key)return;const node=E('div',undefined,'wb-view');node.dataset.view=current.view;content.replaceChildren(node);await render(node,destination);if(activeKey!==key)return;node._snapshot=copy(snapshot);cache.set(key,node);notice('');locate(node,destination);return getContext();}catch(e){notice(e.message,'danger',e.details);throw e;}}
     async function navigate(dest){return options.onNavigate?options.onNavigate(dest):open(dest);}
-    async function refresh({force=false}={}){
-      if(hasDirty()&&!force){notice('资料有新变化。未保存输入已保留；保存或放弃后可刷新。','warning');return {dirty:true};}
-      cache.clear();
-      const overlay=options.roomOverlay?.open?activeRoomOverlay:null;
-      const result=await open({...current});
-      if(overlay&&options.roomOverlay?.open&&overlay===activeRoomOverlay)
-        await renderRoomOverlay(overlay.host,{...overlay.destination,refresh:false,object_ref:null});
-      return result;
-    }
-    function getContext(){const room=(snapshot?.rooms||[]).find(r=>r.ref.id===(prep()?.body.room_id||current.room_id));return {...copy(current),room_name:room?.body.name||'',prep_label:prep()?preparationTitle(prep(),details().draft):'',product_label:current.product_id?productDialog?.body._productLabel||'':'',...(prep()?{preparation_ref:copy(prep().ref),preparation_id:prep().ref.id,room_id:prep().body.room_id}:{}),scope:prepId()?{kind:'preparation',account_id:'local',preparation_id:prepId()}:{kind:'catalog',account_id:'local'}};}
+    async function refresh({force=false}={}){if(hasDirty()&&!force){notice('资料有新变化。未保存输入已保留；保存或放弃后可刷新。','warning');return {dirty:true};}cache.clear();return open({...current});}
+    function getContext(){const room=(snapshot?.rooms||[]).find(r=>r.ref.id===(prep()?.body.room_id||current.room_id));return {...copy(current),room_name:room?.body.name||'',prep_label:prep()?preparationTitle(prep(),details().draft):'',...(prep()?{preparation_ref:copy(prep().ref),preparation_id:prep().ref.id,room_id:prep().body.room_id}:{}),scope:prepId()?{kind:'preparation',account_id:'local',preparation_id:prepId()}:{kind:'catalog',account_id:'local'}};}
     async function resolveSelection(selection){if(Array.isArray(selection?.items)){const items=[];for(const item of selection.items)items.push(await resolveSelection(item));return{label:'已选 '+items.length+' 项',items,...(items.some(item=>item.stale)?{stale:true}:{})};}const result=copy(selection);let ref=result?.target?.object_ref;if(!ref)return result;let known=replacements.get(ref.id);const seen=new Set();while(known&&!seen.has(known.id)){seen.add(known.id);result.target.object_ref=known;known=replacements.get(known.id);}if(seen.size){ref=result.target.object_ref;if(result.target.module_key){const s=await api.query('read_script',{ref});result.target.selected_text_hash=await api.hash(s.modules[result.target.module_key].sentences);}}
       if(ref.kind==='product'){const head=await api.query('read_product',{product_id:ref.id});if(!equal(head.ref,ref))return {...result,stale:true,current_ref:head.ref};}else if(ref.kind==='preparation'&&result.preparation_id){const head=await api.query('read_preparation',{preparation_id:result.preparation_id});if(!equal(head.ref,ref))return {...result,stale:true,current_ref:head.ref};}else if(ref.kind==='analysis'&&result.preparation_id){const record=await api.query('read_analysis_report',{ref});if(record.body.preparation_id!==result.preparation_id)return {...result,stale:true,current_ref:null,reason:'该研究尚未保存为当前本场建议'};}else if(ref.kind==='script_revision'&&result.preparation_id){const head=await api.query('read_preparation',{preparation_id:result.preparation_id});if(!head.body.script_refs.some(r=>equal(r,ref)))return {...result,stale:true,current_ref:null};}return result;}
-    async function render(node,destination){if(current.view==='products')return renderProducts(node);if(current.view==='rooms')return renderRooms(node);if(current.view==='room-config')return renderRoomConfig(node);if(!prep())return renderOverview(node);if(current.view==='session')return renderSession(node);if(current.view==='insights')return renderInsights(node);if(current.view==='scripts')return renderScripts(node);if(current.view==='playlist')return renderPlaylist(node);if(current.view==='changes')return renderChanges(node);return renderOverview(node);}
+    async function render(node,destination){if(current.view==='products')return current.product_id||destination.action==='new_product'?renderProduct(node,current.product_id):renderProducts(node);if(current.view==='rooms')return renderRooms(node,destination);if(!prep())return renderOverview(node);if(current.view==='session')return renderSession(node);if(current.view==='insights')return renderInsights(node);if(current.view==='scripts')return renderScripts(node);if(current.view==='playlist')return renderPlaylist(node);if(current.view==='changes')return renderChanges(node);return renderOverview(node);}
     function renderOverview(node){node.append(header('本场播前准备','把需求交给右侧 Agent；左侧用于核对、补充和微调。'));
-      if(!prep()){if(current.room_id){const room=(snapshot.rooms||[]).find(r=>r.ref.id===current.room_id);node.append(empty('已选择：'+(room?.body.name||'直播间'),'创建本场准备，或继续此直播间的已有本场。',[button('新建本场准备',()=>createPreparation(current.room_id),true),button('查看已有本场',()=>navigate({...roomWorkspace(current.room_id),room_section:'preparations'}))]));}else node.append(empty('先选择直播间','创建或选择一个直播间，然后进入本场准备。商品库在所有直播间之间共用。',[button('选择直播间',returnToRoomList,true),button('管理商品库',()=>navigate({view:'products',product_id:null}))]));return;}
-      const p=prep().body,room=(snapshot.rooms||[]).find(r=>r.ref.id===p.room_id);const summary=section(preparationTitle(prep(),details().draft));summary.classList.add('wb-overview-summary');summary.append(E('p',preparationStateLabel(prep(),room),'wb-muted'));if(p.goal)summary.append(jsonDetails('查看本场原始任务',p.goal));const grid=E('div',undefined,'wb-grid');for(const [view,title,info]of [['session','本场配置',p.draft_ref?'已保存':'待配置'],['products','引用商品',p.selected_product_refs.length+' 个'],['insights','顾客与卖点',p.analysis_refs.length+' 份建议'],['scripts','话术、顺序与语音',p.script_refs.length+' 版 · '+(preparationAdopted(prep(),room)?'当前已采用':p.candidate_publication_ref?'已生成候选':'待准备')]]){const row=section(title);row.append(E('p',info,'wb-muted'),button('查看与微调',()=>navigate({view,product_id:null})));grid.append(row);}summary.append(grid);node.append(summary);if(details().asset_checklist)renderAssets(node,details().asset_checklist);}
-    async function renderProducts(node){
-      const pid=prepId(),initialPreparation=copy(prep());
-      const stateKey=pid||'catalog';
-      const pageState=catalogViewStates.get(stateKey)||{query:'',page:1,size:6};
-      catalogViewStates.set(stateKey,pageState);
-      node.classList.add('wb-catalog-view');
-      const add=E('section',undefined,'wb-catalog-add');
-      const addActions=E('div',undefined,'wb-catalog-add-actions');
-      addActions.append(button('新建商品',openProductDialog,true,{newProduct:''}));
-      if(!pid)addActions.append(button('上传资料新增商品',origin=>openProductDialog(origin,{upload:true}),false,{openProductUpload:''}));
-      add.append(E('h2','添加商品'),addActions);
-      const inventory=E('section',undefined,'wb-catalog-inventory');
-      const inventoryHead=E('div',undefined,'wb-catalog-inventory-head');
-      const heading=E('h2',pid?'选择本场引用商品':'商品列表','wb-card-title');
-      const search=control('search',pageState.query,'搜索商品');
-      search.placeholder='商品名称或 SKU';
-      inventoryHead.append(heading,search);
-      const window=E('div',undefined,'wb-catalog-list-window');
-      const list=E('ul',undefined,'wb-catalog-list');
-      const rowProbe=E('div',undefined,'wb-catalog-size-probe');
-      rowProbe.setAttribute('aria-hidden','true');
-      const emptyText=E('p',undefined,'wb-catalog-empty');
-      window.append(rowProbe,list,emptyText);
-      const footer=E('div',undefined,'wb-catalog-footer');
-      const count=E('p',undefined,'wb-catalog-count');
-      count.setAttribute('aria-live','polite');
-      const pager=E('nav',undefined,'wb-catalog-pager');
-      pager.setAttribute('aria-label','商品列表页码');
-      footer.append(count,pager);
-      const columns=E('div',undefined,'wb-catalog-columns');
-      if(pid)columns.dataset.hasSelection='';
-      columns.append(E('span','商品名称'),E('span','核心卖点','wb-catalog-field-heading'),
-        E('span','促销','wb-catalog-field-heading'),E('span','物流','wb-catalog-field-heading'),
-        E('span','日常售价','wb-catalog-price-heading'),E('span','在售状态','wb-catalog-status-heading'),E('span','操作','wb-catalog-actions-heading'));
-      inventory.append(inventoryHead,columns,window,footer);
-      node.append(add,inventory);
-      const products=copy(snapshot.products.items||[]);
-      let cursor=snapshot.products.next_cursor;
-      while(cursor!==null&&cursor!==undefined){
-        const page=await api.query('search_products',{cursor,limit:200});
-        products.push(...page.items);
-        cursor=page.next_cursor;
-      }
-
-      const selectedRefs=initialPreparation?.body.selected_product_refs||[];
-      const picked=new Map(selectedRefs.map(ref=>[ref.id,ref]));
-      let selectionBuffer;
-      const filtered=()=>{
-        const query=pageState.query.trim().toLowerCase();
-        return products.filter(product=>(product.name+' '+(product.sku_id||'')).toLowerCase().includes(query));
-      };
-      function thumbnail(product){
-        const frame=E('span',undefined,'wb-catalog-thumbnail');
-        const placeholder=E('span','无图');
-        placeholder.setAttribute('aria-hidden','true');
-        const raster=source=>typeof source==='string'&&source.length<=4500000
-          &&/^data:image\/(?:png|jpeg|webp);base64,[A-Za-z0-9+/]+={0,2}$/i.test(source);
-        const local=source=>typeof source==='string'
-          &&/^\/(?:assets\/(?:product-images|product-thumbnails)|product-images|api\/prelive\/v2\/product-thumbnail)\/[a-zA-Z0-9_-]+\.(?:png|jpe?g|webp)$/i.test(source);
-        const show=(source,onError)=>{
-          const image=E('img');
-          image.alt='';
-          image.loading='lazy';
-          image.decoding='async';
-          image.addEventListener('error',onError,{once:true});
-          image.src=source;
-          frame.replaceChildren(image);
-        };
-        function loadSavedImage(){
-          frame.replaceChildren(placeholder);
-          const ref=product.ref;
-          if(product.has_image===false||!ref?.id)return;
-          const key=JSON.stringify([ref.id,ref.revision,ref.content_hash]);
-          let pending=catalogThumbnailReads.get(key);
-          if(!pending){
-            pending=api.query('read_product',{ref}).then(record=>{
-              if(!equal(ref,record.ref)||!raster(record.body?.image))return '';
-              return record.body.image;
-            }).catch(()=>{
-              if(catalogThumbnailReads.get(key)===pending)catalogThumbnailReads.delete(key);
-              return '';
-            });
-            catalogThumbnailReads.set(key,pending);
-            if(catalogThumbnailReads.size>32)catalogThumbnailReads.delete(catalogThumbnailReads.keys().next().value);
-          }
-          void pending.then(image=>{
-            if(image)show(image,()=>frame.replaceChildren(placeholder));
-          });
-        }
-        const source=product.thumbnail_url;
-        if((raster(source)&&source.length<=16464)||local(source))show(source,loadSavedImage);
-        else loadSavedImage();
-        return frame;
-      }
-      function productRow(product){
-        const row=E('li',undefined,'wb-catalog-row');
-        row.dataset.catalogProductId=product.ref.id;
-        row.classList.toggle('wb-located',pageState.highlightedProduct===product.ref.id);
-        if(initialPreparation){
-          const check=E('input');
-          check.type='checkbox';
-          check.checked=picked.has(product.ref.id);
-          check.setAttribute('aria-label','本场引用 '+product.name);
-          check.addEventListener('change',()=>{
-            if(check.checked)picked.set(product.ref.id,selectedRefs.find(ref=>ref.id===product.ref.id)||product.ref);
-            else picked.delete(product.ref.id);
-            changed(selectionBuffer);
-          });
-          const holder=region(E('span',undefined,'wb-catalog-checkbox'),{kind:'product_selection',id:pid});
-          holder.append(check);
-          row.append(holder);
-        }
-        const text=E('div',undefined,'wb-catalog-product-text');
-        const name=E('strong',product.name);
-        name.title=product.name;
-        const retained=picked.has(product.ref.id)&&!equal(picked.get(product.ref.id),product.ref);
-        const specs=Number.isInteger(product.specification_count)?product.specification_count+' 项规格':null;
-        const knowledge=Number.isInteger(product.knowledge_document_count)?product.knowledge_document_count+' 份文档':null;
-        const caption=[specs,knowledge].filter(Boolean).join(' · ');
-        text.append(name);
-        if(caption)text.append(E('span',caption,'wb-catalog-product-info'));
-
-        const point=(Array.isArray(product.selling_points_preview)&&product.selling_points_preview.find(value=>typeof value==='string'&&value.trim()))||
-          (typeof product.selling_point_preview==='string'&&product.selling_point_preview.trim())||'';
-        const details=E('div',undefined,'wb-catalog-details');
-        for(const [label,value,kind] of [
-          ['核心卖点',point,'selling-point'],['促销',product.promotion_preview,'promotion'],['物流',product.shipping_time_preview,'shipping']
-        ]){
-          const field=E('dl',undefined,'wb-catalog-field wb-catalog-'+kind);
-          const original=typeof value==='string'?value.replace(/\s+/g,' ').trim():'';
-          const preview=[...original];
-          const description=E('dd',preview.length>52?preview.slice(0,52).join('')+'…':original||'未填写');
-          if(original)description.title=original;
-          field.append(E('dt',label),description);
-          details.append(field);
-        }
-        const summary=E('div',undefined,'wb-catalog-summary');
-        summary.append(text,details);
-        const price=E('div',undefined,'wb-catalog-price');
-        price.append(E('span','日常价','wb-catalog-cell-label'),E('strong',product.price==null?'未标价':product.price+(product.currency?' '+product.currency:'')));
-        const available=product.sale_status!=='unavailable';
-        const status=E('div',undefined,'wb-catalog-status');
-        const badge=E('span',available?'在售':'停售','wb-catalog-status-value');
-        badge.dataset.available=String(available);
-        status.append(E('span','状态','wb-catalog-cell-label'),badge);
-        if(retained){
-          const revision=E('span','引用旧版','wb-catalog-revision');
-          revision.title='本场仍引用该商品的旧修订';
-          status.append(revision);
-        }
-        const actions=E('div',undefined,'wb-catalog-row-actions');
-        actions.append(button('编辑',()=>navigate({view:'products',product_id:product.ref.id,action:null}),false,{openProduct:''}));
-        if(!pid){
-          actions.append(button('复制',async origin=>{
-            const source=await api.query('read_product',{product_id:product.ref.id});
-            if(!source||source.body.archived)throw Error('原商品已移除，请刷新商品列表。');
-            if(origin.isConnected)await openProductDialog(origin,{copyFrom:source});
-          },false,{copyProduct:''}));
-          const remove=button('删除',origin=>openProductDialog(origin,{archiveProduct:product}),false,{deleteProduct:''});
-          remove.classList.add('wb-catalog-danger');
-          actions.append(remove);
-        }
-        row.append(thumbnail(product),summary,price,status,actions);
-        return row;
-      }
-      function paint(){
-        const matches=filtered();
-        const pages=Math.max(1,Math.ceil(matches.length/pageState.size));
-        pageState.page=Math.max(1,Math.min(pageState.page,pages));
-        const start=(pageState.page-1)*pageState.size;
-        list.replaceChildren(...matches.slice(start,start+pageState.size).map(productRow));
-        emptyText.hidden=!!matches.length;
-        emptyText.textContent=products.length?'没有匹配的商品。试试商品名称或 SKU。':'商品知识库还没有商品。可在上方添加。';
-        count.textContent='共 '+matches.length+' 件商品';
-        pager.replaceChildren();
-        pager.hidden=!matches.length;
-        if(!matches.length)return;
-        function go(page,focusKey){
-          pageState.page=page;
-          pageState.highlightedProduct=null;
-          paint();
-          const target=[...pager.querySelectorAll('button')].find(item=>item.dataset.catalogPage===focusKey);
-          (target&&!target.disabled?target:pager.querySelector('[aria-current="page"]'))?.focus({preventScroll:true});
-        }
-        const previous=button('上一页',()=>go(pageState.page-1,'previous'),false,{catalogPage:'previous'});
-        previous.disabled=pageState.page===1;
-        pager.append(previous);
-        const numbers=[...new Set([1,pageState.page-1,pageState.page,pageState.page+1,pages])].filter(page=>page>0&&page<=pages).sort((a,b)=>a-b);
-        let last=0;
-        for(const page of numbers){
-          if(page-last>1){const gap=E('span','…');gap.setAttribute('aria-hidden','true');pager.append(gap);}
-          const tab=button(String(page),()=>go(page,String(page)),false,{catalogPage:String(page)});
-          tab.setAttribute('aria-label','第 '+page+' 页');
-          if(page===pageState.page)tab.setAttribute('aria-current','page');
-          pager.append(tab);
-          last=page;
-        }
-        const next=button('下一页',()=>go(pageState.page+1,'next'),false,{catalogPage:'next'});
-        next.disabled=pageState.page===pages;
-        pager.append(next);
-      }
-      search.addEventListener('input',()=>{pageState.query=search.value;pageState.page=1;pageState.highlightedProduct=null;paint();});
-      function fit(){
-        const height=window.clientHeight,rowHeight=rowProbe.getBoundingClientRect().height;
-        if(!height||!rowHeight)return;
-        const nextSize=Math.max(1,Math.floor((height+.25)/rowHeight));
-        if(nextSize===pageState.size)return;
-        const active=document.activeElement?.closest('[data-catalog-product-id]');
-        const activeId=list.contains(active)?active.dataset.catalogProductId:null;
-        const anchor=activeId||pageState.highlightedProduct;
-        const anchorIndex=anchor?filtered().findIndex(product=>product.ref.id===anchor):-1;
-        const first=anchorIndex>=0?anchorIndex:(pageState.page-1)*pageState.size;
-        pageState.size=nextSize;
-        pageState.page=Math.floor(first/nextSize)+1;
-        paint();
-        if(activeId)[...list.children].find(row=>row.dataset.catalogProductId===activeId)?.querySelector('[data-open-product]')?.focus({preventScroll:true});
-      }
-      node._activateCatalog=()=>{
-        catalogResizeObserver?.disconnect();
-        fit();
-        if(typeof ResizeObserver==='function'){
-          catalogResizeObserver=new ResizeObserver(fit);
-          catalogResizeObserver.observe(window);
-          catalogResizeObserver.observe(rowProbe);
-        }
-      };
-      node._showCatalogProduct=(id,{clearSearch=true,highlight=false}={})=>{
-        let index=filtered().findIndex(product=>product.ref.id===id);
-        if(index<0&&clearSearch&&products.some(product=>product.ref.id===id)){
-          pageState.query='';
-          search.value='';
-          index=products.findIndex(product=>product.ref.id===id);
-        }
-        if(index<0)return null;
-        pageState.page=Math.floor(index/pageState.size)+1;
-        if(highlight)pageState.highlightedProduct=id;
-        paint();
-        return [...list.children].find(row=>row.dataset.catalogProductId===id);
-      };
-      if(initialPreparation){
-        const actions=E('div',undefined,'wb-catalog-selection-actions');
-        const save=async()=>{
-          const r=await command('update_preparation_products',{preparation_id:pid,expected_revision:selectionBuffer.base_ref.revision,selected_product_refs:[...picked.values()]});
-          clearBuffer(selectionBuffer);
-          changedBusiness(r);
-          await refresh({force:true});
-          notice('本场商品引用已保存。');
-        };
-        selectionBuffer=registerBuffer('product-selection:'+pid,'本场商品引用',initialPreparation.ref,()=>[...picked.values()],refs=>{
-          picked.clear();
-          for(const ref of refs)picked.set(ref.id,ref);
-          paint();
-        },save,actions);
-        actions.append(button('保存本场引用',save,true));
-        footer.append(actions);
-      }
-      paint();
-    }
-    function productControl(key,descriptor,value,defs,customLabel){const schema=effectiveSchema(descriptor,defs);const label=customLabel||FIELD_LABELS[key]||descriptor.title||key;let c,read,write,validate;
+      if(!prep()){if(current.room_id){const room=(snapshot.rooms||[]).find(r=>r.ref.id===current.room_id);node.append(empty('已选择：'+(room?.body.name||'直播间'),'创建本场准备，或到直播间列表恢复已有本场。',[button('新建本场准备',()=>createPreparation(current.room_id),true),button('查看已有本场',()=>navigate({view:'rooms',product_id:null,action:null}))]));}else node.append(empty('先选择直播间','创建或选择一个直播间，然后进入本场准备。商品库在所有直播间之间共用。',[button('选择直播间',()=>navigate({view:'rooms',product_id:null}),true),button('管理商品库',()=>navigate({view:'products',product_id:null}))]));return;}
+      const p=prep().body,room=(snapshot.rooms||[]).find(r=>r.ref.id===p.room_id);const summary=section(preparationTitle(prep(),details().draft));summary.append(E('p',preparationStateLabel(prep(),room)+' · '+refName(prep().ref),'wb-record-meta'));if(p.goal)summary.append(jsonDetails('查看本场原始任务',p.goal));const grid=E('div',undefined,'wb-grid');for(const [view,title,info]of [['session','本场配置',p.draft_ref?'已保存':'待配置'],['products','引用商品',p.selected_product_refs.length+' 个'],['insights','顾客与卖点',p.analysis_refs.length+' 份建议'],['scripts','话术、顺序与语音',p.script_refs.length+' 版 · '+(preparationAdopted(prep(),room)?'当前已采用':p.candidate_publication_ref?'已生成候选':'待准备')]]){const row=section(title);row.append(E('p',info,'wb-muted'),button('查看与微调',()=>navigate({view,product_id:null})));grid.append(row);}summary.append(grid);node.append(summary);if(details().asset_checklist)renderAssets(node,details().asset_checklist);}
+    async function renderProducts(node){const pid=prepId();const initialPreparation=copy(prep());node.append(header('共享商品库','商品资料统一维护。本场只引用商品的明确修订，不复制商品库。',[button('新建商品',()=>navigate({view:'products',product_id:null,action:'new_product'}),true)]));renderMaterials(node);
+      const search=control('search','','搜索商品');search.placeholder='商品名称或 SKU';node.append(field('查找商品',search));const list=E('div',undefined,'wb-list');node.append(list);let all=copy(snapshot.products.items||[]);let cursor=snapshot.products.next_cursor;while(cursor!==null&&cursor!==undefined){const page=await api.query('search_products',{cursor,limit:200});all.push(...page.items);cursor=page.next_cursor;}
+      const checks=new Map();const selectedRefs=initialPreparation?.body.selected_product_refs||[];const picked=new Map(selectedRefs.map(r=>[r.id,r]));
+      const paint=()=>{list.replaceChildren();const rows=all.filter(x=>(x.name+' '+(x.sku_id||'')).toLowerCase().includes(search.value.toLowerCase()));for(const product of rows){const row=E('div',undefined,'wb-list-item');if(initialPreparation){const check=E('input');check.type='checkbox';check.checked=picked.has(product.ref.id);check.setAttribute('aria-label','本场引用 '+product.name);checks.set(product.ref.id,check);check.addEventListener('change',()=>{if(check.checked)picked.set(product.ref.id,selectedRefs.find(r=>r.id===product.ref.id)||product.ref);else picked.delete(product.ref.id);changed(selectionBuffer);});const holder=region(E('span'),{kind:'product_selection',id:pid});holder.append(check);row.append(holder);}const info=E('div');info.append(E('strong',product.name),E('p',(product.price??'')+' '+product.currency+' · '+refName(product.ref),'wb-muted'));row.append(info,button('查看与编辑',()=>navigate({view:'products',product_id:product.ref.id,action:null})));if(picked.has(product.ref.id)&&!equal(picked.get(product.ref.id),product.ref))row.append(E('span','本场保留旧修订，需检查差异','wb-badge wb-badge--warning'));list.append(row);}if(!rows.length)list.append(empty('暂无匹配商品','可新建商品，或在对话上传资料让 Agent 整理。'));};search.addEventListener('input',paint);
+      let selectionBuffer;if(initialPreparation){const box=E('div',undefined,'wb-form-actions');const base=copy(initialPreparation.ref);const save=async()=>{const r=await command('update_preparation_products',{preparation_id:pid,expected_revision:selectionBuffer.base_ref.revision,selected_product_refs:[...picked.values()]});clearBuffer(selectionBuffer);changedBusiness(r);await refresh({force:true});notice('本场商品引用已保存。');};selectionBuffer=registerBuffer('product-selection:'+pid,'本场商品引用',base,()=>[...picked.values()],v=>{picked.clear();for(const r of v)picked.set(r.id,r);paint();},save,box);box.append(button('保存本场引用',save,true));node.append(box);}paint();}
+    function productControl(key,descriptor,value,defs,customLabel){const schema=effectiveSchema(descriptor,defs);const label=customLabel||FIELD_LABELS[key]||descriptor.title||key;let c,read,write;
       if(key==='core_selling_points'){
         c=E('div',undefined,'wb-core-points');let rows=[];
         const add=value=>{const parsed=unpackCorePoint(value),row=E('div',undefined,'wb-core-point-row');const name=control('text',parsed.name,'卖点名称'),text=control('textarea',parsed.content,'卖点内容');name.placeholder='名称（选填，如足弓支撑）';name.maxLength=120;text.placeholder='填写有依据的具体特点与用途';text.maxLength=4000;text.rows=2;const record={row,name,text,original:parsed.original};rows.push(record);const actions=E('div',undefined,'wb-core-point-actions');actions.append(button('上移',()=>{const i=rows.indexOf(record);if(i>0){rows.splice(i,1);rows.splice(i-1,0,record);paint();notify();}}),button('下移',()=>{const i=rows.indexOf(record);if(i<rows.length-1){rows.splice(i,1);rows.splice(i+1,0,record);paint();notify();}}),button('删除卖点',()=>{rows=rows.filter(r=>r!==record);paint();notify();}));row.append(name,text,actions);return record;};
         const list=E('div');const notify=()=>c.dispatchEvent(new Event('input',{bubbles:true}));const paint=()=>{list.replaceChildren(...rows.map((r,i)=>{r.name.setAttribute('aria-label','卖点名称 '+(i+1));r.text.setAttribute('aria-label','卖点内容 '+(i+1));return r.row;}));};
-        const pack=row=>packCorePoint({name:row.name.value,content:row.text.value,original:row.original});
-        read=()=>rows.map(pack);
-        validate=()=>{
-          if(rows.some(row=>!row.text.value.trim()))throw Error('每条核心卖点都需要填写内容，或删除空行');
-          if(rows.some(row=>{const value=pack(row);return value.length>4000&&value!==row.original;}))
-            throw Error('单条卖点名称与内容合计不能超过4000字；可拆分为多条卖点');
-        };
-        write=value=>{rows=[];for(const item of value||[])add(item);paint();};write(value||[]);c.append(list,button('添加卖点',()=>{add('');paint();notify();},false,{addCorePoint:''}));
+        read=()=>rows.map(r=>{const value=packCorePoint({name:r.name.value,content:r.text.value,original:r.original});if(!r.text.value.trim())throw Error('每条核心卖点都需要填写内容，或删除空行');if(value.length>4000&&value!==r.original)throw Error('单条卖点名称与内容合计不能超过4000字；可拆分为多条卖点');return value;});write=value=>{rows=[];for(const item of value||[])add(item);paint();};write(value||[]);c.append(list,button('添加卖点',()=>{add('');paint();notify();}));
       }
       else if(key==='specifications'&&schema.type==='array'){
         c=E('div',undefined,'wb-specification-editor');const list=E('div',undefined,'wb-specification-list');let rows=[];
@@ -989,16 +199,10 @@
       else if(schema.type==='boolean'){c=E('input');c.type='checkbox';c.checked=!!value;read=()=>c.checked;write=v=>c.checked=!!v;}
       else if(schema.type==='number'||schema.type==='integer'){c=control('number',value,label);c.step=schema.type==='integer'?'1':'any';if(schema.minimum!==undefined)c.min=schema.minimum;if(schema.maximum!==undefined)c.max=schema.maximum;read=()=>{if(c.value==='')return schema.nullable?null:0;const n=Number(c.value);if(!Number.isFinite(n))throw Error(label+'须填写数字');return n;};write=v=>c.value=v??'';}
       else if(schema.type==='array'&&effectiveSchema(schema.items||{},defs).type!=='object'){const item=effectiveSchema(schema.items||{},defs);if(item.enum){c=E('div',undefined,'wb-checklist');const checks=item.enum.map(v=>{const check=E('input');check.type='checkbox';check.value=v;check.checked=(value||[]).includes(v);if(key==='hidden_optional_fields')check.setAttribute('aria-label','不适用：'+(FIELD_LABELS[v]||v));const row=E('label');row.append(check,E('span',FIELD_LABELS[v]||v));c.append(row);return check;});read=()=>checks.filter(x=>x.checked).map(x=>x.value);write=v=>checks.forEach(x=>x.checked=(v||[]).includes(x.value));}else{c=control('textarea',(value||[]).join('\n'),label);read=()=>c.value.split('\n').map(x=>x.trim()).filter(Boolean);write=v=>c.value=(v||[]).join('\n');}}
-      else if(schema.type==='array'){c=E('div',undefined,'wb-list');const listNode=c;const itemSchema=effectiveSchema(schema.items||{},defs);let rows=[];const add=(item={})=>{const row=E('div',undefined,'wb-card');const fields={};if(key==='knowledge_documents'&&item.id)row.dataset.productDocumentId=item.id;for(const [k,desc]of Object.entries(itemSchema.properties||{})){if(k==='id'&&!item[k])item[k]='doc_'+uid().replace(/-/g,'');const child=productControl(k,desc,item[k]??schemaDefault(desc,defs),defs,({name:'规格名称',value:'规格内容',id:'文档编号',title:'文档标题',content:'文档内容'})[k]||k);fields[k]=child;row.append(child.box);}const record={row,fields};rows.push(record);row.append(button('删除此条',()=>{rows=rows.filter(x=>x!==record);row.remove();c.dispatchEvent(new Event('input',{bubbles:true}));}));listNode.append(row);};for(const item of value||[])add(copy(item));const actions=E('div',undefined,'wb-form-actions');actions.append(button('添加一条',()=>{add();c.dispatchEvent(new Event('input',{bubbles:true}));}));const wrap=E('div');wrap.append(c,actions);c=wrap;read=()=>rows.map(r=>Object.fromEntries(Object.entries(r.fields).map(([k,f])=>[k,f.read()])));write=v=>{rows=[];listNode.replaceChildren();for(const x of v||[])add(copy(x));};}
+      else if(schema.type==='array'){c=E('div',undefined,'wb-list');const listNode=c;const itemSchema=effectiveSchema(schema.items||{},defs);let rows=[];const add=(item={})=>{const row=E('div',undefined,'wb-card');const fields={};for(const [k,desc]of Object.entries(itemSchema.properties||{})){if(k==='id'&&!item[k])item[k]='doc_'+uid().replace(/-/g,'');const child=productControl(k,desc,item[k]??schemaDefault(desc,defs),defs,({name:'规格名称',value:'规格内容',id:'文档编号',title:'文档标题',content:'文档内容'})[k]||k);fields[k]=child;row.append(child.box);}const record={row,fields};rows.push(record);row.append(button('删除此条',()=>{rows=rows.filter(x=>x!==record);row.remove();c.dispatchEvent(new Event('input',{bubbles:true}));}));listNode.append(row);};for(const item of value||[])add(copy(item));const actions=E('div',undefined,'wb-form-actions');actions.append(button('添加一条',()=>{add();c.dispatchEvent(new Event('input',{bubbles:true}));}));const wrap=E('div');wrap.append(c,actions);c=wrap;read=()=>rows.map(r=>Object.fromEntries(Object.entries(r.fields).map(([k,f])=>[k,f.read()])));write=v=>{rows=[];listNode.replaceChildren();for(const x of v||[])add(copy(x));};}
       else{c=control(['name','sku_id','currency','material','shipping_origin','shelf_life_unit'].includes(key)?'text':'textarea',value,label);if(schema.maxLength)c.maxLength=schema.maxLength;read=()=>c.value;write=v=>c.value=v??'';}
-      c.dataset.field=key;const box=field(label,c);box.dataset.agentField='/'+key;return {box,c,read,write,validate};}
-    async function renderProduct(node,productId,productRecord,{onSaved,draftKey='product:'+(productId||'new'),copyFrom}={}){const record=productRecord||(productId?await api.query('read_product',{product_id:productId}):null);node._productRef=record?.ref;node._productLabel=record?.body.name||'';const productSchema=schema.schema.product;const defs=productSchema.$defs||{};const fields={};const initial={};
-      const copied=copyFrom?{...copy(copyFrom.body),
-        name:Array.from(copyFrom.body.name).slice(0,56).join('')+'（副本）',
-        sku_id:'',promo_price:null,promotion:'',
-        knowledge_documents:(copyFrom.body.knowledge_documents||[]).map(doc=>({...doc,id:'doc_'+uid().replace(/-/g,'')}))
-      }:null;
-      for(const[k,s]of Object.entries(productSchema.properties)){initial[k]=record?.body[k]??copied?.[k]??schemaDefault(s,defs);fields[k]=productControl(k,s,initial[k],defs);}const initialPoints=copy(initial.core_selling_points?.length?initial.core_selling_points:String(initial.selling_points||'').split('\n').filter(v=>v.trim()));fields.core_selling_points?.write(initialPoints);if(!onSaved)node.append(header(record?'编辑商品':'新建共享商品',record?refName(record.ref):'本场优惠请在「本场配置」中设置。',[button('返回商品知识库',()=>navigate({view:'products',product_id:null,action:null}))]));const form=E('form',undefined,'wb-product-form');form.addEventListener('submit',e=>e.preventDefault());
+      c.dataset.field=key;const box=field(label,c);box.dataset.agentField='/'+key;return {box,c,read,write};}
+    async function renderProduct(node,productId){const record=productId?await api.query('read_product',{product_id:productId}):null;const productSchema=schema.schema.product;const defs=productSchema.$defs||{};const fields={};const initial={};for(const[k,s]of Object.entries(productSchema.properties)){initial[k]=record?.body[k]??schemaDefault(s,defs);fields[k]=productControl(k,s,initial[k],defs);}const initialPoints=copy(initial.core_selling_points?.length?initial.core_selling_points:String(initial.selling_points||'').split('\n').filter(v=>v.trim()));fields.core_selling_points?.write(initialPoints);node.append(header(record?'编辑商品':'新建共享商品',record?refName(record.ref):'本场优惠请在「本场配置」中设置。',[button('返回商品库',()=>navigate({view:'products',product_id:null,action:null}))]));const form=E('form',undefined,'wb-product-form');form.addEventListener('submit',e=>e.preventDefault());
       const first=['name','sku_id','sale_status','sales_platform','price','currency','image'];const managed=['selling_points','core_selling_points','specifications','faq','knowledge','knowledge_documents','shipping_time','return_policy','promo_price','promotion'];const rest=Object.keys(fields).filter(k=>!first.includes(k)&&!managed.includes(k));const grid=E('div',undefined,'wb-grid');for(const k of first)if(fields[k])grid.append(fields[k].box);form.append(grid);if(fields.core_selling_points)form.append(fields.core_selling_points.box);else if(fields.selling_points)form.append(fields.selling_points.box);
       if(fields.specifications){fields.specifications.box.classList.add('wb-product-specifications');form.append(fields.specifications.box);}
       if(fields.faq){fields.faq.box.classList.add('wb-product-faq');fields.faq.c.rows=5;fields.faq.c.placeholder='逐条写清常见问题与回答，例如：问：如何选尺码？答：按已确认的尺码说明选择。';fields.faq.box.append(E('p','顾客常问的问题与回答保存在这里，与补充知识文档分别管理。','wb-muted'));form.append(fields.faq.box);}
@@ -1008,39 +212,10 @@
       let docBox,paintPlatform=()=>{};const paintOptional=()=>{const hidden=applyOptionalProductVisibility(fields);if(docBox)docBox.hidden=hidden.has('knowledge_documents');};
       fields.hidden_optional_fields?.box.append(E('p','标记不适用后该项不用于生成和检索；保存会清空旧值，重新添加需填写。保存前取消勾选可恢复当前输入。','wb-muted'));
       fields.hidden_optional_fields?.c.addEventListener('change',paintOptional);paintOptional();
-      const read=()=>{const value=activeProductFields(Object.fromEntries(Object.entries(fields).map(([k,f])=>[k,['promo_price','promotion'].includes(k)?copy(initial[k]):f.read()])));if(fields.core_selling_points){if(equal(value.core_selling_points,initialPoints)){value.core_selling_points=copy(initial.core_selling_points||[]);value.selling_points=initial.selling_points||'';}else value.selling_points=value.core_selling_points.join('\n');}return value;};const write=value=>{Object.entries(fields).forEach(([k,f])=>f.write(k==='core_selling_points'?(value[k]?.length?value[k]:String(value.selling_points||'').split('\n').filter(v=>v.trim())):value[k]===undefined?initial[k]:value[k]));paintOptional();paintPlatform();};let buffer;const save=async()=>{fields.core_selling_points?.validate();let value=read();if(!value.name?.trim())throw Error('请填写商品名称');const checked=await api.query('validate_product_assembly',{schema_hash:schema.schema_hash,fields:value});if(!checked.valid)throw Object.assign(Error('商品资料有缺项或格式不正确'),{details:checked.errors});value=checked.normalized_fields;const canonicalChanged=!equal(value.core_selling_points,initial.core_selling_points);const patches=Object.keys(value).filter(k=>!(canonicalChanged&&k==='selling_points')&&canonicalProductField(value[k])!==canonicalProductField(initial[k])).map(k=>({path:'/'+k,op:'set',value:value[k]}));
-        if(record&&!patches.length){
-          if(onSaved){
-            clearBuffer(buffer);
-            await onSaved(record.ref,{unchanged:true});
-          }else{
-            buffer.dirty=false;form.classList.remove('wb-dirty');persist(buffer);options.onDirty?.(getDirtySummary());
-            notice('没有需要保存的修改。');
-          }
-          return true;
-        }
-        let result;try{result=await command('save_product',{product_id:record?.ref.id||null,expected_revision:record?buffer.base_ref.revision:null,schema_hash:schema.schema_hash,patches,fields:value,source_manifest_refs:record?.body.source_manifest_refs||[]});}catch(error){if(error.code==='PRODUCT_IDENTITY_CONFIRMATION_REQUIRED'){showIdentity(error,value);return false;}if(['REVISION_CONFLICT','VERSION_CONFLICT'].includes(error.code)){const head=await api.query('read_product',{product_id:record.ref.id});notice('商品已被另一个操作更新；你的输入已保留。请对比后明确重新应用。','warning');const conflict=section('商品版本冲突');conflict.append(jsonDetails('原基础版本',initial),jsonDetails('当前服务端版本',head.body),jsonDetails('我的未保存内容',value),button('基于新版重新应用我的修改',async()=>{const own=read();const updated={...head.body};for(const p of patches)updated[p.path.slice(1)]=own[p.path.slice(1)];if(canonicalChanged)updated.selling_points=(updated.core_selling_points||[]).join('\n');for(const k of Object.keys(fields))initial[k]=head.body[k]??schemaDefault(productSchema.properties[k],defs);buffer.base_ref=head.ref;record.ref=head.ref;write(updated);persist(buffer);conflict.remove();notice('已把你的字段修改应用到新版基础；请再次点击保存修改。','warning');}));(form.querySelector('.wb-product-dialog-scroll')||form).append(conflict);conflict.scrollIntoView({block:'nearest'});return false;}throw error;}return finishSave(result);};
-      async function finishSave(result){
-        const newRef=result.data.product_ref||result.data.record_ref;
-        clearBuffer(buffer);
-        if(record&&newRef)replacements.set(record.ref.id,newRef);
-        if(onSaved){
-          changedBusiness(result);
-          await onSaved(newRef);
-          return true;
-        }
-        current.product_id=newRef?.id||record?.ref.id;
-        current.action=null;
-        changedBusiness(result);
-        cache.clear();
-        await open({...current});
-        notice('商品已保存。相关历史话术不会自动改写。');
-        return true;
-      }
-      function showIdentity(error,value){form.querySelector('[data-product-identity-choice]')?.remove();const choices=section('已有同名商品，请明确区分');choices.dataset.productIdentityChoice='';choices.append(E('p','可以更新已有商品，或确认这是不同的新商品。'));for(const ref of error.details?.candidate_refs||[])choices.append(button('查看已有商品 '+ref.id,()=>{if(onSaved)closeProductDialog({restoreFocus:false,keepDraft:true});return navigate({view:'products',product_id:ref.id,action:null});}));choices.append(button('确认是不同商品，新增',async()=>{const proof=await api.request('/api/prelive/v2/human/product-identity',{target_name:value.name,candidate_refs:error.details.candidate_refs});const result=await command('save_product',{product_id:null,expected_revision:null,schema_hash:schema.schema_hash,patches:[],fields:value,identity_decision_ref:proof.identity_decision_ref});if(onSaved)return finishSave(result);clearBuffer(buffer);changedBusiness(result);await navigate({view:'products',product_id:result.data.product_ref.id,action:null});},true));const scroll=form.querySelector('.wb-product-dialog-scroll');if(scroll){scroll.prepend(choices);scroll.scrollTop=0;}else (form.querySelector('.wb-product-dialog-scroll')||form).append(choices);choices.scrollIntoView({block:'nearest'});notice('未覆盖任何已有商品，请先选择。','warning');}
-      const baseRef=record?.ref||null;
-      buffer=registerBuffer(draftKey,'商品：'+(record?.body.name||copied?.name||'新商品'),baseRef,read,write,save,form,{ref:copy(baseRef),value:read()});
-      for(const[k,f]of Object.entries(fields))if(record&&form.contains(f.box)){f.box.dataset.productField='/'+k;const name=f.box.querySelector(':scope > label');if(name){name.dataset.selectField=k;selectable(name,()=>selected('商品库 / '+record.body.name+' / '+(FIELD_LABELS[k]||k),{object_ref:record.ref,field_path:'/'+k},{view:'products',product_id:productId,field_path:'/'+k},buffer),{target:{object_ref:record.ref,field_path:'/'+k}});}}
+      const read=()=>{const value=activeProductFields(Object.fromEntries(Object.entries(fields).map(([k,f])=>[k,['promo_price','promotion'].includes(k)?copy(initial[k]):f.read()])));if(fields.core_selling_points){if(equal(value.core_selling_points,initialPoints)){value.core_selling_points=copy(initial.core_selling_points||[]);value.selling_points=initial.selling_points||'';}else value.selling_points=value.core_selling_points.join('\n');}return value;};const write=value=>{Object.entries(fields).forEach(([k,f])=>f.write(k==='core_selling_points'?(value[k]?.length?value[k]:String(value.selling_points||'').split('\n').filter(v=>v.trim())):value[k]===undefined?initial[k]:value[k]));paintOptional();paintPlatform();};let buffer;const save=async()=>{let value=read();if(!value.name?.trim())throw Error('请填写商品名称');const checked=await api.query('validate_product_assembly',{schema_hash:schema.schema_hash,fields:value});if(!checked.valid)throw Object.assign(Error('商品资料有缺项或格式不正确'),{details:checked.errors});value=checked.normalized_fields;const canonicalChanged=!equal(value.core_selling_points,initial.core_selling_points);const patches=Object.keys(value).filter(k=>!(canonicalChanged&&k==='selling_points')&&!equal(value[k],initial[k])).map(k=>({path:'/'+k,op:'set',value:value[k]}));let result;try{result=await command('save_product',{product_id:record?.ref.id||null,expected_revision:record?buffer.base_ref.revision:null,schema_hash:schema.schema_hash,patches,fields:value,source_manifest_refs:record?.body.source_manifest_refs||[]});}catch(error){if(error.code==='PRODUCT_IDENTITY_CONFIRMATION_REQUIRED'){showIdentity(error,value);return false;}if(['REVISION_CONFLICT','VERSION_CONFLICT'].includes(error.code)){const head=await api.query('read_product',{product_id:record.ref.id});notice('商品已被另一个操作更新；你的输入已保留。请对比后明确重新应用。','warning');const conflict=section('商品版本冲突');conflict.append(jsonDetails('原基础版本',initial),jsonDetails('当前服务端版本',head.body),jsonDetails('我的未保存内容',value),button('基于新版重新应用我的修改',async()=>{const own=read();const updated={...head.body};for(const p of patches)updated[p.path.slice(1)]=own[p.path.slice(1)];if(canonicalChanged)updated.selling_points=(updated.core_selling_points||[]).join('\n');for(const k of Object.keys(fields))initial[k]=head.body[k]??schemaDefault(productSchema.properties[k],defs);buffer.base_ref=head.ref;record.ref=head.ref;write(updated);persist(buffer);conflict.remove();notice('已把你的字段修改应用到新版基础；请再次点击保存商品。','warning');}));form.append(conflict);return false;}throw error;}const newRef=result.data.product_ref||result.data.record_ref;clearBuffer(buffer);if(record&&newRef)replacements.set(record.ref.id,newRef);current.product_id=newRef?.id||record?.ref.id;current.action=null;changedBusiness(result);cache.clear();await open({...current});notice('商品已保存。相关历史话术不会自动改写。');return true;};
+      function showIdentity(error,value){const choices=section('已有同名商品，请明确区分');choices.append(E('p','可以更新已有商品，或确认这是不同的新商品。'));for(const ref of error.details?.candidate_refs||[])choices.append(button('查看已有商品 '+ref.id,()=>navigate({view:'products',product_id:ref.id,action:null})));choices.append(button('确认是不同商品，新增',async()=>{const proof=await api.request('/api/prelive/v2/human/product-identity',{target_name:value.name,candidate_refs:error.details.candidate_refs});const result=await command('save_product',{product_id:null,expected_revision:null,schema_hash:schema.schema_hash,patches:[],fields:value,identity_decision_ref:proof.identity_decision_ref});clearBuffer(buffer);changedBusiness(result);await navigate({view:'products',product_id:result.data.product_ref.id,action:null});},true));form.append(choices);notice('未覆盖任何已有商品，请先选择。','warning');}
+      buffer=registerBuffer('product:'+(productId||'new'),'商品：'+(record?.body.name||'新商品'),record?.ref||null,read,write,save,form);
+      for(const[k,f]of Object.entries(fields))if(record&&form.contains(f.box)){const name=f.box.querySelector(':scope > label');if(name){name.dataset.selectField=k;selectable(name,()=>selected('商品库 / '+record.body.name+' / '+(FIELD_LABELS[k]||k),{object_ref:record.ref,field_path:'/'+k},{view:'products',product_id:productId,field_path:'/'+k},buffer),{target:{object_ref:record.ref,field_path:'/'+k}});}}
       if(fields.sales_platform){
         const template=E('div',undefined,'wb-platform-guidance'),hint=E('p',undefined,'wb-muted'),notes=E('ul',undefined,'wb-platform-notes'),sources=E('div',undefined,'wb-platform-sources'),shippingChoices=E('div',undefined,'wb-platform-shipping-choices'),confirmation=E('div',undefined,'wb-platform-confirmation');
         const autoApplied=new Map(),policies=schema.platform_policies||{},policy=()=>policies[fields.sales_platform.read()];
@@ -1063,555 +238,65 @@
         const preview=E('img',undefined,'wb-product-image-preview');preview.alt='商品主图预览';preview.style.maxWidth='180px';preview.style.maxHeight='180px';
         const emptyImage=E('p','添加商品主图，方便在共享商品库识别。','wb-muted');
         const paintImage=()=>{const value=fields.image.read();const allowed=/^data:image\/(?:png|jpeg|webp);base64,/i.test(value)||/^\/[^/]/.test(value);preview.hidden=!allowed;emptyImage.hidden=allowed;preview.src=allowed?value:'';};paintImage();
-        const upload=E('input');upload.type='file';upload.accept='image/png,image/jpeg,image/webp';upload.dataset.bufferIgnore='';upload.setAttribute('aria-label','上传商品图片');upload.addEventListener('change',()=>{const file=upload.files[0];if(!file)return;if(file.size>3000000||!['image/png','image/jpeg','image/webp'].includes(file.type)){notice('请上传小于3 MB的 JPG、PNG 或 WebP 图片。','warning');return;}const reader=new FileReader();reader.onload=()=>{if(!form.isConnected||buffers.get(draftKey)!==buffer)return;fields.image.write(String(reader.result));paintImage();changed(buffer);};reader.readAsDataURL(file);});
+        const upload=E('input');upload.type='file';upload.accept='image/png,image/jpeg,image/webp';upload.setAttribute('aria-label','上传商品图片');upload.addEventListener('change',()=>{const file=upload.files[0];if(!file)return;if(file.size>3000000||!['image/png','image/jpeg','image/webp'].includes(file.type)){notice('请上传小于3 MB的 JPG、PNG 或 WebP 图片。','warning');return;}const reader=new FileReader();reader.onload=()=>{fields.image.write(String(reader.result));paintImage();changed(buffer);};reader.readAsDataURL(file);});
         fields.image.box.append(preview,emptyImage,upload,button('移除商品图片',()=>{fields.image.write('');paintImage();changed(buffer);}));
       }
-      const actions=E('div',undefined,'wb-form-actions');if(onSaved)actions.classList.add('wb-product-dialog-actions');actions.append(button(record?'保存修改':'保存商品',save,true));form.append(actions);const docFile=E('input');docFile.type='file';docFile.dataset.bufferIgnore='';docFile.accept='.txt,.md,.csv,.json';docFile.setAttribute('aria-label','导入商品知识文档');docBox=section('从文本文件补充商品知识库');docBox.append(docFile,button('导入为知识文档',async()=>{const f=docFile.files?.[0];if(!f)throw Error('请先选择文本文件');if(f.size>60000)throw Error('单份知识文档请控制在15000字以内');const text=await f.text();if(text.length>15000)throw Error('知识文档内容不能超过15000字');const docs=fields.knowledge_documents.read();docs.push({id:'doc_'+uid().replace(/-/g,''),title:f.name.slice(0,120),content:text});fields.knowledge_documents.write(docs);changed(buffer);docFile.value='';notice('文档已填入表单，保存商品后才生效。');}));knowledge.append(docBox);paintOptional();node.append(form);}
-    function roomWorkspace(roomId=null,action=null){
-      return {view:'room-config',room_id:roomId,preparation_id:null,product_id:null,room_section:null,action};
-    }
-    function returnToRoomList(){
-      return navigate({view:'rooms',room_id:null,preparation_id:null,product_id:null,room_section:null,action:null});
-    }
-    function renderRooms(node){
-      const rooms=snapshot.rooms||[];
-      const create=()=>navigate(roomWorkspace(null,'new_room'));
-      const heading=header('直播间列表',rooms.length?'共 '+rooms.length+' 个直播间':'还没有直播间',[
-        button('新建直播间',create,true,{newRoom:''})
-      ]);
-      heading.classList.replace('wb-card-header','wb-room-list-header');
-      node.append(heading);
-      if(!rooms.length){node.append(empty('从新建直播间开始','设置直播间名称和默认播报声音后，就可以准备第一场。'));return;}
-      const list=E('ul',undefined,'wb-room-list');
-      const pageSize=5,totalPages=Math.ceil(rooms.length/pageSize);
-      let page=1;
-      const previous=button('上一页',()=>{page--;paint();if(previous.disabled)next.focus({preventScroll:true});});
-      const next=button('下一页',()=>{page++;paint();if(next.disabled)previous.focus({preventScroll:true});});
-      const count=E('span',undefined,'wb-muted');
-      count.setAttribute('aria-live','polite');
-      function paint(){
-        list.replaceChildren();
-        for(const room of rooms.slice((page-1)*pageSize,page*pageSize)){
-          const row=E('li',undefined,'wb-room-card wb-room-list-row');
-          row.dataset.roomId=room.ref.id;
-          const info=E('div',undefined,'wb-room-list-info');
-          const voice=(room.body.tts_provider||room.body.voice_provider)==='minimax'?'MiniMax':'本机普通话';
-          info.append(E('h3',room.body.name),E('p','默认声音 '+voice+(room.body.adopted_publication_ref?' · 已采用播出内容':'')));
-          const enter=button('进入直播间',()=>navigate(roomWorkspace(room.ref.id)));
-          enter.setAttribute('aria-label','进入直播间 '+room.body.name);
-          row.append(info,enter);
-          list.append(row);
-        }
-        count.textContent='第 '+page+' / '+totalPages+' 页';
-        previous.disabled=page===1;
-        next.disabled=page===totalPages;
+      const actions=E('div',undefined,'wb-form-actions');actions.append(button('保存商品',save,true));form.append(actions);const docFile=E('input');docFile.type='file';docFile.accept='.txt,.md,.csv,.json';docFile.setAttribute('aria-label','导入商品知识文档');docBox=section('从文本文件补充商品知识库');docBox.append(docFile,button('导入为知识文档',async()=>{const f=docFile.files?.[0];if(!f)throw Error('请先选择文本文件');if(f.size>60000)throw Error('单份知识文档请控制在15000字以内');const text=await f.text();if(text.length>15000)throw Error('知识文档内容不能超过15000字');const docs=fields.knowledge_documents.read();docs.push({id:'doc_'+uid().replace(/-/g,''),title:f.name.slice(0,120),content:text});fields.knowledge_documents.write(docs);changed(buffer);docFile.value='';notice('文档已填入表单，保存商品后才生效。');}));knowledge.append(docBox);paintOptional();if(record){const archiveBox=E('details',undefined,'wb-danger-zone');archiveBox.append(E('summary','归档商品'),E('p','归档后从共享商品列表隐藏，并阻止旧本场继续采用。历史商品资料和稿件仍保留。','wb-muted'));const confirmed=E('input');confirmed.type='checkbox';confirmed.dataset.bufferIgnore='true';confirmed.setAttribute('aria-label','确认归档 '+record.body.name);const label=E('label');label.append(confirmed,E('span','我确认归档此商品'));archiveBox.append(label,button('确认归档商品',async()=>{if(!confirmed.checked)throw Error('请先勾选确认归档');if(hasDirty())throw Error('请先保存或放弃未保存编辑，再归档商品');const result=await humanMutation('/api/prelive/v2/human/product-archive',{product_ref:record.ref});changedBusiness({data:result});cache.clear();await navigate({view:'products',product_id:null,action:null});notice('商品已归档，历史记录仍保留。');}));form.append(archiveBox);}node.append(form);}
+    async function renderRooms(node,destination){
+      node.append(header('直播间','在这里选择直播间，再进入或新建本场。每个本场独立保存商品引用、配置与话术。'));
+      const roomGrid=E('div',undefined,'wb-room-grid');
+      for(const room of snapshot.rooms||[]){const active=current.room_id===room.ref.id;const card=section(room.body.name);card.classList.add('wb-room-card');card.dataset.roomId=room.ref.id;card.classList.toggle('is-selected',active);card.append(E('p',(room.body.product_ids?.length||0)+' 件默认引用商品 · '+(room.body.tts_provider==='minimax'?'MiniMax':'本机普通话'),'wb-muted'));if(active)card.append(E('span','当前直播间','wb-badge wb-badge--success'));card.append(button('进入直播间',()=>navigate({view:'rooms',room_id:room.ref.id,preparation_id:null,product_id:null,action:null}),!active));roomGrid.append(card);}
+      if(roomGrid.childElementCount)node.append(roomGrid);
+      const activeRoom=(snapshot.rooms||[]).find(r=>r.ref.id===current.room_id);
+      if(activeRoom){
+        const room=await api.query('read_room',{room_id:activeRoom.ref.id});
+        const head=section(room.body.name+' · 本场列表');head.classList.add('wb-room-detail');head.append(E('p','已进入此直播间。创建新本场，或从下方恢复历史准备。','wb-muted'));
+        const title=control('text','','新本场名称');title.placeholder='例如：周末居家好物';head.append(field('本场名称（选填）',title),button('创建本场准备',()=>createPreparation(room.ref.id,{goal:title.value.trim()||'准备本场直播'}),true),button('返回全部直播间',()=>navigate({view:'rooms',room_id:null,preparation_id:null,product_id:null,action:null})));
+        const history=await api.query('read_session_history',{room_id:room.ref.id,limit:200});
+        const rows=E('div',undefined,'wb-list');for(const p of history.preparations||[]){const row=E('article',undefined,'wb-list-item wb-preparation-card');row.dataset.preparationId=p.ref.id;row.classList.toggle('is-selected',current.preparation_id===p.ref.id);const info=E('div'),knownDraft=prep()?.ref.id===p.ref.id?details().draft:null;info.append(E('strong',preparationTitle(p,knownDraft)),E('p',preparationStateLabel(p,room)+' · '+(p.body.selected_product_refs?.length||0)+' 件商品 · '+(p.body.script_refs?.length||0)+' 版话术','wb-muted'),E('small',p.body.updated_at||p.body.created_at||refName(p.ref),'wb-record-meta'));if(p.body.goal)info.append(jsonDetails('查看本场原始任务',p.body.goal));const actions=E('div',undefined,'wb-form-actions');actions.append(button('进入本场',()=>navigate({view:'overview',room_id:room.ref.id,preparation_id:p.ref.id,product_id:null,action:null}),true),button('复制可复用配置',()=>showCopyPreparation(row,room,p)));row.append(info,actions);rows.append(row);}if(!rows.childElementCount)rows.append(empty('还没有本场','创建本场后，从共享商品库选品，再设置主题和声音。'));head.append(rows);node.append(head);await renderRoomSettings(node,room);
       }
-      node.append(list);
-      if(totalPages>1){
-        const pager=E('nav',undefined,'wb-room-list-pager');
-        pager.setAttribute('aria-label','直播间分页');
-        pager.append(previous,count,next);
-        node.append(pager);
-      }
-      paint();
-    }
-    function renderRoomMaterialImport(host,room,preparation){
-      if(!options.onUploadRoomMaterials||!options.onSubmitRoomMaterials)return;
-      const roomId=room.ref.id;
-      const flowKey=id=>roomId+':'+(id||'new');
-      const key=flowKey(preparation?.ref.id);
-      const flow=roomMaterialFlows.get(key)||{files:[],note:'',batch:null,target:null,pending:false,unknown:false};
-      roomMaterialFlows.set(key,flow);
-      const box=section('导入资料到本场');
-      box.classList.add('wb-product-material-flow');
-      box.dataset.roomMaterialFlow='';
-      box.append(E('p',preparation
-        ?'商品资料会归入共享商品库并关联当前本场，活动和优惠只进入当前本场配置。'
-        :'导入时会在当前直播间创建本场。商品资料归入共享商品库，活动和优惠只进入新本场。','wb-muted'));
-      const files=E('input');
-      files.type='file';
-      files.multiple=true;
-      files.accept='.txt,.md,.csv,.json,.pdf,.doc,.docx,.rtf,.xlsx,.png,.jpg,.jpeg,.webp';
-      files.setAttribute('aria-label','选择本场导入资料');
-      const note=control('textarea',flow.note,'本场资料补充说明（选填）');
-      note.rows=2;
-      note.maxLength=4000;
-      const fileList=E('ul',undefined,'wb-product-material-files');
-      const status=E('p',undefined,'wb-muted');
-      status.setAttribute('role','status');
-      const bind=ref=>{
-        flow.target={room_id:roomId,preparation_id:ref.id,preparation_ref:copy(ref),room_name:room.body.name};
-        roomMaterialFlows.set(flowKey(ref.id),flow);
-        if(key!==flowKey(ref.id))roomMaterialFlows.delete(key);
-      };
-      const submit=button('导入并整理',async()=>{
-        if(flow.pending||(!flow.files.length&&!flow.batch))return;
-        flow.pending=true;
-        update('正在准备本场资料…');
-        try{
-          if(!flow.unknown){
-            const currentPreparation=prep();
-            if((currentPreparation?.body.room_id||current.room_id)!==roomId
-                || preparation&&currentPreparation?.ref.id!==preparation.ref.id)
-              throw Error('当前本场已切换，请在要导入的场次重新提交。');
-            if(currentPreparation&&buffers.get('session:'+currentPreparation.ref.id)?.dirty)
-              throw Error('请先保存或放弃当前本场的未保存配置，再导入资料。');
-            if(!flow.batch&&currentPreparation)bind(currentPreparation.ref);
-            if(!flow.target){
-              const existingId=await resolveDefaultRoomPreparation({room_id:roomId});
-              if(existingId){
-                const existing=await api.query('read_preparation',{preparation_id:existingId});
-                if(existing.body.room_id!==roomId)throw Error('此本场不属于当前直播间。');
-                bind(existing.ref);
-                await navigate({...roomWorkspace(roomId),preparation_id:existingId});
-              }else await createPreparation(roomId,{onPrepared:bind});
-            }
-            if(!flow.target)throw Error('暂未取得本场编号，资料尚未提交。');
-            if(!flow.batch||flow.batch.failed?.length){
-              update('正在上传资料…');
-              flow.batch=await options.onUploadRoomMaterials({files:flow.files,batch:flow.batch,room:flow.target});
-              if(flow.batch.failed?.length)throw Error('部分资料尚未上传成功：'+flow.batch.failed.map(item=>item.name).join('、')+'。请重试。');
-              if(!flow.batch.materialRefs?.length)throw Error('尚未有资料上传成功，请检查文件后重试。');
-            }
-          }
-          update('正在提交本场导入…');
-          await options.onSubmitRoomMaterials({batch:flow.batch,room:flow.target,instructions:flow.note});
-          flow.batch=null;
-          flow.files=[];
-          flow.note='';
-          flow.unknown=false;
-          update('Agent 已受理本场导入，可在右侧查看进度和成果。');
-        }catch(error){
-          if(flow.batch&&error.unknown)flow.unknown=true;
-          update(flow.unknown?'暂未确认任务是否受理。再次点击会核实同一请求。':error.message||'导入未提交，已保留资料。');
-        }finally{flow.pending=false;update();}
-      },true);
-      const clear=button('清空资料',()=>{
-        flow.batch=null;flow.files=[];flow.note='';flow.target=null;update('');
-      });
-      function paint(){
-        files.disabled=flow.pending||flow.unknown||!!flow.batch;
-        note.disabled=flow.pending||flow.unknown;
-        if(!flow.files.length)files.value='';
-        if(note.value!==flow.note)note.value=flow.note;
-        submit.textContent=flow.unknown?'核实原提交':'导入并整理';
-        submit.disabled=flow.pending||(!flow.files.length&&!flow.batch);
-        clear.hidden=flow.unknown||(!flow.files.length&&!flow.batch);
-        clear.disabled=flow.pending;
-        status.textContent=flow.message||'';
-        status.hidden=!status.textContent;
-        fileList.replaceChildren(...flow.files.map(file=>E('li',file.name)));
-        fileList.hidden=!flow.files.length;
-      }
-      function update(message){
-        if(message!==undefined)flow.message=message;
-        paint();
-        if(flow.paint!==paint)flow.paint?.();
-      }
-      files.addEventListener('change',()=>{
-        flow.files=Array.from(files.files||[]);
-        update('');
-      });
-      note.addEventListener('input',()=>{flow.note=note.value;});
-      const actions=E('div',undefined,'wb-product-material-actions');
-      actions.append(submit,clear);
-      box.append(files,fileList,field('补充说明（选填）',note),actions,status);
-      flow.paint=paint;
-      paint();
-      host.append(box);
-    }
-    async function renderRoomConfig(node){
-      const location=current;
-      if(location.action==='new_room'&&!location.room_id)return renderRoomCreate(node);
-      if(!location.room_id){
-        node.append(empty('请先选择直播间','从直播间列表选择要配置的直播间。',[button('返回直播间列表',returnToRoomList,true)]));
-        return;
-      }
-      if(location.room_section&&!['basic','preparations'].includes(location.room_section))return;
-      const room=(snapshot.rooms||[]).find(item=>item.ref.id===location.room_id)||
-        await api.query('read_room',{room_id:location.room_id});
-      if(current!==location)return;
-      if(location.room_section==='preparations')return renderRoomPreparations(node,room);
-      if(!options.roomCanvas)return renderRoomSettings(node,room);
-
-      node.classList.add('wb-room-editor-grid');
-      const defaults=section('直播间默认设置');
-      defaults.id='room-defaults-tile';
-      defaults.classList.add('wb-room-tile','wb-room-inline-slot');
-      defaults.dataset.inlineRoomSection='basic';
-      node.append(defaults);
-      await renderRoomSettings(defaults,room);
-      if(current!==location)return;
-
-      const overview=section('准备概况');
-      overview.classList.add('wb-room-canvas-section');
-      overview.dataset.inlineRoomSection='overview';
-      const preparation=prep();
-      node.append(overview);
-      if(!preparation){
-        overview.append(E('p','选择并保存商品后，可在这里查看本场准备进度并配置话术。','wb-muted'));
-        renderRoomMaterialImport(overview,room,null);
-        return;
-      }
-      const body=preparation.body;
-      const facts=E('ul',undefined,'wb-room-overview-facts');
-      for(const [label,value] of [
-        ['本场状态',preparationStateLabel(preparation,room)],
-        ['已选商品',body.selected_product_refs.length+' 件'],
-        ['话术版本',currentScriptVariants(details().scripts||[]).length+' 版'],
-        ['本场设置',body.draft_ref?'已保存':'待填写']
-      ]){
-        const fact=E('li');fact.append(E('span',label),E('strong',value));facts.append(fact);
-      }
-      overview.append(facts);
-      if(details().asset_checklist)renderAssets(overview,details().asset_checklist);
-
-      const scripts=E('section',undefined,'wb-room-canvas-section');
-      scripts.dataset.inlineRoomSection='scripts';
-      scripts.append(E('h3','话术与排序','wb-room-section-title'));
-      const session=E('section',undefined,'wb-room-canvas-section');
-      session.dataset.inlineRoomSection='session';
-      node.append(session,scripts);
-      await renderSession(session,{inline:true});
-      if(current===location)await renderScripts(scripts);
-    }
-    async function showRoomProductDetail(destination,opener){
-      if(!closeProductDialog({restoreFocus:false}))return;
-      const location=current;
-      const record=await api.query('read_product',{product_id:destination.product_id});
-      if(current!==location)return;
-      if(record.body.archived)throw Error('该商品已归档。');
-      if(destination.object_ref?.kind==='product'&&destination.object_ref.id!==record.ref.id)
-        throw Error('成果的商品与打开目标不一致。');
-      const body=await openProductDialog(opener,{record,preserveFocus:destination.preserve_focus});
-      if(body)locate(body,destination,'products');
-    }
-    async function renderRoomOverlay(host,destination){
-      const location=current, overlay={host,destination};
-      activeRoomOverlay=overlay;
-      if(destination.refresh)await readSnapshot();
-      if(current!==location || !host.isConnected || overlay!==activeRoomOverlay || !options.roomOverlay?.open)return;
-      const view=destination.room_section||destination.view;
-      const node=E('div',undefined,'wb-view');
-      node.dataset.view=view;
-      host.replaceChildren(node);
-      if(view==='preparations'){
-        const room=(snapshot.rooms||[]).find(item=>item.ref.id===location.room_id);
-        if(!room)throw Error('找不到当前直播间。');
-        await renderRoomPreparations(node,room);
-      }else if(view==='insights'){
-        if(!prep())throw Error('请先保存本场选品。');
-        await renderInsights(node);
-      }else if(view==='changes'){
-        if(!prep())throw Error('请先保存本场选品。');
-        await renderChanges(node);
-      }else if(view==='products'){
-        await renderProducts(node);
-      }
-      if(current!==location||overlay!==activeRoomOverlay||!options.roomOverlay?.open)return;
-      applyEditorLocks();
-      if(view!=='products')locate(node,destination,view);
-    }
-    async function renderRoomCreate(node){
-      const form=await renderRoomSettings(node);
-      form?.querySelector('input[name="room-name"]')?.focus({preventScroll:true});
-    }
-    function roomDefaultVoice(room){
-      const defaults=room.body;
-      return copy(defaults.default_tts_selection||{
-        provider:defaults.tts_provider||'system',
-        voice:defaults.tts_voice||'Huihui',
-        model:defaults.tts_model||'speech-2.8-turbo'
-      });
-    }
-    function roomDefaultDraft(room,goal,productRefs=[]){
-      return {
-        theme:'',objective:goal||'准备本场直播',scheduled_at:'',timezone:'Asia/Shanghai',
-        campaign_ends_at:'',language:'zh-CN',commerce:{},tts_selection:roomDefaultVoice(room),
-        loop_mode:'infinite',requested_variant_counts:Object.fromEntries(
-          productRefs.map(ref=>[ref.id,room.body.version_count||2])
-        ),unknowns:[]
-      };
+      const create=section('新建直播间');create.classList.add('wb-room-create');const name=control('text','','直播间名称');name.placeholder='例如：日用好物直播间';name.maxLength=80;create.append(field('直播间名称',name),button('创建直播间',async()=>{if(!name.value.trim())throw Error('请填写直播间名称');const r=await command('create_room',{name:name.value.trim(),initial_config:{}});cache.clear();changedBusiness(r);await navigate({view:'rooms',room_id:r.data.room_ref.id,preparation_id:null,product_id:null,action:null});notice('直播间已创建。现在可以创建本场。');},true));if(!current.room_id||destination.action==='create_room')node.append(create);if(destination.action==='create_room')name.focus();
     }
     async function renderRoomSettings(node,room){
-      const location=current;
       voiceOptions=voiceOptions||await api.query('voice_options',{});
-      if(current!==location)return;
-      const form=E('form',undefined,'wb-room-settings wb-card');
-      const creating=!room;
-      form.classList.toggle('wb-room-create',creating);
-      if(room){
-        form.dataset.roomDefaults='';
-        form.dataset.roomId=room.ref.id;
-        form.setAttribute('aria-label','直播间默认设置');
-      }
-      form.addEventListener('submit',event=>event.preventDefault());
-      const defaults=room?.body||{};
-      const name=control('text',defaults.name||'','直播间名称');
-      name.name='room-name';
-      name.placeholder='例如：日用好物直播间';
-      name.maxLength=80;
-      name.required=true;
-      const versions=options.roomCanvas?null:control('number',defaults.version_count||2,'默认话术版本数');
-      if(versions){versions.min=1;versions.max=6;versions.step=1;}
-      const voices=voiceEditor(roomDefaultVoice({body:defaults}),'默认');
-      voices.node.classList.add('wb-room-voice');
-      const basics=E('div',undefined,'wb-room-basics');
-      basics.append(field('直播间名称',name));
-      if(versions)basics.append(field('默认版本数 / 商品',versions));
-      form.append(basics,E('p','默认设置用于新本场。已有本场配置保持原样。','wb-muted'),voices.node);
-      const read=()=>({name:name.value.trim(),version_count:versions?Number(versions.value):defaults.version_count||2,loop_mode:'infinite',tts_selection:voices.read()});
-      const write=value=>{name.value=value.name;if(versions)versions.value=value.version_count;voices.write(value.tts_selection);};
-      const save=async()=>{
-        const value=read();
-        if(!value.name||value.name.length>80)throw Error('请输入 1 至 80 个字符的直播间名称。');
-        if(!Number.isInteger(value.version_count)||value.version_count<1||value.version_count>6)throw Error('默认话术版本数须为 1 至 6 的整数。');
-        if(creating){
-          const voice=value.tts_selection;
-          const result=await command('create_room',{name:value.name,initial_config:{
-            version_count:value.version_count,tts_provider:voice.provider,
-            ...(voice.voice?{tts_voice:voice.voice}:{}),...(voice.model?{tts_model:voice.model}:{})
-          }});
-          const roomId=result.data.room_ref.id;
-          clearBuffer(buffer);
-          cache.clear();
-          changedBusiness(result);
-          await navigate(roomWorkspace(roomId));
-          notice('直播间已创建。可在面板选择商品并保存。');
-          return;
-        }
-        const result=await humanMutation('/api/prelive/v2/human/room-settings',{
-          room_id:room.ref.id,expected_revision:buffer.base_ref.revision,...value
-        });
-        clearBuffer(buffer);
-        changedBusiness({data:result});
-        await refresh({force:true});
-        notice('直播间默认设置已保存，已有本场保持原配置。');
-      };
-      const buffer=registerBuffer('room-defaults:'+(room?.ref.id||'new'),creating?'新直播间':'直播间默认设置',room?.ref||null,read,write,save,form);
-      const actions=E('div',undefined,'wb-form-actions wb-room-form-actions');
-      const submit=button(creating?'创建直播间':options.roomCanvas?'保存默认设置':'保存直播间默认设置',()=>buffer.save(),true);
-      submit.type='submit';
-      if(creating)actions.append(button('返回直播间列表',returnToRoomList));
-      actions.append(submit);
-      form.append(actions);
-      node.append(form);
-      return form;
-    }
-    async function renderRoomPreparations(node,room){
-      const head=section('本场记录');
-      head.classList.add('wb-room-history');
-      head.append(E('p','创建一场新的直播准备，或继续已有本场。','wb-muted'));
-      const title=control('text','','新本场名称');
-      title.placeholder='例如：周末居家好物';
-      const toolbar=E('div',undefined,'wb-room-history-toolbar');
-      toolbar.append(field('本场名称（选填）',title),button('创建本场准备',()=>createPreparation(room.ref.id,{goal:title.value.trim()||'准备本场直播'}),true));
-      head.append(toolbar);
-      const history=await api.query('read_session_history',{room_id:room.ref.id,limit:200});
-      const rows=E('div',undefined,'wb-list');
-      for(const preparation of history.preparations||history.items||[]){
-        const row=E('article',undefined,'wb-list-item wb-preparation-card');
-        row.dataset.preparationId=preparation.ref.id;
-        row.classList.toggle('is-selected',current.preparation_id===preparation.ref.id);
-        const info=E('div');
-        const knownDraft=prep()?.ref.id===preparation.ref.id?details().draft:null;
-        info.append(E('strong',preparationTitle(preparation,knownDraft)),
-          E('p',preparationStateLabel(preparation,room)+' · '+(preparation.body.selected_product_refs?.length||0)+' 件商品 · '+(preparation.body.script_refs?.length||0)+' 版话术','wb-muted'),
-          E('small',preparation.body.updated_at||preparation.body.created_at||refName(preparation.ref),'wb-record-meta'));
-        if(preparation.body.goal)info.append(jsonDetails('查看本场原始任务',preparation.body.goal));
-        const actions=E('div',undefined,'wb-form-actions');
-        actions.append(button('进入本场',()=>navigate({
-          view:'overview',room_id:room.ref.id,preparation_id:preparation.ref.id,product_id:null,room_section:null,action:null
-        }),true),button('复制可复用配置',()=>showCopyPreparation(row,room,preparation)));
-        row.append(info,actions);
-        rows.append(row);
-      }
-      if(!rows.childElementCount)rows.append(empty('还没有本场','创建本场后，从共享商品库选品，再设置主题和声音。'));
-      head.append(rows);
-      node.append(head);
+      const form=E('form',undefined,'wb-room-settings wb-card');form.addEventListener('submit',e=>e.preventDefault());form.append(E('h3','直播间默认设置','wb-section-heading'),E('p','默认声音与版本数供新本场使用；不会改写已准备的本场，也不启动直播。','wb-muted'));
+      const name=control('text',room.body.name,'直播间默认名称');name.maxLength=80;
+      const versions=control('number',room.body.version_count||2,'默认话术版本数');versions.min=1;versions.max=6;versions.step=1;
+      const loop={value:'infinite'};
+      const voices=voiceEditor({provider:room.body.tts_provider||'system',voice:room.body.tts_voice||'Huihui',model:room.body.tts_model||'speech-2.8-turbo'},'默认');
+      form.append(field('直播间名称',name),field('每件商品默认新增版本数',versions),E('p','播完播放清单后，按原顺序从头循环，直到手动停止。','wb-muted'),voices.node);
+      const read=()=>({name:name.value.trim(),version_count:Number(versions.value),loop_mode:loop.value,tts_selection:voices.read()});
+      const write=v=>{name.value=v.name;versions.value=v.version_count;loop.value='infinite';voices.write(v.tts_selection);};let buffer;
+      const save=async()=>{const value=read();if(!value.name||!Number.isInteger(value.version_count)||value.version_count<1||value.version_count>6)throw Error('请填写直播间名称，版本数为1至6');const result=await humanMutation('/api/prelive/v2/human/room-settings',{room_id:room.ref.id,expected_revision:buffer.base_ref.revision,...value});clearBuffer(buffer);changedBusiness({data:result});await refresh({force:true});notice('直播间默认设置已保存，已有本场保持原配置。');};
+      buffer=registerBuffer('room-defaults:'+room.ref.id,'直播间默认设置',room.ref,read,write,save,form);form.append(button('保存直播间默认设置',save,true));node.append(form);
     }
     async function showCopyPreparation(host,room,source){
       host.querySelector('.wb-copy-preparation')?.remove();const sourceSnapshot=await api.query('get_workspace_snapshot',{preparation_id:source.ref.id});const old=sourceSnapshot.preparation_details?.draft?.body?.draft;
       const box=section('复制前核对');box.classList.add('wb-copy-preparation');const goal=control('text',(source.body.goal||'本场准备')+' · 新一场','复制后的本场名称');const include=E('input');include.type='checkbox';include.setAttribute('aria-label','明确复用尚未到期的活动');const expiry=Date.parse(old?.campaign_ends_at||'');const active=Number.isFinite(expiry)&&expiry>Date.now();include.disabled=!active;const line=E('label');line.append(include,E('span',active?'明确复用仍有效的活动（截至 '+old.campaign_ends_at+'）':'活动已过期或缺少截止时间，不继承优惠、赠品和活动说明。'));
       box.append(E('p','复制商品引用、使用场景、长期知识文档和声音设置。未明确复用有效活动时，优惠、赠品和含活动日期的文档不复制。新本场不复制话术、语音、文本批准或播出候选；主题和排期需要重新确认。','wb-muted'),field('新本场名称',goal),line,button('确认复制并创建新本场',async()=>{const result=await createPreparation(room.ref.id,{goal:goal.value.trim()||'准备本场直播',copyFrom:source.ref.id,expectedSourceRef:sourceSnapshot.preparation.ref,includeCampaign:include.checked});notice('已创建新本场并复制可复用配置。请检查商品修订、主题、活动和知识文档中的日期后继续。','warning');return result;},true),button('取消复制',()=>box.remove()));host.append(box);
     }
-    async function resolveDefaultRoomPreparation({room_id,preparation_id}){
-      if(preparation_id)return preparation_id;
-      if(!room_id)return null;
-      const [room,history]=await Promise.all([
-        api.query('read_room',{room_id}),
-        api.query('read_session_history',{room_id,limit:1})
-      ]);
-      const available=(history.preparations||history.items||[]).filter(item=>
-        item.body.room_id===room_id&&!item.body.archived&&item.body.status!=='archived'
-      );
-      const adopted=room?.body?.adopted_publication_ref
-        ?available.find(item=>item.ref.id===room.body.adopted_preparation_id)
-        :null;
-      return adopted?.ref.id||available.at(-1)?.ref.id||null;
-    }
-    async function saveRoomProductSelection({roomId,preparationId,expectedPreparationRef,productRefs}){
-      if(!roomId||!Array.isArray(productRefs)||productRefs.some(ref=>ref?.kind!=='product'||!ref.id)||
-        new Set(productRefs.map(ref=>ref.id)).size!==productRefs.length)throw Error('请核对直播间和所选商品。');
-      if(!preparationId&&!productRefs.length)throw Error('请至少选择一个商品，再创建本场。');
-      if(busy)throw Error('左侧有正在处理的操作，请稍候。');
-      busy=true;
-      let head, preparationRef;
-      try{
-        const room=await api.query('read_room',{room_id:roomId});
-        let creation=pendingRoomCreations.get(roomId);
-        if(preparationId){
-          head=await api.query('read_preparation',{preparation_id:preparationId});
-          if(head.body.room_id!==roomId)throw Error('此本场不属于当前直播间。');
-          const expected=expectedPreparationRef||prep()?.ref;
-          if(!expected||!equal(head.ref,expected))throw Object.assign(Error('本场已更新，请重新读取选品后核对。'),{code:'PREPARATION_STALE'});
-        }else{
-          if(!creation){
-            creation={args:{room_id:roomId,room_revision:room.ref.revision,goal:'准备本场直播',source_refs:[]}};
-            pendingRoomCreations.set(roomId,creation);
-          }
-          if(!creation.ref){
-            try{creation.ref=(await command('create_preparation',creation.args)).data.preparation_ref;}
-            catch(error){
-              if(!error.unknown&&error.code!=='OUTCOME_UNKNOWN')pendingRoomCreations.delete(roomId);
-              throw error;
-            }
-            head={ref:creation.ref,body:{goal:creation.args.goal,selected_product_refs:[]}};
-          }else{
-            preparationRef=creation.ref;
-            head=await api.query('read_preparation',{preparation_id:creation.ref.id});
-            if(head.body.room_id!==roomId||!equal(head.ref,creation.ref))throw Error('新本场已更新，请进入该场核对后保存。');
-          }
-        }
-        preparationRef=head.ref;
-        if(matchingLocks(editorLocks,{kind:'product_selection',id:head.ref.id}).length){
-          throw Error('Agent 正在处理本场选品，请等待任务完成后再保存。');
-        }
-        const pinned=new Map((head.body.selected_product_refs||[]).map(ref=>[ref.id,ref]));
-        const selected=productRefs.map(ref=>pinned.get(ref.id)||ref);
-        if(!equal(head.body.selected_product_refs,selected)){
-          try{
-            const result=await command('update_preparation_products',{
-              preparation_id:head.ref.id,expected_revision:head.ref.revision,selected_product_refs:selected
-            });
-            preparationRef=result.data.preparation_ref;
-          }catch(error){
-            if(error.code==='REVISION_CONFLICT')throw Object.assign(
-              Error('本场已更新，请重新读取选品后核对。',{cause:error}),{code:'PREPARATION_STALE'}
-            );
-            throw error;
-          }
-        }
-        if(creation?.ref?.id===preparationRef.id)pendingRoomCreations.delete(roomId);
-        cache.clear();
-        const outcome={preparationId:preparationRef.id,preparationRef,defaultDraftSaved:false};
-        if(selected.length&&!head.body.draft_ref){
-          try{
-            const result=await command('save_session_draft',{
-              preparation_id:preparationRef.id,expected_revision:preparationRef.revision,
-              draft:roomDefaultDraft(room,head.body.goal,selected)
-            });
-            outcome.preparationRef=result.data.preparation_ref;
-            outcome.defaultDraftSaved=true;
-          }catch(error){
-            outcome.warning='本场选品已保存。'+(error.unknown||error.code==='OUTCOME_UNKNOWN'
-              ?'默认配置结果待核实，请刷新当前本场后查看。'
-              :'默认配置未保存，请在本场特殊设置核对后保存。')+' '+error.message;
-          }
-        }
-        return outcome;
-      }catch(error){
-        if(preparationRef){
-          cache.clear();
-          error.preparationId=preparationRef.id;
-          error.preparationRef=preparationRef;
-        }
-        throw error;
-      }finally{busy=false;}
-    }
-    async function refreshRoomProductReference({preparationRef,previous}){
-      if(busy||hasDirty())throw Error('请先处理左侧尚未完成的编辑。');
-      if(!equal(prep()?.ref,preparationRef))throw Object.assign(Error('本场已更新。'),{code:'REVISION_CONFLICT'});
-      if(matchingLocks(editorLocks,{kind:'product_selection',id:preparationRef.id}).length){
-        throw Error('Agent 正在处理本场选品，请等待任务完成。');
-      }
-      busy=true;
-      try{
-        const latest=await api.query('read_product',{product_id:previous.id});
-        if(latest.ref.id!==previous.id||latest.body.archived||latest.body.sale_status==='unavailable'){
-          throw Error('该商品的最新资料目前无法用于本场。');
-        }
-        if(latest.ref.revision<=previous.revision)return null;
-        const receipt=await command('refresh_product_reference',{preparation_id:preparationRef.id,
-          expected_revision:preparationRef.revision,expected_old_product_ref:previous,new_product_ref:latest.ref});
-        cache.clear();
-        return receipt;
-      }finally{busy=false;}
-    }
     async function createPreparation(roomId,opts={}){
       const room=await api.query('read_room',{room_id:roomId});let sourceSnapshot=null;
       if(opts.copyFrom){sourceSnapshot=await api.query('get_workspace_snapshot',{preparation_id:opts.copyFrom});if(opts.expectedSourceRef&&!equal(opts.expectedSourceRef,sourceSnapshot.preparation.ref))throw Error('源本场配置已经变化，请重新查看复制前核对信息后再创建。');}
       let result=await command('create_preparation',{room_id:roomId,room_revision:room.ref.revision,goal:opts.goal||'准备本场直播',source_refs:[]});
       const id=result.data.preparation_ref.id;
-      if(!sourceSnapshot){
-        let warning='';
-        try{
-          result=await command('save_session_draft',{preparation_id:id,expected_revision:result.data.preparation_ref.revision,
-            draft:roomDefaultDraft(room,opts.goal)});
-        }catch(error){
-          warning=error.unknown||error.code==='OUTCOME_UNKNOWN'
-            ?'新本场已创建。默认配置结果待核实，请刷新当前本场后查看。'
-            :'新本场已创建。默认配置尚未保存，可在本场特殊设置核对后保存。';
-        }
-        const target={...roomWorkspace(roomId),preparation_id:id};
-        if(opts.onPrepared){
-          const ref=result.data.preparation_ref;
-          if(ref?.id!==id)throw Error('保存本场时返回了其他场次，资料尚未提交。');
-          opts.onPrepared(ref);
-        }
-        cache.clear();
-        changedBusiness(result);
-        await navigate(target);
-        if(warning)notice(warning,'warning');
-        return result;
-      }
       try{if(sourceSnapshot){const source=sourceSnapshot.preparation;const selected=source.body.selected_product_refs||[];if(selected.length)result=await command('update_preparation_products',{preparation_id:id,expected_revision:result.data.preparation_ref.revision,selected_product_refs:selected});const draft=sourceSnapshot.preparation_details?.draft?.body?.draft;if(draft)result=await command('save_session_draft',{preparation_id:id,expected_revision:result.data.preparation_ref.revision,draft:reusableDraft(draft,{goal:opts.goal,includeCampaign:opts.includeCampaign})});}}
       catch(error){current={view:'session',room_id:roomId,preparation_id:id};cache.clear();changedBusiness(result);await navigate({...current});throw Object.assign(Error('新本场已创建，部分配置未复制：'+error.message+'。请在当前本场补齐，不必重复创建。'),{code:error.code,details:error.details});}
       current={view:'session',room_id:roomId,preparation_id:id};cache.clear();changedBusiness(result);await navigate({...current});return result;
     }
     function voiceEditor(initial={},prefix=''){
       const node=section(prefix?'默认播报声音':'本场播报声音'), voices=voiceOptions||{};const availability=E('p',undefined,'wb-muted');availability.setAttribute('aria-live','polite');const voiceDescription=E('p',undefined,'wb-muted');let previewButton=null;
-      const provider=select(initial.provider||'system',(voices.providers||['system','minimax']).map(v=>[v,v==='system'?(options.roomCanvas&&prefix?'本机普通话':'本机免费普通话'):'MiniMax']),prefix+'语音供应商');const voice=select(initial.voice,[],prefix+'音色');const model=select(initial.model,[],prefix+'语音模型');
+      const provider=select(initial.provider||'system',(voices.providers||['system','minimax']).map(v=>[v,v==='system'?'本机免费普通话':'MiniMax']),prefix+'语音供应商');const voice=select(initial.voice,[],prefix+'音色');const model=select(initial.model,[],prefix+'语音模型');
       const describeVoice=()=>{voiceDescription.textContent=voices.voice_details?.[provider.value]?.[voice.value]?.description||'';voiceDescription.hidden=!voiceDescription.textContent;};
-      const paint=value=>{
-        const entries=voices.voices?.[provider.value]||[];
-        voice.replaceChildren(...entries.map(v=>{const id=typeof v==='string'?v:v.id,detail=voices.voice_details?.[provider.value]?.[id]||v,option=new Option(detail.name||id,id);option.title=detail.description||'';return option;}));
-        voice.value=value?.voice||voice.options[0]?.value||'';
-        describeVoice();
-        const models=voices.models?.[provider.value]||['speech-2.8-turbo'];
-        model.replaceChildren(...models.map(v=>new Option(v,v)));
-        model.value=value?.model||models[0];
-        const minimax=provider.value==='minimax';
-        model.closest('.wb-field')?.toggleAttribute('hidden',!minimax);
-        const state=voices.provider_status?.[provider.value];
-        availability.textContent=state?.available===false?(state.reason||'当前语音供应商不可用，请检查服务配置。'):(provider.value==='system'?(prefix?'本机普通话可用。':'本机免费普通话，可用于首版功能验证。'):state?.available===true?'MiniMax 已配置，试听和生成会产生接口用量。':'MiniMax 音色支持情况会在试听时检查；不会自动切换到其他供应商。');
-        availability.dataset.tone=state?.available===false?'warning':'info';
-        if(prefix){
-          previewNote.textContent=minimax?'试听固定示例。MiniMax 试听计入接口用量。':'试听固定示例。';
-          previewNote.dataset.tone=minimax?'warning':'info';
-        }
-        if(previewButton)previewButton.disabled=state?.available===false;
-      };
+      const paint=value=>{const entries=voices.voices?.[provider.value]||[];voice.replaceChildren(...entries.map(v=>{const id=typeof v==='string'?v:v.id,detail=voices.voice_details?.[provider.value]?.[id]||v,option=new Option(detail.name||id,id);option.title=detail.description||'';return option;}));voice.value=value?.voice||voice.options[0]?.value||'';describeVoice();const models=voices.models?.[provider.value]||['speech-2.8-turbo'];model.replaceChildren(...models.map(v=>new Option(v,v)));model.value=value?.model||models[0];model.closest('.wb-field')?.toggleAttribute('hidden',provider.value!=='minimax');const state=voices.provider_status?.[provider.value];availability.textContent=state?.available===false?(state.reason||'当前语音供应商不可用，请检查服务配置。'):(provider.value==='system'?'本机免费普通话，可用于首版功能验证。':state?.available===true?'MiniMax 已配置，试听和生成会产生接口用量。':'MiniMax 音色支持情况会在试听时检查；不会自动切换到其他供应商。');availability.dataset.tone=state?.available===false?'warning':'info';if(previewButton)previewButton.disabled=state?.available===false;};
       provider.addEventListener('change',()=>paint());voice.addEventListener('change',describeVoice);node.append(field('语音供应商',provider),field('音色',voice),voiceDescription,field('语音模型',model),availability);
-      const audio=routedAudio(E('audio'));audio.controls=true;audio.preload='none';audio.hidden=true;const previewNote=E('p',prefix?'试听固定示例。MiniMax 试听计入接口用量。':'固定示例用于比较音色；MiniMax 会产生语音接口用量。同一声音设置会复用试听；结果不明时先核实。本场稿件试听仍需先批准整包文本。','wb-muted');previewButton=button('试听'+(prefix?'默认':'当前')+'音色',async()=>{const result=await voicePreview(read());const url=safeUrl(result.url||result.asset?.url);if(!url)throw Error('试听未返回可播放的本机音频');audio.src=url;audio.hidden=false;try{await options.onAudioElement?.(audio);await audio.play();}catch{notice('试听已生成，点击音频播放器开始播放。');}});node.append(previewButton,audio,previewNote);paint(initial);
+      const audio=routedAudio(E('audio'));audio.controls=true;audio.preload='none';audio.hidden=true;const previewNote=E('p','固定示例用于比较音色；MiniMax 会产生语音接口用量。同一声音设置会复用试听；结果不明时先核实。本场稿件试听仍需先批准整包文本。','wb-muted');previewButton=button('试听'+(prefix?'默认':'当前')+'音色',async()=>{const result=await voicePreview(read());const url=safeUrl(result.url||result.asset?.url);if(!url)throw Error('试听未返回可播放的本机音频');audio.src=url;audio.hidden=false;try{await options.onAudioElement?.(audio);await audio.play();}catch{notice('试听已生成，点击音频播放器开始播放。');}});node.append(previewButton,audio,previewNote);paint(initial);
       const read=()=>({provider:provider.value,voice:voice.value,model:model.value});return{node,read,write:value=>{provider.value=value?.provider||'system';paint(value);}};
     }
     function commerceEditor(initial={},products=[]){
       const base=copy(initial), node=E('div',undefined,'wb-commerce-editor'), controls={}, groups={};
-      let overrides=copy(base.product_overrides||{});
       const scene=control('textarea',base.scene||'','本场受众与场景');groups.scene=section('受众、场景与口播要求');groups.scene.append(field('本场受众与场景',scene));
       const promotion=control('textarea',base.promotion||'','本场活动说明');const promotionScope=select(base.promotion_scope||'all',[['all','全部本场商品'],['selected','指定商品']],'活动适用范围');
-      scene.rows=promotion.rows=2;
       function picks(label,chosen){const box=E('div',undefined,'wb-checklist'), checks=[];for(const product of products){const c=E('input');c.type='checkbox';c.value=product.ref.id;c.checked=(chosen||[]).includes(c.value);c.setAttribute('aria-label',label+' '+product.body.name);const row=E('label');row.append(c,E('span',product.body.name));box.append(row);checks.push(c);}if(!checks.length)box.append(E('p','请先在商品库选择本场引用商品。','wb-muted'));return{node:box,read:()=>checks.filter(c=>c.checked).map(c=>c.value),write:v=>checks.forEach(c=>c.checked=(v||[]).includes(c.value))};}
       const promotionProducts=picks('参与本场活动',base.promotion_product_ids);groups.promotion=section('本场活动说明');groups.promotion.append(field('活动适用范围',promotionScope),promotionProducts.node,field('本场活动说明',promotion));
       const coupon=base.coupon||{mode:'none',currency:'CNY',scope:'all',product_ids:[]};groups.coupon=section('优惠（由你决定）');const mode=select(coupon.mode,[['none','不设置优惠'],['coupon','满减 / 抵扣券'],['discount','全场折扣']],'优惠方式');const amount=control('number',coupon.amount,'抵扣金额');const minimum=control('number',coupon.minimum_spend,'满额门槛');const discount=control('number',coupon.discount==null?'':Number(coupon.discount)*10,'折扣（八折填8）');const currency=select(coupon.currency||'CNY',['CNY','TWD','USD','AUD'].map(v=>[v,v]),'优惠币种');const condition=control('text',coupon.condition||'','优惠条件说明');const couponScope=select(coupon.scope||'all',[['all','全部本场商品'],['selected','指定商品']],'优惠适用范围');const couponProducts=picks('参与全场优惠',coupon.product_ids);
@@ -1620,221 +305,27 @@
       groups.coupon.append(field('优惠方式',mode),...Object.values(couponFields),couponProducts.node,E('p','按单件金额计算。会员资格、领券条件等未确认时，不把条件优惠说成人人可得。','wb-muted'));
       const documents=productControl('knowledge_documents',{type:'array',items:{$ref:'#/$defs/Document'}},base.knowledge_documents||[],{Document:{type:'object',properties:{id:{type:'string'},title:{type:'string',maxLength:120},content:{type:'string',maxLength:15000}}}},'本场知识文档');groups.knowledge_documents=section('本场知识库');groups.knowledge_documents.append(documents.box);const documentFile=E('input');documentFile.type='file';documentFile.accept='.txt,.md,.csv,.json';documentFile.setAttribute('aria-label','导入本场知识文档');groups.knowledge_documents.append(documentFile,button('导入为本场知识文档',async()=>{const file=documentFile.files?.[0];if(!file)throw Error('请选择文本文件');if(file.size>60000)throw Error('知识文档请控制在15000字以内');const value=await file.text();if(value.length>15000)throw Error('文档不能超过15000字');const docs=documents.read();if(docs.length>=20)throw Error('本场最多20份知识文档');docs.push({id:'doc_'+uid().replace(/-/g,''),title:file.name.slice(0,120),content:value});documents.write(docs);documentFile.value='';node.dispatchEvent(new Event('input',{bubbles:true}));}));
       for(const box of Object.values(groups))node.append(box);
+      const overrides=section('本场单品优惠、赠品与发货');const overrideRows=[];
+      for(const product of products){const id=product.ref.id, name=product.body.name,value=base.product_overrides?.[id]||{mode:'none',exclusive:true};const row=section(name+' · 日常 '+product.body.price+' '+product.body.currency);row.classList.add('wb-override-card');const m=select(value.mode,[['none','沿用日常价'],['price','本场活动价'],['discount','本场折扣']],'单品优惠方式 '+name),price=control('number',value.price,'本场活动价 '+name),d=control('number',value.discount?value.discount*10:'','单品折扣 '+name),promo=control('textarea',value.promotion||'','单品活动说明 '+name),gifts=control('textarea',value.gifts||'','本场赠品 '+name),shipping=control('text',value.shipping_time||'','本场发货时效 '+name);const exclusive=E('input');exclusive.type='checkbox';exclusive.checked=value.exclusive!==false;exclusive.setAttribute('aria-label','单品优惠不叠加全场优惠 '+name);const shippingOverride=E('input');shippingOverride.type='checkbox';shippingOverride.checked=!!value.shipping_override;shippingOverride.setAttribute('aria-label','本场覆盖发货时效 '+name);const exclusiveLabel=E('label');exclusiveLabel.append(exclusive,E('span','优先单品优惠，不叠加全场优惠'));const shippingLabel=E('label');shippingLabel.append(shippingOverride,E('span','覆盖本场发货时效'));const priceField=field('本场活动价',price),discountField=field('单品折扣（八折填8）',d),shippingField=field('本场特殊发货时效',shipping);const paint=()=>{priceField.hidden=m.value!=='price';discountField.hidden=m.value!=='discount';shippingField.hidden=!shippingOverride.checked;};m.addEventListener('change',paint);shippingOverride.addEventListener('change',paint);row.append(field('单品优惠方式',m),priceField,discountField,exclusiveLabel,field('单品活动说明',promo),field('本场赠品 / 加赠条件',gifts),shippingLabel,shippingField,button('恢复商品默认',()=>{m.value='none';price.value=d.value=promo.value=gifts.value=shipping.value='';exclusive.checked=true;shippingOverride.checked=false;paint();node.dispatchEvent(new Event('input',{bubbles:true}));}));paint();overrides.append(row);overrideRows.push({id,value,m,price,d,promo,gifts,exclusive,shippingOverride,shipping,paint});}
+      node.append(overrides);
       const visibility=E('details',undefined,'wb-optional-settings');visibility.append(E('summary','显示 / 移除可选配置'));const hidden=new Set(base.hidden_sections||[]);for(const[key,box]of Object.entries(groups)){const check=E('input');check.type='checkbox';check.checked=!hidden.has(key);check.setAttribute('aria-label','显示'+({scene:'受众场景',coupon:'全场优惠',promotion:'活动说明',knowledge_documents:'本场知识库'})[key]);controls[key]=check;const label=E('label');label.append(check,E('span',({scene:'受众与场景',coupon:'全场优惠',promotion:'本场活动说明',knowledge_documents:'本场知识库'})[key]));check.addEventListener('change',()=>box.hidden=!check.checked);box.hidden=!check.checked;visibility.append(label);}visibility.append(E('p','移除后该部分不在本场生效，可随时重新添加。','wb-muted'));node.append(visibility);
       const paintModes=()=>{couponFields.amount.hidden=mode.value!=='coupon';couponFields.discount.hidden=mode.value!=='discount';for(const k of ['minimum','currency','condition','scope'])couponFields[k].hidden=mode.value==='none';couponProducts.node.hidden=mode.value==='none'||couponScope.value!=='selected';promotionProducts.node.hidden=promotionScope.value!=='selected';};for(const c of [mode,couponScope,promotionScope])c.addEventListener('change',paintModes);paintModes();
-      const read=()=>{const value=copy(base);value.scene=scene.value;value.promotion=promotion.value;value.promotion_scope=promotionScope.value;value.promotion_product_ids=promotionProducts.read();value.coupon={...coupon,mode:mode.value,amount:mode.value==='coupon'?Number(amount.value):null,minimum_spend:minimum.value===''?null:Number(minimum.value),discount:mode.value==='discount'?Number(discount.value)/10:null,currency:currency.value,condition:condition.value,scope:couponScope.value,product_ids:couponProducts.read()};value.knowledge_documents=documents.read();value.hidden_sections=Object.entries(controls).filter(([,c])=>!c.checked).map(([k])=>k);value.product_overrides=copy(overrides);return value;};
-      const write=value=>{scene.value=value.scene||'';promotion.value=value.promotion||'';promotionScope.value=value.promotion_scope||'all';promotionProducts.write(value.promotion_product_ids);const q=value.coupon||{};mode.value=q.mode||'none';amount.value=q.amount??'';minimum.value=q.minimum_spend??'';discount.value=q.discount?Number(q.discount)*10:'';currency.value=q.currency||'CNY';condition.value=q.condition||'';couponScope.value=q.scope||'all';couponProducts.write(q.product_ids);documents.write(value.knowledge_documents||[]);for(const[k,c]of Object.entries(controls)){c.checked=!(value.hidden_sections||[]).includes(k);groups[k].hidden=!c.checked;}overrides=copy(value.product_overrides||{});paintModes();};
-      function writeOverride(id,value){if(value===undefined)delete overrides[id];else overrides[id]=copy(value);}
-      return{node,read,write,writeOverride};
+      const read=()=>{const value=copy(base);value.scene=scene.value;value.promotion=promotion.value;value.promotion_scope=promotionScope.value;value.promotion_product_ids=promotionProducts.read();value.coupon={...coupon,mode:mode.value,amount:mode.value==='coupon'?Number(amount.value):null,minimum_spend:minimum.value===''?null:Number(minimum.value),discount:mode.value==='discount'?Number(discount.value)/10:null,currency:currency.value,condition:condition.value,scope:couponScope.value,product_ids:couponProducts.read()};value.knowledge_documents=documents.read();value.hidden_sections=Object.entries(controls).filter(([,c])=>!c.checked).map(([k])=>k);value.product_overrides={};for(const r of overrideRows)value.product_overrides[r.id]={...r.value,mode:r.m.value,price:r.m.value==='price'?Number(r.price.value):null,discount:r.m.value==='discount'?Number(r.d.value)/10:null,promotion:r.promo.value,gifts:r.gifts.value,exclusive:r.exclusive.checked,shipping_override:r.shippingOverride.checked,shipping_time:r.shipping.value};return value;};
+      const write=value=>{scene.value=value.scene||'';promotion.value=value.promotion||'';promotionScope.value=value.promotion_scope||'all';promotionProducts.write(value.promotion_product_ids);const q=value.coupon||{};mode.value=q.mode||'none';amount.value=q.amount??'';minimum.value=q.minimum_spend??'';discount.value=q.discount?Number(q.discount)*10:'';currency.value=q.currency||'CNY';condition.value=q.condition||'';couponScope.value=q.scope||'all';couponProducts.write(q.product_ids);documents.write(value.knowledge_documents||[]);for(const[k,c]of Object.entries(controls)){c.checked=!(value.hidden_sections||[]).includes(k);groups[k].hidden=!c.checked;}for(const r of overrideRows){const v=value.product_overrides?.[r.id]||{};r.m.value=v.mode||'none';r.price.value=v.price??'';r.d.value=v.discount?Number(v.discount)*10:'';r.promo.value=v.promotion||'';r.gifts.value=v.gifts||'';r.exclusive.checked=v.exclusive!==false;r.shippingOverride.checked=!!v.shipping_override;r.shipping.value=v.shipping_time||'';r.paint();}paintModes();};
+      return{node,read,write};
     }
-    function sessionProductEditor(product,initial,fieldPath,onSelect){
-      const name=product.body.name,editor=E('div',undefined,'wb-session-product-fields');
-      const mode=select(initial.mode||'none',[['none','沿用日常价'],['price','本场活动价'],['discount','本场折扣']],'单品优惠方式 '+name);
-      const price=control('number',initial.price,'本场活动价 '+name);
-      const discount=control('number',initial.discount==null?'':initial.discount*10,'单品折扣 '+name);
-      const promotion=control('textarea',initial.promotion||'','单品活动说明 '+name);
-      const gifts=control('textarea',initial.gifts||'','本场赠品 '+name);
-      const shipping=control('text',initial.shipping_time||'','本场发货时效 '+name);
-      const exclusive=E('input'), shippingOverride=E('input');
-      exclusive.type=shippingOverride.type='checkbox';
-      exclusive.setAttribute('aria-label','单品优惠不叠加全场优惠 '+name);
-      shippingOverride.setAttribute('aria-label','本场覆盖发货时效 '+name);
-      price.min='0.01';price.step=discount.step='0.01';discount.min='0.01';discount.max='9.99';
-      promotion.rows=gifts.rows=2;
-      const productField=(key,label,input)=>{
-        const box=field(label,input),path=fieldPath+'/'+key;
-        box.dataset.agentField=path;
-        selectable(box.querySelector('label'),()=>onSelect(label,path),{target:{object_ref:prep().ref,field_path:path}});
-        return box;
-      };
-      const priceField=productField('price','本场活动价',price);
-      const discountField=productField('discount','单品折扣（八折填8）',discount);
-      const shippingField=productField('shipping_time','本场特殊发货时效',shipping);
-      function paint(){
-        priceField.hidden=mode.value!=='price';discountField.hidden=mode.value!=='discount';
-        shippingField.hidden=!shippingOverride.checked;
-      }
-      function write(value){
-        mode.value=value.mode||'none';price.value=value.price??'';discount.value=value.discount==null?'':value.discount*10;
-        promotion.value=value.promotion||'';gifts.value=value.gifts||'';shipping.value=value.shipping_time||'';
-        exclusive.checked=value.exclusive!==false;shippingOverride.checked=!!value.shipping_override;paint();
-      }
-      function read(){return {...copy(initial),mode:mode.value,price:mode.value==='price'?Number(price.value):null,
-        discount:mode.value==='discount'?Number(discount.value)/10:null,promotion:promotion.value,gifts:gifts.value,
-        exclusive:exclusive.checked,shipping_override:shippingOverride.checked,shipping_time:shipping.value};}
-      function validate(){
-        if(mode.value==='price'&&(!price.value||!price.checkValidity()))throw Error('请填写有效的本场活动价。');
-        if(mode.value==='discount'&&(!discount.value||!discount.checkValidity()))throw Error('请填写有效的单品折扣，八折填8。');
-      }
-      const exclusiveField=productField('exclusive','优先单品优惠，不叠加全场优惠',exclusive);
-      const shippingToggle=productField('shipping_override','覆盖本场发货时效',shippingOverride);
-      exclusiveField.classList.add('wb-session-product-toggle');shippingToggle.classList.add('wb-session-product-toggle');
-      mode.addEventListener('change',paint);shippingOverride.addEventListener('change',paint);
-      editor.append(productField('mode','单品优惠方式',mode),priceField,discountField,exclusiveField,
-        productField('promotion','单品活动说明',promotion),productField('gifts','本场赠品与加赠条件',gifts),shippingToggle,shippingField);
-      write(initial);
-      return {editor,read,write,validate,focus:mode};
-    }
-    async function openSessionProductConfig(productId,opener,location={}){
-      if(location.preserveFocus)return;
-      const form=content.querySelector('.wb-session-form');
-      if(!form?._openProductOverride)throw Error('请先保存本场选品，再配置单品。');
-      return form._openProductOverride(productId,opener,location);
-    }
-    function openSessionProductDialog(node,product,{opener,location,initial,preparation,buffer,commerce,commit}){
-      if(!product)throw Error('该商品不在本场已保存的选品中。');
-      if(buffer.dirty)throw Error('请先保存或放弃尚未保存的本场设置，再配置单品。');
-      if(node.querySelector('dialog[data-session-product-id][open]'))return;
-      const id=product.ref.id,pid=preparation.ref.id,fieldPath='/draft/commerce/product_overrides/'+id;
-      const original=initial.commerce.product_overrides[id];
-      const dialog=region(E('dialog',undefined,'wb-session-product-dialog'),{kind:'session',id:pid,product_id:id});
-      dialog.dataset.sessionProductId=id;
-      const title=E('h3','单品配置 · '+product.body.name);
-      title.id='wb-session-product-'+uid();dialog.setAttribute('aria-labelledby',title.id);
-      const head=E('header',undefined,'wb-session-product-head');
-      const body=E('div',undefined,'wb-session-product-body');
-      const actions=E('div',undefined,'wb-session-product-actions');
-      const feedback=E('div',undefined,'wb-inline-alert');feedback.setAttribute('role','status');feedback.hidden=true;
-      let working=original;
-      function close(restoreFocus=true){
-        dialog.close();dialog.remove();
-        if(restoreFocus&&opener?.isConnected)opener.focus({preventScroll:true});
-      }
-      function message(text){feedback.replaceChildren(E('p',text));feedback.hidden=false;}
-      function update(value){
-        if(equal(working,value))return;
-        working=value;commerce.writeOverride(id,value);
-        if(equal(value,original)){
-          buffer.dirty=false;buffer.host.classList.remove('wb-dirty');persist(buffer);options.onDirty?.(getDirtySummary());
-        }else changed(buffer);
-        if(!saveButton.dataset.agentInputLocked)saveButton.disabled=!buffer.dirty;
-      }
-      function dismiss(){
-        if(!buffer.dirty){close();return;}
-        message('这件商品还有未保存的本场配置。');
-        const keep=button('继续编辑',()=>{feedback.hidden=true;editor.focus.focus();},false,{readOnlyAction:'true'});
-        const discard=button('放弃修改并关闭',()=>{update(original);close();},false,{readOnlyAction:'true'});
-        feedback.append(keep,discard);keep.focus();
-      }
-      const editor=sessionProductEditor(product,original||{},fieldPath,(label,path)=>{
-        if(buffer.dirty){message('请先保存或放弃单品修改，再交给右侧 Agent。');return;}
-        close(false);
-        options.onSelect?.({label:'仅本场 / '+product.body.name+' / '+label,scope:scope(),preparation_id:pid,
-          target:{object_ref:copy(preparation.ref),field_path:path},destination:{view:'session',preparation_id:pid,field_path:path},dirty:false},{focusChat:true});
-      });
-      const originalValues=editor.read();
-      const onInput=()=>{
-        const value=editor.read();
-        update(equal(value,originalValues)?original:value);
-      };
-      editor.editor.addEventListener('input',onInput);editor.editor.addEventListener('change',onInput);
-      const reset=button('恢复商品默认',()=>{editor.write({});update(undefined);});
-      const saveButton=button('保存单品配置',async()=>{
-        try{
-          editor.validate();
-          const draft=copy(initial);
-          if(working===undefined)delete draft.commerce.product_overrides[id];
-          else draft.commerce.product_overrides[id]=copy(working);
-          await commit(draft,()=>close(false));
-        }catch(error){
-          message(error.message||'保存失败，输入已保留。');
-          if(error.unknown)feedback.append(button('核实原操作结果',async()=>{
-            const receipt=await verifyUnknownOperation();
-            message(receipt?.state==='committed'?'已核实保存成功。再点保存会读取原回执。':'暂未核实结果，请保留当前输入。');
-          },false,{readOnlyAction:'true'}));
-        }
-      },true);
-      saveButton.disabled=true;
-      head.append(title,button('关闭',dismiss,false,{readOnlyAction:'true'}));
-      const price=product.body.price;
-      body.append(E('p',price==null?'日常售价未填写。':'商品库日常价 '+price+' '+product.body.currency+'。此处设置仅用于本场。','wb-muted'),feedback,editor.editor);
-      actions.append(reset,saveButton);dialog.append(head,body,actions);
-      dialog.addEventListener('cancel',event=>{event.preventDefault();if(!busy)guard(dismiss);});
-      node.append(dialog);dialog.showModal();applyEditorLocks();
-      const target=location?.fieldPath&&[...editor.editor.querySelectorAll('[data-agent-field]')].find(item=>item.dataset.agentField===location.fieldPath);
-      if(target&&!target.hidden)markLocation(dialog,target,target.querySelector('input,textarea,select'));
-      else if(location?.fieldPath&&location.fieldPath!==fieldPath){
-        markLocation(dialog,editor.focus.closest('.wb-field'),editor.focus);
-        message('当前配置中没有可编辑的目标字段，已打开此商品的本场配置。');
-      }
-      else editor.focus.focus({preventScroll:true});
-      return dialog;
-    }
-    async function renderSession(node,{inline=false}={}){
+    async function renderSession(node){
       const pid=prepId(),p=copy(prep()),old=details().draft?.body?.draft,room=await api.query('read_room',{room_id:p.body.room_id});
-      const initial=copy(old||roomDefaultDraft(room,p.body.goal,p.body.selected_product_refs));
-      initial.commerce=trimCommerceReferences(initial.commerce||{},p.body.selected_product_refs);
-      initial.tts_selection||=roomDefaultVoice(room);
-      const settings=inline?E('details',undefined,'wb-session-settings'):node;
-      if(inline){
-        settings.dataset.sessionSettings='';
-        const summary=E('summary','本场配置');
-        summary.append(E('span','选填 · 主题、口播要求与活动','wb-session-hint'));
-        settings.append(summary);
-        node.append(settings);
-      }else node.append(header('本场配置','配置只属于当前本场，商品日常事实仍由共享商品库维护。',[
-        button('选择引用商品',()=>navigate({view:'products',product_id:null,action:null})),
-        button('新增话术版本',()=>navigate({view:'scripts',product_id:null,script_id:null,resource_id:null,module_key:null,action:'script_generation'}),false,{readOnlyAction:'true'})
-      ]));
-      renderRoomMaterialImport(settings,room,p);
-      const form=E('form',undefined,'wb-session-form');form.addEventListener('submit',event=>event.preventDefault());
-      if(inline)form.append(E('h3','本场配置','wb-sr-only'));
-      const grid=E('div',undefined,'wb-grid'),controls={};let buffer;
-      for(const [key,label,type] of [['theme','本场主题','text'],['objective','本场目标','textarea'],['scheduled_at','计划时间（带时区 ISO 8601）','text'],['campaign_starts_at','活动开始时间（带时区 ISO 8601）','text'],['campaign_ends_at','活动截止时间（带时区 ISO 8601）','text']]){
-        const c=control(type,initial[key],label);c.dataset.field=key;controls[key]=c;if(type==='textarea')c.rows=2;
-        const isTime=['scheduled_at','campaign_starts_at','campaign_ends_at'].includes(key);
-        if(inline&&isTime){c.placeholder='2026-11-04T20:00:00+08:00';c.title='时间需包含时区';}
-        const f=field(inline&&isTime?label.split('（')[0]:label,c),path='/draft/'+key;f.dataset.agentField=path;
-        const name=f.querySelector('label');name.dataset.selectField=key;
-        selectable(name,()=>selected('仅本场 / '+label,{object_ref:p.ref,field_path:path},{view:'session',preparation_id:pid,field_path:path},buffer),{target:{object_ref:p.ref,field_path:path}});
-        grid.append(f);
-      }
-      form.append(grid);
-      const products=[];
-      for(const ref of p.body.selected_product_refs)products.push(await api.query('read_product',{ref}));
-      const commerce=commerceEditor(initial.commerce,products);
-      commerce.node.dataset.agentField='/draft/commerce';form.append(commerce.node);
-      const read=()=>{
-        const value=copy(initial);
-        for(const [key,c] of Object.entries(controls)){
-          if(key!=='campaign_starts_at'||c.value||Object.hasOwn(initial,key))value[key]=c.value;
-        }
-        value.commerce=commerce.read();
-        return value;
-      };
-      const write=value=>{
-        for(const [key,c] of Object.entries(controls))c.value=value[key]||'';
-        commerce.write(value.commerce||{});
-      };
-      async function commit(draft,afterSave){
-        const result=await command('save_session_draft',{preparation_id:pid,expected_revision:buffer.base_ref.revision,draft});
-        clearBuffer(buffer);afterSave?.();replacements.set(p.ref.id,result.data.preparation_ref);changedBusiness(result);
-        try{await refresh({force:true});notice('本场配置已保存。受影响的话术和语音需要重新检查。');}
-        catch(error){notice('本场配置已保存。请刷新查看最新内容。','warning');}
-        return result;
-      }
-      const save=()=>{
-        const draft=read();
-        for(const key of ['scheduled_at','campaign_starts_at','campaign_ends_at']){
-          if(draft[key]&&(!/T.*(?:Z|[+-]\d\d:\d\d)$/.test(draft[key])||!Number.isFinite(Date.parse(draft[key]))))
-            throw Error('时间请填写带时区 ISO 8601，例如 2026-10-16T20:00:00+08:00');
-        }
-        if(draft.campaign_starts_at&&draft.campaign_ends_at
-          &&Date.parse(draft.campaign_starts_at)>=Date.parse(draft.campaign_ends_at))
-          throw Error('活动截止时间必须晚于活动开始时间。');
-        return commit(draft);
-      };
-      buffer=registerBuffer('session:'+pid,'本场配置',p.ref,read,write,save,form);
-      form.append(button('保存本场配置',save,true));
-      settings.append(markResultSection(form,'draft',details().draft?.ref));
-      form._openProductOverride=(id,opener,location)=>openSessionProductDialog(node,products.find(product=>product.ref.id===id),{
-        opener,location,initial,preparation:p,buffer,commerce,commit
-      });
-      if(!inline&&products.length){
-        const shortcuts=E('div',undefined,'wb-form-actions');
-        for(const product of products)shortcuts.append(button('单品配置 '+product.body.name,opener=>form._openProductOverride(product.ref.id,opener)));
-        node.append(shortcuts);
-      }
+      const initial=copy(old||{theme:'',objective:p.body.goal||'',scheduled_at:'',timezone:'Asia/Shanghai',campaign_ends_at:'',language:'zh-CN',commerce:reusableDraft({commerce:room.body.commerce||{}}).commerce,tts_selection:{provider:room.body.tts_provider||'system',voice:room.body.tts_voice||'Huihui',model:room.body.tts_model||'speech-2.8-turbo'},loop_mode:'infinite',requested_variant_counts:{},unknowns:[]});initial.commerce=trimCommerceReferences(initial.commerce||{},p.body.selected_product_refs);initial.tts_selection||={provider:'system',voice:'Huihui',model:'speech-2.8-turbo'};
+      voiceOptions=voiceOptions||await api.query('voice_options',{});node.append(header('本场配置','配置只属于当前本场，商品日常事实仍由共享商品库维护。',[button('选择引用商品',()=>navigate({view:'products',product_id:null,action:null}))]));
+      const form=E('form',undefined,'wb-session-form');form.addEventListener('submit',e=>e.preventDefault());const grid=E('div',undefined,'wb-grid'),controls={};let buffer;
+      for(const[key,label,type]of [['theme','本场主题','text'],['objective','本场目标','textarea'],['scheduled_at','计划时间（带时区 ISO 8601）','text'],['campaign_ends_at','活动截止时间（带时区 ISO 8601）','text']]){const c=control(type,initial[key],label);c.dataset.field=key;controls[key]=c;const f=field(label,c);f.dataset.agentField='/draft/'+key;const name=f.querySelector('label');name.dataset.selectField=key;selectable(name,()=>selected('仅本场 / '+label,{object_ref:p.ref,field_path:'/draft/'+key},{view:'session',preparation_id:pid,field_path:'/draft/'+key},buffer),{target:{object_ref:p.ref,field_path:'/draft/'+key}});grid.append(f);}form.append(grid);
+      const products=[];for(const ref of p.body.selected_product_refs)products.push(await api.query('read_product',{ref}));const commerce=commerceEditor(initial.commerce,products),voice=voiceEditor(initial.tts_selection);commerce.node.dataset.agentField='/draft/commerce';voice.node.dataset.agentField='/draft/tts_selection';form.append(commerce.node,voice.node);
+      const loop={value:'infinite'};
+      const priceBox=section('本场金额预览');const priceResults=E('div',undefined,'wb-price-results');priceResults.append(E('p','按本场引用的商品修订和当前表单计算，不修改商品或本场配置。','wb-muted'));priceBox.append(button('计算本场金额',async()=>{const result=await api.request('/api/prelive/v2/human/price-preview',{preparation_id:pid,expected_revision:buffer.base_ref.revision,commerce:commerce.read()});priceResults.replaceChildren();if(result.blockers?.length)priceResults.append(E('p','本场还有不可售、已撤回或已失效的配置，金额预览不表示可以开播。','wb-inline-alert'),jsonDetails('需要处理的问题',result.blockers));for(const row of result.items||[]){const quote=row.quote||{},line=section(row.name||row.product_ref?.id||'商品');line.append(E('strong',quote.confirmed?'本场单件到手价 '+quote.final_price+' '+quote.currency:'最终价待确认'),E('p',quote.reason||'请检查完整适用条件','wb-muted'));if(quote.steps)line.append(jsonDetails('金额计算步骤',quote.steps));priceResults.append(line);}if(!result.items?.length)priceResults.append(E('p','尚未选择本场商品。','wb-muted'));}),priceResults);form.append(priceBox);
+      const read=()=>{const value=copy(initial);for(const[k,c]of Object.entries(controls))value[k]=c.value;value.commerce=commerce.read();value.tts_selection=voice.read();value.loop_mode=loop.value;return value;};const write=value=>{for(const[k,c]of Object.entries(controls))c.value=value[k]||'';commerce.write(value.commerce||{});voice.write(value.tts_selection);loop.value='infinite';};
+      const save=async()=>{const draft=read();for(const k of ['scheduled_at','campaign_ends_at'])if(draft[k]&&!/T.*(?:Z|[+-]\d\d:\d\d)$/.test(draft[k]))throw Error('时间请填写带时区 ISO 8601，例如 2026-10-16T20:00:00+08:00');const result=await command('save_session_draft',{preparation_id:pid,expected_revision:buffer.base_ref.revision,draft});clearBuffer(buffer);replacements.set(p.ref.id,result.data.preparation_ref);changedBusiness(result);await refresh({force:true});notice('本场配置已保存；受影响话术和语音需要重新检查。');};
+      buffer=registerBuffer('session:'+pid,'本场配置',p.ref,read,write,save,form);form.append(button('保存本场配置',save,true));node.append(form);renderScriptGeneration(node);
     }
     async function renderInsights(node){const pid=prepId();const initialPreparation=copy(prep());node.append(header('顾客、场景与卖点建议','分析建议不等于真实验证；采纳用于内容，也不会变成已验证的客户事实。'));const references=initialPreparation.body.analysis_refs||[];let found=false;for(const ref of references){const record=await api.query('read_analysis_report',{ref});if(record.body.role!=='audience_scenes')continue;found=true;renderInsight(node,record);}if(!found){for(const ref of initialPreparation.body.selected_product_refs){const records=await api.query('find_audience_research',{ref});for(const research of records.items||[]){found=true;node.append(E('p',research.compatibility==='exact'?'可复用的历史建议':'历史建议需结合本次事实复核','wb-badge wb-badge--warning'));renderHistoricalInsight(node,{ref:research.research_ref,body:{role:'audience_scenes',report:research.report,product_refs:research.product_refs,readset:[]}},research.compatibility);}}}if(!found)node.append(empty('尚无顾客与场景建议','可在右侧要求 Agent 根据商品资料分析。也可以先记录你已知的顾客与使用场景。'));
       const manual=region(section('补充人工顾客与场景建议'),{kind:'insights',id:pid});const summary=control('textarea','','人工建议');manual.append(field('你的顾客与场景判断',summary),button('保存为待验证建议',async()=>{if(!summary.value.trim())throw Error('请填写建议');const report={summary:summary.value,product_ids:initialPreparation.body.selected_product_refs.map(r=>r.id),fields:{},insights:[],evidence:[],hypotheses:['商家输入，待真实顾客验证'],conflicts:[],missing_fields:[],asset_suggestions:[],source_refs:[],dependencies:initialPreparation.body.selected_product_refs};const r=await command('accept_analysis_report',{role:'audience_scenes',report,report_hash:await api.hash(report),preparation_id:pid,expected_revision:initialPreparation.ref.revision,product_refs:initialPreparation.body.selected_product_refs,readset:[]});changedBusiness(r);await refresh({force:true});},true));node.append(manual);if(details().asset_checklist)renderAssets(node,details().asset_checklist);}
@@ -1860,22 +351,12 @@
       },true));
       node.append(box);
     }
-    function renderInsight(node,record){
-      const pid=prepId(),initialPreparation=copy(prep()),box=section('顾客与使用场景');
-      if(record.body.accepted===true&&record.body.preparation_id===pid){
-        box.dataset.analysisId=record.ref.id;
-        markResultSection(box,'analysis',record.ref);
-      }
-      box.append(E('span','分析建议 · 尚未真实验证','wb-badge wb-badge--warning'));const initial=copy(record.body.report);const summary=control('textarea',initial.summary,'分析摘要');const hypotheses=control('textarea',(initial.hypotheses||[]).join('\n'),'待验证假设');box.append(field('分析摘要',summary),field('待验证假设（每行一条）',hypotheses));const insightFields=suggestionEditor(initial.fields||{},'顾客与场景分析内容');const insightRows=suggestionEditor(initial.insights||[],'具体观点');box.append(insightFields.node,insightRows.node);box.append(jsonDetails('查看依据',initial.evidence||[]),jsonDetails('完整建议与依赖',initial));let buffer;const read=()=>({...copy(initial),summary:summary.value,hypotheses:hypotheses.value.split('\n').filter(Boolean),fields:insightFields.read(),insights:insightRows.read()});const save=async()=>{const report=read();const r=await command('accept_analysis_report',{role:'audience_scenes',report,report_hash:await api.hash(report),preparation_id:pid,expected_revision:buffer.base_ref.revision,product_refs:record.body.product_refs||[],readset:record.body.readset||[]});clearBuffer(buffer);if(r.data.analysis_ref)replacements.set(record.ref.id,r.data.analysis_ref);changedBusiness(r);await refresh({force:true});notice('已保存商家修订的建议，仍标记为待验证。');};buffer=registerBuffer('insight:'+record.ref.id,'顾客与场景建议',initialPreparation.ref,read,v=>{summary.value=v.summary;hypotheses.value=(v.hypotheses||[]).join('\n');insightFields.write(v.fields);insightRows.write(v.insights);},save,box);box.append(button('保存修订建议',save,true));selectable(box.querySelector(':scope > h3'),()=>selected('本场 / 顾客与使用场景建议',{object_ref:record.ref},{view:'insights',preparation_id:pid},buffer),{target:{object_ref:record.ref}});node.append(box);
-    }
+    function renderInsight(node,record){const pid=prepId();const initialPreparation=copy(prep());const box=section('顾客与使用场景');box.append(E('span','分析建议 · 尚未真实验证','wb-badge wb-badge--warning'));const initial=copy(record.body.report);const summary=control('textarea',initial.summary,'分析摘要');const hypotheses=control('textarea',(initial.hypotheses||[]).join('\n'),'待验证假设');box.append(field('分析摘要',summary),field('待验证假设（每行一条）',hypotheses));const insightFields=suggestionEditor(initial.fields||{},'顾客与场景分析内容');const insightRows=suggestionEditor(initial.insights||[],'具体观点');box.append(insightFields.node,insightRows.node);box.append(jsonDetails('查看依据',initial.evidence||[]),jsonDetails('完整建议与依赖',initial));let buffer;const read=()=>({...copy(initial),summary:summary.value,hypotheses:hypotheses.value.split('\n').filter(Boolean),fields:insightFields.read(),insights:insightRows.read()});const save=async()=>{const report=read();const r=await command('accept_analysis_report',{role:'audience_scenes',report,report_hash:await api.hash(report),preparation_id:pid,expected_revision:buffer.base_ref.revision,product_refs:record.body.product_refs||[],readset:record.body.readset||[]});clearBuffer(buffer);if(r.data.analysis_ref)replacements.set(record.ref.id,r.data.analysis_ref);changedBusiness(r);await refresh({force:true});notice('已保存商家修订的建议，仍标记为待验证。');};buffer=registerBuffer('insight:'+record.ref.id,'顾客与场景建议',initialPreparation.ref,read,v=>{summary.value=v.summary;hypotheses.value=(v.hypotheses||[]).join('\n');insightFields.write(v.fields);insightRows.write(v.insights);},save,box);box.append(button('保存修订建议',save,true));selectable(box.querySelector(':scope > h3'),()=>selected('本场 / 顾客与使用场景建议',{object_ref:record.ref},{view:'insights',preparation_id:pid},buffer),{target:{object_ref:record.ref}});node.append(box);}
     function renderAssets(node,record){
       const pid=prepId(), initialPreparation=copy(prep());
       const checklist=record.body.checklist||record.body;
       const box=section('展示材料准备清单');
-      box.append(E('p','可在这里查看视频拍摄、商品展示与直播间布置建议，也可绑定图片或文档。准备状态不会影响声音播出。','wb-muted'));
-      if(checklist.notes?.length){
-        const notes=E('ul');for(const note of checklist.notes)notes.append(E('li',note));box.append(notes);
-      }
+      box.append(E('p','首期整理展示材料建议，可上传图片或文档。视频生成与视频上传不在本期；材料不阻塞声音播出。','wb-muted'));
       const rows=[];
       for(const original of checklist.items||[]){
         const item=copy(original), row=section(item.purpose);const entry={item,state:null};
@@ -1892,7 +373,7 @@
       const save=async()=>{const r=await command('save_asset_checklist',{preparation_id:pid,expected_revision:buffer.base_ref.revision,checklist:read()});clearBuffer(buffer);changedBusiness(r);await refresh({force:true});notice('展示材料状态已保存。');};
       buffer=registerBuffer('assets:'+pid,'展示材料准备清单',initialPreparation.ref,read,write,save,box);
       if(rows.length)box.append(button('保存材料准备状态',save,true));else box.append(E('p','暂无材料建议，可请 Agent 分析本商品需要哪些演示。'));
-      node.append(markResultSection(box,'asset_checklist',record.ref));
+      node.append(box);
     }
 
     async function renderScriptAudioPreviews(host,script){
@@ -1913,25 +394,13 @@
         }
       }catch(error){if(host.isConnected&&scriptReader?.dataset.scriptId===requested)host.append(E('p','暂时无法读取已生成试听：'+error.message,'wb-muted'));}
     }
-    function showScriptReader(script,origin,position,{preserveFocus=false}={}){
+    function showScriptReader(script,origin,position){
       const pid=prepId(),scripts=currentScriptVariants(details().scripts||[]),backScrollTop=scriptReader?scriptReader._backScrollTop:container.scrollTop;if(!closeScriptReader({restoreFocus:false}))return;
-      const modal=options.roomCanvas&&current.view==='room-config';
-      const reader=E(modal?'dialog':'section',undefined,modal?'wb-script-reader wb-room-script-dialog':'wb-script-reader');reader.setAttribute('role','dialog');reader.setAttribute('aria-modal',String(!!modal));reader.setAttribute('aria-label','话术版本详情');reader.tabIndex=-1;reader._origin=origin;reader._backScrollTop=backScrollTop;scriptReader=reader;
+      const reader=E('section',undefined,'wb-script-reader');reader.setAttribute('role','dialog');reader.setAttribute('aria-modal','false');reader.setAttribute('aria-label','话术版本详情');reader.tabIndex=-1;reader._origin=origin;reader._backScrollTop=backScrollTop;scriptReader=reader;
       // The reader uses the complete result panel; its underlying toolbar and
       // tabs return unchanged on close, while the Agent pane stays available.
-      reader._panel=modal?null:container.closest('.wb-work-panel');reader._underlay=[];
-      if(reader._panel){
-        reader._panel.classList.add('wb-script-reader-open');
-        // The editor can live inside the room configuration section. Keep its ancestors active.
-        for(let surface=container;surface&&surface!==reader._panel;surface=surface.parentElement){
-          for(const node of surface.parentElement.children){
-            if(node===surface)continue;
-            reader._underlay.push({node,inert:node.inert,ariaHidden:node.getAttribute('aria-hidden')});
-            node.inert=true;
-            node.setAttribute('aria-hidden','true');
-          }
-        }
-      }
+      reader._panel=container.closest('.wb-work-panel');reader._underlay=[];
+      if(reader._panel){reader._panel.classList.add('wb-script-reader-open');for(const node of reader._panel.children){if(node===container)continue;reader._underlay.push({node,inert:node.inert,ariaHidden:node.getAttribute('aria-hidden')});node.inert=true;node.setAttribute('aria-hidden','true');}}
       const productName=id=>snapshot.products.items.find(product=>product.ref.id===id)?.name||id;
       function paint(active,activePosition){
         if([...buffers.values()].some(b=>b.dirty&&reader.contains(b.host))){readerNotice('请先保存或取消正在编辑的句子，再切换版本。','warning');return;}
@@ -1982,480 +451,61 @@
         if(!ordinal)body.append(empty('这版暂无模块正文','可在右侧让 Agent 重新检查这份稿件。'));
         reader.append(body,E('p','估时只用于文字核对；不代表已生成语音或已批准播出。','wb-script-reader-footer'));renderScriptAudioPreviews(previews,active);applyEditorLocks();if(focusKey){const nextFocus=[...reader.querySelectorAll('[data-reader-focus]')].find(element=>element.dataset.readerFocus===focusKey&&!element.disabled)||reader.querySelector('[data-close-script-reader]');nextFocus.focus({preventScroll:true});}container.scrollTop=0;
       }
-      if(!modal){content.inert=true;content.setAttribute('aria-hidden','true');container.classList.add('wb-has-script-reader');container.scrollTop=0;}
-      container.append(reader);paint(script,position);
-      if(modal)reader.showModal();
-      if(modal||!preserveFocus)reader.querySelector('[data-close-script-reader]').focus({preventScroll:true});
+      content.inert=true;content.setAttribute('aria-hidden','true');container.classList.add('wb-has-script-reader');container.scrollTop=0;container.append(reader);paint(script,position);reader.querySelector('[data-close-script-reader]').focus({preventScroll:true});
     }
-    function renderScriptGeneration(){
+    function renderScriptGeneration(node){
       const pid=prepId(),initialPreparation=copy(prep()),scripts=currentScriptVariants(details().scripts||[]),generate=region(section('新增话术版本'),{kind:'scripts',id:pid});generate.dataset.scriptGeneration='';
-      generate.append(E('p','按已保存的本场设置生成，每件可选 1–6 版。','wb-muted'));
-      const roomVersionCount=snapshot.rooms?.find(room=>room.ref.id===initialPreparation.body.room_id)?.body.version_count||2;
+      generate.append(E('p','已有话术在「话术与排序」查看。这里仅设置新增需求：Agent 会先对照已有版本，再生成不同的完整稿件；每版目标8–10分钟。','wb-muted'));
       const rows=[];for(const ref of initialPreparation.body.selected_product_refs){const product=snapshot.products.items.find(value=>value.ref.id===ref.id),name=product?.name||ref.id,existing=scripts.filter(value=>value.body.product_id===ref.id),row=E('div',undefined,'wb-generation-product');
-        const chosen=E('input');chosen.type='checkbox';chosen.checked=true;chosen.setAttribute('aria-label','为此商品新增话术 '+name);const quantity=control('number',details().draft?.body?.draft?.requested_variant_counts?.[ref.id]||roomVersionCount,'本次新增版本数 '+name);quantity.min='1';quantity.max='6';quantity.step='1';
-        const label=E('label'),description=E('div');description.append(E('strong',name),E('p','已有 '+existing.length+' 版','wb-muted'));label.append(chosen,description);row.append(label,field('新增版数',quantity));generate.append(row);rows.push({ref,name,chosen,quantity,existing});
+        const chosen=E('input');chosen.type='checkbox';chosen.checked=true;chosen.setAttribute('aria-label','为此商品新增话术 '+name);const quantity=control('number',details().draft?.body?.draft?.requested_variant_counts?.[ref.id]||1,'本次新增版本数 '+name);quantity.min='1';quantity.max='6';quantity.step='1';
+        const label=E('label'),description=E('div');description.append(E('strong',name),E('p','已有 '+existing.length+' 版 · 新稿需有不同的切入角度、场景或表达','wb-muted'));label.append(chosen,description);row.append(label,field('本次新增',quantity));generate.append(row);rows.push({ref,name,chosen,quantity,existing});
       }
-      if(!rows.length)generate.append(E('p','请先选择这场直播要卖的商品。','wb-muted'),button('选择本场商品',()=>navigate({view:'products',product_id:null,action:null}),false,{readOnlyAction:'true'}));
-      else if(!initialPreparation.body.draft_ref)generate.append(E('p','保存本场配置后即可提交新增要求。','wb-muted'),button('查看本场配置',()=>navigate({view:'session',product_id:null,action:null}),false,{readOnlyAction:'true'}));
+      if(!rows.length)generate.append(E('p','请先在本场选择引用的商品，再设置新增版本。','wb-muted'));
       const send=button('将新增要求交给 Agent',async()=>{
         const chosen=rows.filter(row=>row.chosen.checked);if(!chosen.length)throw Error('请至少选择一个商品');if(!initialPreparation.body.draft_ref)throw Error('请先保存本场配置');if(hasDirty())throw Error('请先保存或放弃未保存的配置，再生成话术');
         for(const row of chosen)if(!Number.isInteger(Number(row.quantity.value))||Number(row.quantity.value)<1||Number(row.quantity.value)>6)throw Error('每件商品每次可新增1至6版');
         const prepareGeneration=options.onPrepareGeneration||options.onPrepareMessage;if(!prepareGeneration)throw Error('右侧 Agent 对话尚未连接，请刷新后重试');
-        const request={preparation_id:pid,draft_ref:copy(initialPreparation.body.draft_ref),product_counts:chosen.map(row=>({product_ref:row.ref,count:Number(row.quantity.value),existing_script_refs:row.existing.map(value=>value.ref)})),target_duration_seconds:{min:480,max:600},prior_script_refs:copy(initialPreparation.body.script_refs||[])};
+        const request={preparation_id:pid,product_counts:chosen.map(row=>({product_ref:row.ref,count:Number(row.quantity.value),existing_script_refs:row.existing.map(value=>value.ref)})),target_duration_seconds:{min:480,max:600},prior_script_refs:copy(initialPreparation.body.script_refs||[])};
         const lines=chosen.map(row=>'- '+row.name+'：新增 '+Number(row.quantity.value)+' 版；本场已有 '+row.existing.length+' 版。');
-        await prepareGeneration('请为当前本场新增完整话术版本：\n'+lines.join('\n')+'\n请先读取并对照已有版本，保留真实商品事实，在切入角度、顾客场景和表达上形成差异，不复制已有稿。每一个版本都要单独完整生成，普通话播报目标8–10分钟，按240有效口播字/分约1920–2400字；整版一次生成，再按模块存储。只生成文字。新稿保存后会进入本场播放顺序末尾，请勿手动调整已有顺序，也勿生成语音、批准或播出。按本场实际配置处理活动，没有活动不要编造。\n当前明确范围与已有稿引用：\n'+JSON.stringify(request,null,2),{kind:'script_generation',focus:true,preparation_id:pid,room_id:initialPreparation.body.room_id,
-          script_generation:{preparation_id:pid,draft_ref:request.draft_ref,
-            product_counts:request.product_counts.map(({product_ref,count})=>({product_ref,count})),
-            target_duration_seconds:request.target_duration_seconds},
-          script_generation_label:chosen.map(row=>row.name+' · '+Number(row.quantity.value)+' 版').join('、')});
-        notice('检查右侧的商品和版数，可以补充写作要求，再发送给 Agent。');
-      },true);send.disabled=!rows.length||!initialPreparation.body.draft_ref;generate.append(send);return generate;
+        await prepareGeneration('请为当前本场新增完整话术版本：\n'+lines.join('\n')+'\n请先读取并对照已有版本，保留真实商品事实，在切入角度、顾客场景和表达上形成差异，不复制已有稿。每一个版本都要单独完整生成，普通话播报目标8–10分钟，按240有效口播字/分约1920–2400字；整版一次生成，再按模块存储。只生成文字，不自动排序、生成语音、批准或播出。按本场实际配置处理活动，没有活动不要编造。\n当前明确范围与已有稿引用：\n'+JSON.stringify(request,null,2),{kind:'script_generation',focus:true,preparation_id:pid,room_id:initialPreparation.body.room_id});
+        notice('新增要求已放到右侧输入框。检查商品和数量后发送，Agent 才会开始生成。');
+      },true);send.disabled=!rows.length;generate.append(send,button('查看已有话术与排序',()=>navigate({view:'scripts',product_id:null,script_id:null,resource_id:null,module_key:null}),false,{readOnlyAction:'true'}));node.append(generate);
     }
     async function renderScripts(node){return renderPlaylist(node);}
     async function renderPlaylist(node){
-      const pid=prepId(),initialPreparation=copy(prep());
-      const records=details().scripts||[];
-      const scripts=currentScriptVariants(records);
-      const scriptsById=new Map(records.map(script=>[script.ref.id,script]));
-      const selected=new Map((initialPreparation.body.selected_product_refs||[]).map(ref=>[ref.id,ref]));
-      const eligible=script=>{
-        const product=script&&selected.get(script.body.product_id), pinned=script?.body.product_ref;
-        return !!product&&(!pinned||product.revision===pinned.revision&&product.content_hash===pinned.content_hash);
-      };
-      const inline=node.dataset.inlineRoomSection==='scripts';
-      const generator=renderScriptGeneration();
-      generator.id='wb-script-generation-'+uid();
-      generator.hidden=!inline;
-      const showGenerator=button('新增话术版本',()=>{
-        if(generator.hidden)node._showScriptGeneration(true);
-        else{generator.hidden=true;showGenerator.setAttribute('aria-expanded','false');}
-      },scripts.length===0,{readOnlyAction:'true'});
-      showGenerator.setAttribute('aria-controls',generator.id);
-      showGenerator.setAttribute('aria-expanded','false');
-      node._showScriptGeneration=focus=>{
-        generator.hidden=false;
-        showGenerator.setAttribute('aria-expanded','true');
-        const heading=generator.querySelector('h3');
-        markLocation(node,heading,focus&&heading);
-      };
-
-      const saved=details().playlist;
-      const savedItems=saved?.body.items||[];
-      const scriptFor=item=>scriptsById.get(item.script_revision_ref.id);
-      const activeItem=item=>{
-        const script=scriptFor(item);
-        return eligible(script)&&item.product_id===script.body.product_id&&
-          item.script_revision_ref.revision===script.ref.revision&&item.script_revision_ref.content_hash===script.ref.content_hash;
-      };
-      const newOccurrence=script=>({occurrence_id:'occ_'+uid(),product_id:script.body.product_id,script_revision_ref:script.ref});
-      let items=copy(savedItems).filter(activeItem);
-      const queued=new Set(items.map(item=>item.script_revision_ref.id));
-      items.push(...scripts.filter(script=>eligible(script)&&!queued.has(script.ref.id)).map(newOccurrence));
-      const inactive=scripts.filter(script=>!eligible(script));
-      let preview=null,buffer,discardOrder;
-      const order=region(section('本场话术版本'),{kind:'playlist',id:pid});
-      order.classList.add('wb-script-queue');
-      const list=E('div',undefined,'wb-playlist');
-      const summary=E('p',undefined,'wb-version-summary');
-      const playlistLocked=()=>matchingLocks(editorLocks,{kind:'playlist',id:pid}).length>0;
-      const read=()=>({items:copy(items),loop_mode:'infinite',preview:copy(preview)});
-      const write=value=>{items=copy(value.items||[]);preview=copy(value.preview);paint();queueMicrotask(syncOrderActions);};
-      const productName=id=>snapshot.products.items.find(product=>product.ref.id===id)?.name||id;
-      const scriptName=script=>productName(script.body.product_id)+' · 第'+script.body.version_number+'版';
-      function dirty(){preview=null;changed(buffer);}
-      function syncOrderActions(){if(discardOrder)discardOrder.hidden=!buffer?.dirty;}
-      function move(from,to){
-        if(to<0||to>=items.length||from===to)return;
-        items.splice(to,0,items.splice(from,1)[0]);
-        dirty();
-        paint();
-      }
-      const confirm=E('section',undefined,'wb-script-delete-confirm');
-      confirm.hidden=true;
-      confirm.setAttribute('aria-label','删除话术版本确认');
-      function askDelete(script,origin){
-        if(buffer.dirty)throw Error('请先保存或放弃尚未保存的播放顺序，再删除版本。');
-        region(confirm,{kind:'scripts',id:pid,script_id:script.ref.id,product_id:script.body.product_id});
-        const cancel=button('取消',()=>{confirm.hidden=true;origin.focus({preventScroll:true});},false,{readOnlyAction:'true'});
-        const remove=button('确认删除',async()=>{
-          if(buffer.dirty)throw Error('请先保存或放弃尚未保存的播放顺序，再删除版本。');
-          const result=await humanMutation('/api/prelive/v2/human/script-delete',{
-            preparation_id:pid,expected_revision:initialPreparation.ref.revision,script_ref:script.ref
-          });
-          confirm.hidden=true;
-          changedBusiness({data:result});
-          try{
-            await refresh({force:true});
-            notice('话术版本已从本场删除。请重新检查播放顺序及播出内容。');
-          }catch(error){notice('话术版本已删除。请刷新查看最新播放顺序。','warning');}
-        });
-        remove.classList.add('wb-script-delete-button');
-        const actions=E('div',undefined,'wb-form-actions');
-        actions.append(cancel,remove);
-        confirm.replaceChildren(E('p','删除「'+scriptName(script)+'」将移除它在本场的所有播放位置。此前采用的内容需要重新检查。'),actions);
-        confirm.hidden=false;
-        confirm.scrollIntoView({block:'nearest'});
-        cancel.focus({preventScroll:true});
-      }
-      function rowFor(script,item,index,repeats){
-        const ordered=!!item;
-        const position=ordered?index+1:undefined;
-        const row=E('article',undefined,'wb-playlist-item wb-version-card');
-        row.dataset.scriptId=script.ref.id;
-        row.dataset.readOnlyAction='true';
-        if(ordered)row.dataset.occurrence=item.occurrence_id;
-        row.draggable=ordered;
-        row.tabIndex=0;
-        row.setAttribute('aria-label',scriptName(script)+(ordered?'，播放位置'+position:'，需核对本场选品'));
-        const ordinal=E('span',ordered?String(position).padStart(2,'0'):'—','wb-queue-position');
-        ordinal.setAttribute('aria-hidden','true');
-        const info=E('div',undefined,'wb-version-card-info');
-        const badges=E('div',undefined,'wb-version-card-badges');
-        const metrics=scriptTextMetrics(script,position);
-        badges.append(E('span',ordered?(index%5===0?'长开场':'短引入'):'需核对本场选品','wb-badge'),
-          E('span',metrics.characters+' 字 · 约 '+metrics.estimated_minutes+' 分钟','wb-version-metrics'));
-        info.append(E('strong',scriptName(script)),badges);
-
-        const openReader=(origin,{moduleKey,preserveFocus}={})=>{
-          showScriptReader(script,origin,position,{preserveFocus});
-          const module=moduleKey&&[...(scriptReader?.querySelectorAll('[data-module]')||[])].find(value=>value.dataset.module===moduleKey);
-          if(module)markLocation(scriptReader,module);
-        };
-        const view=button(inline?'查看全文':'查看完整话术',()=>openReader(view),false,{readOnlyAction:'true',openScript:script.ref.id});
-        if(inline)view.setAttribute('aria-label','查看完整话术');
-        const actions=E('div',undefined,'wb-version-card-actions');
-        actions.append(view);
-        if(ordered){
-          const up=button('上移',()=>move(index,index-1));
-          const down=button('下移',()=>move(index,index+1));
-          up.disabled=index===0;
-          down.disabled=index===items.length-1;
-          const duplicate=button(inline?'重复':'重复此播放项',()=>{
-            items.splice(index+1,0,newOccurrence(script));
-            dirty();paint();
-          });
-          if(inline)duplicate.setAttribute('aria-label','重复此播放项');
-          actions.append(up,down,duplicate);
-          if(repeats>1)actions.append(button('移除此重复项',()=>{
-            items.splice(index,1);
-            dirty();paint();
-          }));
-          row.addEventListener('dragstart',event=>{
-            if(playlistLocked()){event.preventDefault();return;}
-            event.dataTransfer.setData('text/plain',item.occurrence_id);
-            event.dataTransfer.effectAllowed='move';
-          });
-          row.addEventListener('dragover',event=>{if(!playlistLocked())event.preventDefault();});
-          row.addEventListener('drop',event=>{
-            event.preventDefault();
-            if(playlistLocked())return;
-            const from=items.findIndex(value=>value.occurrence_id===event.dataTransfer.getData('text/plain'));
-            if(from>=0)move(from,index);
-          });
-        }
-        const deletion=region(E('span'),{kind:'scripts',id:pid,script_id:script.ref.id,product_id:script.body.product_id});
-        const remove=button('删除版本',origin=>askDelete(script,origin),false,{deleteScript:script.ref.id});
-        remove.classList.add('wb-script-delete-button');
-        deletion.append(remove);
-        actions.append(deletion);
-        row.append(ordinal,info,actions);
-        row._openScriptReader=(moduleKey,preserveFocus)=>openReader(row,{moduleKey,preserveFocus});
-        row.addEventListener('click',event=>{if(!event.target.closest('button'))openReader(row);});
-        row.addEventListener('keydown',event=>{
-          if(event.target===row&&['Enter',' '].includes(event.key)){event.preventDefault();openReader(row);}
-        });
-        return row;
-      }
-      let updateAudioOrder;
+      const pid=prepId(),initialPreparation=copy(prep()),scripts=currentScriptVariants(details().scripts||[]);node.append(header('话术与排序','每张卡片是一份完整商品版本。点击查看模块；拖动只调整整版播放顺序。新增版本请到「本场配置」。'));
+      const saved=details().playlist;let items=copy(saved?.body.items||[]),preview=null;const order=region(section('本场话术版本'),{kind:'playlist',id:pid}),list=E('div',undefined,'wb-playlist'),available=E('div',undefined,'wb-available-scripts'),summary=E('p',undefined,'wb-version-summary');const loop={value:'infinite'};
+      const read=()=>({items:copy(items),loop_mode:loop.value,preview:copy(preview)}),write=value=>{items=copy(value.items||[]);loop.value='infinite';preview=copy(value.preview);paint();};let buffer;
+      function dirty(){preview=null;changed(buffer);}const productName=id=>snapshot.products.items.find(product=>product.ref.id===id)?.name||id;
+      const scriptFor=item=>(details().scripts||[]).find(script=>script.ref.id===item.script_revision_ref.id);
+      function itemName(item){const script=scriptFor(item);return productName(item.product_id)+' · 第'+(script?.body.version_number||'?')+'版';}
+      function viewButton(script,position,label){const open=button(label||'查看完整话术',()=>showScriptReader(script,open,position),false,{readOnlyAction:'true'});open.dataset.openScript=script.ref.id;open.setAttribute('aria-disabled','false');return open;}
+      function addScript(script){items.push({occurrence_id:'occ_'+uid(),product_id:script.body.product_id,script_revision_ref:script.ref});dirty();paint();}
+      function move(from,to){if(to<0||to>=items.length)return;items.splice(to,0,items.splice(from,1)[0]);dirty();paint();}
       function paint(){
-        confirm.hidden=true;
-        syncOrderActions();
-        list.replaceChildren();
-        const validItems=items.filter(activeItem);
-        summary.textContent='共 '+scripts.length+' 个版本 · '+validItems.length+' 个播放项'+
-          (equal(items,savedItems)?'':' · 顺序待保存');
-        const repetitions=new Map();
-        for(const item of validItems)repetitions.set(item.script_revision_ref.id,(repetitions.get(item.script_revision_ref.id)||0)+1);
-        items.forEach((item,index)=>{
-          if(activeItem(item))list.append(rowFor(scriptFor(item),item,index,repetitions.get(item.script_revision_ref.id)));
+        list.replaceChildren();available.replaceChildren();summary.textContent='共 '+scripts.length+' 个版本 · 已编排 '+items.length+' 个播放项';
+        items.forEach((item,index)=>{const script=scriptFor(item),row=E('article',undefined,'wb-playlist-item wb-version-card');row.draggable=true;row.dataset.occurrence=item.occurrence_id;row.dataset.scriptId=item.script_revision_ref.id;row._openScriptReader=moduleKey=>{if(!script)return;showScriptReader(script,row,index+1);if(moduleKey)scriptReader.querySelector('[data-module="'+String(moduleKey).replace(/[^a-z_]/g,'')+'"]')?.scrollIntoView({block:'nearest'});};
+          const grip=E('span','⠿','wb-grip');grip.setAttribute('aria-hidden','true');const info=E('div',undefined,'wb-version-card-info');info.append(E('strong',String(index+1).padStart(2,'0')+'. '+itemName(item)));const badges=E('div',undefined,'wb-version-card-badges');badges.append(E('span',index%5===0?'长开场':'短引入','wb-badge'));
+          if(script){const metrics=scriptTextMetrics(script,index+1);badges.append(E('span',metrics.characters+' 字 · 约 '+metrics.estimated_minutes+' 分钟','wb-version-metrics'));}info.append(badges);
+          const actions=E('div',undefined,'wb-version-card-actions');if(script)actions.append(viewButton(script,index+1));actions.append(button('上移',()=>move(index,index-1)),button('下移',()=>move(index,index+1)),button('重复此播放项',()=>{items.splice(index+1,0,{...copy(item),occurrence_id:'occ_'+uid()});dirty();paint();}),button('移除此播放项',()=>{items.splice(index,1);dirty();paint();}));row.append(grip,info,actions);
+          row.addEventListener('click',event=>{if(script&&!event.target.closest('button'))showScriptReader(script,row,index+1);});row.tabIndex=0;row.setAttribute('aria-label',itemName(item)+'，播放位置'+(index+1));row.addEventListener('keydown',event=>{if(event.target===row&&['Enter',' '].includes(event.key)&&script){event.preventDefault();showScriptReader(script,row,index+1);}});
+          row.addEventListener('dragstart',event=>{event.dataTransfer.setData('text/plain',item.occurrence_id);event.dataTransfer.effectAllowed='move';});row.addEventListener('dragover',event=>event.preventDefault());row.addEventListener('drop',event=>{event.preventDefault();const from=items.findIndex(value=>value.occurrence_id===event.dataTransfer.getData('text/plain'));if(from>=0)move(from,index);});list.append(row);
         });
-        for(const script of inactive)list.append(rowFor(script,null,undefined,0));
-        if(!scripts.length)list.append(empty('尚无本场话术','点「新增话术版本」，选择商品和数量，再交给右侧 Agent 生成。'));
-        updateAudioOrder?.();
-      }
-      async function reorder(mode){
-        if(!items.length||!items.every(activeItem))throw Error('请先核对本场选品和话术版本，再调整播放顺序。');
-        const productOrder=[...new Set([...(saved?.body.product_group_order||[]),...items.map(item=>item.product_id)])];
-        if(saved&&!buffer.dirty&&equal(items,savedItems)){
-          const spec={mode,product_group_order:productOrder,within_product:'keep',seed:uid().replace(/-/g,''),algorithm_version:'reorder-v1'};
-          const result=await api.query('preview_playlist_reorder',{preparation_id:pid,ref:saved.ref,spec});
-          items=copy(result.proposed_items);
-          preview={spec:result.resolved_spec,hash:result.preview_hash};
-        }else{
-          const groups=productOrder.map(id=>items.filter(item=>item.product_id===id));
-          if(mode==='grouped')items=groups.flat();
-          else if(mode==='interleave'){
-            items=[];
-            for(let i=0;groups.some(group=>i<group.length);i++)groups.forEach(group=>{if(group[i])items.push(group[i]);});
-          }else for(let i=items.length-1;i>0;i--){
-            const j=crypto.getRandomValues(new Uint32Array(1))[0]%(i+1);
-            [items[i],items[j]]=[items[j],items[i]];
-          }
-          preview=null;
+        if(!items.length)list.append(empty('尚未编排播放顺序','下方所有已生成版本都可以直接查看；加入播放顺序后再拖动排序。'));
+        const queued=new Set(items.map(item=>item.script_revision_ref.id)),remaining=scripts.filter(script=>!queued.has(script.ref.id));available.append(E('h4','未加入播放顺序（'+remaining.length+'版）'));
+        for(const script of remaining){const card=E('article',undefined,'wb-version-card wb-version-card--available');card.dataset.scriptId=script.ref.id;card._openScriptReader=moduleKey=>{showScriptReader(script,card);if(moduleKey)scriptReader.querySelector('[data-module="'+String(moduleKey).replace(/[^a-z_]/g,'')+'"]')?.scrollIntoView({block:'nearest'});};
+          const info=E('div',undefined,'wb-version-card-info'),metrics=scriptTextMetrics(script);info.append(E('strong',productName(script.body.product_id)+' · 第'+script.body.version_number+'版'),E('p',metrics.characters+' 字 · 估算约 '+metrics.estimated_minutes+' 分钟','wb-muted'));const actions=E('div',undefined,'wb-version-card-actions');actions.append(viewButton(script),button('加入播放顺序',()=>addScript(script)));card.append(info,actions);card.tabIndex=0;card.addEventListener('click',event=>{if(!event.target.closest('button'))showScriptReader(script,card);});card.addEventListener('keydown',event=>{if(event.target===card&&['Enter',' '].includes(event.key)){event.preventDefault();showScriptReader(script,card);}});available.append(card);
         }
-        changed(buffer);paint();notice('已预览整版顺序，保存后才会生效。');
+        if(!scripts.length)available.append(empty('尚无本场话术','在「本场配置」选择商品和新增数量，再交给右侧 Agent 生成。',[button('设置新增版本',()=>navigate({view:'session',product_id:null,action:null}),true)]));
       }
-      const save=async()=>{
-        if(!items.length)throw Error('需要至少一版可用话术。');
-        if(!items.every(activeItem))throw Error('播放顺序含有已变化的版本。请核对最新本场并重新排序。');
-        const result=await command('save_playlist',{
-          preparation_id:pid,expected_revision:buffer.base_ref.revision,items,loop_mode:'infinite',
-          product_group_order:preview?.spec.product_group_order||[...new Set(items.map(item=>item.product_id))],
-          reorder_spec:preview?.spec||null,preview_hash:preview?.hash||null
-        });
-        let compiled;
-        try{
-          compiled=await command('compile_playback_plan',{preparation_id:pid,expected_revision:result.data.preparation_ref.revision,playlist_ref:result.data.playlist_ref});
-        }catch(error){
-          clearBuffer(buffer);changedBusiness(result);await refresh({force:true});
-          notice('顺序已保存，编排检查未完成。'+error.message+' 请让右侧 Agent 按新位置补齐缺失开场。');
-          return;
-        }
-        clearBuffer(buffer);changedBusiness(compiled);await refresh({force:true});
-        notice('顺序已保存。第1、6、11…项使用长开场，其余短引入。');
-      };
-      buffer=registerBuffer('playlist:'+pid,'播放顺序',initialPreparation.ref,read,write,save,order);
-      const toolbar=region(E('div',undefined,'wb-toolbar wb-version-toolbar wb-script-tools'),{kind:'playlist',id:pid});
-      const saveOrder=button('保存顺序并检查',save,true);
-      saveOrder.disabled=!items.length;
-      discardOrder=button('放弃顺序修改',async()=>{clearBuffer(buffer);await refresh({force:true});notice('已恢复本场保存的播放顺序。');});
-      const orderActions=[['同商品连续','grouped'],['商品穿插','interleave'],['随机重排','full_shuffle']].map(([label,mode])=>{
-        const action=button(label,()=>reorder(mode));
-        action.disabled=!items.length;
-        return action;
-      });
-      if(!inline)toolbar.append(showGenerator);
-      toolbar.append(...orderActions,saveOrder,discardOrder);
-      order.append(summary,confirm,list);
-      if(!inline)node.append(header('话术与排序','查看本场版本、调整顺序并准备声音。'));
-      if(inline){
-        const layout=E('div',undefined,'wb-inline-script-layout');
-        const queue=E('div',undefined,'wb-inline-script-order');
-        queue.append(toolbar,markResultSection(order,'playlist',saved?.ref));
-        layout.append(generator,queue);
-        node.append(layout);
-      }else node.append(toolbar,generator,markResultSection(order,'playlist',saved?.ref));
-      paint();
-      if(inline){
-        const top=E('div',undefined,'wb-inline-script-header');
-        top.append(node.querySelector('.wb-room-section-title'));
-        node.prepend(top);
-        updateAudioOrder=await renderRoomAudio(top,initialPreparation,()=>{
-          if(!items.length)return '先生成至少一版可播话术。';
-          if(!saved?.ref||!equal(items,savedItems))return '请先保存播放顺序。';
-          return '';
-        });
-        return;
-      }
-      const audio=E('details',undefined,'wb-script-audio-details');
-      audio.open=true;
-      audio.append(E('summary','整包检查与语音'));
-      node.append(audio);
-      await renderAudio(audio);
-    }
-    async function renderRoomAudio(node,initialPreparation,orderBlock){
-      const pid=initialPreparation.ref.id, location=current;
-      const box=region(E('section',undefined,'wb-room-audio-action'),{kind:'playlist',id:pid});
-      box.dataset.audioReview='';
-      markResultSection(box,'audio_manifest',initialPreparation.body.audio_manifest_ref);
-      const status=E('p',undefined,'wb-muted');status.setAttribute('role','status');
-      const heading=E('h3','本场语音');
-      const scopeInfo=E('details',undefined,'wb-room-audio-scope');
-      const actions=E('div',undefined,'wb-room-audio-buttons');
-      const publication=E('div',undefined,'wb-room-audio-publication');
-      const row=E('div',undefined,'wb-room-audio-row');
-      const copyBox=E('div');copyBox.append(heading,status);
-      row.append(copyBox,actions);
-      box.append(row,scopeInfo,publication);node.append(box);
-      let observation, review, reviewError, approval, retry, polling=false;
-      const observe=()=>api.query('read_completion_observation',{preparation_id:pid});
-      const currentJob=()=>{
-        const body=initialPreparation.body;
-        if(!body.requirements_ref)return null;
-        return (observation?.jobs||[]).filter(({body:job})=>job.kind==='audio'&&
-          job.generation_epoch===body.generation_epoch&&equal(job.requirements_ref,body.requirements_ref)&&
-          equal(job.approval_ref,body.approval_ref)).sort((a,b)=>String(b.body.created_at).localeCompare(String(a.body.created_at)))[0];
-      };
-      const active=job=>['queued','running'].includes(job?.body.status);
-      const uncertain=item=>['timeout_unknown','outcome_unknown'].includes(item.call_state)||
-        item.provider_attempts?.some(attempt=>['timeout_unknown','outcome_unknown'].includes(attempt.state));
-      const isEditing=()=>busy||hasDirty()||options.getAudioBlock?.()||productDialog||scriptReader||
-        options.roomOverlay?.open||content.querySelector('dialog[data-session-product-id][open]')||
-        (container.contains(document.activeElement)&&document.activeElement?.matches('input,textarea,select'));
-      function assertCanGenerate(){
-        if(current!==location)throw Error('直播间配置已切换，请在当前场次重新选择。');
-        const blocked=options.getAudioBlock?.()||orderBlock();
-        if(blocked)throw Error(blocked);
-        if(hasDirty())throw Error('请先保存或放弃未保存的编辑。');
-      }
-      const generate=button('生成语音',async()=>{
-        assertCanGenerate();
-        let expected=initialPreparation.ref;
-        const saved=initialPreparation.body;
-        const latest=await api.query('read_preparation',{preparation_id:pid});
-        assertCanGenerate();
-        if(!equal(expected,latest.ref))throw Error('本场配置已有更新，请读取最新内容后再生成语音。');
-        const retrying=retry;
-        if(!saved.compiled_plan_ref||!saved.requirements_ref){
-          try{
-            const compiled=await command('compile_playback_plan',{
-              preparation_id:pid,expected_revision:expected.revision,playlist_ref:saved.playlist_ref
-            });
-            expected=compiled.data.preparation_ref;
-            changedBusiness(compiled);
-          }catch(error){
-            if(error.code==='MISSING_MODULE')throw Object.assign(Error('播放顺序中的话术还缺少模块。请在右侧请 Agent 补齐，再生成语音。'),{code:error.code,details:error.details});
-            throw error;
-          }
-        }
-        const [boundReview,boundApproval]=await Promise.all([
-          api.query('create_text_review',{preparation_id:pid}),api.query('read_text_approval',{preparation_id:pid})
-        ]);
-        assertCanGenerate();
-        if(review&&review.review_hash!==boundReview.review_hash)
-          throw Error('文稿或音色已经变化，请读取最新内容后再生成语音。');
-        if(boundReview.voice.provider==='minimax'){
-          const count=boundReview.cost_scope.characters.toLocaleString('zh-CN');
-          const voice=boundReview.voice_display_name||boundReview.voice.voice;
-          const action=retrying?'仅重试本次已知失败的语音':'确认当前文稿并生成语音';
-          if(!global.confirm(action+'？本场合成范围为 '+count+' 字符，使用 MiniMax · '+voice+'，按供应商实际用量计费。')){
-            if(!equal(expected,initialPreparation.ref))await refresh({force:true});
-            return;
-          }
-        }
-        let approvalRef=boundApproval.status==='current'?boundApproval.approval_ref:null;
-        if(!approvalRef){
-          const approved=await command('approve_text_for_audio',{
-            preparation_id:pid,expected_revision:expected.revision,review_hash:boundReview.review_hash
-          });
-          approvalRef=approved.data.approval_ref;
-          expected=approved.data.preparation_ref;
-          changedBusiness(approved);
-          assertCanGenerate();
-        }
-        const receipt=retrying?await command('retry_failed_items',{job_id:retrying.ref.id}):
-          await command('prepare_required_audio',{
-            preparation_id:pid,expected_revision:expected.revision,approval_ref:approvalRef,
-            review_hash:boundReview.review_hash,expected_generation_epoch:boundReview.generation_epoch
-          });
-        changedBusiness(receipt);
-        if(current===location&&!hasDirty())await refresh({force:true});
-        notice(retrying?'语音失败项已重新排队。':'本场语音已提交生成。');
-      },true,{generateRoomAudio:'true'});
-      actions.append(generate);
-      function paint(){
-        const job=currentJob(), items=job?.body.items||[], unknown=items.some(uncertain);
-        const pending=active(job)||observation?.pending_job_ids?.length;
-        const blocked=orderBlock();
-        const ready=initialPreparation.body.audio_manifest_ref&&approval?.status==='current';
-        retry=!unknown&&!pending&&job&&['failed','partially_failed','interrupted'].includes(job.body.status)&&
-          items.some(item=>['failed','interrupted'].includes(item.status))?job:null;
-        generate.hidden=!!(ready||pending||unknown);
-        if(!generate.dataset.agentInputLocked)generate.disabled=!!blocked||!!reviewError;
-        generate.textContent=retry?'重试语音失败项':'生成语音';
-        status.textContent=ready?'当前语音已就绪。':
-          pending?(active(job)?'正在生成语音 · '+items.filter(item=>item.status==='succeeded').length+' / '+items.length:'正在等待本场任务完成。'):
-          unknown?'部分语音请求结果待核对。可在「测试与评测」查看任务。':
-          retry?'部分语音生成失败，可重试失败项。':
-          blocked||reviewError||(review?'按已保存的文稿、顺序和音色生成。':'使用已保存的播放顺序，先检查话术再生成。');
-        if(review?.voice.provider==='minimax'&&!ready&&!pending&&!blocked&&!reviewError)
-          status.textContent+=' MiniMax 按实际用量计费。';
-      }
-      async function poll(){
-        if(polling||!observation?.pending_job_ids?.length)return;
-        polling=true;
-        while(box.isConnected&&current===location&&observation.pending_job_ids?.length){
-          await new Promise(resolve=>global.setTimeout(resolve,2500));
-          if(!box.isConnected||current!==location)return;
-          if(document.hidden)continue;
-          try{observation=await observe();}
-          catch{continue;}
-          if(!box.isConnected||current!==location)return;
-          paint();
-          if(!observation.pending_job_ids?.length){
-            if(!isEditing())await refresh();
-            else{
-              status.textContent='本场任务已结束。处理当前编辑后可刷新语音状态。';
-              actions.append(button('刷新状态',()=>refresh(),false,{readOnlyAction:'true'}));
-            }
-          }
-        }
-      }
-      try{
-        observation=await observe();
-        if(initialPreparation.body.compiled_plan_ref&&initialPreparation.body.requirements_ref){
-          [review,approval]=await Promise.all([
-            api.query('create_text_review',{preparation_id:pid}),api.query('read_text_approval',{preparation_id:pid})
-          ]);
-        }
-      }catch(error){
-        reviewError=error.code==='CURRENTNESS_BLOCKED'?'有商品资料需要核对，请先确认本场选品和对应话术。':
-          error.code==='COMPILED_PLAN_STALE'?'编排已变化，请重新保存播放顺序。':'暂时无法读取语音状态，请刷新后重试。';
-        actions.append(button('刷新状态',()=>refresh(),false,{readOnlyAction:'true'}));
-      }
-      scopeInfo.hidden=!review;
-      if(review){
-        scopeInfo.append(E('summary','查看合成范围'),E('p',(review.voice_display_name||review.voice.voice)+' · '+playbackSummary(review),'wb-muted'));
-        scopeInfo.addEventListener('toggle',()=>{
-          if(scopeInfo.open&&!scopeInfo.querySelector('ol')){
-            const lines=E('ol');
-            for(const item of review.texts)lines.append(E('li',item.spoken_text));
-            scopeInfo.append(lines);
-          }
-        },{passive:true});
-      }
-      paint();
-      const ready=initialPreparation.body.audio_manifest_ref&&approval?.status==='current';
-      if(ready){
-        try{await renderAudioPublication(publication,pid,initialPreparation,approval);}
-        catch{
-          status.textContent='当前播出内容需要核对。请检查选品和播放顺序，或刷新状态。';
-          actions.append(button('刷新状态',()=>refresh(),false,{readOnlyAction:'true'}));
-        }
-      }
-      if(observation?.pending_job_ids?.length)global.setTimeout(()=>void poll(),1000);
-      return paint;
+      async function reorder(mode){if(!items.length)throw Error('请先将需要的版本加入播放顺序');const productOrder=[...new Set([...(saved?.body.product_group_order||[]),...items.map(item=>item.product_id)])];if(saved&&!buffer.dirty){const spec={mode,product_group_order:productOrder,within_product:'keep',seed:uid().replace(/-/g,''),algorithm_version:'reorder-v1'},result=await api.query('preview_playlist_reorder',{preparation_id:pid,ref:saved.ref,spec});items=copy(result.proposed_items);preview={spec:result.resolved_spec,hash:result.preview_hash};}else{const groups=productOrder.map(id=>items.filter(item=>item.product_id===id));if(mode==='grouped')items=groups.flat();else if(mode==='interleave'){items=[];for(let i=0;groups.some(group=>i<group.length);i++)groups.forEach(group=>{if(group[i])items.push(group[i]);});}else for(let i=items.length-1;i>0;i--){const j=crypto.getRandomValues(new Uint32Array(1))[0]%(i+1);[items[i],items[j]]=[items[j],items[i]];}preview=null;}changed(buffer);paint();notice('已预览整版顺序，保存后才会生效。');}
+      const save=async()=>{if(!items.length)throw Error('至少选择一个播放项');const result=await command('save_playlist',{preparation_id:pid,expected_revision:buffer.base_ref.revision,items,loop_mode:loop.value,product_group_order:preview?.spec.product_group_order||[...new Set(items.map(item=>item.product_id))],reorder_spec:preview?.spec||null,preview_hash:preview?.hash||null});let compiled;try{compiled=await command('compile_playback_plan',{preparation_id:pid,expected_revision:result.data.preparation_ref.revision,playlist_ref:result.data.playlist_ref});}catch(error){clearBuffer(buffer);changedBusiness(result);await refresh({force:true});notice('顺序已保存，编排检查未完成：'+error.message+' 请让右侧 Agent 按新位置补齐缺失开场；已存在正文继续保留。');return;}clearBuffer(buffer);changedBusiness(compiled);await refresh({force:true});notice('顺序已保存。第1、6、11…项使用长开场，其余短引入；只检查需要的开场，不重写其他正文。');};
+      buffer=registerBuffer('playlist:'+pid,'播放顺序',initialPreparation.ref,read,write,save,order);const toolbar=E('div',undefined,'wb-toolbar wb-version-toolbar');toolbar.append(button('同商品连续',()=>reorder('grouped')),button('商品穿插',()=>reorder('interleave')),button('随机重排',()=>reorder('full_shuffle')),button('保存顺序并检查',save,true));
+      order.append(summary,toolbar,list,available,E('p','每项都是完整版本，模块顺序不参与拖动。播完从第一项继续循环，直到手动停止。估时按240有效口播字/分，生成语音后以实测为准。','wb-muted'));node.append(order);paint();await renderAudio(node);
     }
     async function renderAudio(node){const pid=prepId();const initialPreparation=copy(prep());const observation=await api.query('read_completion_observation',{preparation_id:pid});const box=region(section('整包检查与语音'),{kind:'playlist',id:pid});box.append(E('p','先检查当前文本、顺序和音色；你批准整包后才能提交试听或生成语音。','wb-muted'));let review=null,approval=null;try{review=await api.query('create_text_review',{preparation_id:pid});approval=await api.query('read_text_approval',{preparation_id:pid});}catch(e){box.append(E('p','尚不能检查：'+e.message,'wb-inline-alert'));}if(review){const summary=E('div',undefined,'wb-record-meta');summary.append(E('p',playbackSummary(review)+' · '+review.voice.provider+' / '+review.voice.voice),jsonDetails('查看本场整包文本与开场位置',{texts:review.texts,plan_summary:review.plan_summary,voice:review.voice,cost_scope:review.cost_scope,playback_statistics:review.playback_statistics}));box.append(summary);const currentApproval=approval?.status==='current';box.append(E('span',currentApproval?'当前整包已批准':'尚未批准当前整包','wb-badge '+(currentApproval?'wb-badge--success':'wb-badge--warning')));if(!currentApproval)box.append(button('批准当前整包文本',async()=>{if(hasDirty())throw Error('请先保存或放弃未保存编辑，再批准整包。');const r=await command('approve_text_for_audio',{preparation_id:pid,expected_revision:initialPreparation.ref.revision,review_hash:review.review_hash});changedBusiness(r);await refresh({force:true});notice('当前整包文本已批准，尚未调用 TTS。');},true));else{box.append(button('生成本场所需语音',async()=>{if(hasDirty())throw Error('请先保存或放弃未保存编辑。');const r=await command('prepare_required_audio',{preparation_id:pid,expected_revision:initialPreparation.ref.revision,approval_ref:approval.approval_ref,review_hash:review.review_hash,expected_generation_epoch:initialPreparation.body.generation_epoch});changedBusiness(r);await refresh({force:true});notice('语音任务已受理。仅生成本场实际需要的句子；请查看任务进度。');},true));const choice=select(review.texts[0]?.requirement_id,review.texts.map(t=>[t.requirement_id,t.spoken_text.slice(0,45)]),'试听句子');box.append(field('选一句试听（会调用当前 TTS）',choice),button('生成选中一句的试听',async()=>{const r=await command('preview_audio',{preparation_id:pid,expected_revision:initialPreparation.ref.revision,approval_ref:approval.approval_ref,review_hash:review.review_hash,expected_generation_epoch:initialPreparation.body.generation_epoch,requirement_id:choice.value});changedBusiness(r);await refresh({force:true});}),button('撤销文本批准',async()=>{const r=await command('revoke_text_approval',{approval_ref:approval.approval_ref,reason:'用户在工作台撤销'});changedBusiness(r);await refresh({force:true});}));}}
       for(const job of observation.jobs||[]){const jobBox=section((job.body.kind==='scripts'?'话术':job.body.kind==='preview'?'试听':'语音')+'任务 · '+job.body.status);let failed=false;for(const item of job.body.items||[]){jobBox.append(E('p',item.status+' · '+(item.input?.spoken_text||item.input?.product_ref?.id||item.item_id),'wb-muted'));if(['failed','interrupted'].includes(item.status))failed=true;const url=safeUrl(item.output?.asset?.url);if(url){const audio=routedAudio(E('audio'));audio.controls=true;audio.preload='none';audio.src=url;jobBox.append(audio);}if(item.error)jobBox.append(jsonDetails('此项错误',item.error));}if(failed)jobBox.append(button('仅重试失败项',async()=>{const r=await command('retry_failed_items',{job_id:job.ref.id});changedBusiness(r);await refresh({force:true});}));if(['queued','running'].includes(job.body.status))jobBox.append(button('取消此任务',async()=>{const r=await command('cancel_job',{job_id:job.ref.id});changedBusiness(r);await refresh({force:true});}));box.append(jobBox);}
-      box.dataset.audioReview='';
-      markResultSection(box,'audio_manifest',initialPreparation.body.audio_manifest_ref);
-      box.append(button('刷新任务与语音状态',()=>refresh()));
-      await renderAudioPublication(box,pid,initialPreparation,approval);
-      node.append(box);
-    }
-    async function renderAudioPublication(box,pid,initialPreparation,approval){
-      const publication=initialPreparation.body.candidate_publication_ref;
-      if(initialPreparation.body.audio_manifest_ref&&approval?.status==='current'&&!publication)box.append(button('生成本场播出候选',async()=>{const r=await command('publish_preparation',{preparation_id:pid,expected_revision:initialPreparation.ref.revision,approval_ref:approval.approval_ref});changedBusiness(r);await refresh({force:true});},true));
-      if(publication){
-        const review=await api.query('create_review',{ref:publication});
-        const candidate=markResultSection(E('section'),'publication',publication);
-        candidate.append(E('h3','本场播出内容','wb-section-heading'),E('p',review.adopted?'当前候选已采用，尚未代表开播。':'候选已生成，采用前将再次检查最新版本。','wb-badge'));
-        if(review.currentness?.differences?.length){
-          candidate.append(jsonDetails('商品新旧差异',review.currentness));
-          for(const diff of review.currentness.differences){
-            if(!diff.diff_hash)continue;
-            const choices=section('商品修订有变化');
-            choices.append(jsonDetails('查看本次差异',diff));
-            for(const[choice,label]of [['keep_pinned','保留旧版'],['refresh','刷新到新版']])choices.append(button(label,async()=>{const r=await command('record_product_revision_choice',{preparation_id:pid,expected_revision:initialPreparation.ref.revision,pinned_product_ref:diff.pinned_ref||diff.pinned_product_ref,observed_head_ref:diff.head_ref||diff.observed_head_ref,diff_hash:diff.diff_hash,choice});changedBusiness(r);await refresh({force:true});}));
-            candidate.append(choices);
-          }
-        }
-        if(review.currentness?.blockers?.length)candidate.append(jsonDetails('采用前需要处理的问题',review.currentness.blockers));
-        else if(!review.adopted)candidate.append(button('确认采用本场',async()=>{if(hasDirty())throw Error('请先保存或放弃未保存编辑，再采用。');const r=await command('adopt_snapshot',{publication_ref:publication,review_hash:review.review_hash,expected_room_revision:review.room_ref.revision});changedBusiness(r);await refresh({force:true});notice('本场播出版本已采用。当前没有启动直播。');},true));
-        box.append(candidate);
-      }
-    }
+      box.append(button('刷新任务与语音状态',()=>refresh()));if(initialPreparation.body.audio_manifest_ref&&approval?.status==='current'&&!initialPreparation.body.candidate_publication_ref)box.append(button('生成本场播出候选',async()=>{const r=await command('publish_preparation',{preparation_id:pid,expected_revision:initialPreparation.ref.revision,approval_ref:approval.approval_ref});changedBusiness(r);await refresh({force:true});},true));if(initialPreparation.body.candidate_publication_ref){const review=await api.query('create_review',{ref:initialPreparation.body.candidate_publication_ref});box.append(E('p',review.adopted?'当前候选已采用，尚未代表开播。':'候选已生成，采用前将再次检查最新版本。','wb-badge'));if(review.currentness?.differences?.length){box.append(jsonDetails('商品新旧差异',review.currentness));for(const diff of review.currentness.differences){if(!diff.diff_hash)continue;const choices=section('商品修订有变化');choices.append(jsonDetails('查看本次差异',diff));for(const[choice,label]of [['keep_pinned','保留旧版'],['refresh','刷新到新版']])choices.append(button(label,async()=>{const r=await command('record_product_revision_choice',{preparation_id:pid,expected_revision:initialPreparation.ref.revision,pinned_product_ref:diff.pinned_ref||diff.pinned_product_ref,observed_head_ref:diff.head_ref||diff.observed_head_ref,diff_hash:diff.diff_hash,choice});changedBusiness(r);await refresh({force:true});}));box.append(choices);}}if(review.currentness?.blockers?.length)box.append(jsonDetails('采用前需要处理的问题',review.currentness.blockers));else if(!review.adopted)box.append(button('确认采用本场',async()=>{if(hasDirty())throw Error('请先保存或放弃未保存编辑。');const r=await command('adopt_snapshot',{publication_ref:initialPreparation.body.candidate_publication_ref,review_hash:review.review_hash,expected_room_revision:review.room_ref.revision});changedBusiness(r);await refresh({force:true});notice('本场播出版本已采用。当前没有启动直播。');},true));}node.append(box);}
     async function renderChanges(node){
       const pid=prepId();node.append(header('变更记录与引用','按最新优先展示本场及共享商品库的实际记录，可继续加载更早记录。'));node.append(jsonDetails('本场引用与版本',copy(prep())));
       const list=E('div',undefined,'wb-change-list'),seen=new Set();let cursor=0;node.append(list);
@@ -2463,9 +513,9 @@
       async function load(){const page=await api.query('read_events',{cursor,limit:50,scope_id:pid,include_catalog:true,order:'desc'});for(const event of page.events||page.items||[]){const id=event.event_id||event.sequence||JSON.stringify(event);if(seen.has(id))continue;seen.add(id);list.append(jsonDetails((event.type||event.event_type||'业务变更')+' · '+(event.timestamp||event.occurred_at||''),event));}cursor=page.next_cursor;more.hidden=!page.has_more;if(!seen.size&&!list.childElementCount)list.append(E('p','当前本场和共享商品库暂无变更记录。','wb-muted'));}
       await load();
     }
-    function dispose(){closeProductDialog({restoreFocus:false,keepDraft:true});closeScriptReader({restoreFocus:false,force:true});document.removeEventListener('keydown',readerKeydown);disposed=true;lockObserver.disconnect();lockedControls.clear();cache.clear();productMaterialFlows.clear();roomMaterialFlows.clear();catalogViewStates.clear();catalogThumbnailReads.clear();catalogResizeObserver?.disconnect();}
-    return {open,renderRoomOverlay,showRoomProductDetail,openSessionProductConfig,closeCatalogImportDialog,getContext,hasOpenProductDialog:()=>!!productDialog,hasOpenScriptReader:()=>!!scriptReader,hasOpenSessionProductConfig:()=>!!content.querySelector('dialog[data-session-product-id][open]'),setEditorLocks,setSelected,hasDirty,getDirtySummary,saveDirty,discardDirty,resolveSelection,refresh,createPreparation,resolveDefaultRoomPreparation,saveRoomProductSelection,refreshRoomProductReference,verifyUnknownOperation,dispose,_inspect:()=>({current:copy(current),dirty:getDirtySummary(),cache:cache.size,disposed,unknownOperation:copy(unknownOperation)})};
+    function dispose(){closeScriptReader({restoreFocus:false,force:true});document.removeEventListener('keydown',readerKeydown);disposed=true;lockObserver.disconnect();lockedControls.clear();cache.clear();for(const url of previewUrls)URL.revokeObjectURL(url);}
+    return {open,getContext,setEditorLocks,setSelected,hasDirty,getDirtySummary,saveDirty,discardDirty,resolveSelection,refresh,createPreparation,verifyUnknownOperation,dispose,_inspect:()=>({current:copy(current),dirty:getDirtySummary(),cache:cache.size,disposed,unknownOperation:copy(unknownOperation)})};
   }
-  global.ShengboWorkspaceEditors={mount,preparationTitle,preparationAdopted,_test:{schemaDefault,effectiveSchema,safeUrl,reusableDraft,trimCommerceReferences,matchingLocks,newVariantModuleKeys,scriptTextMetrics,currentScriptVariants,playbackSummary,activeProductFields,applyOptionalProductVisibility,unpackCorePoint,packCorePoint,preparationTitle,preparationAdopted,preparationStateLabel}};
+  global.ShengboWorkspaceEditors={mount,preparationTitle,_test:{schemaDefault,effectiveSchema,safeUrl,reusableDraft,trimCommerceReferences,matchingLocks,newVariantModuleKeys,scriptTextMetrics,currentScriptVariants,playbackSummary,activeProductFields,applyOptionalProductVisibility,unpackCorePoint,packCorePoint,preparationTitle,preparationAdopted,preparationStateLabel}};
   if(typeof module!=='undefined'&&module.exports)module.exports={schemaDefault,effectiveSchema,safeUrl,reusableDraft,trimCommerceReferences,matchingLocks,newVariantModuleKeys,scriptTextMetrics,currentScriptVariants,playbackSummary,activeProductFields,applyOptionalProductVisibility,unpackCorePoint,packCorePoint,preparationTitle,preparationAdopted,preparationStateLabel};
 })(typeof window!=='undefined'?window:globalThis);

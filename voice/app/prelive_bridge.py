@@ -159,9 +159,7 @@ class ExistingVoiceAdapter:
 
     def script_generation_signature(self):
         """Whole responses never share a cache identity with legacy modules."""
-        from .prelive.whole_script_generation import PROTOCOL, whole_script_flash_options
-        if options := whole_script_flash_options():
-            return {"provider": "deepseek", "model": options["model"], "thinking": options["thinking"], "protocol": PROTOCOL}
+        from .prelive.whole_script_generation import PROTOCOL
         return {**self.module_generation_signature(), "protocol": PROTOCOL}
 
     async def generate_script(self, context, actions, product, *, response_observer=None):
@@ -431,9 +429,6 @@ def install(app, server_module):
             return response
         except BusinessError as error:
             return JSONResponse({"schema_version": "PRELIVE-2.3", "error": error.payload()}, status_code=error.status)
-
-    from .model_key_setup import install_model_key_setup
-    install_model_key_setup(app, server_module, browser_identity)
 
     @app.api_route("/api/assistant/v2/{path:path}", methods=["GET", "POST", "PUT", "PATCH", "DELETE"])
     async def proxy(path: str, request: Request):

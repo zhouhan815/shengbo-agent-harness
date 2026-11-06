@@ -12,7 +12,6 @@ const { chromium } = require('playwright');
     const errors = []; page.on('pageerror', e => errors.push(e.message));
     await page.setContent('<!doctype html><meta charset="utf-8"><div id="assistant" style="width:100%;height:960px"></div>');
     await page.addStyleTag({ content: fs.readFileSync(path.join(__dirname, 'assistant.css'), 'utf8') });
-    await page.addScriptTag({ path: path.join(__dirname, 'assistant-decision-copy.js') });
     await page.addScriptTag({ path: path.join(__dirname, 'assistant.js') });
     await page.evaluate(() => {
       window.calls = []; window.sequence = 0;
@@ -79,7 +78,7 @@ const { chromium } = require('playwright');
     const beforeEmptyRevision = (await answers()).length;
     await page.getByRole('button', { name: '按意见修改', exact: true }).click();
     assert.equal((await answers()).length, beforeEmptyRevision, 'empty revision does not submit');
-    assert.ok((await page.locator('.sb-a-decision-error').textContent()).includes('请先填写'));
+    assert.ok((await page.locator('.sb-a-error').textContent()).includes('请先填写'));
     await page.getByRole('textbox', { name: '卖点修改意见（可选）' }).fill('强调自主练习，不承诺提高球技');
     assert.equal(await approve.isEnabled(), false, 'unsubmitted feedback cannot silently approve old content');
     await page.getByRole('textbox', { name: '卖点修改意见（可选）' }).fill('');
@@ -110,54 +109,6 @@ const { chromium } = require('playwright');
     await page.locator('.sb-a-answer').fill('修改意见');
     await page.locator('.sb-a-answer').fill('');
     assert.equal(await page.getByRole('button', { name: '受约束的确认', exact: true }).isEnabled(), false, 'editing feedback cannot bypass an explicit human-action requirement');
-    await page.evaluate(async () => {
-      window.run.questions = [{ decision_id: 'catalog-test', status: 'OPEN', revision: 1, kind: 'catalog_confirm',
-        prompt: '模拟资料：标准装 29.90 元。日常售价→price；直播售价→promo_price。缺项 image、sales_platform。',
-        options: [{ value: 'split_by_sku', label: '拆分保存，日常价=price、直播价=promo_price' },
-          { value: 'skip_save', label: '暂不保存' }], allow_text: true }];
-      await window.ui.refresh();
-    });
-    const dialog = page.getByRole('dialog', { name: '确认商品入库方案' });
-    assert.ok(await dialog.isVisible());
-    assert.equal(await page.locator('.sb-a-transcript [data-decision-id]').count(), 0);
-    assert.doesNotMatch(await dialog.innerText(), /\b(?:price|promo_price|image|sales_platform)\b/);
-    assert.match(await dialog.innerText(), /促销参考价/);
-    await page.getByRole('button', { name: '稍后处理' }).click();
-    await page.evaluate(() => window.ui.refresh());
-    assert.equal(await dialog.count(), 0, 'a polling refresh must not reopen a deferred dialog');
-    await page.getByRole('button', { name: '查看待确认' }).click();
-    await dialog.getByRole('textbox').fill('只整理差异，等我确认后再写入');
-    assert.equal(await dialog.getByRole('button', { name: /拆分保存/ }).isEnabled(), false);
-    await dialog.getByRole('button', { name: '提交答复' }).click();
-    await page.waitForFunction(() => window.calls.some(c => c.url.endsWith('/decisions/catalog-test/answers')));
-    assert.deepEqual((await answers()).at(-1).body.answer, { text: '只整理差异，等我确认后再写入' });
-    await page.evaluate(async () => {
-      window.run.questions = [{ decision_id: 'legacy-catalog-options', status: 'OPEN', revision: 1, kind: 'catalog_confirm',
-        prompt: '请选择要入库的方式',
-        options: [{ save_both: '标准装与加量装分别入库' }, { save_standard: '只保存标准装' }, { skip: '暂不入库' }],
-        allow_text: true }];
-      await window.ui.refresh();
-    });
-    assert.deepEqual(await dialog.locator('.sb-a-question-actions button').allTextContents(),
-      ['标准装与加量装分别入库', '只保存标准装', '暂不入库']);
-    await dialog.getByRole('button', { name: '只保存标准装' }).click();
-    await page.waitForFunction(() => window.calls.some(c => c.url.endsWith('/decisions/legacy-catalog-options/answers')));
-    assert.equal((await answers()).at(-1).body.answer, 'save_standard');
-    await page.evaluate(async () => {
-      window.run.questions = [{ decision_id: 'ambiguous-options', status: 'OPEN', revision: 1, kind: 'catalog_confirm',
-        prompt: '请选择要入库的方式', options: [{ save_both: '分别入库', skip: '暂不入库' }], allow_text: true }];
-      await window.ui.refresh();
-    });
-    assert.equal(await dialog.locator('.sb-a-question-actions button').count(), 0);
-    assert.match(await dialog.innerText(), /选项说明不完整/);
-    assert.ok(await dialog.getByRole('textbox').isVisible());
-    await page.evaluate(async () => {
-      window.run.questions = [{ decision_id: 'retired-question', status: 'OPEN', revision: 1, kind: 'catalog_confirm', prompt: '已经停止的任务' }];
-      window.run.status = 'CANCELLED'; await window.ui.refresh();
-    });
-    assert.equal(await page.getByRole('dialog').count(), 0);
-    assert.equal(await page.getByRole('button', { name: '查看待确认' }).count(), 0);
-    await page.evaluate(() => { window.run.status = 'WAITING_USER'; });
     await askConfirmation();
     await page.setViewportSize({ width: 390, height: 844 });
     await page.evaluate(() => { document.getElementById('assistant').style.height = '810px'; document.body.style.margin = '0'; });

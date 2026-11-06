@@ -111,17 +111,18 @@ def test_legacy_whole_script_and_true_offer_gates_still_need_nonstackable_condit
     assert issues(complete) == []
 
 
-def test_intro_boundary_stays_scoped_and_shared_marketing_guidance_refreshes_cache_identities():
-    assert hashlib.sha256(generation.SYSTEM.encode()).hexdigest() == "481def3d367d2ee18e94bd80b86e31870f75323a57d599f42addf26b532f0c7b"
-    expected = {"opening_long": "745cc98d6ea3b9f1", "opening_short": "ab9a94915b1cd9ec",
-        "product_intro": "ff5cd704bd066e47", "selling_points": "016cccf3ef450bf1", "campaign": "140d9a9c4f38b616",
-        "cta": "1766e33dfe22be63", "transition": "481def3d367d2ee1"}
-    for key, revision in expected.items():
+def test_intro_boundary_is_guidance_only_and_other_cache_identities_remain_stable():
+    assert hashlib.sha256(generation.SYSTEM.encode()).hexdigest() == "9da25be062a955b32f9597923d500667cb3e15c9f7c064a70c5bda136572367a"
+    expected_unchanged = {"opening_long": "216323ada5c416af", "opening_short": "ab534e305c17c9a9",
+        "selling_points": "71c0b1b8466f800b", "campaign": "2fc3127842895898",
+        "cta": "b1fb08b56d57441f", "transition": "9da25be062a955b3"}
+    for key, revision in expected_unchanged.items():
         assert generation.module_prompt_revision(key) == revision
+    assert generation.module_prompt_revision("product_intro") != "22f94f7216766512"
     request = generation.build_request(product(), {"module_key": "product_intro"}, "product_intro", [], model="offline")
     task = json.loads(request["messages"][1]["content"])
-    assert "不编配件、包装、物流及排他属性" in task["module_spec"]
-    assert "准确售价可在促单讲" in task["module_spec"]
+    assert "不是礼盒套装、没有礼盒等商品否定事实" in task["module_spec"]
+    assert "简介不做促销预告" in task["module_spec"]
 
 
 @pytest.mark.asyncio

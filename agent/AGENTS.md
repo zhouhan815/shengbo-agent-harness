@@ -1,14 +1,5 @@
 # 声播播前Agent项目上下文
 
-- 2026-11-05 当前仅正式环境与第二环境。正式根目录保持原路径，已恢复本轮token精简前的工作流与Flash配置；API管理及后续优化留在 D:/Codex project/shengbo-second-environment。修改在用户指定环境进行，第二环境未经确认不得同步正式。正式源码继续使用既有GitHub仓库与原同步任务，不新建镜像。
-
-- 2026-11-05 用户要求所有 DeepSeek 模型统一 Flash。正式默认主 Agent、子 Agent、摘要、提取、卖点生成与事实复核及恢复均用 canonical `deepseek-flash`。主 Agent 及各角色既有思考设置保留；正式整稿／模块话术和实时回复使用 Flash，话术继续原创作简报和关闭思考的流程。此要求覆盖历史 Pro 选择，避免再次恢复旧配置。
-- 2026-11-04 话术生成分工：普通单版由主Agent保留现有授权、精确上下文和模块计划，文案模型同一次整版请求选择购买角度、写正文。只有同商品多版或用户明确要差异时才在现有计划分配方向。具体缺项按授权定向局改，保留其余文本并核验合稿。常规单版新计划误选逐模块会在写入前纠正，旧作业恢复、精确局部编辑和扩版沿用既有路径。一次整版写作只计Voice文案请求，主Agent的意图、授权、读取、协调与交付仍独立。
-
-- 2026-11-03 核心卖点一键补空：入库报告的生成并保存按钮通过 `generate_and_save` 明确授权，只能写入所选精确版本仍为空白的核心卖点。新任务由固定流程核对授权、读取商品、复用或验收顾客研究、保存和收尾。单款正常路径调用一次撰写、一次独立事实复核，缺适用研究时多一次研究。模型选择当前商品的证据编号，程序取回原文并核对写入范围，以实际回执交付。历史 `generate` 任务及普通对话沿用原候选确认。
-
-- 2026-11-03 人工确认文案：每个可点击选项必须用用户能看懂的文字说明具体操作和主要后果。Agent 单独传输内部选项值和显示文案，界面用显示文案渲染，提交时保留原选项值。旧格式只有在能唯一还原两者时才展示，遇到歧义提示补充说明或重新生成选项。回归覆盖真实滚筒入库的「两款分别入库」「只保存标准装」「暂不入库」。
-
 - 2026-10-21 MiniMax连续试听：独立`audio_preview`目标与`preview_script_audio`工具仅执行真实人工回执固定的script/module原文、顺序、voice/style。人工命令`approve_script_audio_preview`不等同整包语音批准；专用HITL核验真实回执再恢复，未知付费请求先对账。第一版长开场＋商品介绍已由实际Agent一次请求生成114.148秒WAV，usage_characters=1094。入口与证据见output/20261021-minimax-two-modules/连续语音试听与控制说明.md。正式整包句级编排尚未迁移段级，不能把试听成功冒充整场播音连贯度已验收。
 
 - 工程设计入口：`D:/Codex project/shengbo-ops-agent-plan/README_当前设计入口.md`。
@@ -84,4 +75,3 @@
   - 省token（上下文管理）：M3默认split——阶段固定字段（Goal、授权、原始请求、资料引用、约束）进系统前缀可缓存，变化状态留末尾；被重派替代的失败分支只留一行；核心手册正文并入主Agent系统提示（记为delivery=system_prompt），只预加载分册；分册frontmatter `metadata.shengbo_tool_groups`在预加载时一次展开工具组，运行中工具列表不变（未用原生include_tools：其随手册在上下文才出现，摘要后会变）；原生ContextEditingMiddleware(ClearToolUsesEdit)只清理可按ref重读的读取结果（主>3万、分支>2万tokens，保留最近6条）。
   - 监控：model.request记录实际模型/思考档（thinking_mode）；对比脚本新增milestones（scripts_ready目标≤600秒）、skill读取只计/skills/。
 - 已知未修：DeepSeek在格式/规则遵守上出错多于ChatGPT（分支越权读资料SOURCE_SCOPE_DENIED会硬停并重派）；语音端test_module_generation两条旧用例（fact_reference失败、oversize用例卡住）在改动前即存在。
-- 新话术的内部`variant_id`由 Ops 在授权范围校验之后按业务操作和计划条目分配，`version_number`继续按商品展示。原工具调用以原提交哈希验证重放并复用已保存计划，修订保留准确的基准方案标识，扩版保留原稿引用并取得新标识。

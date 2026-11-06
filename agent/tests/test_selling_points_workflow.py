@@ -20,7 +20,7 @@ from pydantic import PrivateAttr
 from shengbo_contracts.common import ContractError
 from shengbo_contracts.common import canonical_hash
 from shengbo_contracts.business import AnalysisReport
-from shengbo_prelive.models import AnswerRequest, IntentAssessment, MessageRequest, RunScope
+from shengbo_prelive.models import AnswerRequest, IntentAssessment, RunScope
 from shengbo_prelive.runtime import CURRENT_SCOPE
 from shengbo_prelive.workflows import run_workflow
 from test_runtime_business import Product, env, human_command, new_run, stop_at_interrupt
@@ -125,64 +125,6 @@ def assert_no_script_or_audio(case):
     for operation in case.engine.store.list('operation'):
         assert operation['key'] not in {'submit_script_change', 'patch_script',
             'prepare_required_audio', 'publish_preparation'}
-
-
-@pytest.mark.asyncio
-async def test_report_submit_drafts_two_exact_products_without_repeating_generation_question(env, monkeypatch):
-    engine, service = env
-    first = await create_tennis(service)
-    snapshot = await service.query('read_product', {'ref': first})
-    second = (await human_command(service, 'save_product', {
-        'fields': {**fields(snapshot), 'name': '隔离测试单人网球回弹训练器 双球款', 'sku_id': 'TEST-SECOND'},
-        'schema_hash': service.schema()['schema_hash'], 'patches': [],
-    }))['data']['product_ref']
-    refs = [first, second]
-    conversation = engine.create_conversation({'scope': {'kind': 'catalog'}})
-    selection = {'items': [{'label': '核心卖点', 'target': {'object_ref': ref, 'field_path': '/core_selling_points'}}
-                           for ref in refs]}
-    text = '请为选中的商品生成核心卖点候选。只修改核心卖点，确认后再保存。'
-    request = MessageRequest(text=text, intent_mode='new_task', client_request_id='explicit-selling-points',
-        view_context={'view': 'products', 'selling_points_action': 'generate'},
-        selection=selection, observed_versions=refs)
-    with pytest.raises(ContractError, match='SELLING_POINTS_REQUEST_INVALID'):
-        await engine.submit_message(conversation['id'], request.model_copy(update={'observed_versions': request.observed_versions[:1]}))
-    accepted = await engine.submit_message(conversation['id'], request)
-    rid = accepted['run']['id']
-    intent = IntentAssessment(objective='catalog_update', summary='仅整理选中两款的核心卖点',
-        target_product_ids=[ref['id'] for ref in refs], authorization_quote=text,
-        requested_product_paths=['/core_selling_points'], product_field_scope_quote='只修改核心卖点')
-    with pytest.raises(ContractError, match='SELLING_POINTS_INPUT_INVALID'):
-        engine.save_assessment(RunScope(rid, 'bad-intent', 'intent'), intent.model_copy(update={'target_product_ids': ['unselected']}))
-    engine.save_assessment(RunScope(rid, 'explicit-intent', 'intent'), intent)
-    await engine._freeze_goal(engine.store.get('run', rid))
-    run = engine.store.get('run', rid)
-    case = SimpleNamespace(engine=engine, service=service, ref=first, run=run,
-                           scope=RunScope(rid, 'explicit-selling-points', 'execute'))
-
-    async def blocked_raw_save(ref):
-        current = await service.query('read_product', {'ref': ref})
-        raw_points = ['尚未确认的卖点']
-        with pytest.raises(ContractError, match='SELLING_POINTS_CONFIRMATION_REQUIRED'):
-            await engine.business_command(case.scope, 'save_product', {'product_id': ref['id'],
-                'expected_revision': ref['revision'], 'schema_hash': service.schema()['schema_hash'],
-                'fields': {**fields(current), 'core_selling_points': raw_points, 'selling_points': raw_points[0]},
-                'patches': [{'path': '/core_selling_points', 'op': 'set', 'value': raw_points}]}, 'unapproved-' + ref['id'])
-
-    for index, ref in enumerate(refs):
-        case.ref = ref
-        await blocked_raw_save(ref)
-        offer = await execute(case, 'offer', {'product_ref': ref}, 'offer-explicit-' + str(index))
-        assert offer['status'] == 'generation_requested' and 'human_receipt' not in offer
-        assert not engine.get_run(rid)['questions']
-        question = await proposed(case, monkeypatch, call_id='propose-explicit-' + str(index))
-        assert question['preview']['product_ref']['id'] == ref['id']
-        assert question['preview']['generation_intent']['source'] == 'submitted_product_selection'
-        await blocked_raw_save(ref)
-        await answer(case, question, 'approve')
-        await execute(case, 'save', {'proposal_id': proposal_id(question)}, 'save-explicit-' + str(index))
-        assert (await catalog(case))['body']['core_selling_points']
-    questions = [item for item in engine.store.list('question') if item['run_id'] == rid]
-    assert [item['kind'] for item in questions] == ['selling_points_confirmation'] * 2
 
 
 @pytest.mark.asyncio

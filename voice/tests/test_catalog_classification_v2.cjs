@@ -76,7 +76,7 @@ async function main(){
       const faq='问：如何打理？\n答：按已确认的清洗说明操作。';await field('faq').fill(faq);
       await nav({view:'products',product_id:'product-B',preparation_id:null});await nav({view:'products',product_id:'product-A',preparation_id:null});
       assert.equal(await field('faq').inputValue(),faq);assert.equal(await page.getByLabel('规格内容 1',{exact:true}).inputValue(),'已确认EVA');
-      await page.getByRole('button',{name:'保存修改',exact:true}).click();await idle();const saved=state.calls.filter(c=>c.body?.command==='save_product').at(-1).body.args;
+      await page.getByRole('button',{name:'保存商品',exact:true}).click();await idle();const saved=state.calls.filter(c=>c.body?.command==='save_product').at(-1).body.args;
       assert.equal(saved.fields.faq,faq);assert.deepEqual(saved.fields.knowledge_documents,originalDocuments);assert.deepEqual(saved.fields.specifications,[{name:'材质',value:'已确认EVA'},{name:'尺码',value:'36—45'},{name:'适用范围',value:'日常居家'}]);
       assert.ok(saved.patches.some(p=>p.path==='/faq'));assert.ok(saved.patches.some(p=>p.path==='/specifications'));assert.ok(!saved.patches.some(p=>p.path==='/knowledge_documents'));
     });

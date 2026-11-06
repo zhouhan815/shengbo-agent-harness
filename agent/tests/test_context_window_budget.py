@@ -273,8 +273,7 @@ def test_wire_preview_has_real_schemas_without_constructing_credentials():
     assert names == {tool.name for tool in registered}, 'the SDK must serialize every public registered tool exactly once'
     assert len(tools) == len(registered) == len(names)
     assert 'read_generation_output' in names
-    assert names - {'read_generation_output', 'import_script', 'patch_script', 'wf_selling_points',
-                    'read_script_audio_preview', 'preview_script_audio', 'list_script_audio_previews'} == original_tools
+    assert names - {'read_generation_output', 'import_script', 'patch_script', 'wf_selling_points'} == original_tools
     assert next(tool for tool in tools if tool['name'] == 'save_task_assessment')['parameters']['properties']
     readiness = next(tool for tool in tools if tool['name'] == 'read_audio_readiness')['parameters']
     assert readiness['required'] == ['preparation_id']
@@ -318,13 +317,6 @@ async def test_no_gain_summary_fits_wire_and_does_not_summarize_same_tool_tail_a
         with engine.store.tx() as db:
             assert db.execute('SELECT COUNT(*) FROM attempts WHERE run_id=?', (run['id'],)).fetchone()[0] == 0
         fixed = {**captured[0], 'input': [item for item in captured[0]['input'] if item.get('role') == 'developer']}
-        fixed_tokens = engine._estimate_payload(fixed)
-        summary_trigger, _ = engine.summary_tokens_for('main')
-        # Calibrate against the registered schemas as well as the real wire.
-        # A bigger fixed part can leave the generated tail under the summary
-        # trigger even when the total still sits inside the pressure margin.
-        engine.context_input_token_limit = max(TEST_FIXED_LIMIT, fixed_tokens + summary_trigger + 1536)
-        assert engine.context_input_token_limit <= TEST_FIXED_LIMIT + 2048
 
         def estimate(repetitions):
             result.content = '保留的独立工具批次。' * repetitions

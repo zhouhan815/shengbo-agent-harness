@@ -35,9 +35,6 @@ def test_single_text_projection_preserves_all_words_and_punctuation():
     audit = result["normalization"]
     assert audit["text_unchanged"] and not audit["semantic_changes"] and not audit["content_approved"]
     assert audit["single_source_text_projections"] and source["content"] == original
-    recovery = result["recovery"]
-    assert recovery["status"] == "succeeded" and recovery["disposition"] == "structure_repair"
-    assert recovery["affected_units"] == ["product_intro"] and recovery["model_requests"] == 0
 
 
 def test_legacy_mismatched_two_texts_are_not_silently_changed():

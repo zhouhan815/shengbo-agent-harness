@@ -10,12 +10,9 @@ import time
 from copy import deepcopy
 from typing import Any, Literal
 
-from pydantic import Field, JsonValue, ValidationError, model_validator
-from shengbo_contracts.business import AssetChecklist, ReorderSpec, SaveScriptPlanArgs
-from shengbo_contracts.common import ArtifactRef, RecordRef, ContractError, StrictModel, canonical_hash, now_iso, same_artifact_ref
-from .action_contracts import tool_argument_error
+from pydantic import Field
+from shengbo_contracts.common import ArtifactRef, RecordRef, ContractError, StrictModel, canonical_hash, now_iso
 from .observability import sanitize
-from .script_product_view import script_product_view
 
 
 class MaterialsFlowInput(StrictModel):
@@ -25,7 +22,7 @@ class MaterialsFlowInput(StrictModel):
         description="auto小资料正文只返回一次；复杂长材料先索引，按read_args取sheet/块或图片。full显式重读原文。")
     query: str = ""
     parameters: dict[str, Any] = Field(default_factory=dict,
-        description="save: 原save_product参数。save_from_facts: branch_task_id、精确accepted_report_ref，可选精确product_ref及显式overrides，默认原样使用已验收事实；本场明确授权补齐新商品空白卖点时可传selling_points_from_research={branch_task_id,accepted_report_ref,user_quote}。两种save只写商品库；select: update_preparation_products参数，selected_product_refs须明确给保留原项的完整精确清单，服务端读本场最新CAS。inspect无需参数。")
+        description="save: 原save_product参数。save_from_facts: branch_task_id、精确accepted_report_ref，可选精确product_ref及显式overrides，原样使用已验收事实字段，不自动提炼或改写。两种save只写商品库；select: update_preparation_products参数，selected_product_refs须明确给保留原项的完整精确清单，服务端读本场最新CAS。inspect无需参数。")
 
 
 class AnalysisFlowInput(StrictModel):
@@ -38,54 +35,28 @@ class AnalysisFlowInput(StrictModel):
 class SellingPointsFlowInput(StrictModel):
     action: Literal["inspect", "offer", "propose", "save"] = "inspect"
     parameters: dict[str, Any] = Field(default_factory=dict,
-        description="inspect/offer可用{product_ref:精确商品引用}；inspect也可读proposal_id。propose给product_ref、items、research_refs、direction，items的selling_point/audience_need/use_scene/limitations为字符串，evidence优先用[{evidence_id}]，编号由当前商品的selling_point_evidence返回。报告明确授权生成并保存时，propose须传精确研究引用及证据编号，同一次调用校验并填入空白卖点。其他任务按原规则确认候选，save用proposal_id保存；传统逐字依据[{product_field,fact}]仍可用。")
-
-
-class SessionSettingUpdate(StrictModel):
-    path: str = Field(pattern=r"^/[A-Za-z_][A-Za-z0-9_]*(?:/[A-Za-z0-9_-]+){0,5}$", max_length=300)
-    value: JsonValue
+        description="inspect/offer的parameters仅{product_ref:精确商品引用}，不接受direction或items；offer记录生成意愿，propose前须有其正式generate回执，不能以文本同意冒充。propose给product_ref、items，items每项selling_point/audience_need/use_scene/limitations均为字符串（limitations不能数组），evidence为[{product_field,fact}]数组，可选research_refs/direction；只用当前商品事实，研究不能补造性能。候选等待确认。save仅给proposal_id，原样保存已批准候选，不改其他字段或话术。")
 
 
 class ContextFlowInput(StrictModel):
-    action: Literal["inspect", "save", "apply_session_settings"] = "inspect"
+    action: Literal["inspect", "save"] = "inspect"
     detail: Literal["index", "plan", "full"] = Field(default="index",
         description="inspect默认index：完整商品/草案/精确引用与研究摘要、章节回读路径；plan补齐可读研究计划字段；full显式全文。save始终绑定完整正式原文，不受detail影响。")
     user_decisions: list[dict[str, Any]] = Field(default_factory=list)
     source_refs: list[ArtifactRef] = Field(default_factory=list)
     analysis_refs: list[ArtifactRef] = Field(default_factory=list, max_length=64,
         description="显式追加绑定已正式验收、精确商品版本及读取范围合法的既有研究。与本场原analysis_refs合并，不替换或重做；save绑定完整正文，user_decisions中的ID不算绑定。")
-    session_updates: list[SessionSettingUpdate] = Field(default_factory=list, max_length=32,
-        description="apply_session_settings仅提交用户要求修改的草案字段，例如{path:'/theme',value:'露营专场'}或{path:'/commerce/product_overrides/真实商品ID/price',value:59}。程序保留其余配置。")
-    session_preparation_ref: RecordRef | None = Field(default=None,
-        description="apply_session_settings若已读取本场则原样传精确引用。遇到同时编辑后必须核对最新草案，按返回值提供新的本场引用。")
 
 
 class ScriptFlowInput(StrictModel):
-    action: Literal["execute", "status", "retry", "review", "plan_execute_wait"] = "status"
+    action: Literal["execute", "status", "retry", "review"] = "status"
     plan_ref: ArtifactRef | None = None
     job_id: str | None = None
     recovery_mode: Literal["retry", "revalidate_archived"] = "retry"
-    bundle_ref: ArtifactRef | None = None
-    items: list[dict[str, JsonValue]] = Field(default_factory=list, max_length=64,
-        description="plan_execute_wait使用save_script_change_plan的items格式：新整版或基于同一精确original_script_ref扩版。")
-    recap_dispositions: list[dict[str, JsonValue]] = Field(default_factory=list, max_length=200,
-        description="格式同save_script_change_plan.recap_dispositions。")
-
-    @model_validator(mode="after")
-    def plan_arguments_are_action_specific(self):
-        if self.action != "plan_execute_wait" and (self.bundle_ref or self.items or self.recap_dispositions):
-            raise ValueError("bundle_ref、items 和 recap_dispositions 仅用于 plan_execute_wait")
-        return self
 
 
 class ReviewFlowInput(StrictModel):
-    action: Literal["inspect", "prepare_order", "save_playlist", "reorder", "asset_inputs", "save_assets", "compile", "review"] = "inspect"
-    reorder_spec: ReorderSpec | None = Field(default=None,
-        description="reorder只用于用户明确要求按算法调整已保存队列。给mode、当前队列商品完整顺序和可选组内方式；程序预览、保存并重新编译。")
-    asset_checklist: dict[str, JsonValue] | None = Field(default=None,
-        description="save_assets使用save_asset_checklist的checklist格式。按优先级排列items；无已核实文件时状态填missing。")
-    asset_preparation_ref: RecordRef | None = Field(default=None,
-        description="独立素材任务保存时原样返回asset_inputs提供的本场preparation_ref，避免按过期商品、配置或清单保存。")
+    action: Literal["inspect", "prepare_order", "save_playlist", "save_assets", "compile", "review"] = "inspect"
     parameters: dict[str, Any] = Field(default_factory=dict,
         description="prepare_order: ordered_script_refs为主Agent明确选择的精确话术引用顺序，可选expected_preparation_ref/prompt；仅装配并核验提案，不提问或保存。save_playlist使用原参数；save_assets使用checklist。compile/review无需参数，均不替代人工决定。")
 
@@ -113,7 +84,7 @@ WORKFLOW_EFFECTS = {
     "wf_product_materials": {"save_product", "update_preparation_products"},
     "wf_selling_points": {"save_product"},
     "wf_analysis_coordination": {"accept_analysis_report"},
-    "wf_context_bundle": {"save_context_bundle", "save_session_draft"},
+    "wf_context_bundle": {"save_context_bundle"},
     "wf_script_execution": {"submit_script_change"},
     "wf_playback_review": {"save_playlist", "compile_playback_plan", "save_asset_checklist"},
     "wf_required_audio": {"prepare_required_audio"},
@@ -127,12 +98,6 @@ class Flow:
         self.id = "flow_" + canonical_hash([scope.run_id, name, args])[7:39]
         self.completed = []
         self.started = time.perf_counter()
-
-    def validate_parameters(self, schema, parameters):
-        try:
-            return schema.model_validate(parameters)
-        except ValidationError as error:
-            raise tool_argument_error(self.name, error, prefix=("parameters",)) from None
 
     async def step(self, name, callback, parameters=None):
         await self.engine.assert_scope(self.scope)
@@ -214,12 +179,10 @@ async def run_workflow(engine, scope, name, args, *, tool_call_id=None):
     data = WORKFLOW_SCHEMAS[name].model_validate(args).model_dump(mode="json", exclude_none=True)
     f = Flow(engine, scope, name, data)
     if name == "wf_selling_points" and tool_call_id:
-        from .selling_points import automatic_writeback_requested
-        identity = [scope.run_id, name, tool_call_id]
-        if data.get("action") != "propose" or not automatic_writeback_requested(run):
-            # Preserve existing confirmation/replay identities for generic tasks.
-            identity.append(data)
-        f.id = "flow_" + canonical_hash(identity)[7:39]
+        # Human edit/reject decisions are scoped to one actual invocation.
+        # New model calls may submit the same text for a fresh review, while
+        # interrupt replay of that call must return its original answer.
+        f.id = "flow_" + canonical_hash([scope.run_id, name, tool_call_id, data])[7:39]
     engine._emit(scope.run_id, "workflow.started", {"title": name, "workflow": name,
         "flow_id": f.id, "parameters": data}, scope)
     try:
@@ -254,20 +217,12 @@ async def materials(f, a):
         candidates = await f.query("search_products", {"q": a["query"], "limit": 20}) if a["query"] else None
         result = {"documents": documents, "schema": schema, "identity_candidates": candidates,
             "note": "请主Agent/商品事实分支整理完整配置与缺项，检查歧义；此动作未写商品。商品库保存与本场选品是两个独立动作"}
-        if refs and "save_product" in run.get("allowed_effects", []):
-            original_refs = [ref for ref in run["input"].get("material_refs", []) if ref in refs]
-            try:
-                aliases = await f.engine._verified_source_aliases(f.scope, original_refs)
-            except ContractError as error:
-                result["source_write_readiness"] = {"status": "unverified", "error_code": error.code}
-            else:
-                result["source_write_readiness"] = f.engine._source_analysis_status(f.scope, original_refs, aliases)
         if run["scope"].get("preparation_id"):
             result["preparation_selection"] = preparation_dependencies(await f.prep())
         return f.result(result=result)
     if a["action"] == "save_from_facts":
         from .product_materials import SaveAcceptedProductInput, save_accepted_product
-        candidate = f.validate_parameters(SaveAcceptedProductInput, a["parameters"]).model_dump(mode="json", exclude_none=True)
+        candidate = SaveAcceptedProductInput.model_validate(a["parameters"]).model_dump(mode="json", exclude_none=True)
         receipt = await f.step("save_accepted_product", lambda: save_accepted_product(
             f.engine, f.scope, candidate, tool_call_id=f.id), candidate)
     else:
@@ -325,29 +280,21 @@ def preparation_dependencies(prep, *, candidate_product_refs=None):
 async def analyses(f, a):
     if a["action"] == "dispatch":
         from .tools import DispatchInput
-        dispatch = f.validate_parameters(DispatchInput, a["parameters"])
-        value = await f.step("dispatch_analysis_batch", lambda: f.engine.dispatch(
-            f.scope, dispatch.tasks, dispatch.reason, f.id, wait_for_results=dispatch.wait_for_results,
-            assessment=dispatch.assessment, on_ready=dispatch.on_ready), a["parameters"])
-        statuses = {item["status"] for item in value["items"]}
-        if statuses & {"FAILED", "BLOCKED", "CANCELLED"}:
-            return f.result("NEEDS_REPLAN", result=value)
-        return f.result("WAITING" if statuses & {"QUEUED", "RUNNING", "RECOVERING"} else "COMPLETED", result=value)
+        dispatch = DispatchInput.model_validate(a["parameters"])
+        value = await f.step("dispatch_analysis_batch", lambda: f.engine.dispatch(f.scope, dispatch.tasks, dispatch.reason, f.id), a["parameters"])
+        return f.result("WAITING", result=value)
     if a["action"] == "bind":
         value = await f.step("bind_analysis_product", lambda: f.engine.bind_source_analysis(
             f.scope, a["branch_task_ids"], a["parameters"], f.id), a["parameters"])
         return f.result(result=value)
+    batch = await f.step("read_analysis_batch", lambda: _async_value(f.engine.read_batch_view(f.scope, a["branch_task_ids"])))
     if a["action"] == "accept":
         value = await f.step("accept_analysis_reports", lambda: f.engine.accept_reports(f.scope, a["branch_task_ids"], f.id))
         return f.result(result=value)
-    batch = await f.step("read_analysis_batch", lambda: _async_value(f.engine.read_batch_view(f.scope, a["branch_task_ids"])))
     return f.result(result=batch)
 
 
 async def context(f, a):
-    if a["action"] == "apply_session_settings":
-        from .session_settings import apply_session_settings
-        return await apply_session_settings(f, a["session_updates"], a.get("session_preparation_ref"))
     prep = await f.prep()
     b = prep["body"]
     if not b.get("draft_ref") or not b.get("selected_product_refs"):
@@ -374,11 +321,7 @@ async def context(f, a):
         return f.result(result=receipt)
     # Queries and their trace remain complete. Only the model-facing view is
     # selected; formal bundle creation below still uses preparation refs.
-    run = await f.engine.assert_scope(f.scope)
     products = [await f.query("read_product", {"ref": ref}) for ref in b["selected_product_refs"]]
-    text_only = bool((run.get("goal") or {}).get("script_generation"))
-    if text_only:
-        products = [script_product_view(product) for product in products]
     draft = await f.query("read_context", {"ref": b["draft_ref"], "sections": ["draft"]})
     research = [await f.query("read_analysis_report", {"ref": ref}) for ref in b.get("analysis_refs", [])]
     recaps = [await f.query("read_recap", {"ref": ref}) for ref in b.get("recap_refs", [])]
@@ -387,12 +330,10 @@ async def context(f, a):
         "prior_script_refs": b.get("script_refs", []), "note": "主Agent按本次目标决定生成/局改/复用；原文完整保留"}
     if a["detail"] == "full":
         return f.result(result=inputs)
+    run = await f.engine.assert_scope(f.scope)
     full_ref = f.engine._snapshot_context(run, {"kind": "workflow_context_inputs", "inputs": inputs,
         "branch": {"id": f.scope.branch_task_id}})
-    view = _context_inputs_view(inputs, a["detail"], full_ref)
-    if text_only:
-        view["projection_contract"] += "本次只生成文字，商品事实完整，模型展示与回读省略商品图片。"
-    return f.result(result=view)
+    return f.result(result=_context_inputs_view(inputs, a["detail"], full_ref))
 
 
 def _context_inputs_view(inputs, detail, full_ref):
@@ -470,7 +411,7 @@ def script_recovery_options(job, outcome):
     items, attention = body.get("items", []), job.get("attention_items", [])
     if not isinstance(items, list) or not isinstance(attention, list):
         return []
-    rejection_codes = {"MODULE_RESPONSE_INVALID", "MODULE_RESPONSE_MISMATCH", "WHOLE_SCRIPT_RESPONSE_INVALID", "WHOLE_SCRIPT_RESULT_MISMATCH", "WHOLE_SCRIPT_LENGTH_OUT_OF_RANGE", "SHORT_MODULE_TOO_LONG",
+    rejection_codes = {"MODULE_RESPONSE_INVALID", "MODULE_RESPONSE_MISMATCH", "WHOLE_SCRIPT_RESPONSE_INVALID", "WHOLE_SCRIPT_RESULT_MISMATCH", "SHORT_MODULE_TOO_LONG",
         "GENERATED_MODULE_NEEDS_REVIEW", "INVALID_MODULE_TEXT", "DUPLICATE_MODULE_SENTENCE", "MODULE_DETAILS_MISMATCH"}
     observed = set()
     for item in [*items, *attention]:
@@ -530,101 +471,7 @@ def script_output_read_options(job, outcome):
     return options
 
 
-def _typed_plan_product_refs(goal, preparation, command):
-    """Use the Voice-owned wire ref only after proving the exact typed target."""
-    request = goal.get("script_generation")
-    if not request:
-        return command
-    from .action_contracts import uncommitted_input_error
-
-    requested = {row["product_ref"]["id"]: row["product_ref"] for row in request["product_counts"]}
-    pinned = {ref["id"]: ref for ref in preparation["selected_product_refs"]}
-    items = []
-    for item in command["items"]:
-        supplied = item["product_ref"]
-        identity = supplied["id"]
-        actual = pinned.get(identity)
-        if not same_artifact_ref(supplied, requested.get(identity)) or not same_artifact_ref(supplied, actual):
-            raise uncommitted_input_error("TARGET_SCOPE_UNVERIFIED", "话术计划的商品版本与本次选定商品不一致。", status=422)
-        items.append({**item, "product_ref": actual})
-    return {**command, "items": items}
-
-
-def _typed_plan_replay_args(f, goal, preparation, previous_args):
-    if not goal.get("script_generation"):
-        return previous_args
-    canonical_args = _typed_plan_product_refs(goal, preparation, previous_args)
-    if canonical_args == previous_args:
-        return previous_args
-    previous_hash = canonical_hash(previous_args)
-    for operation in f.engine.store.list("operation"):
-        if (operation.get("run_id") == f.scope.run_id and operation.get("key") == "save_script_plan"
-                and previous_hash in (operation.get("request_hash"), operation.get("submitted_plan_hash"))
-                and (operation.get("status") != "known_failed" or operation.get("error_code") != "REF_SCHEMA_MISMATCH")):
-            return previous_args
-    # An unsent or definitely rejected input can use the corrected wire form.
-    # Its old checkpoint and operation remain immutable audit evidence.
-    return canonical_args
-
-
-async def _plan_execute_wait(f, a):
-    from .action_contracts import uncommitted_input_error
-    run = await f.engine.assert_scope(f.scope)
-    goal = run["goal"]
-    items = a["items"]
-    mode = goal.get("script_mode")
-    expansion = mode == "expand_original"
-    new_generation = mode == "generate" and goal.get("script_delivery_requirement") == "new_generation"
-    if (not (expansion or new_generation)
-            or not {"save_script_plan", "submit_script_change"} <= set(run.get("allowed_effects", []))
-            or not items or not a.get("bundle_ref") or a.get("plan_ref") or a.get("job_id")):
-        raise uncommitted_input_error("SCRIPT_MODE_CONFLICT", "此入口只接受已授权的新整版或基于同一原稿扩版，并使用当前冻结上下文；局改请用原流程。", status=422)
-    preparation = await f.prep()
-    body = preparation["body"]
-    if not same_artifact_ref(body.get("bundle_ref"), a["bundle_ref"]):
-        raise ContractError("CONTEXT_BUNDLE_CHANGED", "冻结上下文已变化，请核对本场再提交。", status=409)
-    if run.get("pending_unknown_operation"):
-        raise ContractError("RECONCILIATION_REQUIRED", "原提交结果待核实，先核对原操作。", status=409)
-    checkpoint = f.engine.store.get("script_plan_handoff", f.id, required=False)
-    if checkpoint is None:
-        observation = await f.step("check_plan_handoff_readiness", lambda: f.engine._completion_observation(run))
-        if observation.get("pending_job_ids") or observation.get("unknown_job_ids"):
-            return f.result("NEEDS_REPLAN", blockers=["本场已有未结清的生成任务，请先核对它的结果。"])
-        command = {"preparation_id": preparation["ref"]["id"], "expected_revision": preparation["ref"]["revision"],
-                   "bundle_ref": body["bundle_ref"], "items": items, "recap_dispositions": a["recap_dispositions"]}
-        try:
-            command = SaveScriptPlanArgs.model_validate(command).model_dump(mode="json", exclude_none=True)
-        except ValidationError as error:
-            raise tool_argument_error(f.name, error) from None
-        if any(item.get("base_script_ref") or bool(item.get("original_script_ref")) != expansion or item["generation_mode"] == "module"
-               or any(module["action"] not in {"generate", "disable"} for module in item["modules"])
-               for item in command["items"]):
-            raise uncommitted_input_error("SCRIPT_MODE_CONFLICT", "此入口只接受新整版模块；扩版要传原稿引用，不能覆盖旧稿。", status=422)
-        if expansion and not all(same_artifact_ref(item["original_script_ref"], command["items"][0]["original_script_ref"])
-                                 for item in command["items"]):
-            raise uncommitted_input_error("SCRIPT_MODE_CONFLICT", "同一批扩版只使用一份精确原稿。", status=422)
-        for item in command["items"]:
-            item["generation_mode"] = "whole_script"
-        command = _typed_plan_product_refs(goal, body, command)
-        f.engine.store.put("script_plan_handoff", {"id": f.id, "run_id": f.scope.run_id, "plan_args": command})
-    else:
-        command = _typed_plan_replay_args(f, goal, body, checkpoint["plan_args"])
-    plan = await f.command("save_script_plan", command)
-    plan_ref = plan["data"]["script_plan_ref"]
-    return await scripts(f, {"action": "execute", "plan_ref": plan_ref}, wait_on_plan=True)
-
-
-async def _script_execution_result(f, status, result, plan, *, wait_on_plan=False, remaining=None):
-    if status == "WAITING" and wait_on_plan:
-        wait = await f.engine.finish(f.scope, "WAITING_JOBS", "话术计划已提交，正在等待生成结果。")
-        if wait["accepted"]:
-            result = {**result, "plan_ref": plan, "waiting_registered": True}
-    return f.result(status, result=result, remaining=remaining)
-
-
-async def scripts(f, a, *, wait_on_plan=False):
-    if a["action"] == "plan_execute_wait":
-        return await _plan_execute_wait(f, a)
+async def scripts(f, a):
     if a["action"] == "retry":
         return await _retry(f, a)
     prep = await f.prep()
@@ -682,8 +529,7 @@ async def scripts(f, a, *, wait_on_plan=False):
     if plan != b.get("plan_ref"):
         raise ContractError("GENERATION_INPUTS_CHANGED", "选择的计划不是本场当前计划")
     same = [j for j in observation.get("jobs", []) if j.get("body", {}).get("kind") == "scripts"
-        and j.get("body", {}).get("plan_ref") == plan
-        and (not wait_on_plan or j.get("body", {}).get("run_id") == run["id"])]
+        and j.get("body", {}).get("plan_ref") == plan]
     if same:
         job = same[-1]
         status = job["body"]["status"]
@@ -702,12 +548,13 @@ async def scripts(f, a, *, wait_on_plan=False):
         reads = script_output_read_options(job_view, outcome)
         if reads:
             result["optional_output_reads"] = reads
-        return await _script_execution_result(f, outcome, result, plan, wait_on_plan=wait_on_plan,
+        return f.result(outcome,
+            result=result,
             remaining=["已失败任务不自动重提；优先核对校验问题、公开响应及committed_modules精确refs，由主Agent选择局改或合法重试"] if status not in {"queued", "running", "succeeded"} else [])
     receipt = await f.command("submit_script_change", {"preparation_id": prep["ref"]["id"],
         "expected_revision": prep["ref"]["revision"], "plan_ref": plan, "context_bundle_ref": b["bundle_ref"],
         "expected_generation_epoch": b["generation_epoch"]})
-    return await _script_execution_result(f, "WAITING", receipt, plan, wait_on_plan=wait_on_plan)
+    return f.result("WAITING", result=receipt)
 
 
 def text_audio_approval_option():
@@ -776,96 +623,9 @@ async def review(f, a):
         value = await f.step("prepare_playlist_proposal", lambda: prepare_playlist_proposal(f.engine, f.scope, parameters), parameters)
         return f.result(result=value,
             remaining=["本次只读提案装配完成；主Agent仍需选择后续动作，排序和文字转语音分别需要原人工确认。"])
-    if a["action"] == "save_assets" and (f.engine.store.get("run", f.scope.run_id).get("goal") or {}).get("objective") == "asset_preparation":
-        snapshot = a.get("asset_preparation_ref")
-        run = await f.engine.assert_scope(f.scope)
-        if (not snapshot or snapshot["kind"] != "preparation" or snapshot["id"] != run["scope"].get("preparation_id")
-                or snapshot not in run.get("observed_refs", [])):
-            return f.result("NEEDS_REPLAN", blockers=["请先用asset_inputs读取当前本场，再原样提供preparation_ref。"])
-        checklist = a.get("asset_checklist")
-        if not checklist or not checklist.get("items"):
-            return f.result("NEEDS_REPLAN", blockers=["请在asset_checklist.items列出可执行的素材建议。"])
-        try:
-            checklist = AssetChecklist.model_validate(checklist).model_dump(mode="json", exclude_none=True)
-        except ValidationError as error:
-            raise tool_argument_error(f.name, error, prefix=("asset_checklist",)) from None
-        if any(item.get("product_ref") and item["product_ref"]["id"] not in run["target_product_ids"]
-               for item in checklist["items"]):
-            raise ContractError("ASSET_PRODUCT_NOT_SELECTED", "只能给本次选中的商品保存素材建议。", status=403)
-        snapshot_body = next((row["result"]["body"] for row in f.engine.store.list("query_evidence")
-            if row.get("run_id") == f.scope.run_id and row.get("key") == "read_preparation"
-            and (row.get("result") or {}).get("ref") == snapshot), {})
-        current_ref = snapshot_body.get("asset_checklist_ref")
-        if current_ref:
-            current = await f.query("read_asset_checklist", {"ref": current_ref})
-            prior_items = current["body"]["checklist"]["items"]
-        else:
-            prior_items = []
-        existing = {item["item_id"]: item for item in prior_items}
-        protected = {item["item_id"]: item for item in prior_items if item.get("product_ref")
-                     and item["product_ref"]["id"] not in run["target_product_ids"]}
-        if any(item["item_id"] in protected or item.get("blob_ref") and
-               item.get("blob_ref") != existing.get(item["item_id"], {}).get("blob_ref") for item in checklist["items"]):
-            return f.result("NEEDS_REPLAN", blockers=["素材建议不能替换其他商品的项目或新增文件绑定。请保留原项目编号和已有文件。"])
-        proposed, items = set(), []
-        for item in checklist["items"]:
-            identity = item["item_id"]
-            proposed.add(identity)
-            prior = existing.get(identity, {})
-            if prior.get("blob_ref"):
-                item = {**item, "blob_ref": prior["blob_ref"], "status": prior["status"]}
-            items.append(item)
-        items.extend(item for item in prior_items if item["item_id"] not in proposed
-                     and (item["item_id"] in protected or item.get("blob_ref")))
-        checklist = {**checklist, "items": items}
-        try:
-            value = await f.command("save_asset_checklist", {"preparation_id": snapshot["id"],
-                "expected_revision": snapshot["revision"], "checklist": checklist}, version_key=snapshot)
-        except ContractError as error:
-            if error.code != "REVISION_CONFLICT":
-                raise
-            return f.result("NEEDS_REPLAN", blockers=["本场配置、商品或清单已变化。请用asset_inputs重新读取当前本场。"])
-        priorities = "、".join(item["purpose"][:60] for item in items[:3])
-        completion = await f.engine.finish(f.scope, "COMPLETED", f"已保存本场素材准备清单，共 {len(items)} 项。优先查看：{priorities}。这些素材建议不会影响声音播出。")
-        if not completion.get("accepted"):
-            return f.result("NEEDS_REPLAN", result=value, blockers=completion.get("missing", []))
-        return f.result(result=value)
     prep = await f.prep()
     b = prep["body"]
     common = {"preparation_id": prep["ref"]["id"], "expected_revision": prep["ref"]["revision"]}
-    if a["action"] == "reorder":
-        run = f.engine.store.get("run", f.scope.run_id)
-        if run["goal"]["objective"] != "playlist_reorder" or not {"save_playlist", "compile_playback_plan"} <= set(run["allowed_effects"]):
-            raise ContractError("GOAL_EFFECT_DENIED", "只有用户明确要求重排已保存队列时才能执行", status=403)
-        if not b.get("playlist_ref") or not b.get("draft_ref"):
-            return f.result("NEEDS_DECISION", blockers=["请先保存本场配置与播放顺序，再进行重排"])
-        spec = a.get("reorder_spec")
-        if spec is None:
-            return f.result("NEEDS_REPLAN", blockers=["请提供明确的重排方式和当前队列商品顺序"])
-        spec = {**spec, "seed": spec.get("seed") or canonical_hash(f.id)[7:39]}
-        preview = await f.query("preview_playlist_reorder", {
-            "preparation_id": prep["ref"]["id"], "ref": b["playlist_ref"], "spec": spec})
-        saved = await f.command("save_playlist", {**common, "items": preview["proposed_items"],
-            "product_group_order": preview["resolved_spec"]["product_group_order"], "loop_mode": "infinite",
-            "reorder_spec": preview["resolved_spec"], "preview_hash": preview["preview_hash"]})
-        compiled = await f.command("compile_playback_plan", {**common,
-            "expected_revision": saved["data"]["preparation_ref"]["revision"],
-            "playlist_ref": saved["data"]["playlist_ref"]})
-        return f.result(result={"playlist": saved, "compiled": compiled,
-            "ordered_items": preview["proposed_items"]})
-    if a["action"] == "asset_inputs":
-        run = await f.engine.assert_scope(f.scope)
-        standalone = (run.get("goal") or {}).get("objective") == "asset_preparation"
-        targets = set(run.get("target_product_ids", []))
-        products = [await f.query("read_product", {"ref": ref}) for ref in b.get("selected_product_refs", [])
-                    if not standalone or ref["id"] in targets]
-        draft = await f.query("read_context", {"ref": b["draft_ref"]}) if b.get("draft_ref") else None
-        checklist = await f.query("read_asset_checklist", {"preparation_id": prep["ref"]["id"]})
-        if standalone and not run.get("task_assessment"):
-            f.engine.save_assessment(f.scope, {"summary": "根据当前直播间配置及已选商品整理素材建议",
-                "capabilities": ["wf_playback_review"], "steps": ["读取本场及已有清单", "起草素材建议", "核验并保存清单"]})
-        return f.result(result={"preparation_ref": prep["ref"], "products": products,
-            "draft": draft, "asset_checklist": checklist})
     if a["action"] in {"save_playlist", "save_assets"}:
         key = "save_playlist" if a["action"] == "save_playlist" else "save_asset_checklist"
         value = await f.command(key, {**common, **a["parameters"]})
@@ -933,11 +693,11 @@ async def audio(f, a):
             "requirements_ref": b["requirements_ref"], "approval_ref": b["approval_ref"]})
     if matching:
         latest = max(matching, key=lambda job: (job["body"].get("created_at", ""), job["ref"]["id"]))
-        if latest["body"].get("status") in {"partially_failed", "failed", "interrupted", "cancelled"}:
+        if latest["body"].get("status") in {"failed", "interrupted", "cancelled"}:
             return f.result("NEEDS_REPLAN", result={"data": {"job_id": latest["ref"]["id"],
                 "job_ref": latest["ref"], "status": latest["body"]["status"]},
                 "existing_job": f.engine._job_view(run, latest, include_provider_outputs=False)},
-                blockers=["原音频任务有失败或已中断、取消的条目；未提交替代任务"],
+                blockers=["原音频任务已失败、中断或取消；未提交替代任务"],
                 remaining=["主Agent检查原任务，明确选择retry原job或调整合法计划"])
     receipt = await f.command("prepare_required_audio", {"preparation_id": prep["ref"]["id"],
         "expected_revision": prep["ref"]["revision"], "approval_ref": b["approval_ref"],

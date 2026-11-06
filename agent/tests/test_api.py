@@ -4,12 +4,10 @@ from __future__ import annotations
 import json
 
 from fastapi.testclient import TestClient
-from httpx import ASGITransport, AsyncClient
 import pytest
 
 from shengbo_contracts.common import ContractError
 from shengbo_prelive.api import MAX_UPLOAD_BYTES, create_app
-from shengbo_prelive.runtime import RuntimeEngine
 
 TOKEN = "test-service-credential-never-displayed"
 BASE = "/api/assistant/v2"
@@ -118,48 +116,6 @@ def test_conversation_message_and_scope_contract(client):
     assert client.post(BASE + "/conversations/c1/messages", json={"text": "x", "client_request_id": "x", "scope": {"kind": "catalog", "account_id": "another"}}).status_code == 403
     assert client.post(BASE + "/conversations/c1/messages", json={"text": "", "client_request_id": "x"}).status_code == 422
     assert client.post(BASE + "/conversations/c1/messages", json={"text": "x"}).status_code == 422
-
-
-async def test_delete_conversation_preserves_run_and_blocks_active_work(tmp_path):
-    # ASGITransport does not run the lifespan, so the queued task never dispatches.
-    engine = RuntimeEngine(tmp_path, business_client=None)
-    try:
-        transport = ASGITransport(app=create_app(engine, TOKEN))
-        async with AsyncClient(transport=transport, base_url="http://testserver",
-                               headers={"X-Shengbo-Service-Token": TOKEN}) as client:
-            first = await client.post(BASE + "/conversations", json={"title": "原对话"})
-            other = await client.post(BASE + "/conversations", json={"title": "保留的对话"})
-            identity = first.json()["conversation_id"]
-            path = BASE + "/conversations/" + identity
-            assert (await client.delete(path, headers={"X-Shengbo-Service-Token": "wrong"})).status_code == 401
-            request = {"text": "核对商品资料", "client_request_id": "message-1"}
-            queued = await client.post(path + "/messages", json=request)
-            assert queued.status_code == 202
-            run_id = queued.json()["run"]["id"]
-            for status in ("QUEUED", "WAITING_USER", "RUNNING"):
-                engine.store.update("run", run_id, status=status)
-                refused = await client.delete(path)
-                assert refused.status_code == 409
-                assert refused.json()["error"]["code"] == "CONVERSATION_HAS_ACTIVE_RUN"
-                assert (await client.get(path)).status_code == 200
-            engine.store.update("run", run_id, status="COMPLETED")
-            deleted = await client.delete(path)
-            assert deleted.json() == {"conversation_id": identity, "deleted": True}
-            assert deleted.status_code == 200
-            tombstone = engine.store.get("conversation", identity)
-            assert tombstone["deleted_at"]
-            assert (await client.delete(path)).status_code == 200
-            assert engine.store.get("conversation", identity) == tombstone
-            remaining = (await client.get(BASE + "/conversations")).json()["items"]
-            assert [item["conversation_id"] for item in remaining] == [other.json()["conversation_id"]]
-            assert (await client.get(path)).status_code == 404
-            assert (await client.post(path + "/messages", json=request)).status_code == 404
-            assert (await client.post(BASE + "/materials", data={"conversation_id": identity},
-                                      files={"file": ("facts.txt", b"test", "text/plain")})).status_code == 404
-            assert (await client.get(BASE + "/runs/" + run_id)).json()["status"] == "COMPLETED"
-            assert engine.store.list("message")[0]["content"] == request["text"]
-    finally:
-        engine.instance.release()
 
 
 def test_invalid_dto_never_echoes_input_or_principal(client):

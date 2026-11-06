@@ -1,10 +1,9 @@
 """The model proposes a plan; this module never treats a proposal as permission."""
 from __future__ import annotations
 
-import json
 import re
 from shengbo_contracts.business import MODULE_KEYS
-from shengbo_contracts.common import ContractError, same_artifact_ref
+from shengbo_contracts.common import ContractError
 
 READ_TOOLS = {"read_capabilities", "read_business_schema", "read_source", "search_catalog", "read_product",
               "read_preparation", "read_room", "read_voice_options", "read_context", "read_script", "read_script_usage",
@@ -27,7 +26,6 @@ EFFECTS = {
     "facts_analysis": BASE_WRITES,
     "audience_research": BASE_WRITES,
     "session_config": BASE_WRITES | {"save_session_draft"},
-    "asset_preparation": {"save_asset_checklist"},
     "playlist_reorder": {"save_playlist", "compile_playback_plan"},
     "script_change": BASE_WRITES | {"save_context_bundle", "save_script_plan", "submit_script_change", "patch_script", "save_playlist", "compile_playback_plan"},
     "audio_prepare": {"compile_playback_plan", "prepare_required_audio", "publish_preparation"},
@@ -57,12 +55,6 @@ _NEGATIVE_AUDIO = re.compile(
     + "|" + _NEGATION + _ACTION_MODIFIERS + r"合成(?:了)?$", re.IGNORECASE)
 _TEXT_ONLY = re.compile(r"(?:仅仅|仅|只)(?:是)?(?:先|暂时)?(?:要|需要|需|做|生成|输出|提供|写|准备|保存|整理)?(?:本场|本次|完整|整包|一版|两版|一份|两份|的)*(?:文案|话术|脚本|文字稿|文字|文本)")
 _DOUBLE_NEGATION = re.compile(r"(?:不是|并非|不能|不得|不可|不要|不需要|不需|不用|不必|别|不)$")
-_RECAP_IMPORT_REQUEST = re.compile(
-    r"^(?:请|帮我|先|再|然后|直接|将|把)*"
-    r"(?:导入(?:这份|此份|上传的|附件里的|附件中的|本次的)?(?:直播|播后|历史)?复盘(?:文件|资料|报告)?"
-    r"|(?:这份|此份|上传的|附件里的|附件中的|本次的)?(?:直播|播后|历史)?复盘(?:文件|资料|报告)?导入)"
-    r"(?:(?:并关联|并绑定|到|进)本场)?$"
-)
 
 
 def excludes_audio(text):
@@ -101,106 +93,10 @@ def excludes_audio(text):
     return False
 
 
-_SCRIPT_TEXT_EFFECTS = {"save_context_bundle", "save_script_plan", "submit_script_change", "retry_failed_items"}
-_SCRIPT_BUTTON_HEADER = "请为当前本场新增完整话术版本："
-_SCRIPT_BUTTON_SCOPE = re.compile(r"\r?\n当前明确范围与已有稿引用：\r?\n")
-_SCRIPT_FOLLOW_UP = re.compile(
-    r"(?:\A|(?<=[。；\n]))(?:复用[^。；\r\n]{1,80}，)?(?:只|仅)为以下[一二三四五六七八九十两0-9]+款分别新增完整(?:直播)?话术(?:版本)?[：:]"
-)
-_SCRIPT_TARGET_LINE = re.compile(r"(?m)^- [^：:\r\n]+[：:]\s*新增 ([1-9][0-9]?) 版[，；。]")
-
-
-def _script_button_manifest(text):
-    if not text.startswith(_SCRIPT_BUTTON_HEADER):
-        return None
-    sections = _SCRIPT_BUTTON_SCOPE.split(text, maxsplit=1)
-    if len(sections) != 2:
-        return None
-    try:
-        binding = json.loads(sections[1])
-    except ValueError:
-        return None
-    return binding if isinstance(binding, dict) else None
-
-
-def _script_authorization_from_input(run, proposal):
-    """Resolve only the explicit new-text workflow from the current submitted input."""
-    value = run["input"]
-    text = value["text"]
-    scope = run.get("scope") or {}
-    preparation_id = scope.get("preparation_id")
-    typed = value.get("script_generation")
-    if typed:
-        expected = {row["product_ref"]["id"]: row["count"] for row in typed["product_counts"]}
-        counts = {row.product_id: row.count for row in proposal.requested_script_variants}
-        if (proposal.objective != "materials_to_script" or proposal.script_mode != "generate"
-                or proposal.script_delivery_requirement != "new_generation" or proposal.preparation_id != preparation_id
-                or typed["preparation_id"] != preparation_id or scope.get("kind") != "preparation"
-                or proposal.room_id not in {None, run.get("room_id")}
-                or counts != expected or set(proposal.target_product_ids) != expected.keys()
-                or proposal.required_analyses or proposal.required_reuse_analysis_refs or proposal.requested_modules
-                or proposal.requested_product_paths or proposal.needs_clarification
-                or set(proposal.proposed_effects) - _SCRIPT_TEXT_EFFECTS):
-            raise ContractError("INTENT_SCRIPT_GENERATION_SCOPE", "新增话术只使用当前本场明确选择的商品、版数和文字生成范围", status=422)
-        return text.strip().splitlines()[0][:4000]
-    if (proposal.objective not in {"materials_to_script", "script_change"} or proposal.script_mode != "generate"
-            or scope.get("kind") != "preparation" or not preparation_id
-            or proposal.preparation_id not in {None, preparation_id}
-            or value.get("material_refs") or value.get("selection") or proposal.needs_clarification
-            or proposal.required_analyses or not excludes_audio(text)):
-        return None
-    counts = {item.product_id: item.count for item in proposal.requested_script_variants}
-    if not counts or None in counts or set(counts) != set(proposal.target_product_ids):
-        return None
-    if text.startswith(_SCRIPT_BUTTON_HEADER):
-        binding = _script_button_manifest(text)
-        try:
-            declared = binding["product_counts"]
-            bound_preparation = binding["preparation_id"]
-            expected = {item["product_ref"]["id"]: item["count"] for item in declared if item["product_ref"]["kind"] == "product"}
-        except (ValueError, TypeError, KeyError):
-            return None
-        if (bound_preparation != preparation_id or len(expected) != len(declared)
-                or any(type(count) is not int for count in expected.values()) or expected != counts):
-            return None
-        return _SCRIPT_BUTTON_HEADER
-    if value.get("intent_mode") != "follow_up" or not text.startswith(("请接着完成", "继续完成")):
-        return None
-    match = _SCRIPT_FOLLOW_UP.search(text)
-    products = {ref["id"] for ref in value.get("observed_versions", []) if ref["kind"] == "product"}
-    declared_counts = [int(count) for count in _SCRIPT_TARGET_LINE.findall(text)]
-    # Only the uniform, explicitly listed retry shape is bound without a
-    # typed per-product manifest. The observed refs narrow the existing scope.
-    if (match and products == set(counts) and len(set(counts.values())) == 1
-            and sorted(declared_counts) == sorted(counts.values())):
-        return match.group()
-    return None
-
-
-def bind_intent_authorization(run, proposal):
-    """Persist an exact server-selected quote for supported script requests."""
-    quote = _script_authorization_from_input(run, proposal)
-    return proposal.model_copy(update={"authorization_quote": quote}) if quote is not None else proposal
-
-
 def validate_intent(run, proposal):
-    from .product_material_actions import validate_product_material_intent
-    from .selling_points import validate_selling_points_intent
-    validate_product_material_intent(run, proposal)
-    validate_selling_points_intent(run, proposal)
     text = run["input"]["text"]
-    bound_quote = _script_authorization_from_input(run, proposal)
-    quote = proposal.authorization_quote
-    if not isinstance(quote, str) or not quote.strip() or quote not in text:
+    if proposal.authorization_quote not in text:
         raise ContractError("INTENT_EVIDENCE_INVALID", "任务判断必须引用本次真实用户指令")
-    typed = run["input"].get("script_generation")
-    if typed and bound_quote is not None:
-        from .script_job_delivery import delivery_constraints
-        return {"requires_decision": False, "allowed_effects": sorted(_SCRIPT_TEXT_EFFECTS),
-                "script_delivery_requirement": "new_generation", "authorization_source": "current_script_request",
-                "script_request_snapshot": {"draft_ref": typed["draft_ref"],
-                    "product_refs": [row["product_ref"] for row in typed["product_counts"]]},
-                "script_generation": {**typed, **delivery_constraints(typed, text)}}
     if proposal.required_reuse_analysis_refs or proposal.reuse_analysis_quote is not None:
         quote = proposal.reuse_analysis_quote
         if (proposal.objective not in {"script_change", "materials_to_script", "prepare_session"}
@@ -257,14 +153,8 @@ def validate_intent(run, proposal):
         raise ContractError("INTENT_MODULE_SCOPE_REQUIRED", "用户已限定局部模块，任务判断须明确requested_modules，不能留空默许整稿修改", status=422,
             details={"field": "assessment.requested_modules", "allowed_values": list(MODULE_KEYS), "commit_state": "not_committed"})
     action = bool(re.search(r"更新|修改|改成|改为|改一下|润色|缩短|精简|补充|新增|新建|建立|保存|整理.*商品|导入|生成|重写|调整|重排|排序|准备|分析|研究|调研|配置|帮我.*做", text))
-    if not action and proposal.objective == "script_change" and proposal.script_mode == "expand_original":
-        action = any(re.search(r"(?:扩成|扩写成|扩展成|扩展为|扩版)\s*(?:[一二两三四五六七八九十]+|\d+)\s*(?:个\s*)?(?:新\s*)?版", clause)
-            and not re.search(r"不要|不用|无需|不必|不想|不需要|禁止|别|怎么|如何|为什么", clause)
-            for clause in re.split(r"[，,。；;！？!?\r\n]+", text))
     if proposal.objective == "audio_preview" and re.search(r"试听|合成", text):
         action = True
-    if proposal.objective == "asset_preparation":
-        action = bool(re.search(r"素材|布景|装修|拍摄|准备.*视频|视频.*清单", text))
     if selected_script and proposal.objective == "script_change" and re.search(r"改|润色|口语|缩短|精简|重写|扩写|替换", text):
         action = True
     if proposal.objective != "read_explain" and not action:
@@ -284,12 +174,6 @@ def validate_intent(run, proposal):
     if proposal.objective == "audio_preview" and not proposal.requested_modules:
         raise ContractError("PREVIEW_MODULE_SCOPE_REQUIRED", "局部试听须明确requested_modules，不能默认整稿合成", status=422)
     effects = set(EFFECTS[proposal.objective])
-    if bound_quote is not None:
-        effects &= _SCRIPT_TEXT_EFFECTS
-    if (proposal.objective in {"script_change", "materials_to_script"} and proposal.script_mode != "import_original"
-            and run["input"].get("material_refs") and any(_RECAP_IMPORT_REQUEST.match(clause.strip())
-                for clause in re.split(r"[，,。；;！？!?\r\n]+", text))):
-        effects.update({"import_blob", "import_recap", "link_recap_to_preparation"})
     if proposal.script_mode == "import_original":
         effects -= {"save_script_plan", "submit_script_change", "patch_script", "retry_failed_items"}
     if excludes_audio(text):
@@ -298,19 +182,7 @@ def validate_intent(run, proposal):
         effects -= {"submit_script_change", "patch_script", "prepare_required_audio"}
     if proposal.proposed_effects and not set(proposal.proposed_effects) <= effects:
         raise ContractError("GOAL_SCOPE_CONFLICT", "计划包含用户任务未授予的业务动作")
-    result = {"requires_decision": False, "allowed_effects": sorted(effects), "script_delivery_requirement": delivery}
-    if bound_quote is not None:
-        result["authorization_source"] = "current_script_request"
-        binding = _script_button_manifest(text)
-        if binding is not None and "draft_ref" in binding:
-            draft = binding["draft_ref"]
-            products = [item["product_ref"] for item in binding["product_counts"]]
-            if (not same_artifact_ref(draft, draft) or draft["kind"] != "draft"
-                    or any(not same_artifact_ref(ref, ref) for ref in products)):
-                raise ContractError("CONTEXT_INPUTS_CHANGED", "生成要求缺少有效的本场配置或商品引用，请刷新后重新提交",
-                                    status=409, details={"commit_state": "not_committed"})
-            result["script_request_snapshot"] = {"draft_ref": draft, "product_refs": products}
-    return result
+    return {"requires_decision": False, "allowed_effects": sorted(effects), "script_delivery_requirement": delivery}
 
 
 def check_tool_allowed(scope, run, name):
@@ -329,8 +201,6 @@ def check_tool_allowed(scope, run, name):
         from .workflows import WORKFLOW_EFFECTS
         effects = set(run.get("allowed_effects", []))
         allowed |= {flow for flow, required in WORKFLOW_EFFECTS.items() if effects & required}
-        if (run.get("goal") or {}).get("objective") == "asset_preparation":
-            allowed.discard("dispatch_analysis_batch")
     if name not in allowed:
         raise ContractError("TOOL_SCOPE_DENIED", "当前授权或角色不能调用该工具", status=403, details={"tool": name})
 

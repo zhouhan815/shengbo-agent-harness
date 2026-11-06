@@ -31,6 +31,7 @@ from contextvars import ContextVar
 from copy import deepcopy
 import json
 import os
+from pathlib import Path
 import time
 from typing import Any
 from uuid import uuid4
@@ -46,12 +47,10 @@ from .chatgpt import (ModelProviderError, _CONNECT_RETRY_DELAY_SECONDS, _async_h
                       _image_data_url, _sync_http_error, _text, _transport_exception_name, preview_request_payload,
                       safe_transport_diagnostic)
 from .credentials import CredentialError
-from .deepseek_key import read_api_key
-from .tool_arguments import parse_tool_arguments
 
 ENDPOINT = "https://api.deepseek.com/chat/completions"
 HARNESS_PROVIDER_KEY = "shengbo_deepseek"
-DEFAULT_REASONING_MODEL = "deepseek-flash"
+DEFAULT_REASONING_MODEL = "deepseek-v4-pro"
 DEFAULT_VISION_MODEL = "deepseek-flash"
 DEFAULT_SUMMARY_MODEL = "deepseek-flash"
 VALID_EFFORTS = {"low", "high", "max"}
@@ -81,6 +80,31 @@ def note_stream_activity():
     beat = STREAM_ACTIVITY.get()
     if beat is not None:
         beat()
+
+
+def _voice_env_path() -> Path:
+    override = os.environ.get("SHENGBO_DEEPSEEK_ENV_FILE")
+    if override:
+        return Path(override)
+    return Path(__file__).resolve().parents[4] / "ecommerce-voice-agent" / ".env"
+
+
+def read_api_key() -> str:
+    """Key from the environment or the voice service's local .env; never logged."""
+    value = os.environ.get("DEEPSEEK_API_KEY", "").strip()
+    if value:
+        return value
+    path = _voice_env_path()
+    try:
+        for line in path.read_text(encoding="utf-8").splitlines():
+            if line.strip().startswith("DEEPSEEK_API_KEY="):
+                value = line.split("=", 1)[1].strip().strip('"').strip("'")
+                break
+    except OSError:
+        value = ""
+    if not value:
+        raise CredentialError("deepseek_api_key_missing")
+    return value
 
 
 def agent_model_settings() -> dict:
@@ -329,7 +353,7 @@ class DeepSeekAgentModel(BaseChatModel):
         return self.bind(tools=converted, tool_choice=tool_choice, **kwargs)
 
     def _payload(self, messages, *, stop=None, **kwargs):
-        unsupported = set(kwargs) - {"tools", "tool_choice", "parallel_tool_calls", "response_format"}
+        unsupported = set(kwargs) - {"tools", "tool_choice", "parallel_tool_calls"}
         if unsupported or stop:
             raise ModelProviderError("model_request_option_unsupported")
         chat, unseen_images = build_chat_messages(messages)
@@ -342,11 +366,6 @@ class DeepSeekAgentModel(BaseChatModel):
         else:
             payload["thinking"] = {"type": "disabled"}
         tools = kwargs.get("tools") or []
-        response_format = kwargs.get("response_format")
-        if response_format is not None:
-            if response_format != {"type": "json_object"} or tools:
-                raise ModelProviderError("model_request_option_unsupported")
-            payload["response_format"] = response_format
         if tools:
             payload["tools"] = tools
             choice = kwargs.get("tool_choice")
@@ -367,8 +386,6 @@ class DeepSeekAgentModel(BaseChatModel):
             tools = [tool["function"] for tool in kwargs.get("tools") or []]
             preview = preview_request_payload(messages, [{"type": "function", **tool} for tool in tools],
                                               model_name=payload["model"])
-            if "response_format" in payload:
-                preview["response_format"] = payload["response_format"]
         if self._before_send:
             self._before_send(deepcopy(preview))
         return payload, preview, str(uuid4())
@@ -379,11 +396,10 @@ class DeepSeekAgentModel(BaseChatModel):
             safe["input"] = [item for item in safe.get("input", []) if item.get("type") != "reasoning"]
             safe["provider"] = "deepseek"
             safe["provider_model"] = payload["model"]
-            safe["provider_options"] = {key: payload[key] for key in ("thinking", "reasoning_effort", "response_format")
-                                        if key in payload}
+            safe["provider_options"] = {key: payload[key] for key in ("thinking", "reasoning_effort") if key in payload}
             self._on_request({"attempt_id": attempt_id, "payload": safe})
 
-    def _response(self, body, attempt_id, model, observed, *, json_mode=False):
+    def _response(self, body, attempt_id, model, observed):
         usage, details = _usage(body.get("usage"))
         observed.update(response_received=True, response_status="completed")
         if usage:
@@ -408,11 +424,8 @@ class DeepSeekAgentModel(BaseChatModel):
         for call in message.get("tool_calls") or []:
             try:
                 function = call["function"]
-                if not isinstance(function, dict):
-                    raise ValueError()
-                arguments = function.get("arguments")
-                args = parse_tool_arguments("{}" if arguments is None or arguments == "" else arguments)
-                if not function.get("name") or not call.get("id"):
+                args = json.loads(function.get("arguments") or "{}")
+                if not isinstance(args, dict) or not function.get("name") or not call.get("id"):
                     raise ValueError()
             except (KeyError, ValueError, TypeError) as error:
                 # Shape only (never argument text) so a rare malformed call can be diagnosed.
@@ -429,25 +442,10 @@ class DeepSeekAgentModel(BaseChatModel):
         content = message.get("content") or ""
         if not content and not calls:
             raise ModelProviderError("model_empty_completed_response")
-        output = {"text": content, "tool_calls": calls}
-        additional = {}
-        if json_mode:
-            if calls or finish != "stop":
-                raise ModelProviderError("model_json_output_invalid")
-            try:
-                structured = parse_tool_arguments(content)
-            except (TypeError, ValueError):
-                raise ModelProviderError("model_json_output_invalid") from None
-            # Keep JSON keys visible to the trace redactor. The raw reply is
-            # unnecessary in the trace once the strict parser has accepted it.
-            output = {"json": structured}
-            additional["json_output"] = structured
         reasoning = message.get("reasoning_content") or ""
-        if reasoning:
-            additional["reasoning_content"] = reasoning
         if self._on_response:
             self._on_response({"attempt_id": attempt_id, "status": "completed", "model": model,
-                               "output": output,
+                               "output": {"text": content, "tool_calls": calls},
                                "usage": observed.get("usage"), "usage_details": observed.get("usage_details"),
                                "provider_response_id": observed.get("provider_response_id"),
                                "response_received": True, "content_status": "pending_validation"})
@@ -455,7 +453,7 @@ class DeepSeekAgentModel(BaseChatModel):
                    response_received=True, content_status="accepted",
                    provider_response_id=observed.get("provider_response_id"))
         return AIMessage(content=content, tool_calls=calls,
-                         additional_kwargs=additional,
+                         additional_kwargs={"reasoning_content": reasoning} if reasoning else {},
                          response_metadata={"provider": "deepseek", "model_name": model, "purpose": self.purpose,
                                             "response_completed": True, "attempt_id": attempt_id,
                                             "finish_reason": "tool_calls" if calls else "stop"},
@@ -463,27 +461,23 @@ class DeepSeekAgentModel(BaseChatModel):
 
     def _failure(self, error, attempt_id, model, *, phase, post_started, observed):
         code = error.code if isinstance(error, (CredentialError, ModelProviderError)) else "model_transport_failed"
-        # Use the same connection-only predicate as the in-attempt retry, without
-        # its retry-count restriction. No model request crossed this connection.
-        if _connection_retry_allowed(error, phase, observed, retries=0):
-            post_started = False
         diagnostic = safe_transport_diagnostic(phase, _transport_exception_name(error), post_started,
             http_status=getattr(error, "http_status", None), provider_error_code=getattr(error, "provider_error_code", None),
             provider_error_type=getattr(error, "provider_error_type", None))
         unknown = False if observed.get("response_received") else getattr(error, "outcome_unknown", post_started)
+        if isinstance(error, ModelProviderError):
+            error.outcome_unknown = unknown
         self._emit("model.failed", attempt_id, model, code=code, outcome_unknown=unknown,
                    **{key: value for key, value in observed.items() if key not in {"usage_details"}},
                    content_status="rejected" if observed.get("response_received") else "unavailable", **diagnostic)
-        return diagnostic, unknown
+        return diagnostic
 
-    def _raise(self, error, diagnostic, outcome_unknown):
-        if isinstance(error, ModelProviderError):
-            error.outcome_unknown = outcome_unknown
+    def _raise(self, error, diagnostic, observed):
         if isinstance(error, (ModelProviderError, CredentialError, asyncio.CancelledError, KeyboardInterrupt, SystemExit)):
             for key, value in diagnostic.items():
                 setattr(error, key, value)
             raise error
-        raise ModelProviderError("model_transport_failed", outcome_unknown=outcome_unknown,
+        raise ModelProviderError("model_transport_failed", outcome_unknown=not observed.get("response_received"),
                                  **diagnostic) from None
 
     def _invoke_wire(self, payload, preview, attempt_id):
@@ -513,17 +507,12 @@ class DeepSeekAgentModel(BaseChatModel):
                     except (httpx.ConnectError, httpx.ConnectTimeout) as error:
                         if not _connection_retry_allowed(error, phase, observed, retries):
                             raise
-                        self._emit("model.connection_retry", attempt_id, model, phase="responses_connect",
-                            retry_number=1, max_retries=1, delay_ms=200,
-                            exception_type=_transport_exception_name(error))
                         time.sleep(_CONNECT_RETRY_DELAY_SECONDS)
                 phase = "response_parse"
-                return self._response(_parse_body(raw), attempt_id, model, observed,
-                                      json_mode="response_format" in payload)
+                return self._response(_parse_body(raw), attempt_id, model, observed)
         except BaseException as error:
-            diagnostic, unknown = self._failure(error, attempt_id, model, phase=phase, post_started=post_started,
-                                                observed=observed)
-            self._raise(error, diagnostic, unknown)
+            diagnostic = self._failure(error, attempt_id, model, phase=phase, post_started=post_started, observed=observed)
+            self._raise(error, diagnostic, observed)
 
     async def _ainvoke_wire(self, payload, preview, attempt_id):
         model, phase, post_started, observed = payload["model"], "credential", False, {}
@@ -553,17 +542,12 @@ class DeepSeekAgentModel(BaseChatModel):
                     except (httpx.ConnectError, httpx.ConnectTimeout) as error:
                         if not _connection_retry_allowed(error, phase, observed, retries):
                             raise
-                        self._emit("model.connection_retry", attempt_id, model, phase="responses_connect",
-                            retry_number=1, max_retries=1, delay_ms=200,
-                            exception_type=_transport_exception_name(error))
                         await asyncio.sleep(_CONNECT_RETRY_DELAY_SECONDS)
                 phase = "response_parse"
-                return self._response(_parse_body(raw), attempt_id, model, observed,
-                                      json_mode="response_format" in payload)
+                return self._response(_parse_body(raw), attempt_id, model, observed)
         except BaseException as error:
-            diagnostic, unknown = self._failure(error, attempt_id, model, phase=phase, post_started=post_started,
-                                                observed=observed)
-            self._raise(error, diagnostic, unknown)
+            diagnostic = self._failure(error, attempt_id, model, phase=phase, post_started=post_started, observed=observed)
+            self._raise(error, diagnostic, observed)
 
     def _generate(self, messages: list[BaseMessage], stop=None, run_manager=None, **kwargs):
         payload, preview, attempt = self._prepare(messages, stop, kwargs)

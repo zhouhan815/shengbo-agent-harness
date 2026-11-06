@@ -10,7 +10,6 @@ from langchain_core.messages import AIMessage, HumanMessage, SystemMessage, Tool
 from langchain_core.tools import tool
 
 from shengbo_prelive.providers import build_agent_model
-from shengbo_prelive.providers.chatgpt import ModelProviderError
 from shengbo_prelive.providers.deepseek import (NON_LEADING_SYSTEM_PREFIX, SEEN_IMAGE_PLACEHOLDER, DeepSeekAgentModel,
                                                 agent_model_settings, build_chat_messages, read_api_key)
 
@@ -29,29 +28,15 @@ def test_defaults_follow_user_decision(monkeypatch):
         monkeypatch.delenv(name, raising=False)
     for name in ("SHENGBO_INTENT_REASONING_EFFORT", "SHENGBO_BRANCH_REASONING_EFFORT"):
         monkeypatch.delenv(name, raising=False)
-    assert agent_model_settings() == {"provider": "deepseek", "model": "deepseek-flash", "vision_model": "deepseek-flash",
+    assert agent_model_settings() == {"provider": "deepseek", "model": "deepseek-v4-pro", "vision_model": "deepseek-flash",
                                       "summary_model": "deepseek-flash", "effort": "high",
                                       "intent_effort": "low", "branch_effort": "low"}
     main = build_agent_model(model="gpt-6.1-sol")
     summary = build_agent_model(purpose="summary")
-    assert isinstance(main, DeepSeekAgentModel) and main.model_name == "deepseek-flash" and main.thinking
+    assert isinstance(main, DeepSeekAgentModel) and main.model_name == "deepseek-v4-pro" and main.thinking
     assert summary.model_name == "deepseek-flash" and summary.thinking is False
-    # The canonical Flash model covers unseen image requests and later text
-    # without changing existing thinking settings for either purpose.
-    image_message = HumanMessage(content=[{"type": "image_url", "image_url": {"url": PNG}}])
-    assert main._payload([HumanMessage("普通任务")])["model"] == "deepseek-flash"
-    assert main._payload([image_message])["model"] == "deepseek-flash"
-    assert main._payload([image_message])["thinking"] == {"type": "enabled"}
-    assert summary._payload([HumanMessage("摘要")])["thinking"] == {"type": "disabled"}
     monkeypatch.setenv("SHENGBO_AGENT_MODEL_PROVIDER", "chatgpt_plan")
     assert build_agent_model(purpose="summary") is None
-
-
-def test_blank_model_overrides_fall_back_to_canonical_flash(monkeypatch):
-    for name in ("SHENGBO_AGENT_MODEL", "SHENGBO_AGENT_VISION_MODEL", "SHENGBO_SUMMARY_MODEL"):
-        monkeypatch.setenv(name, "   ")
-    settings = agent_model_settings()
-    assert {settings[key] for key in ("model", "vision_model", "summary_model")} == {"deepseek-flash"}
 
 
 def test_messages_route_unseen_images_to_vision_and_keep_reasoning():
@@ -172,47 +157,6 @@ async def test_stream_cut_before_finish_is_not_accepted():
 
 
 @pytest.mark.asyncio
-@pytest.mark.parametrize("sync", [True, False], ids=["sync", "async"])
-@pytest.mark.parametrize("failure,expected_unknown", [
-    (httpx.ConnectError, False), (httpx.ConnectTimeout, False), (httpx.ReadTimeout, True),
-    (httpx.WriteError, True), (httpx.RemoteProtocolError, True),
-])
-async def test_transport_classification_matches_retry_and_ledger(sync, failure, expected_unknown):
-    events = []
-    requests = []
-
-    def respond(request):
-        requests.append(request)
-        raise failure("sensitive network detail", request=request)
-
-    transport = httpx.MockTransport(respond)
-    model = DeepSeekAgentModel(observer=events.append, transport=transport, async_transport=transport,
-                              key_reader=lambda: "test-key")
-    messages = [HumanMessage("x")]
-    with pytest.raises(ModelProviderError) as raised:
-        if sync:
-            model.invoke(messages)
-        else:
-            await model.ainvoke(messages)
-
-    expected_events = ["model.sent"]
-    if not expected_unknown:
-        expected_events.append("model.connection_retry")
-    assert [event["type"] for event in events] == [*expected_events, "model.failed"]
-    assert len(requests) == (1 if expected_unknown else 2)
-    assert len({event["attempt_id"] for event in events}) == 1
-    if not expected_unknown:
-        assert {key: events[1][key] for key in ("phase", "retry_number", "max_retries", "delay_ms")} == {
-            "phase": "responses_connect", "retry_number": 1, "max_retries": 1, "delay_ms": 200}
-    error = raised.value
-    assert error.code == events[-1]["code"] == "model_transport_failed"
-    assert error.outcome_unknown is events[-1]["outcome_unknown"] is expected_unknown
-    assert error.responses_post_started is events[-1]["responses_post_started"] is expected_unknown
-    assert error.exception_type == events[-1]["exception_type"] == failure.__name__
-    assert "sensitive network detail" not in str(error) and "sensitive network detail" not in json.dumps(events)
-
-
-@pytest.mark.asyncio
 async def test_http_rejection_is_known_failure_without_key_leak():
     events = []
     model = DeepSeekAgentModel(observer=events.append, async_transport=_transport(
@@ -267,35 +211,19 @@ async def test_balance_exhausted_is_a_named_known_rejection():
 
 
 @pytest.mark.asyncio
-@pytest.mark.parametrize("arguments", [
-    '{"ref": "秘密内容', '{"ref":"秘密内容","ref":"second"}',
-    r'{"ref":"秘密内容","nested":[{"a":1,"\u0061":2}]}',
-    '{"ref":"秘密内容","x":NaN}', '{"ref":"秘密内容","x":1e999}',
-])
-async def test_malformed_tool_call_records_shape_but_not_arguments(arguments):
+async def test_malformed_tool_call_records_shape_but_not_arguments():
     events = []
     bad = [SSE_CHUNKS[0], {"id": "resp-s", "choices": [{"index": 0, "delta": {"tool_calls": [{"index": 0, "id": "call_1",
-           "type": "function", "function": {"name": "read_context", "arguments": arguments}}]}}]},
+           "type": "function", "function": {"name": "read_context", "arguments": "{\"ref\": \"秘密内容"}}]}}]},
            {"id": "resp-s", "choices": [{"index": 0, "delta": {}, "finish_reason": "tool_calls"}]}, "[DONE]"]
     model = DeepSeekAgentModel(observer=events.append, async_transport=_sse_transport(bad), key_reader=lambda: "test-key")
     with pytest.raises(Exception) as error:
         await model.bind_tools([read_context]).ainvoke([HumanMessage("读")])
     assert error.value.code == "model_tool_call_invalid"
-    assert error.value.outcome_unknown is False
     rejected = next(event for event in events if event["type"] == "model.tool_call_rejected")
-    assert rejected["tool_name"] == "read_context" and rejected["arguments_chars"] == len(arguments)
+    assert rejected["tool_name"] == "read_context" and rejected["arguments_chars"] == len("{\"ref\": \"秘密内容")
     assert "秘密内容" not in json.dumps(events, ensure_ascii=False)
 
-
-@pytest.mark.asyncio
-@pytest.mark.parametrize("arguments", ["", None])
-async def test_empty_tool_arguments_are_still_an_empty_object(arguments):
-    body = {"id": "resp-empty", "choices": [{"finish_reason": "tool_calls", "message": {
-        "tool_calls": [{"id": "call_empty", "type": "function",
-                        "function": {"name": "list_items", "arguments": arguments}}]}}]}
-    model = DeepSeekAgentModel(async_transport=_transport(body), key_reader=lambda: "test-key")
-    result = await model.ainvoke([HumanMessage("列出项目")])
-    assert result.tool_calls[0]["args"] == {}
 
 
 @pytest.mark.asyncio

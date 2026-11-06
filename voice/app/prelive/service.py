@@ -8,7 +8,6 @@ from __future__ import annotations
 import asyncio
 import base64
 from copy import deepcopy
-from datetime import datetime, timezone
 import hashlib
 import inspect
 import os
@@ -26,7 +25,6 @@ from ..consumer_catalog import assert_consumer_product, policy_metadata as consu
 from ..platform_rules import platform_policy_catalog
 from ..prosody import sentence_style
 from ..speech import resolved_style
-from ..voice_catalog import VOICE_CATALOG
 from .storage import BusinessError, Store, canonical, digest, now, uid
 from .playback_compiler import reorder, compile_items, playback_statistics
 
@@ -41,14 +39,6 @@ class Product(DTO, commerce.ProductFields):
     knowledge: str = Field(default="", max_length=15000)
     knowledge_documents: list[commerce.Document] = Field(default_factory=list, max_length=20)
     image: str = Field(default="", max_length=4500000)
-
-
-def room_default_voice(body):
-    return body.get("default_tts_selection") or {
-        "provider": body.get("tts_provider") or "system",
-        "voice": body.get("tts_voice") or "Huihui",
-        "model": body.get("tts_model") or "speech-2.8-turbo",
-    }
 
 
 class UnavailableAdapter:
@@ -68,23 +58,12 @@ class UnavailableAdapter:
 HUMAN_ONLY = {"approve_text_for_audio", "approve_script_audio_preview", "approve_missing_audio_reissue", "revoke_text_approval", "adopt_snapshot", "start_prepared_room", "record_product_revision_choice"}
 CONTROLLER_ONLY = {"issue_grant", "revoke_grant"}
 SESSION_DRAFT_FIELDS = frozenset({"theme", "objective", "scheduled_at", "timezone", "commerce", "language",
-    "tts_selection", "requested_variant_counts", "loop_mode", "inheritance_decisions", "unknowns", "campaign_starts_at", "campaign_ends_at"})
+    "tts_selection", "requested_variant_counts", "loop_mode", "inheritance_decisions", "unknowns", "campaign_ends_at"})
 ARTIFACT_KINDS = {"analysis", "draft", "context", "script_plan", "module", "script_revision", "playlist", "compiled_plan", "requirements", "approval", "audio_manifest", "publication", "recap", "asset_checklist", "blob", "revision_choice", "adoption"}
 
 
 def wire(value):
     return value.model_dump(exclude_none=True) if hasattr(value, "model_dump") else deepcopy(value)
-
-
-def campaign_expiry(value):
-    if value is None or value == "":
-        return None
-    if not isinstance(value, str):
-        raise ValueError("campaign expiry must be a string")
-    expiry = datetime.fromisoformat(value.replace("Z", "+00:00"))
-    if expiry.utcoffset() is None:
-        raise ValueError("campaign expiry must include a time zone")
-    return expiry
 
 
 class PreliveService:
@@ -113,15 +92,10 @@ class PreliveService:
             "language": "口播语言，例如zh-CN。", "tts_selection": "真实音色选择，生成语音仍须另行人工整包批准。",
             "requested_variant_counts": "建议使用商品ID到版本数量的映射。", "loop_mode": "保存后固定为infinite，直到人工停止。",
             "inheritance_decisions": "历史配置采用或拒绝的决定与依据。", "unknowns": "未确认项，不能作为已知承诺口播。",
-            "campaign_starts_at": "活动优惠开始时间，使用含年份和时区的ISO 8601字符串；与直播排期分开保存。",
             "campaign_ends_at": "活动优惠截止时间，使用含年份和时区的ISO 8601字符串；与场次结束分开保存。"}
         draft_properties = {key: {"description": descriptions[key]} for key in sorted(SESSION_DRAFT_FIELDS)}
         draft_properties["tts_selection"].update(VoiceSelection.model_json_schema())
         draft_properties["loop_mode"]["const"] = "infinite"
-        for field in ("campaign_starts_at", "campaign_ends_at"):
-            draft_properties[field]["anyOf"] = [
-                {"type": "string", "format": "date-time"}, {"const": ""}, {"type": "null"},
-            ]
         # Additive query metadata does not invalidate an existing product
         # assembly's schema_hash. The accepted field set is shared with writes.
         return {"schema": schema, "schema_hash": digest(schema), "contract_version": "PRELIVE-2.3",
@@ -129,7 +103,7 @@ class PreliveService:
             "platform_policies": platform_policy_catalog(),
             "session_draft_schema": {"type": "object", "additionalProperties": False, "properties": draft_properties,
                 "allowed_fields": sorted(SESSION_DRAFT_FIELDS),
-                "backend_validation": "顶层字段严格；commerce与tts_selection按对应schema验证；活动起止时间须带时区或留空。"}}
+                "backend_validation": "顶层字段严格；commerce与tts_selection按对应schema验证；其余值原样保存。"}}
 
     def _assert_scope(self, c, principal, scope, preparation_id=None):
         if principal.account_id != "local" or (scope and scope.account_id != principal.account_id):
@@ -522,22 +496,7 @@ class PreliveService:
             dispositions = [{"path": "/" + key, "action": "clear" if key in derived_clear_fields or (not old and key in inactive) else patch_actions.get("/" + key, "preserve"), "knowledge": "not_applicable" if key in inactive else "unknown" if product[key] in (None, "", []) else "known", "source_refs": [wire(r) for r in a.source_manifest_refs], "reason": "停用字段不作为商品事实；仅本次明确停用才清空，其余历史值保持原样" if key in inactive else "服务依据明确字段操作生成的完整处理清单"} for key in sorted(names)]
         audit = self.store.artifact(c, "product_assembly", {"product_ref": ref, "field_dispositions": dispositions, "sources": [wire(r) for r in a.source_manifest_refs], "changed_paths": changed})
         change = c.execute("SELECT id FROM prelive_changes WHERE kind='product' AND object_id=? AND after_ref=? ORDER BY created_at DESC LIMIT 1", (identity, canonical(ref))).fetchone()
-        changed_document_ids = []
-        if not old or "/knowledge_documents" in changed:
-            previous_documents = {
-                doc["id"]: doc for doc in (previous.get("knowledge_documents") or [])
-                if isinstance(doc, dict) and isinstance(doc.get("id"), str)
-            }
-            changed_document_ids = [
-                doc["id"] for doc in body["knowledge_documents"]
-                if previous_documents.get(doc["id"]) != doc
-            ]
-        return {
-            "product_ref": ref, "product": body, "assembly_ref": audit,
-            "change_id": change[0] if change else None, "changed_paths": changed,
-            "changed_knowledge_document_ids": changed_document_ids,
-            "scripts_automatically_changed": False, "created": old is None,
-        }
+        return {"product_ref": ref, "product": body, "assembly_ref": audit, "change_id": change[0] if change else None, "changed_paths": changed, "scripts_automatically_changed": False, "created": old is None}
 
     def record_identity_decision(self, target_name, candidate_refs, *, principal):
         """Trusted human UI callback; deliberately absent from model tools."""
@@ -691,12 +650,15 @@ class PreliveService:
                     blockers.append({"code": "PRODUCT_REVISION_CHOICE_REQUIRED", "product_id": pinned["id"], "diff_hash": diff_hash})
         if prep.get("draft_ref"):
             draft = self._artifact(c, prep["draft_ref"])["body"]["draft"]
-            try:
-                expiry = campaign_expiry(draft.get("campaign_ends_at"))
-                if expiry is not None and expiry <= datetime.now(timezone.utc):
-                    blockers.append({"code": "CAMPAIGN_EXPIRED"})
-            except ValueError:
-                blockers.append({"code": "INVALID_CAMPAIGN_EXPIRY"})
+            end = draft.get("campaign_ends_at")
+            if end:
+                from datetime import datetime, timezone
+                try:
+                    expiry = datetime.fromisoformat(end.replace("Z", "+00:00"))
+                    if expiry.tzinfo is None or expiry <= datetime.now(timezone.utc):
+                        blockers.append({"code": "CAMPAIGN_EXPIRED"})
+                except ValueError:
+                    blockers.append({"code": "INVALID_CAMPAIGN_EXPIRY"})
         return {"differences": diffs, "blockers": blockers, "revision_choice_refs": choices, "current": not blockers}
 
     def record_product_control(self, args, *, principal):
@@ -747,32 +709,11 @@ class PreliveService:
             receipt.update(self._refresh(c, prep, pinned, head))
         return receipt
 
-    def _campaign_start_blocker(self, c, prep):
-        ref = prep.get("draft_ref")
-        if ref:
-            draft = self._artifact(c, ref)["body"]["draft"]
-            starts = campaign_expiry(draft.get("campaign_starts_at"))
-            if starts and starts > datetime.now(timezone.utc):
-                return {"code": "CAMPAIGN_NOT_STARTED", "campaign_starts_at": draft["campaign_starts_at"]}
-        return None
-
     def _cmd_save_session_draft(self, c, a, m, p, s):
         prep = self._prep(c, a.preparation_id, a.expected_revision)
         allowed = SESSION_DRAFT_FIELDS
         if set(a.draft) - allowed:
             raise BusinessError("UNKNOWN_DRAFT_FIELD", details={"fields": sorted(set(a.draft) - allowed)})
-        try:
-            starts = campaign_expiry(a.draft.get("campaign_starts_at"))
-        except ValueError:
-            raise BusinessError("INVALID_CAMPAIGN_START", "活动开始时间须为带时区的日期时间，或留空", status=422,
-                details={"field": "/draft/campaign_starts_at", "commit_state": "not_committed"}) from None
-        try:
-            ends = campaign_expiry(a.draft.get("campaign_ends_at"))
-        except ValueError:
-            raise BusinessError("INVALID_CAMPAIGN_EXPIRY", "活动截止时间须为带时区的日期时间，或留空", status=422,
-                details={"field": "/draft/campaign_ends_at", "commit_state": "not_committed"}) from None
-        if starts and ends and starts >= ends:
-            raise BusinessError("INVALID_CAMPAIGN_WINDOW", "活动开始时间必须早于截止时间", status=422)
         draft = deepcopy(a.draft)
         # The first release always repeats the arranged queue until manual stop.
         # Accept old clients' `once` value but persist one authoritative policy.
@@ -795,12 +736,7 @@ class PreliveService:
                                     "action": "select", "requires_explicit_selection": True}})
         draft["commerce"] = commerce.validate_room(configured, products)
         draft.setdefault("language", "zh-CN")
-        prior_ref = prep["body"].get("draft_ref")
-        prior = self._artifact(c, prior_ref)["body"]["draft"] if prior_ref else {}
-        if "tts_selection" not in draft:
-            prior_voice = prior.get("tts_selection")
-            room = self.store.get(c, "config", prep["body"]["room_id"])
-            draft["tts_selection"] = prior_voice or room_default_voice(room["body"])
+        draft.setdefault("tts_selection", {"provider": "system", "voice": "Huihui", "model": "speech-2.8-turbo"})
         draft["tts_selection"] = VoiceSelection.model_validate(draft["tts_selection"]).model_dump()
         if draft["tts_selection"]["provider"] == "system" and draft["tts_selection"]["voice"] != "Huihui":
             raise BusinessError("LOCAL_VOICE_NOT_AVAILABLE")
@@ -810,13 +746,7 @@ class PreliveService:
             return {"draft_ref": ref, "preparation_ref": prep["ref"], "unchanged": True}
         body.update(draft_ref=ref, bundle_ref=None, plan_ref=None, compiled_plan_ref=None, requirements_ref=None, audio_manifest_ref=None)
         result = self._save_prep(c, prep, body)
-        old_overrides = (prior.get("commerce") or {}).get("product_overrides", {})
-        new_overrides = draft["commerce"]["product_overrides"]
-        default_override = commerce.ProductOverride().model_dump()
-        changed_overrides = [identity for identity in products if
-            {**default_override, **old_overrides.get(identity, {})} != new_overrides.get(identity, default_override)]
-        return {**result, "draft_ref": ref, "blocking_gaps": draft.get("unknowns", []),
-                "changed_product_override_ids": changed_overrides}
+        return {**result, "draft_ref": ref, "blocking_gaps": draft.get("unknowns", [])}
 
     def _cmd_accept_analysis_report(self, c, a, m, p, s):
         report = wire(a.report)
@@ -926,7 +856,10 @@ class PreliveService:
             raise BusinessError("DUPLICATE_VARIANT_ID", "一份计划中每套话术需要独立的方案ID", status=422)
         # A display version identifies a variant line; revision identifies an
         # edit on that line. Never relabel historical script/approval records.
-        used_numbers = self._script_version_numbers(c, prep["body"])
+        used_numbers = {}
+        for script_ref in prep["body"]["script_refs"]:
+            current = self._artifact(c, script_ref, "script_revision", a.preparation_id)["body"]
+            used_numbers.setdefault(current["product_id"], set()).add(current["version_number"])
         for item_index, item in enumerate(a.items):
             product_ref = self._artifact(c, item.product_ref, "product")["ref"]
             if product_ref not in prep["body"]["selected_product_refs"]:
@@ -1008,22 +941,14 @@ class PreliveService:
                 from .whole_script_generation import prompt_revision
                 normalized_item["generator_revision"] = prompt_revision()
                 normalized_item["version_context_contract"] = "existing-script-text-v3"
-            if all_generated and item.original_script_ref:
-                from .expansion_expression import CONTRACT
-                origin = normalized_item["original_script_ref"]
-                normalized_item["expansion_expression_contract"] = CONTRACT
-                normalized_item["expansion_comparison_refs"] = [ref for ref in prep["body"]["script_refs"]
-                    if self._artifact(c, ref, "script_revision", a.preparation_id)["body"].get(
-                        "generation_provenance", {}).get("original_script_ref") == origin]
             normalized_items.append(normalized_item)
-        from .recap_writing import bind_recap_writing
-        dispositions = [wire(decision) for decision in a.recap_dispositions]
-        guidance = bind_recap_writing(bundle, normalized_items, dispositions)
-        plan = {"preparation_id": a.preparation_id, "bundle_ref": bundle_record["ref"],
-                "items": normalized_items, "recap_dispositions": dispositions}
-        if guidance is not None:
-            plan["recap_writing_guidance"] = guidance
-        ref = self.store.artifact(c, "script_plan", plan)
+        finding_ids = set()
+        for ref in bundle["recap_refs"]:
+            recap = self._artifact(c, ref)["body"]
+            finding_ids.update(f.get("finding_id") or f.get("id") for f in recap["document"].get("findings", []))
+        if finding_ids - {d.get("finding_id") for d in a.recap_dispositions}:
+            raise BusinessError("RECAP_DISPOSITION_MISSING")
+        ref = self.store.artifact(c, "script_plan", {"preparation_id": a.preparation_id, "bundle_ref": bundle_record["ref"], "items": normalized_items, "recap_dispositions": a.recap_dispositions})
         body = deepcopy(prep["body"])
         body["plan_ref"] = ref
         return {**self._save_prep(c, prep, body), "script_plan_ref": ref}
@@ -1041,8 +966,6 @@ class PreliveService:
         if prep["body"]["generation_epoch"] != a.expected_generation_epoch or prep["body"]["plan_ref"] != plan_record["ref"] or prep["body"]["bundle_ref"] != context_record["ref"]:
             raise BusinessError("GENERATION_INPUTS_CHANGED")
         plan, context = plan_record["body"], context_record["body"]
-        if "recap_writing_guidance" in plan:
-            context = {**context, "recap_writing_guidance": plan["recap_writing_guidance"]}
         existing = self.store.all(c, "script_revision")
         for item in plan["items"]:
             if not item.get("base_script_ref") and any(r["body"]["variant_id"] == item["variant_id"] for r in existing):
@@ -1052,76 +975,6 @@ class PreliveService:
     def _cmd_import_script(self, c, a, m, p, s):
         from .script_imports import import_script
         return import_script(self, c, a)
-
-    def _script_version_numbers(self, c, prep):
-        """Preserve display numbers even when a variant leaves the draft."""
-        numbers = {}
-        for row in c.execute("""SELECT json_extract(body,'$.product_id'), json_extract(body,'$.version_number')
-                FROM records WHERE kind='script_revision' AND json_extract(body,'$.preparation_id')=?""", (prep["id"],)):
-            if isinstance(row[1], int):
-                numbers.setdefault(row[0], set()).add(row[1])
-        for ref in prep["script_refs"]:
-            current = self._artifact(c, ref, "script_revision", prep["id"])["body"]
-            numbers.setdefault(current["product_id"], set()).add(current["version_number"])
-        return numbers
-
-    def _update_script_playlist(self, c, prep, *, replacement=None, append_missing=False):
-        """Update a draft queue atomically with its saved script revisions."""
-        saved_ref = prep.get("playlist_ref")
-        saved = self._artifact(c, saved_ref, "playlist", prep["id"])["body"] if saved_ref else {}
-        old_items = saved.get("items", [])
-        items = []
-        removed = 0
-        for item in old_items:
-            if replacement and item["script_revision_ref"] == replacement[0]:
-                if replacement[1] is None:
-                    removed += 1
-                    continue
-                item = {**item, "script_revision_ref": replacement[1]}
-            items.append(item)
-        if append_missing:
-            queued = {item["script_revision_ref"]["id"] for item in items}
-            for ref in prep["script_refs"]:
-                if ref["id"] in queued:
-                    continue
-                script = self._artifact(c, ref, "script_revision", prep["id"])["body"]
-                if script["product_ref"] not in prep["selected_product_refs"]:
-                    continue
-                items.append({"occurrence_id": uid("occ"), "product_id": script["product_id"], "script_revision_ref": ref})
-                queued.add(ref["id"])
-        if items == old_items:
-            return saved_ref, removed
-        if not items:
-            return None, removed
-        product_ids = list(dict.fromkeys(item["product_id"] for item in items))
-        group_order = [identity for identity in saved.get("product_group_order", []) if identity in product_ids]
-        group_order.extend(identity for identity in product_ids if identity not in group_order)
-        ref = self.store.artifact(c, "playlist", {"preparation_id": prep["id"], "items": items,
-            "loop_mode": "infinite", "product_group_order": group_order, "reorder_provenance": None})
-        return ref, removed
-
-    def delete_script_version(self, c, args, *, live_room_ids=()):
-        prep = self._prep(c, args.preparation_id, args.expected_revision)
-        script = self._artifact(c, args.script_ref, "script_revision", args.preparation_id)
-        if script["ref"] not in prep["body"]["script_refs"]:
-            raise BusinessError("SCRIPT_NOT_IN_PREPARATION", "话术版本已经修改或移除，请刷新后重试。")
-        room_id = prep["body"]["room_id"]
-        if room_id in live_room_ids or c.execute("""SELECT 1 FROM prelive_live_slot
-                WHERE slot=1 AND room_id=? AND state IN ('starting','live','unknown')""", (room_id,)).fetchone():
-            raise BusinessError("ROOM_IS_LIVE", "请先停止此直播间的播出或核实开播结果，再删除话术。")
-        if c.execute("""SELECT 1 FROM records WHERE kind='prelive_job'
-                AND json_extract(body,'$.preparation_id')=? AND json_extract(body,'$.generation_epoch')=?
-                AND json_extract(body,'$.status') IN ('queued','running') LIMIT 1""",
-                (args.preparation_id, prep["body"]["generation_epoch"])).fetchone():
-            raise BusinessError("BUSINESS_JOB_PENDING", "本场仍有执行中的任务，请等待完成后再删除话术。")
-        updated = deepcopy(prep["body"])
-        updated["script_refs"].remove(script["ref"])
-        updated["playlist_ref"], removed = self._update_script_playlist(c, updated, replacement=(script["ref"], None))
-        updated.update(bundle_ref=None, plan_ref=None, compiled_plan_ref=None, requirements_ref=None, audio_manifest_ref=None)
-        # Keep immutable script and publication records for receipts, history,
-        # and old sessions. The cleared candidate also gates any stale restart.
-        return {**self._save_prep(c, prep, updated), "playlist_ref": updated["playlist_ref"],
-                "deleted_script_ref": script["ref"], "removed_occurrence_count": removed}
 
     def _cmd_patch_script(self, c, a, m, p, s):
         prep = self._prep(c, a.preparation_id, a.expected_revision)
@@ -1159,7 +1012,12 @@ class PreliveService:
         prep_body = deepcopy(prep["body"])
         prep_body["script_refs"] = [new_ref if r == script["ref"] else r for r in prep_body["script_refs"]]
         # Preserve occurrence identities and positions; only replace this exact line.
-        prep_body["playlist_ref"], _ = self._update_script_playlist(c, prep_body, replacement=(script["ref"], new_ref))
+        if prep_body["playlist_ref"]:
+            playlist = deepcopy(self._artifact(c, prep_body["playlist_ref"])["body"])
+            for item in playlist["items"]:
+                if item["script_revision_ref"] == script["ref"]:
+                    item["script_revision_ref"] = new_ref
+            prep_body["playlist_ref"] = self.store.artifact(c, "playlist", playlist)
         prep_body.update(compiled_plan_ref=None, requirements_ref=None, audio_manifest_ref=None)
         return {**self._save_prep(c, prep, prep_body), "script_ref": new_ref, "replacement": {
             "old_ref": script["ref"], "new_ref": new_ref, "module_key": a.module_key,
@@ -1565,7 +1423,6 @@ class PreliveService:
         draft = self._artifact(c, publication["draft_ref"])["body"]["draft"]
         playlist = self._artifact(c, publication["playlist_ref"])["body"]
         body = deepcopy(room["body"])
-        body.setdefault("default_tts_selection", room_default_voice(body))
         body.update(product_ids=[r["id"] for r in publication["product_refs"]], commerce=draft["commerce"], adopted_publication_ref=wire(a.publication_ref), adopted_preparation_id=publication["preparation_id"], plan_mode="all", loop=True, script_order=[i["script_revision_ref"]["id"] for i in playlist["items"]], selected_script_ids=[i["script_revision_ref"]["id"] for i in playlist["items"]], tts_provider=draft["tts_selection"]["provider"], tts_voice=draft["tts_selection"]["voice"], tts_model=draft["tts_selection"].get("model", "speech-2.8-turbo"))
         room_ref = self.store.put(c, "config", room["ref"]["id"], body, expected=a.expected_room_revision)
         adoption_ref = self.store.artifact(c, "adoption", {"publication_ref": wire(a.publication_ref), "room_ref": room_ref, "human_actor": p.actor_id, "review_hash": a.review_hash, "revision_choice_refs": review["currentness"]["revision_choice_refs"], "operation_id": m.operation_id})
@@ -1600,10 +1457,6 @@ class PreliveService:
                 if slot and slot["state"] in {"starting", "live", "unknown"}:
                     raise BusinessError("LIVE_SLOT_BUSY", "直播启动或运行中，不能重复开播")
                 publication = review["publication"]
-                future_campaign = self._campaign_start_blocker(c, self._prep(c, publication["preparation_id"])["body"])
-                if future_campaign:
-                    raise BusinessError("CAMPAIGN_NOT_STARTED", "本场优惠尚未开始，请在活动开始后开播或移除活动配置。",
-                        details=future_campaign)
                 plan = self._artifact(c, publication["compiled_plan_ref"])["body"]
                 manifest = self._artifact(c, publication["audio_manifest_ref"])["body"]
                 assets = {x["requirement_id"]: x for x in manifest["assets"]}
@@ -2451,16 +2304,9 @@ class PreliveService:
             "variant": {"variant_id": spec["variant_id"], "version_number": spec["version_number"]}})
         from .script_imports import original_script_context
         from .script_version_context import script_version_context
-        from .expansion_expression import references, verify_expression, writing_context
         with self.store.transaction() as c:
             context.update(original_script_context(self, c, spec, job["preparation_id"]))
             context.update(script_version_context(self, c, job, spec))
-            expression_refs = references(self, c, job, spec)
-        if expression_refs:
-            context["expansion_expression"] = writing_context(job, spec)
-        from .recap_writing import project_recap_writing
-        context = project_recap_writing(context, spec["variant_id"],
-            {action["key"] for action in spec["modules"] if action["action"] == "generate"})
         from .writing_input_projection import project_writing_context
         context = project_writing_context(context, spec)
         signature = self.adapter.script_generation_signature() if hasattr(self.adapter, "script_generation_signature") else {}
@@ -2501,13 +2347,11 @@ class PreliveService:
                     modules = {key: self._module_body(key, value.get("sentences"),
                         next(a.get("base_module_ref") for a in spec["modules"] if a["key"] == key), value.get("sentence_details"))
                         for key, value in texts["modules"].items()}
-                    verify_expression(modules, expression_refs)
                     await asyncio.to_thread(self._record_archive_revalidation, job["id"], item["item_id"], "whole_script",
                         checkpoint, status="validated", check_id=check_id, validation_details={
                             "verified_dependency_hash": expected_hash, "validation_product_hash": digest(validation_product),
                             "validation_product_contract": validation["contract"],
-                            "normalization": texts.get("normalization"), "validation_metrics": texts.get("validation_metrics"),
-                            **({"recovery": texts["recovery"]} if "recovery" in texts else {})})
+                            "normalization": texts.get("normalization"), "validation_metrics": texts.get("validation_metrics")})
                     validated = True
                     reused_refs = checkpoint.get("committed_module_refs")
                     if reused_refs:
@@ -2552,7 +2396,6 @@ class PreliveService:
             modules = {key: self._module_body(key, value.get("sentences"),
                 next(a.get("base_module_ref") for a in spec["modules"] if a["key"] == key), value.get("sentence_details"))
                 for key, value in texts["modules"].items()}
-            verify_expression(modules, expression_refs)
             tick = perf_counter_ns()
             refs = await asyncio.to_thread(self._commit_whole_script_result, job["id"], item["item_id"],
                 dependency_hash, modules, attempt)
@@ -2585,16 +2428,10 @@ class PreliveService:
             else:
                 with self.store.transaction() as c:
                     prior = self._artifact(c, action["base_module_ref"])["body"]["sentences"] if action.get("base_module_ref") else []
-                from .recap_writing import project_recap_writing
-                writer_context = project_recap_writing(job["context"], spec["variant_id"], {key})
-                context = commerce.active_context_products({**writer_context, "generation_instruction": action["instruction"], "module_key": key})
+                context = commerce.active_context_products({**job["context"], "generation_instruction": action["instruction"], "module_key": key})
                 from .script_imports import original_script_context
-                from .expansion_expression import references, writing_context
                 with self.store.transaction() as c:
                     context.update(original_script_context(self, c, spec, job["preparation_id"]))
-                    expression_refs = references(self, c, job, spec)
-                if expression_refs:
-                    context["expansion_expression"] = writing_context(job, spec)
                 from .module_generation import module_prompt_revision, finish_received_module
                 dependency_input = {"version": "module-result-v1", "variant_id": spec["variant_id"],
                     "version_number": spec["version_number"], "product_ref": spec["product_ref"],
@@ -2734,10 +2571,6 @@ class PreliveService:
                 for key, module in output["modules"].items():
                     module_refs[key] = None if module is None else module["reuse_ref"] if "reuse_ref" in module else self.store.artifact(c, "module", module)
                 spec, base = output["spec"], output["base"]
-                if spec.get("expansion_expression_contract") and spec.get("generation_mode") != "whole_script":
-                    from .expansion_expression import references, verify_expression
-                    verify_expression({key: self._artifact(c, ref, "module")["body"] for key, ref in module_refs.items() if ref},
-                                      references(self, c, body, spec))
                 script_body = {"preparation_id": body["preparation_id"], "product_id": spec["product_ref"]["id"], "product_ref": spec["product_ref"], "variant_id": spec["variant_id"], "version_number": spec["version_number"], "script_revision": base["script_revision"] + 1 if base else 1, "parent_ref": spec.get("base_script_ref"), "module_refs": module_refs, "input_hash": digest({"plan_ref": body["plan_ref"], "spec": spec}), "created_at": now(), "content_diagnostics": self._script_content_diagnostics(c, module_refs)}
                 from ..welcome import build_product_templates
                 script_body["welcome_templates"] = build_product_templates(self.store.exact(c, spec["product_ref"])["body"])
@@ -2746,19 +2579,19 @@ class PreliveService:
                     "generation_mode": spec.get("generation_mode", "module"),
                     "generator_revision": spec.get("generator_revision"), "job_id": job_id,
                     "item_id": item_id, "parent_script_ref": spec.get("base_script_ref")}
-                if spec.get("expansion_expression_contract"):
-                    script_body["generation_provenance"]["original_script_ref"] = spec["original_script_ref"]
                 result_ref = self.store.artifact(c, "script_revision", script_body)
                 prep_body = deepcopy(prep["body"])
-                base_ref = spec.get("base_script_ref")
-                if base_ref:
-                    prep_body["script_refs"] = [result_ref if r == base_ref else r for r in prep_body["script_refs"]]
+                if spec.get("base_script_ref"):
+                    prep_body["script_refs"] = [result_ref if r == spec["base_script_ref"] else r for r in prep_body["script_refs"]]
+                    if prep_body["playlist_ref"]:
+                        playlist = deepcopy(self._artifact(c, prep_body["playlist_ref"])["body"])
+                        for occurrence in playlist["items"]:
+                            if occurrence["script_revision_ref"] == spec["base_script_ref"]:
+                                occurrence["script_revision_ref"] = result_ref
+                        prep_body["playlist_ref"] = self.store.artifact(c, "playlist", playlist)
                 elif result_ref not in prep_body["script_refs"]:
                     prep_body["script_refs"].append(result_ref)
-                prep_body["playlist_ref"], _ = self._update_script_playlist(c, prep_body,
-                    replacement=(base_ref, result_ref) if base_ref else None, append_missing=True)
-                prep_body.update(compiled_plan_ref=None, requirements_ref=None, approval_ref=None,
-                                 audio_manifest_ref=None, candidate_publication_ref=None, status="draft")
+                prep_body.update(compiled_plan_ref=None, requirements_ref=None, approval_ref=None, audio_manifest_ref=None, candidate_publication_ref=None)
                 self._save_prep(c, prep, prep_body, invalidate=False)
                 item["output"] = {"script_ref": result_ref, "content_diagnostics": script_body["content_diagnostics"]}
                 if item.get("recovery_mode") == "revalidate_archived":
@@ -2789,7 +2622,6 @@ class PreliveService:
                     else:
                         manifest_ref = self.store.artifact(c, "audio_manifest", {"preparation_id": body["preparation_id"], "requirements_ref": body["requirements_ref"], "approval_ref": body["approval_ref"], "assets": [i["output"]["asset"] for i in body["items"]], "all_ready": True})
                     if manifest_ref:
-                        body["audio_manifest_ref"] = manifest_ref
                         prep_body = deepcopy(latest["body"])
                         prep_body["audio_manifest_ref"] = manifest_ref
                         self._save_prep(c, latest, prep_body, invalidate=False)
@@ -2816,8 +2648,7 @@ class PreliveService:
             elif (item.get("provider_attempts") and item["provider_attempts"][-1].get("validation_state") == "pending"
                     and error.code in {"MODULE_RESPONSE_INVALID", "MODULE_RESPONSE_MISMATCH", "SHORT_MODULE_TOO_LONG",
                     "GENERATED_MODULE_NEEDS_REVIEW", "INVALID_MODULE_TEXT", "DUPLICATE_MODULE_SENTENCE", "MODULE_DETAILS_MISMATCH",
-                    "WHOLE_SCRIPT_RESPONSE_INVALID", "WHOLE_SCRIPT_RESULT_MISMATCH", "WHOLE_SCRIPT_LENGTH_OUT_OF_RANGE",
-                    "SCRIPT_EXPANSION_REPEATED_EXPRESSION"}):
+                    "WHOLE_SCRIPT_RESPONSE_INVALID", "WHOLE_SCRIPT_RESULT_MISMATCH"}):
                 item["provider_attempts"][-1].update(validation_state="rejected", validation_error=error.payload())
             if candidate is not None:
                 # Audit-only quarantine: never changes preparation/room refs.
@@ -2834,45 +2665,10 @@ class PreliveService:
         return self.schema()
 
     def _q_search_products(self, c, a, p, s):
-        def preview(value, limit):
-            text = " ".join(value.split()) if isinstance(value, str) else ""
-            return text if len(text) <= limit else text[:limit - 1].rstrip() + "…"
-
         products = self.store.all(c, "product")
-        matches = [r for r in products if not r["body"].get("archived") and a.q.casefold() in (r["body"].get("name", "") + " " + (r["body"].get("sku_id") or "")).casefold()]
+        matches = [r for r in products if not r["body"].get("archived") and a.q.casefold() in (r["body"].get("name", "") + " " + r["body"].get("sku_id", "")).casefold()]
         page = matches[a.cursor:a.cursor + a.limit]
-        rows = []
-        for record in page:
-            body = record["body"]
-            row = {"ref": record["ref"], "name": body["name"], "sku_id": body.get("sku_id"),
-                   "display_number": body.get("display_number"), "price": body["price"],
-                   "currency": body["currency"], "sale_status": body.get("sale_status", "available")}
-            if p.kind == "human":
-                points = body.get("core_selling_points") or (body.get("selling_points") or "").splitlines()
-                visible_points = []
-                for line in points:
-                    if isinstance(line, str) and line.strip():
-                        visible_points.append(" ".join(line.split()))
-                        if len(visible_points) == 3:
-                            break
-                point = visible_points[0] if visible_points else ""
-                fulfillment = commerce.active_product_fields({
-                    "shipping_time": body.get("shipping_time"),
-                    "hidden_optional_fields": body.get("hidden_optional_fields") or [],
-                }, consumer_safe=False)
-                thumb = body.get("image") or ""
-                row.update(selling_point_preview=point[:100] + ("…" if len(point) > 100 else ""),
-                           selling_points_preview=[preview(line, 64) for line in visible_points],
-                           promotion_preview=preview(body.get("promotion"), 100),
-                           shipping_time_preview=preview(fulfillment["shipping_time"], 100),
-                           sales_platform=body.get("sales_platform", "unspecified"),
-                           specification_count=len(body.get("specifications") or []),
-                           knowledge_document_count=len(body.get("knowledge_documents") or []),
-                           has_faq=bool(body.get("faq")), has_knowledge=bool(body.get("knowledge")))
-                if len(thumb) <= 12288 and re.fullmatch(r"data:image/(png|jpeg|webp);base64,[A-Za-z0-9+/]+={0,2}", thumb):
-                    row["thumbnail_url"] = thumb
-            rows.append(row)
-        return {"items": rows, "next_cursor": a.cursor + a.limit if a.cursor + a.limit < len(matches) else None}
+        return {"items": [{"ref": r["ref"], "name": r["body"]["name"], "sku_id": r["body"].get("sku_id"), "display_number": r["body"].get("display_number"), "price": r["body"]["price"], "currency": r["body"]["currency"], "sale_status": r["body"].get("sale_status", "available")} for r in page], "next_cursor": a.cursor + a.limit if a.cursor + a.limit < len(matches) else None}
 
     def _q_read_product(self, c, a, p, s):
         if a.ref:
@@ -2995,12 +2791,7 @@ class PreliveService:
         return result
 
     def _q_create_text_review(self, c, a, p, s):
-        review = self._text_review(c, self._prep(c, a.preparation_id)["body"])
-        voice = review["voice"]
-        voices = VOICE_CATALOG.get(voice["provider"], ())
-        name = next((item["name"] for item in voices if item["id"] == voice["voice"]), None)
-        # Display copy is outside the signed review payload.
-        return {**review, "voice_display_name": name}
+        return self._text_review(c, self._prep(c, a.preparation_id)["body"])
 
     def _q_read_text_approval(self, c, a, p, s):
         prep = self._prep(c, a.preparation_id)
@@ -3357,46 +3148,6 @@ class PreliveService:
         if not ref:
             raise BusinessError("PUBLICATION_REQUIRED")
         return self._publication_review(c, ref)
-
-    def _q_read_start_readiness(self, c, a, p, s):
-        prep = self._prep(c, a.preparation_id)
-        body = prep["body"]
-        blockers = []
-        ref = body.get("candidate_publication_ref")
-        review = None
-        if ref:
-            try:
-                review = self._publication_review(c, ref)
-            except BusinessError as error:
-                blockers.append({"code": error.code})
-            else:
-                blockers.extend(review["currentness"]["blockers"])
-                if not review["adopted"]:
-                    blockers.append({"code": "START_ADOPTION_REQUIRED"})
-        else:
-            blockers.extend(self._currentness(c, body, choices_required=True)["blockers"])
-            for field, code in (
-                ("selected_product_refs", "START_PRODUCTS_REQUIRED"),
-                ("draft_ref", "START_SESSION_REQUIRED"),
-                ("script_refs", "START_SCRIPTS_REQUIRED"),
-                ("playlist_ref", "START_PLAYLIST_REQUIRED"),
-            ):
-                if not body.get(field):
-                    blockers.append({"code": code})
-            if body.get("playlist_ref"):
-                audio = self._q_read_audio_readiness(c, QueryArgs(preparation_id=a.preparation_id, limit=1), p, s)
-                blockers.extend(item for item in audio["blockers"] if item not in blockers)
-            if not blockers:
-                blockers.append({"code": "START_PUBLICATION_REQUIRED"})
-        future_campaign = self._campaign_start_blocker(c, body)
-        if future_campaign:
-            blockers.append(future_campaign)
-        if c.execute("SELECT 1 FROM prelive_live_slot WHERE slot=1 AND state IN ('starting','live','unknown')").fetchone():
-            blockers.append({"code": "LIVE_SLOT_BUSY"})
-        return {"ready": review is not None and not blockers, "room_id": body["room_id"],
-                "preparation_ref": prep["ref"], "publication_ref": ref,
-                "review_hash": review["review_hash"] if review else None,
-                "room_ref": review["room_ref"] if review else None, "blockers": blockers}
 
     def _q_read_operation_receipt(self, c, a, p, s):
         import json

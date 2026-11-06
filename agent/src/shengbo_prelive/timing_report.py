@@ -154,7 +154,7 @@ def _stage(name, args=None):
         return "audio"
     if command in {"publish_preparation", "read_completion_observation", "read_publication", "verify_finish"}:
         return "publication"
-    if command in {"request_decision", "request_user_decision"}:
+    if command == "request_decision":
         return "human_decision"
     return "planning_coordination"
 
@@ -238,7 +238,7 @@ def analyze(evidence: Evidence, run_ids=None, *, observed_end=None):
         if kind == "tool.started":
             key = (*invocation, data.get("tool_call_id") or data.get("tool_name"))
             tool_pending[key] = (at, data)
-        elif kind in {"tool.completed", "tool.interrupted", "tool.failed", "tool.error"}:
+        elif kind in {"tool.completed", "tool.failed", "tool.error"}:
             candidates = [key for key in tool_pending if key[:3] == invocation
                           and tool_pending[key][1].get("tool_name") == data.get("tool_name")]
             if candidates:

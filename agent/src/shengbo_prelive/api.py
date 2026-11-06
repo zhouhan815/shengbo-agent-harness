@@ -156,10 +156,6 @@ def create_app(engine, service_token: str) -> FastAPI:
     async def get_conversation(conversation_id: str):
         return _response(await _call(engine.get_conversation, _require_id(conversation_id)))
 
-    @app.delete(base + "/conversations/{conversation_id}", dependencies=protected)
-    async def delete_conversation(conversation_id: str):
-        return _response(await _call(engine.delete_conversation, _require_id(conversation_id)))
-
     @app.post(base + "/conversations/{conversation_id}/messages", dependencies=protected)
     async def submit_message(conversation_id: str, body: MessageRequest):
         _require_local_scope(body.scope)
@@ -205,12 +201,7 @@ def create_app(engine, service_token: str) -> FastAPI:
 
     @app.get(base + "/runs/{run_id}", dependencies=protected)
     async def get_run(run_id: str):
-        value = await _call(engine.get_run, _require_id(run_id))
-        if value.get("status") == "COMPLETED" and value.get("catalog_intake_result"):
-            from .catalog_intake_report import refresh_catalog_intake_requirements
-            report = await refresh_catalog_intake_requirements(engine.client, value["catalog_intake_result"])
-            value = {**value, "catalog_intake_result": report}
-        return _response(value)
+        return _response(await _call(engine.get_run, _require_id(run_id)))
 
     @app.post(base + "/runs/{run_id}/cancel", dependencies=protected)
     async def cancel_run(run_id: str, body: CancelRequest | None = None):

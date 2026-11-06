@@ -21,27 +21,24 @@ def spoken_character_count(text):
     return sum(character.isalnum() for character in text) if isinstance(text, str) else 0
 
 
-def length_goal(module_keys, requested_range=None):
+def length_goal(module_keys):
     keys = list(module_keys)
     weights = {"opening_long": 7, "opening_short": 2, "product_intro": 1,
                "selling_points": 63, "campaign": 12, "cta": 22}
     # Unused opening/campaign time is shared by the selected speaking modules.
     total_weight = sum(weights.get(key, 0) for key in keys)
-    limits = requested_range or TARGET_SPOKEN_CHARACTERS
-    middle = sum(limits) // 2
+    middle = sum(TARGET_SPOKEN_CHARACTERS) // 2
     module_targets = {key: round(middle * weights.get(key, 0) / total_weight)
                       for key in keys} if total_weight else {}
     return {"policy_revision": DURATION_POLICY_REVISION,
-            "target_minutes": ([round(count / CHARACTERS_PER_MINUTE, 2) for count in limits]
-                               if requested_range else list(TARGET_MINUTES)),
-            "spoken_characters_range": list(limits),
+            "target_minutes": list(TARGET_MINUTES),
+            "spoken_characters_range": list(TARGET_SPOKEN_CHARACTERS),
             "nominal_spoken_characters": middle,
             "counting_basis": "spoken_text_letters_and_numbers_excluding_punctuation_and_space",
             "assumed_characters_per_minute": CHARACTERS_PER_MINUTE,
             "module_spoken_character_targets": module_targets,
             "measurement_kind": "text_estimate_not_measured_audio",
-            "requirements": ["按本次指定字数写完一版短口播，四段合计控制在范围内。" if requested_range else
-                "整版一次生成，完整正文目标约八至十分钟，长短开场只改变引入长度，不缩短主体。",
+            "requirements": ["整版一次生成，完整正文目标约八至十分钟，长短开场只改变引入长度，不缩短主体。",
                 "商品介绍只写一句营销亮品，不另写参数段；更多组成与用途在相关卖点中讲清。",
                 "参考模块预算统筹全文，用各条已确认卖点的具体场景、使用动作、顾客利益和递进邀选充分展开；不写FAQ或模拟现场问答，不靠紧邻重复清单凑字数。",
                 "信息不足以有意义展开时保留真实可用内容，不能编造性能、优惠、见证、库存或重复句填满时长。"],

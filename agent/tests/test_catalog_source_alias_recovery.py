@@ -32,12 +32,8 @@ async def test_catalog_accepted_sources_save_and_multihop_followup_preserve_exac
     # A prepared label must not authorize a Voice alias or the original upload.
     original_args = COMMAND_ARGS['save_product'].model_validate({'fields': candidate, 'patches': [],
         'schema_hash': service.schema()['schema_hash'], 'source_manifest_refs': [source]})
-    with pytest.raises(ContractError, match='REPORT_DEPENDENCY_NOT_READY') as blocked:
+    with pytest.raises(ContractError, match='REPORT_DEPENDENCY_NOT_READY'):
         await engine._normalize_business_source_refs(scope, original_args)
-    assert blocked.value.details['sources'] == [{'source_ref': source, 'status': 'report_required'}]
-    assert blocked.value.details['next_actions'][0]['args']['branch_task_ids'] == [branch_id]
-    without_sources = original_args.model_copy(update={'source_manifest_refs': []})
-    assert (await engine._normalize_business_source_refs(scope, without_sources))['source_manifest_refs'] == []
     reference = (await engine.accept_reports(scope, [branch_id], 'catalog-accept'))['accepted_refs'][0]
     report = await engine.business_query(scope, 'read_context', {'ref': reference})
     alias = report['body']['report']['source_refs'][0]

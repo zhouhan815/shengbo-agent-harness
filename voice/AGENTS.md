@@ -1,8 +1,5 @@
 # 声播业务后端开发约定
 
-- 2026-11-05 当前仅正式环境与第二环境。正式根目录保持原路径，已恢复本轮token精简前的工作流与Flash配置；API管理及后续优化留在 D:/Codex project/shengbo-second-environment。修改在用户指定环境进行，第二环境未经确认不得同步正式。正式源码继续使用既有GitHub仓库与原同步任务，不新建镜像。
-
-- 2026-11-05 用户要求所有 DeepSeek 模型统一 Flash。正式默认主 Agent、子 Agent、摘要、提取、卖点生成与事实复核及恢复均用 canonical `deepseek-flash`。主 Agent 及各角色既有思考设置保留；正式整稿／模块话术和实时回复使用 Flash，话术继续原创作简报和关闭思考的流程。此要求覆盖历史 Pro 选择，避免再次恢复旧配置。
 - 2026-10-21正式TTS提效：`PreliveService.drain_jobs`仍由唯一coordinator持有`_worker_lock`；仅MiniMax正式audio按句批内默认3路，`PRELIVE_MINIMAX_AUDIO_CONCURRENCY`只允许1–3。每批全部收束后才重新扫描持久队列，脚本、试听、本机COM保持串行。每句沿原批准、外部request key、账本、WAV校验和CAS提交；`job.batch_claimed`记录实际批数。取消不能再次cancel正在写失败账本的child，须await全部收束；已提交success优先于迟到的取消。job失败终态需同时检查queued/running，不能让尾批早失败掩盖仍运行的句子。新增离线测试在`tests/test_formal_audio_concurrency_v1.py`，模拟计时不代表供应商真实加速比。
 
 - 2026-10-21连续试听：`app/prelive/script_audio_preview.py`持有独立精确人工授权，复用`voice_preview.py` durable attempt一次合成有序模块全文；未知结果不重发，回执缓存不重复计算本次usage。不得用局部试听授权批准整包或改manifest。`speech.minimax_request_body`为MiniMax唯一请求体入口；主播风格使用真实voice_setting，角色说明不进入朗读正文。新只读list查询及话术详情audio卡可刷新重读，正式整包音频编排保持既有路径。

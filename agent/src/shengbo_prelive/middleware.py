@@ -16,7 +16,6 @@ from typing import Any
 from langchain.agents.middleware import AgentMiddleware
 from langchain.agents.middleware.types import hook_config
 from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, SystemMessage, ToolMessage
-from langgraph.errors import GraphInterrupt
 from pydantic import TypeAdapter, ValidationError
 
 from shengbo_contracts.business import COMMAND_ARGS, ProductAssemblyInvalidDetails, ProductConsumerContentInvalidDetails, ScriptPlanModuleBaseInvalidDetails
@@ -28,84 +27,21 @@ from shengbo_prelive.policy import EXECUTE_READ_TOOLS, FORBIDDEN, READ_TOOLS
 _FORBIDDEN = FORBIDDEN | {"sql", "bash", "terminal", "exec", "python", "javascript", "run_command"}
 _LOCAL_NON_BUSINESS = {"save_task_assessment", "request_user_decision", "finish_turn", "dispatch_analysis_batch",
                        "ls", "read_file", "glob", "grep", "validate_product_assembly", "tool_catalog", "activate_tools"}
-from .action_contracts import recoverable_input_error, tool_argument_error
+from .action_contracts import recoverable_input_error
 
 _EFFECT_INPUT = TypeAdapter(list[BusinessEffect])
 # Plan corrections are one-shot: a second wrong plan keeps the original hard stop.
-_CORRECTION_LIMITS = {"PLAN_CAPABILITY_DENIED": 1, "PLAN_BEFORE_READ": 1, "TOOL_ARGUMENTS_INVALID": 1,
-                      "INVALID_CAMPAIGN_EXPIRY": 1, "SELLING_POINTS_RESEARCH_SCOPE_INVALID": 1}
+_CORRECTION_LIMITS = {"PLAN_CAPABILITY_DENIED": 1, "PLAN_BEFORE_READ": 1}
 
 
-_REQUIRES_USER = {
-    "DECISION_INPUT_INVALID", "IDENTITY_CANDIDATES_EMPTY", "IDENTITY_NAME_REQUIRED",
-    "PLAYLIST_DECISION_REQUIRED", "PRODUCT_IDENTITY_CONFIRMATION_REQUIRED",
-    "SELLING_POINTS_CONFIRMATION_REQUIRED", "SELLING_POINTS_GENERATION_CHOICE_REQUIRED",
-}
-_EXACT_INPUT_ERRORS = {"MATERIAL_READ_ROUTE_INVALID", "TOOL_ARGUMENTS_INVALID"}
-
-
-def _prior_tool_results(request, *, include_workflows=False):
-    """Use only the last tool batch in this graph's checkpoint."""
-    current_call = request.tool_call.get("id")
-    seen_current = False
-    for message in reversed((getattr(request, "state", None) or {}).get("messages") or []):
-        if isinstance(message, AIMessage):
-            if seen_current:
-                break
-            seen_current = any(call.get("id") == current_call for call in message.tool_calls)
-        elif seen_current and isinstance(message, ToolMessage):
-            if message.status != "error" and not (include_workflows and (message.name or "").startswith("wf_")):
-                continue
-            if not isinstance(message.content, str):
-                continue
-            try:
-                result = json.loads(message.content)
-            except ValueError:
-                continue
-            if isinstance(result, dict):
-                yield message, result
-
-
-def _step_recovery(call, error_code, count):
-    args = call.get("args")
-    args = args if isinstance(args, dict) else {}
-    action = args.get("action")
-    if not call["name"].startswith("wf_") or not isinstance(action, str):
-        action = None
-    strategy = ("choose_another_read_view" if error_code == "MATERIAL_READ_ROUTE_INVALID" else
-                "repair_arguments" if error_code == "TOOL_ARGUMENTS_INVALID" else "check_dependency_or_change_method")
-    recovery = {"tool": call["name"], "action": action, "reason_code": error_code, "strategy": strategy,
-                "attempt": count, "preserve_verified_steps": True}
-    if error_code in _EXACT_INPUT_ERRORS:
-        recovery["rejected_arguments_hash"] = canonical_hash(args)
-    return recovery
-
-
-def _recovery_message(request, value):
-    return ToolMessage(content=json.dumps(value, ensure_ascii=False), status="error",
-                       tool_call_id=request.tool_call.get("id", ""), name=request.tool_call.get("name"))
-
-
-def _validate_tool_arguments(request):
-    """Check our registered tool DTO before its handler can run."""
-    schema = getattr(getattr(request, "tool", None), "args_schema", None)
-    if "runtime" not in getattr(schema, "model_fields", {}):
-        return
-    try:
-        schema.model_validate({**request.tool_call["args"], "runtime": request.runtime})
-    except ValidationError as error:
-        if any(issue["loc"][:1] == ("runtime",) for issue in error.errors(include_input=False)):
-            raise
-        raise tool_argument_error(request.tool_call["name"], error) from None
-
-
-def _same_turn_calls(request):
+def _sibling_read_calls(request) -> list[str]:
+    """Read tools sent in the same model turn as this tool call."""
     state = getattr(request, "state", None) or {}
     call_id = request.tool_call.get("id")
     for message in reversed(state.get("messages") or []):
         calls = getattr(message, "tool_calls", None) or []
         if any(call.get("id") == call_id for call in calls):
-            return calls
+            return sorted({call["name"] for call in calls if call.get("name") in READ_TOOLS})
     return []
 
 
@@ -234,7 +170,7 @@ def trusted_context_text(projection):
 # request, refs). "split" placement sends them inside the cached system prefix
 # and only the changing remainder as the tail message.
 STABLE_CONTEXT_KEYS = frozenset({"phase", "role", "original_user_request", "scope", "room_id", "goal", "selection",
-    "observed_versions", "allowed_effects", "material_refs", "constraints", "inherited_context",
+    "selection_binding", "observed_versions", "allowed_effects", "material_refs", "constraints", "inherited_context",
     "assignment", "original_goal", "source_refs"})
 
 
@@ -394,15 +330,19 @@ class ToolPolicy(_Boundary):
         tools = sorted(set((entry or {}).get("public_tools", []) + (entry or {}).get("workflows", [])) & allowed)
         if not tools:
             return None
-        if self.engine.store.claim_tool_correction(scope.run_id, "COMMAND_ID_AS_TOOL", 1) is None:
+        run = self.engine.store.get("run", scope.run_id)
+        counters = dict(run.get("correctable_tool_errors") or {})
+        if counters.get("COMMAND_ID_AS_TOOL", 0) >= 1:
             return None
+        counters["COMMAND_ID_AS_TOOL"] = 1
+        await _await(self.engine.store.update("run", scope.run_id, correctable_tool_errors=counters))
         self._event(scope, "correctable_tool_input", "CORRECTING", reason_code="COMMAND_ID_AS_TOOL",
                     tool_name=name, suggested_tools=tools, correction_count=1)
         value = {"status": "error", "error": {"code": "COMMAND_ID_AS_TOOL", "tool": name, "use_tools": tools},
                  "corrective_hint": f"{name}是业务命令ID，不是可调用的工具，本次没有执行任何动作。请改用use_tools中的工具并按其参数重新调用；不要扩大Goal。只有这一次修正机会。",
-                 "correction_count": 1, "correction_limit": 1,
-                 "step_recovery": _step_recovery(request.tool_call, "COMMAND_ID_AS_TOOL", 1)}
-        return _recovery_message(request, value)
+                 "correction_count": 1, "correction_limit": 1}
+        return ToolMessage(content=json.dumps(value, ensure_ascii=False), status="error",
+                           tool_call_id=request.tool_call.get("id", ""), name=name)
 
 
 def _product_save_correction_details(engine, scope, request, error):
@@ -490,12 +430,11 @@ def _script_plan_base_correction_details(engine, scope, request, error):
         if getattr(error, "known_operation_id", None) != expected_op:
             return None
         op = engine.store.get("operation", expected_op)
-        supplied_hash = canonical_hash(supplied)
         if (op.get("run_id") != scope.run_id or op.get("key") != "save_script_plan"
                 or op.get("status") != "known_failed" or op.get("error_code") != error.code
                 or op.get("request_hash") != canonical_hash(op.get("args"))
-                or op.get("submitted_plan_hash", op.get("request_hash")) != supplied_hash
-                or getattr(error, "known_operation_input_hash", None) != supplied_hash):
+                or canonical_hash(op.get("args")) != canonical_hash(supplied)
+                or getattr(error, "known_operation_input_hash", None) != canonical_hash(supplied)):
             return None
         if (details.preparation_ref.id != supplied["preparation_id"]
                 or details.preparation_ref.revision != supplied["expected_revision"]
@@ -503,7 +442,7 @@ def _script_plan_base_correction_details(engine, scope, request, error):
                 or details.item_index >= len(supplied["items"])):
             return None
         item = supplied["items"][details.item_index]
-        if (item != op["args"]["items"][details.item_index] or item.get("base_script_ref") is not None
+        if (item.get("base_script_ref") is not None
                 or not same_ref(item["product_ref"], details.requested_product_ref.model_dump(mode="json"))
                 or item["variant_id"] != details.requested_variant_id
                 or item["version_number"] != details.requested_version_number):
@@ -536,99 +475,13 @@ class ActionBoundary(_Boundary):
             self._event(scope, "action_locked", tool_name=name)
             return await self._invoke_correctable(scope, request, handler)
 
-    def _workflow_recovery(self, scope, message, result):
-        if (message.status == "error" or result.get("status") != "NEEDS_REPLAN"
-                or not message.name or not message.name.startswith("wf_")
-                or result.get("workflow") != message.name or not isinstance(result.get("flow_id"), str)):
-            return None
-        flow = self.engine.store.get("workflow", result["flow_id"], required=False)
-        if (not flow or flow.get("run_id") != scope.run_id or flow.get("status") != "NEEDS_REPLAN"
-                or flow.get("workflow") != message.name
-                or not flow.get("evidence_ref") or flow["evidence_ref"] != result.get("evidence_ref")):
-            return None
-        return {
-            "error": {"code": "WORKFLOW_NEEDS_REPLAN",
-                      "details": {key: result.get(key, []) for key in
-                                  ("blockers", "completed_steps", "committed_refs", "remaining_steps")}},
-            "corrective_hint": "依据 blockers 和 remaining_steps 选择下一项受控操作。保留 completed_steps 和 committed_refs。"
-                               "如果已有任务或回执，先读取该任务状态，并按失败项处理。",
-            "step_recovery": _step_recovery({"name": message.name}, "WORKFLOW_NEEDS_REPLAN", 1),
-        }
-
-    def _recovery_before_tool(self, scope, request, args, prior):
-        name = request.tool_call["name"]
-        errors = [result for message, result in prior
-                  if message.status == "error" and isinstance(result.get("step_recovery"), dict)]
-        if name == "finish_turn" and args.get("outcome") == "BLOCKED" and not any(
-                call.get("name") == "request_user_decision" for call in _same_turn_calls(request)):
-            workflow_recoveries = [self._workflow_recovery(scope, message, result) for message, result in prior]
-            for result in errors + [item for item in workflow_recoveries if item]:
-                step = result["step_recovery"]
-                if step["reason_code"] in _REQUIRES_USER or step["attempt"] != 1 or step.get("alternative_already_attempted"):
-                    continue
-                key = ":".join(("STEP_RECOVERY_BEFORE_BLOCK", scope.phase, step["tool"],
-                                step.get("action") or "", step["reason_code"]))
-                if self.engine.store.claim_tool_correction(scope.run_id, key, 1) is None:
-                    continue
-                self._event(scope, "step_recovery_before_block", "CORRECTING",
-                            tool_name=step["tool"], reason_code=step["reason_code"])
-                return _recovery_message(request, {
-                    "accepted": False, "error": result["error"], "step_recovery": step,
-                    "corrective_hint": ("尚有一次有针对性的恢复机会。保留已核实结果，先尝试上一条错误建议中的"
-                                        "替代读取、修正参数或补齐依赖，再核验结果。确实需要用户提供事实或授权时，"
-                                        "直接发起具体询问。上一条建议：" + result["corrective_hint"]),
-                })
-        for result in errors:
-            step = result["step_recovery"]
-            if (step["tool"] != name or "rejected_arguments_hash" not in step
-                    or step["rejected_arguments_hash"] != canonical_hash(args)):
-                continue
-            key = ":".join(("STEP_RECOVERY_DUPLICATE", scope.branch_task_id or scope.phase, name, step["reason_code"]))
-            if self.engine.store.claim_tool_correction(scope.run_id, key, 1) is None:
-                run = self.engine.store.get("run", scope.run_id)
-                if run.get("pending_unknown_operation"):
-                    return None
-                raise ContractError(step["reason_code"], "同一无效调用重复提交，必须改用有效的读取路径或工具参数。", status=422)
-            self._event(scope, "step_recovery_duplicate", "CORRECTING", tool_name=name, reason_code=step["reason_code"])
-            return _recovery_message(request, {**result,
-                "step_recovery": {**step, "attempt": 2},
-                "corrective_hint": "完全相同的无效参数已跳过。请改变做法。上一次反馈：" + result["corrective_hint"],
-            })
-        return None
-
     async def _invoke_correctable(self, scope, request, handler):
-        name = request.tool_call["name"]
-        args = request.tool_call.get("args")
-        args = args if isinstance(args, dict) else {}
-        blocking = name == "finish_turn" and args.get("outcome") == "BLOCKED"
-        prior = list(_prior_tool_results(request, include_workflows=blocking))
-        early = self._recovery_before_tool(scope, request, args, prior)
-        if early is not None:
-            return early
         try:
-            selling_review = (name == "wf_selling_points" and args.get("action") == "propose"
-                or name == "request_user_decision" and args.get("kind") == "selling_points_confirmation")
-            if selling_review and len(_same_turn_calls(request)) > 1:
-                from .selling_points import automatic_writeback_requested, explicit_generation_refs
-                run = self.engine.store.get("run", scope.run_id)
-                if explicit_generation_refs(run) and not automatic_writeback_requested(run):
-                    raise ContractError("SELLING_POINTS_INPUT_INVALID", "请单独提交一款的卖点候选，确认完再提交下一款。",
-                        status=422, details={"commit_state": "not_committed", "tool": name})
-            dispatch = args if name == "dispatch_analysis_batch" else {}
-            if name == "wf_analysis_coordination" and args.get("action") == "dispatch":
-                parameters = args.get("parameters")
-                dispatch = parameters if isinstance(parameters, dict) else {}
-            combined = (dispatch.get("wait_for_results") is True or dispatch.get("assessment") is not None
-                        or name == "wf_script_execution" and args.get("action") == "plan_execute_wait")
-            if combined and len(_same_turn_calls(request)) > 1:
-                raise ContractError("WAIT_DEPENDENCIES_INVALID", "会登记后台等待的合并入口请单独调用；需并行处理时，请分开提交计划、派发与等待。",
-                    status=422, details={"commit_state": "not_committed", "tool": name})
             if (scope.phase == "execute" and scope.role == "main"
                     and request.tool_call.get("name") == "save_task_assessment"):
                 current = self.engine.store.get("run", scope.run_id)
                 reads = [] if current.get("task_assessment") or (current.get("correctable_tool_errors") or {}).get(
-                    "PLAN_BEFORE_READ") else sorted({call["name"] for call in _same_turn_calls(request)
-                                                   if call.get("name") in READ_TOOLS})
+                    "PLAN_BEFORE_READ") else _sibling_read_calls(request)
                 if reads:
                     # Read before plan: the first execute plan sent in parallel with
                     # reads is returned once, unsaved; a second attempt goes through.
@@ -648,7 +501,6 @@ class ActionBoundary(_Boundary):
                         if all(item["type"] == "literal_error" for item in error.errors()):
                             raise ContractError("INVALID_EFFECT_ENUM", "proposed_effects只能填写枚举中的业务命令ID，不能填写自然语言计划", status=422,
                                 details={"field": "assessment.proposed_effects", "allowed_values": list(BUSINESS_EFFECT_IDS)}) from None
-            _validate_tool_arguments(request)
             return await handler(request)
         except ContractError as error:
             # Only explicit known input/dependency failures can become model-
@@ -670,21 +522,12 @@ class ActionBoundary(_Boundary):
                 # A resolvable read dependency is not a general permission or
                 # write failure. Genuine 403s and unknown sends still stop.
                 raise
-            tool_call = request.tool_call
-            session_settings = (tool_call.get("name") == "wf_context_bundle"
-                and (tool_call.get("args") or {}).get("action") == "apply_session_settings")
-            session_write = tool_call.get("name") == "save_session_draft" or session_settings
             if error.code == "PREPARATION_PRODUCTS_NOT_SELECTED" and (
                     error.status != 409 or scope.role != "main" or scope.phase != "execute"
-                    or not session_write
+                    or request.tool_call.get("name") != "save_session_draft"
                     or error.details.get("commit_state") != "not_committed"):
                 # Only the explicit, side-effect-free Voice dependency
                 # contract is recoverable; a generic VOICE_REJECTED is not.
-                raise
-            if error.code == "INVALID_CAMPAIGN_EXPIRY" and (
-                    error.status != 422 or scope.role != "main" or scope.phase != "execute"
-                    or not session_write
-                    or error.details.get("field") != "/draft/campaign_ends_at"):
                 raise
             if error.code == "PATCH_SCOPE_COLLAPSE_REQUIRES_EXPLICIT_INTENT" and (
                     error.status != 422 or scope.role != "main" or scope.phase != "execute"
@@ -706,22 +549,19 @@ class ActionBoundary(_Boundary):
                 if details is None:
                     raise
                 error = ContractError(error.code, "局改计划未提交：显式复用模块需要其所属整版基稿", status=422, details=details)
-            counter_key = error.code
-            if error.code in _EXACT_INPUT_ERRORS or scope.branch_task_id:
-                counter_key = ":".join((error.code, scope.branch_task_id or scope.phase, tool_call["name"]))
+            counters = dict(run.get("correctable_tool_errors") or {})
+            count = int(counters.get(error.code, 0))
             limit = _CORRECTION_LIMITS.get(error.code, 3)
-            count = self.engine.store.claim_tool_correction(scope.run_id, counter_key, limit)
-            if count is None:
-                self._event(scope, "correctable_tool_limit", "DENIED", tail=True, reason_code=error.code)
+            if count >= limit:
+                self._event(scope, "correctable_tool_limit", "DENIED", tail=True, reason_code=error.code, correction_count=count)
                 raise
-            hint = ("请按 details.issues 中的字段路径、类型和合法值修正同一工具调用。原调用未执行，保留已确认的对象和范围。" if error.code == "TOOL_ARGUMENTS_INVALID" else
-                    "草案未保存。仅把 draft.campaign_ends_at 修正为来源明确且含时区的日期时间。资料没有给出时留空，不能推测日期或时区。" if error.code == "INVALID_CAMPAIGN_EXPIRY" else
-                    "计划未保存。capabilities只能逐项使用details.allowed_values中的工具ID或分析角色ID；details.invalid_capabilities是业务命令ID或尚不可用的名称，删除或换成对应的可用工具ID，自然语言步骤写入steps。只有这一次修正机会，不要扩大Goal。" if error.code == "PLAN_CAPABILITY_DENIED" else
+            counters[error.code] = count + 1
+            await _await(self.engine.store.update("run", scope.run_id, correctable_tool_errors=counters))
+            hint = ("计划未保存。capabilities只能逐项使用details.allowed_values中的工具ID或分析角色ID；details.invalid_capabilities是业务命令ID或尚不可用的名称，删除或换成对应的可用工具ID，自然语言步骤写入steps。只有这一次修正机会，不要扩大Goal。" if error.code == "PLAN_CAPABILITY_DENIED" else
                     "首份执行计划未保存，同轮读取照常执行。先查看details.parallel_reads的读取结果，再依据结果单独提交save_task_assessment；不要在同一轮再并行读取与提交计划。" if error.code == "PLAN_BEFORE_READ" else
                     "本次整模块修改未提交，原稿完整保留。若只改一句，按details.reader读取精确原句，用对应single_sentence_edit_targets的sentence_ids和selected_text_hash替换；多个句子须连续并使用其实际原句数组hash。确实有意大幅替换完整模块时才显式intentional_full_module_replacement=true并保留整模块hash；该声明不增加商品/模块/UI选区权限，不构成人工批准。" if error.code == "PATCH_SCOPE_COLLAPSE_REQUIRES_EXPLICIT_INTENT" else
                     "本次动作未提交。保留冻结Goal的指定研究精确refs，使用read_context受控核验后，通过wf_context_bundle(action=save,analysis_refs=[指定refs])或原save_context_bundle绑定完整正文，再基于新context保存计划。复用不等于重做，不能仅在user_decisions写ID、换用其他研究、扩大权限或重试未知付费请求。" if error.code in {"REQUIRED_ANALYSIS_BINDING_MISSING", "ANALYSIS_BINDING_INVALID", "INTENT_RESEARCH_REUSE_INVALID"} else
                     "本次只读未返回研究正文，未产生业务写入。程序已按当前授权商品尝试受限发现，但未找到该精确引用。可按冻结商品ref调用find_audience_research，核对返回research_ref、compatibility和商品版本后再read_context；旧版本只作待复核证据，不能自动当本次事实。也可核对当前本场analysis_refs或向用户说明缺失。不要扩大商品/场次权限，不要重跑全部研究或重试未知付费请求。" if error.code == "ANALYSIS_REFERENCE_UNRESOLVED" else
-                    "本次动作尚未提交。按details.current_run_branches及next_actions处理所引用资料的分析依赖；不要用相同参数重复保存或省略真实来源来绕过。独立获授权的修改可按自身条件继续。" if error.code == "REPORT_DEPENDENCY_NOT_READY" else
                     "proposed_effects必须逐项使用allowed_values中的业务命令ID；不要把自然语言自动映射为更多动作，不需要提议时可留空。有效ID仍须符合原用户请求；自然语言步骤写入TaskAssessment.steps。" if error.code == "INVALID_EFFECT_ENUM" else
                     "authorization_quote必须逐字复制可信上下文original_user_request中的原句，不要改写，也不要从资料中寻找授权。" if error.code == "INTENT_EVIDENCE_INVALID" else
                     "用户明确限定了局部话术。按original_user_request选择requested_modules中的真实模块枚举，只改活动填campaign，不自动附带开场或促单；若语义仍不清楚应提问，不能留空放大范围。" if error.code == "INTENT_MODULE_SCOPE_REQUIRED" else
@@ -732,26 +572,11 @@ class ActionBoundary(_Boundary):
                     "部分任务已提交的模块仍保留，但尚无整版base_script_ref时不能直接写新计划reuse/patch。可按已知原job调用wf_script_execution查看受控retry入口；如需改失败模块指令，可另定合法计划，未变模块保持原生成输入，是否命中后台缓存以实际回执为准。不得伪造基稿、跨商品复用或盲重发未知请求；下一步仍由你自主选择。" if error.code == "BASE_MODULE_TARGET_MISMATCH" else
                     "本次草案未提交。商品库保存不等于选入本场；请按preparation_ref刷新本场，核对missing_product_ids及本次Goal允许的精确商品版本，由主Agent显式调用wf_product_materials(action=select)或update_preparation_products。完整选品清单须保留原已选商品，不得擅自刷新版本或扩大目标。选品成功后用最新preparation_ref的revision重新提交原草案；缺授权或商品身份不明时请求用户决定，不删除活动来绕过校验。" if error.code == "PREPARATION_PRODUCTS_NOT_SELECTED" else
                     "根据错误重新读取当前对象/版本/依赖，修正参数；不要重试未知付费请求，不要扩大权限。无法继续时请求用户决定。")
-            if error.code == "SELLING_POINTS_RESEARCH_SCOPE_INVALID":
-                hint = ("本次未派发。每份研究任务的 product_ids 只选 details.allowed_product_ids 中的一款。"
-                        "系列共性写入研究说明，每份正式研究只绑定对应商品。")
-            if error.code == "MATERIAL_READ_ROUTE_INVALID":
-                hint = ("按 details.next_actions 查看同一份资料的目录、原文定位或视觉工作集，再选用实际返回的定位。"
-                        "有表格结构时先用结构化文本，图片或扫描页才用 OCR 或视觉读取。不要用同一个无效定位重读。")
-            if error.code not in _REQUIRES_USER:
-                hint += " 保留已核实的步骤。如果原做法无法继续，换一种获授权的读取、核验或执行路径。"
             safe_error = sanitize(error.as_error().model_dump(mode="json"))
             self._event(scope, "correctable_tool_input", "CORRECTING", reason_code=error.code,
-                        correction_count=count, error=safe_error, tool_name=tool_call["name"])
-            step = _step_recovery(tool_call, error.code, count)
-            for message, result in prior:
-                previous = result.get("step_recovery")
-                if (message.status == "error" and isinstance(previous, dict)
-                        and (previous.get("tool"), previous.get("action")) == (step["tool"], step["action"])):
-                    step["alternative_already_attempted"] = True
-                    break
+                        correction_count=count + 1, error=safe_error)
             value = {"status": "error", "error": safe_error, "corrective_hint": hint,
-                     "correction_count": count, "correction_limit": limit, "step_recovery": step}
+                     "correction_count": count + 1, "correction_limit": limit}
             if error.code == "ANALYSIS_REFERENCE_UNRESOLVED":
                 value["recovery"] = {"read_state": "not_read", "business_write_performed": False,
                     "explicit_model_action_required": True, "preserve_product_and_preparation_fences": True}
@@ -783,16 +608,14 @@ class ActionBoundary(_Boundary):
                     "resubmit": {"tool": "save_product", "requires_complete_fields": True,
                                  "preserve_goal_and_cas": True, "explicit_model_action_required": True}}
             if error.code == "PREPARATION_PRODUCTS_NOT_SELECTED":
-                retry_tool = ({"tool": "wf_context_bundle", "action": "apply_session_settings",
-                               "preserve_session_updates": True} if session_settings else
-                              {"tool": "save_session_draft", "use_latest_revision": True,
-                               "preserve_original_draft": True})
                 value["recovery"] = {"commit_state": "not_committed", "automatic_action_taken": False,
                     "preparation_ref": safe_error.get("details", {}).get("preparation_ref"),
                     "next_actions": [safe_error.get("details", {}).get("refresh_query"),
                                      safe_error.get("details", {}).get("required_action")],
-                    "retry_after_selection": retry_tool}
-            return _recovery_message(request, value)
+                    "retry_after_selection": {"tool": "save_session_draft", "use_latest_revision": True,
+                                              "preserve_original_draft": True}}
+            return ToolMessage(content=json.dumps(value, ensure_ascii=False),
+                               status="error", tool_call_id=request.tool_call.get("id", ""), name=request.tool_call.get("name"))
 
 
 class Budget(_Boundary):
@@ -930,10 +753,7 @@ class BranchCompletionGuard(_Boundary):
             raise ContractError("BRANCH_REPORT_MISSING", "子任务没有提交结构化候选报告")
         await _await(self.engine.store.update("branch", scope.branch_task_id, guard_retries=count + 1))
         self._event(scope, "after_model", "CORRECTING", correction=count + 1)
-        correction = ("请保留已经核实的证据。若前序工具返回可修复错误，按其反馈换获授权的工具或读法，"
-                      "补齐失败步骤后再调用本角色的submit_*_report提交结构化报告。"
-                      "如果原始信息确实缺失，在报告中列出具体缺项。普通文字说明不会保存报告。")
-        return {"messages": [HumanMessage(content=correction)], "jump_to": "model"}
+        return {"messages": [HumanMessage(content="请调用本角色的submit_*_report工具提交完整结构化报告。普通文字说明不等于报告已经持久化。")], "jump_to": "model"}
 
 
 class Audit(_Boundary):
@@ -948,11 +768,8 @@ class Audit(_Boundary):
     def _tail(self, scope, kind, status, result, parent_event_id, elapsed, **data):
         try:
             ref = self.engine.trace.payload(scope.run_id, _public(result))
-            suffix = {"SUCCEEDED": "completed", "INTERRUPTED": "interrupted", "FAILED": "failed"}[status]
-            title = "模型" if kind == "model" else "工具"
-            title += "已暂停" if status == "INTERRUPTED" else "返回"
-            self.engine.trace.try_emit(scope.run_id, f"{kind}.{suffix}",
-                                       {"title": title, "status": status, "payload_ref": ref,
+            self.engine.trace.try_emit(scope.run_id, kind + (".completed" if status == "SUCCEEDED" else ".failed"),
+                                       {"title": "模型返回" if kind == "model" else "工具返回", "status": status, "payload_ref": ref,
                                         "result_preview": _preview(result), "duration_ms": round(elapsed * 1000), **data},
                                        invocation_id=scope.invocation_id, branch_task_id=scope.branch_task_id,
                                        parent_event_id=parent_event_id)
@@ -976,7 +793,7 @@ class Audit(_Boundary):
         try:
             result = await handler(request)
         except BaseException as error:
-            self._tail(scope, "model", "INTERRUPTED" if isinstance(error, GraphInterrupt) else "FAILED",
+            self._tail(scope, "model", "INTERRUPTED" if type(error).__name__ == "GraphInterrupt" else "FAILED",
                        {"error_type": type(error).__name__, "reason_code": getattr(error, "code", None)}, parent, time.monotonic() - started)
             raise
         self._tail(scope, "model", "SUCCEEDED", result, parent, time.monotonic() - started)
@@ -992,7 +809,7 @@ class Audit(_Boundary):
         try:
             result = await handler(request)
         except BaseException as error:
-            self._tail(scope, "tool", "INTERRUPTED" if isinstance(error, GraphInterrupt) else "FAILED",
+            self._tail(scope, "tool", "INTERRUPTED" if type(error).__name__ == "GraphInterrupt" else "FAILED",
                        {"error_type": type(error).__name__, "reason_code": getattr(error, "code", None)}, parent, time.monotonic() - started, tool_name=name)
             raise
         if name == "read_file" and hasattr(self.engine, "record_skill_read"):
