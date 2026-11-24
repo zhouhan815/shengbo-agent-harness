@@ -4,6 +4,12 @@
 
 声播面向电商直播运营和主播。开播前，他们要从规格表、商品文档和活动说明中确认每款商品的卖点、价格与优惠，再写话术、排播并准备语音。资料往往分散在几份文档里，一次改价或换款就可能牵动多个环节。声播把这些工作放进一个本地工作台，让运营在右侧交代任务，在左侧核对并编辑实际保存的商品、本场配置和话术。
 
+[看工作台演示](#工作台演示) · [查看实现](#从哪里看实现)
+
+## 工作台演示
+
+![声播播前工作台实测截图。左侧打开已保存的商品资料，右侧显示入库结果及新直播间入口。](media/portfolio-workbench.png)
+
 ## 我如何定义这个产品
 
 我把播前准备拆成三个可以分别管理的业务对象。
@@ -61,8 +67,8 @@ flowchart TD
 
 ## 从哪里看实现
 
-- **交互与业务服务** · [工作台入口](voice/web/agent-workbench.js) · [业务保存与作业](voice/app/prelive/service.py) · [本地使用说明](voice/README.md)
-- **Agent 与 Harness** · [运行器](agent/src/shengbo_prelive/runtime.py) · [商品导入](agent/src/shengbo_prelive/catalog_intake.py) · [播前工作流](agent/src/shengbo_prelive/workflows.py) · [工具与数据契约](agent/src/shengbo_contracts/) · [角色 Skills](agent/skills/)
+- **交互与业务服务** · [工作台前端源码](voice/web/agent-workbench.js) · [业务保存与作业](voice/app/prelive/service.py) · [本地使用说明](voice/README.md)
+- **Agent 与 Harness** · [运行器](agent/src/shengbo_prelive/runtime.py) · [商品资料保存](agent/src/shengbo_prelive/product_materials.py) · [播前工作流](agent/src/shengbo_prelive/workflows.py) · [工具与数据契约](agent/src/shengbo_contracts/) · [角色 Skills](agent/skills/)
 - **产品与工程设计** · [设计文档索引](design/README_当前设计入口.md)
 
 这是以播前准备为重点的本地作品集项目。语音准备、人工采用和播出控制台承接已审阅内容，开播由运营人员发起。
