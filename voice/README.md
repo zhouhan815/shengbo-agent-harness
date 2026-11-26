@@ -56,7 +56,7 @@ Set-Location -LiteralPath 'D:\Codex project\ecommerce-voice-agent'
 
 ## 文档与验证
 
-- [抖音接入调试与实测](#抖音接入调试-v182026-10-15) · 接入步骤、事件范围和实测记录。
+- [抖音声音接入、弹幕真实验证与融合方案（2026-10-15）](github-research-output/douyin-io-20261015/phase6_blueprint/final_report.md)：公开房间45秒收到29条评论；包含OBS/虚拟音频线方案及后续生产接入契约。
 - [评论测试台与本地持久化 v1.5](docs/评论测试台与本地持久化_v1.5.md)（最新功能、保存范围、接口和验证记录）
 - [直播间配置与预生成语音修复](docs/直播间配置与预生成语音修复_v1.2.md)（当前 UI 与开播流程）
 - [话术提示词优化与量化评测](docs/话术提示词优化与量化评测报告_v1.3.md)（原提示词、多轮实验与限制）
@@ -75,7 +75,7 @@ Set-Location -LiteralPath 'D:\Codex project\ecommerce-voice-agent'
 
 ## 商品与直播间配置 v1.6（2026-10-15）
 
-直播运营需要分别维护商品资料、全场优惠与单商品活动规则。下面是声播对应的配置项。
+依据[客户端/网页端功能优化版本1.2 PRD](https://fancyjing.feishu.cn/wiki/JFpDwKI1qiXnadkvZQscYO0rn2b)的商品、总直播间、单商品直播间配置项适配声播。读取的文档 revision_id 为 402；原始资料保存在本机 `runtime/prd-reference-20261015/source.json`，不上传公共仓库。
 
 **归属：商品库统一保存长期商品事实，直播间以 `product_ids` 引用商品，`commerce.product_overrides[product_id]` 只保存本场覆写。** 脚本的 `product_snapshot` 是已有的历史生成依据，不是直播间内另建商品库。
 
